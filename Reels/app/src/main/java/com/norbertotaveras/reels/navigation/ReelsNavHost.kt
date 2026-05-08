@@ -11,7 +11,7 @@ import com.norbertotaveras.reels.features.movies.details.MovieDetailsRoute
 import com.norbertotaveras.reels.features.movies.list.MoviesListRoute
 
 @Composable
-fun CinematicsNavHost(modifier: Modifier = Modifier) {
+fun ReelsNavHost(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
 
     NavHost(

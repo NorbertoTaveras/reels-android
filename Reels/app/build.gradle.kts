@@ -98,16 +98,25 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.paging.compose)
+    implementation(libs.hilt.navigation.compose)
 
     // core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
+    // material icons
+    implementation(libs.androidx.compose.material.icons.core.android)
+    implementation(libs.androidx.compose.material.icons.extended.android)
+    implementation(libs.androidx.compose.material.icons.extended)
+
     // hilt
     implementation(libs.hilt.android)
-    implementation(libs.paging.compose)
     ksp(libs.hilt.compiler)
-    implementation(libs.hilt.navigation.compose)
+
+    // paging
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
 
     // retrofit
     implementation(libs.com.squareup.retrofit2.retrofit)

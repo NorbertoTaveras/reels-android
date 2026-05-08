@@ -6,9 +6,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.norbertotaveras.reels.navigation.CinematicsNavHost
+import com.norbertotaveras.reels.navigation.ReelsNavHost
 import com.norbertotaveras.reels.ui.theme.ReelsTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -19,8 +20,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ReelsTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    CinematicsNavHost(modifier = Modifier.padding(innerPadding))
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    containerColor = MaterialTheme.colorScheme.background
+                ) { innerPadding ->
+                    ReelsNavHost(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
