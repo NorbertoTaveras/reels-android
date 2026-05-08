@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import com.norbertotaveras.reels.ui.theme.ReelsSpacing
 
 @Composable
 fun CenteredErrorState(
@@ -23,7 +23,7 @@ fun CenteredErrorState(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(ReelsSpacing.xLarge),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -33,7 +33,7 @@ fun CenteredErrorState(
             textAlign = TextAlign.Center
         )
         Button(
-            modifier = Modifier.padding(top = 16.dp),
+            modifier = Modifier.padding(top = ReelsSpacing.large),
             onClick = onRetry
         ) {
             Text(text = retryLabel)
