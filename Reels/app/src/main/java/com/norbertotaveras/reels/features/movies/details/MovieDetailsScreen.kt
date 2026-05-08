@@ -47,72 +47,28 @@ fun MovieDetailsScreen(
 
         state.movie != null -> {
             val movie = checkNotNull(state.movie)
-            LazyColumn(
-                modifier = modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                item {
-                    Button(onClick = onBackClick) {
-                        Text(text = "Back")
-                    }
-                }
-
-                item {
-                    AsyncImage(
-                        model = (movie.backdropPath ?: movie.posterPath).toTmdbImageUrl(),
-                        contentDescription = movie.title,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(220.dp)
-                            .clip(RoundedCornerShape(24.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-
-                item {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            text = movie.title,
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = buildString {
-                                append(movie.releaseDate ?: "Unknown release")
-                                append(" • ")
-                                append(String.format("%.1f", movie.voteAverage))
-                                movie.runtime?.let {
-                                    append(" • ")
-                                    append("$it min")
-                                }
-                            },
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-
-                if (movie.genres.isNotEmpty()) {
-                    item {
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            movie.genres.take(3).forEach { genre ->
-                                AssistChip(
-                                    onClick = {},
-                                    label = { Text(text = genre.name) }
-                                )
-                            }
-                        }
-                    }
-                }
-
-                item {
-                    Text(
-                        text = movie.overview.ifBlank { "No overview available yet." },
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-            }
+            MovieDetailsContent(
+                modifier = modifier,
+                title = movie.title,
+                backdropUrl = (movie.backdropPath ?: movie.posterPath).toTmdbImageUrl(),
+                posterUrl = movie.posterPath.toTmdbImageUrl(),
+                metadata = listOfNotNull(
+                    movie.releaseDate?.take(4),
+                    movie.runtime?.let { "$it min" }
+                ),
+                rating = String.format("%.1f", movie.voteAverage),
+                genres = movie.genres.map { it.name },
+                overview = movie.overview,
+                releaseDate = movie.releaseDate,
+                originalLanguage = null,
+                popularityLabel = null,
+                onBackClick = onBackClick,
+                onFavoriteClick = {},
+                onCastClick = {},
+                onCastSeeAllClick = {},
+                onTrailerClick = {},
+                onSimilarMovieClick = {}
+            )
         }
     }
 }
