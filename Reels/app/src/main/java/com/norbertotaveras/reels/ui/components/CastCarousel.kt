@@ -11,19 +11,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.norbertotaveras.reels.model.data.CastMemberDataModel
+import com.norbertotaveras.reels.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.ui.theme.ReelsTheme
 
-data class CastCarouselItem(
-    val id: Int,
-    val name: String,
-    val characterName: String,
-    val profileUrl: String?,
-)
-
 @Composable
 fun CastCarousel(
-    cast: List<CastCarouselItem>,
+    cast: List<CastMemberDataModel>,
     onCastClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     onSeeAllClick: (() -> Unit)? = null,
@@ -46,13 +41,13 @@ fun CastCarousel(
         ) {
             items(
                 items = cast,
-                key = { item -> item.id }
-            ) { item ->
+                key = { castMember -> castMember.id }
+            ) { castMember ->
                 CastCard(
-                    name = item.name,
-                    characterName = item.characterName,
-                    profileUrl = item.profileUrl,
-                    onClick = { onCastClick(item.id) }
+                    name = castMember.name,
+                    characterName = castMember.characterName,
+                    profileUrl = castMember.profilePath.toTmdbImageUrl(),
+                    onClick = { onCastClick(castMember.id) }
                 )
             }
         }
@@ -70,29 +65,29 @@ private fun CastCarouselPreview() {
         ) {
             CastCarousel(
                 cast = listOf(
-                    CastCarouselItem(
+                    CastMemberDataModel(
                         id = 1,
                         name = "Timothée Chalamet",
                         characterName = "Paul Atreides",
-                        profileUrl = null
+                        profilePath = null
                     ),
-                    CastCarouselItem(
+                    CastMemberDataModel(
                         id = 2,
                         name = "Zendaya",
                         characterName = "Chani",
-                        profileUrl = null
+                        profilePath = null
                     ),
-                    CastCarouselItem(
+                    CastMemberDataModel(
                         id = 3,
                         name = "Rebecca Ferguson",
                         characterName = "Lady Jessica",
-                        profileUrl = null
+                        profilePath = null
                     ),
-                    CastCarouselItem(
+                    CastMemberDataModel(
                         id = 4,
                         name = "Josh Brolin",
                         characterName = "Gurney Halleck",
-                        profileUrl = null
+                        profilePath = null
                     )
                 ),
                 onCastClick = {},

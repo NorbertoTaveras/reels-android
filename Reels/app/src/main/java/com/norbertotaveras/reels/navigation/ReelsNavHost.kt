@@ -7,6 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.norbertotaveras.reels.features.cast.details.CastDetailsRoute
+import com.norbertotaveras.reels.features.cast.details.CastDetailsScreen
 import com.norbertotaveras.reels.features.movies.details.MovieDetailsRoute
 import com.norbertotaveras.reels.features.movies.list.MoviesListRoute
 
@@ -16,26 +18,51 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
 
     NavHost(
         navController = navController,
-        startDestination = CinematicsDestinations.MOVIES,
+        startDestination = ReelsDestinations.MOVIES,
         modifier = modifier
     ) {
-        composable(CinematicsDestinations.MOVIES) {
+        composable(ReelsDestinations.MOVIES) {
             MoviesListRoute(
                 onMovieClick = { movieId ->
-                    navController.navigate(CinematicsDestinations.movieDetailsRoute(movieId))
+                    navController.navigate(ReelsDestinations.movieDetailsRoute(movieId))
                 }
             )
         }
 
         composable(
-            route = CinematicsDestinations.MOVIE_DETAILS_ROUTE,
+            route = ReelsDestinations.MOVIE_DETAILS_ROUTE,
             arguments = listOf(
-                navArgument(CinematicsDestinations.MOVIE_ID_ARG) {
+                navArgument(ReelsDestinations.MOVIE_ID_ARG) {
                     type = NavType.IntType
                 }
             )
         ) {
-            MovieDetailsRoute(onBackClick = navController::navigateUp)
+            MovieDetailsRoute(
+                onBackClick = navController::navigateUp,
+                onCastClick = { personId ->
+                    navController.navigate(ReelsDestinations.castDetailsRoute(personId))
+                }
+            )
+        }
+
+        composable(
+            route = ReelsDestinations.CAST_DETAILS_ROUTE,
+            arguments = listOf(
+                navArgument(ReelsDestinations.PERSON_ID_ARG) {
+                    type = NavType.IntType
+                }
+            )
+        ) { backStackEntry ->
+            val personId = checkNotNull(
+                backStackEntry.arguments?.getInt(ReelsDestinations.PERSON_ID_ARG)
+            )
+
+            CastDetailsRoute(
+                onBackClick = navController::navigateUp,
+                onMovieClick = { movieId ->
+                    navController.navigate(ReelsDestinations.movieDetailsRoute(movieId))
+                }
+            )
         }
     }
 }

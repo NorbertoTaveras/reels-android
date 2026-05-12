@@ -10,6 +10,7 @@ object ReelsSpacing {
     val xLarge = 24.dp
     val xxLarge = 32.dp
     val screenHorizontal = 20.dp
+    val section = 28.dp
 }
 
 object ReelsRatios {
