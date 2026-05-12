@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.norbertotaveras.reels.model.data.CastMemberDataModel
 import com.norbertotaveras.reels.ui.components.CastCarousel
 import com.norbertotaveras.reels.ui.components.CastCarouselItem
 import com.norbertotaveras.reels.ui.components.MovieHeroHeader
@@ -60,7 +61,7 @@ fun MovieDetailsContent(
     modifier: Modifier = Modifier,
     isFavorite: Boolean = false,
     isFavoriteLoading: Boolean = false,
-    cast: List<CastCarouselItem> = emptyList(),
+    cast: List<CastMemberDataModel> = emptyList(),
     trailers: List<TrailerCarouselItem> = emptyList(),
     similarMovies: List<PosterCarouselItem> = emptyList(),
     onBackClick: () -> Unit,
@@ -270,29 +271,29 @@ private fun MovieInfoIcon(
 
 
 private val previewCast = listOf(
-    CastCarouselItem(
+    CastMemberDataModel(
         id = 1,
         name = "Timothée Chalamet",
         characterName = "Paul Atreides",
-        profileUrl = null
+        profilePath = null
     ),
-    CastCarouselItem(
+    CastMemberDataModel(
         id = 2,
         name = "Zendaya",
         characterName = "Chani",
-        profileUrl = null
+        profilePath = null
     ),
-    CastCarouselItem(
+    CastMemberDataModel(
         id = 3,
         name = "Rebecca Ferguson",
         characterName = "Lady Jessica",
-        profileUrl = null
+        profilePath = null
     ),
-    CastCarouselItem(
+    CastMemberDataModel(
         id = 4,
         name = "Josh Brolin",
         characterName = "Gurney Halleck",
-        profileUrl = null
+        profilePath = null
     )
 )
 

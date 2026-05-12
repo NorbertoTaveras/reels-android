@@ -28,6 +28,7 @@ import com.norbertotaveras.reels.ui.extensions.toTmdbImageUrl
 fun MovieDetailsScreen(
     state: MovieDetailsUiState,
     onBackClick: () -> Unit,
+    onCastClick: (Int) -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -62,9 +63,10 @@ fun MovieDetailsScreen(
                 releaseDate = movie.releaseDate,
                 originalLanguage = null,
                 popularityLabel = null,
+                cast = state.cast,
                 onBackClick = onBackClick,
                 onFavoriteClick = {},
-                onCastClick = {},
+                onCastClick = onCastClick,
                 onCastSeeAllClick = {},
                 onTrailerClick = {},
                 onSimilarMovieClick = {}

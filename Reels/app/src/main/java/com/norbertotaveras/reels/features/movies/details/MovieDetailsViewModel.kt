@@ -3,20 +3,22 @@ package com.norbertotaveras.reels.features.movies.details
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.norbertotaveras.reels.navigation.CinematicsDestinations
+import com.norbertotaveras.reels.navigation.ReelsDestinations
+import com.norbertotaveras.reels.usecases.GetMovieCreditsUseCase
 import com.norbertotaveras.reels.usecases.GetMovieDetailsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class MovieDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val getMovieDetailsUseCase: GetMovieDetailsUseCase
-) : ViewModel() {
+    private val getMovieDetailsUseCase: GetMovieDetailsUseCase,
+    private val getMovieCreditsUseCase: GetMovieCreditsUseCase,
+    ) : ViewModel() {
     val state = MovieDetailsUiState()
     private val movieId: Int = checkNotNull(
-        savedStateHandle.get<Int>(CinematicsDestinations.MOVIE_ID_ARG)
+        savedStateHandle.get<Int>(ReelsDestinations.MOVIE_ID_ARG)
     )
 
     init {
@@ -28,10 +30,13 @@ class MovieDetailsViewModel @Inject constructor(
             state.isLoading = true
             state.errorMessage = null
 
-            getMovieDetailsUseCase(movieId = movieId).fold(
+            val movieResult = getMovieDetailsUseCase(movieId = movieId)
+
+            movieResult.fold(
                 onSuccess = { movie ->
                     state.movie = movie
                     state.isLoading = false
+                    loadCredits()
                 },
                 onFailure = { error ->
                     state.errorMessage = error.localizedMessage ?: "Unable to load movie details."
@@ -40,4 +45,18 @@ class MovieDetailsViewModel @Inject constructor(
             )
         }
     }
+
+    private fun loadCredits() {
+        viewModelScope.launch {
+            getMovieCreditsUseCase(movieId = movieId).fold(
+                onSuccess = { credits ->
+                    state.cast = credits.cast.take(10)
+                },
+                onFailure = {
+                    state.cast = emptyList()
+                }
+            )
+        }
+    }
+
 }
