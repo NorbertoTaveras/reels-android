@@ -1,8 +1,11 @@
 package com.norbertotaveras.reels.model.dto
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import com.norbertotaveras.reels.model.data.MovieDetailsDataModel
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class MovieDetailsDto(
     @SerializedName("id")
     val id: Int,
@@ -22,7 +25,7 @@ data class MovieDetailsDto(
     val voteAverage: Double,
     @SerializedName("genres")
     val genres: List<GenreDto>,
-) {
+) : Parcelable{
     fun toMovieDetailsDataModel(): MovieDetailsDataModel {
         return MovieDetailsDataModel(
             id = id,

@@ -1,7 +1,10 @@
 package com.norbertotaveras.reels.network
 
+import com.norbertotaveras.reels.model.dto.MovieCreditsDto
 import com.norbertotaveras.reels.model.dto.MovieDetailsDto
 import com.norbertotaveras.reels.model.dto.MoviesResponseDto
+import com.norbertotaveras.reels.model.dto.PersonDetailsDto
+import com.norbertotaveras.reels.model.dto.PersonMovieCreditsDto
 import javax.inject.Inject
 
 class TMDBFwkRepositoryImpl @Inject constructor(
@@ -25,6 +28,36 @@ class TMDBFwkRepositoryImpl @Inject constructor(
     ): MovieDetailsDto {
         return service.getMovieDetails(
             movieId = movieId,
+            language = language
+        )
+    }
+
+    override suspend fun getMovieCredits(
+        movieId: Int,
+        language: String?
+    ): MovieCreditsDto {
+        return service.getMovieCredits(
+            movieId = movieId,
+            language = language
+        )
+    }
+
+    override suspend fun getPersonDetails(
+        personId: Int,
+        language: String?
+    ): PersonDetailsDto {
+        return service.getPersonDetails(
+            personId = personId,
+            language = language
+        )
+    }
+
+    override suspend fun getPersonMovieCredits(
+        personId: Int,
+        language: String?
+    ): PersonMovieCreditsDto {
+        return service.getPersonMovieCredits(
+            personId = personId,
             language = language
         )
     }
