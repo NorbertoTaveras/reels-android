@@ -112,7 +112,8 @@ fun CastDetailsContent(
             PersonalInfoSection(
                 birthday = birthday,
                 knownForDepartment = knownForDepartment,
-                alsoKnownAs = name
+                alsoKnownAs = name,
+                knownCreditsCount = knownFor.size
             )
         }
     }
@@ -438,6 +439,7 @@ private fun KnownForPreviewSection(
 private fun PersonalInfoSection(
     birthday: String?,
     knownForDepartment: String?,
+    knownCreditsCount: Int,
     alsoKnownAs: String?,
     modifier: Modifier = Modifier,
 ) {
@@ -472,15 +474,10 @@ private fun PersonalInfoSection(
 
                 PersonalInfoRow(
                     label = "Known Credits",
-                    value = "47"
+                    value = knownCreditsCount.toString()
                 )
 
                 PersonalInfoDivider()
-
-                PersonalInfoRow(
-                    label = "Known For",
-                    value = knownForDepartment ?: "Unknown"
-                )
 
                 if (!alsoKnownAs.isNullOrBlank()) {
                     PersonalInfoDivider()
