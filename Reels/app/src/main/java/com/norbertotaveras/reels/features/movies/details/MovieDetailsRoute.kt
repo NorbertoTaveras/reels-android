@@ -8,6 +8,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 fun MovieDetailsRoute(
     onBackClick: () -> Unit,
     onCastClick: (Int) -> Unit,
+    onTrailerClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MovieDetailsViewModel = hiltViewModel(),
 ) {
@@ -16,6 +17,7 @@ fun MovieDetailsRoute(
         state = viewModel.state,
         onBackClick = onBackClick,
         onCastClick = onCastClick,
+        onTrailerClick = onTrailerClick,
         onRetry = viewModel::loadMovie
     )
 }

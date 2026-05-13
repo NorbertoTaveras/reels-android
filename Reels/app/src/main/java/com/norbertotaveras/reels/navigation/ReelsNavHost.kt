@@ -2,19 +2,24 @@ package com.norbertotaveras.reels.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.norbertotaveras.reels.features.cast.details.CastDetailsRoute
-import com.norbertotaveras.reels.features.cast.details.CastDetailsScreen
 import com.norbertotaveras.reels.features.movies.details.MovieDetailsRoute
 import com.norbertotaveras.reels.features.movies.list.MoviesListRoute
 
 @Composable
 fun ReelsNavHost(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
+    val uriHandler = LocalUriHandler.current
+    val openExternalUrl: (String) -> Unit = { url ->
+        uriHandler.openUri(url)
+    }
+
 
     NavHost(
         navController = navController,
@@ -41,7 +46,8 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
                 onBackClick = navController::navigateUp,
                 onCastClick = { personId ->
                     navController.navigate(ReelsDestinations.castDetailsRoute(personId))
-                }
+                },
+                onTrailerClick = openExternalUrl
             )
         }
 
