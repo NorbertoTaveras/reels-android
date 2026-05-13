@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.ui.components.CenteredErrorState
 import com.norbertotaveras.reels.ui.components.CenteredLoadingState
+import com.norbertotaveras.reels.ui.components.TrailerCarouselItem
 import com.norbertotaveras.reels.ui.extensions.toTmdbImageUrl
 
 @Composable
@@ -29,6 +30,7 @@ fun MovieDetailsScreen(
     state: MovieDetailsUiState,
     onBackClick: () -> Unit,
     onCastClick: (Int) -> Unit,
+    onTrailerClick: (String) -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -50,25 +52,27 @@ fun MovieDetailsScreen(
             val movie = checkNotNull(state.movie)
             MovieDetailsContent(
                 modifier = modifier,
-                title = movie.title,
-                backdropUrl = (movie.backdropPath ?: movie.posterPath).toTmdbImageUrl(),
-                posterUrl = movie.posterPath.toTmdbImageUrl(),
-                metadata = listOfNotNull(
-                    movie.releaseDate?.take(4),
-                    movie.runtime?.let { "$it min" }
-                ),
-                rating = String.format("%.1f", movie.voteAverage),
-                genres = movie.genres.map { it.name },
-                overview = movie.overview,
-                releaseDate = movie.releaseDate,
-                originalLanguage = null,
-                popularityLabel = null,
+                movie = movie,
                 cast = state.cast,
+                trailers = state.trailers.map { trailer ->
+                    TrailerCarouselItem(
+                        id = trailer.id,
+                        title = trailer.name,
+                        thumbnailUrl = trailer.youtubeThumbnailUrl,
+                        source = trailer.site,
+                        duration = null
+                    )
+                },
                 onBackClick = onBackClick,
                 onFavoriteClick = {},
                 onCastClick = onCastClick,
                 onCastSeeAllClick = {},
-                onTrailerClick = {},
+                onTrailerClick = { trailerId ->
+                    state.trailers
+                        .firstOrNull { trailer -> trailer.id == trailerId }
+                        ?.youtubeUrl
+                        ?.let(onTrailerClick)
+                },
                 onSimilarMovieClick = {}
             )
         }

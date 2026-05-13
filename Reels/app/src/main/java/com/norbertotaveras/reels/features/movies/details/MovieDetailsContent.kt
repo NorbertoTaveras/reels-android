@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.TrendingUp
@@ -24,13 +23,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.norbertotaveras.reels.model.data.CastMemberDataModel
+import com.norbertotaveras.reels.model.data.GenreDataModel
+import com.norbertotaveras.reels.model.data.MovieDetailsDataModel
 import com.norbertotaveras.reels.ui.components.CastCarousel
-import com.norbertotaveras.reels.ui.components.CastCarouselItem
 import com.norbertotaveras.reels.ui.components.MovieHeroHeader
 import com.norbertotaveras.reels.ui.components.PosterCarouselItem
 import com.norbertotaveras.reels.ui.components.SimilarMoviesSection
 import com.norbertotaveras.reels.ui.components.TrailerCarousel
 import com.norbertotaveras.reels.ui.components.TrailerCarouselItem
+import com.norbertotaveras.reels.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.ui.theme.ReelsTheme
 
@@ -48,16 +49,7 @@ private enum class MovieInfoIcon {
 
 @Composable
 fun MovieDetailsContent(
-    title: String,
-    backdropUrl: String?,
-    posterUrl: String?,
-    metadata: List<String>,
-    rating: String?,
-    genres: List<String>,
-    overview: String,
-    releaseDate: String?,
-    originalLanguage: String?,
-    popularityLabel: String?,
+    movie: MovieDetailsDataModel,
     modifier: Modifier = Modifier,
     isFavorite: Boolean = false,
     isFavoriteLoading: Boolean = false,
@@ -80,12 +72,15 @@ fun MovieDetailsContent(
     ) {
         item {
             MovieHeroHeader(
-                title = title,
-                backdropUrl = backdropUrl,
-                posterUrl = posterUrl,
-                metadata = metadata,
-                rating = rating,
-                genres = genres,
+                title = movie.title,
+                backdropUrl = (movie.backdropPath ?: movie.posterPath).toTmdbImageUrl(),
+                posterUrl = movie.posterPath.toTmdbImageUrl(),
+                metadata = listOfNotNull(
+                    movie.releaseDate?.take(4),
+                    movie.runtime?.let { "$it min" }
+                ),
+                rating = String.format("%.1f", movie.voteAverage),
+                genres = movie.genres.map { it.name },
                 isFavorite = isFavorite,
                 isFavoriteLoading = isFavoriteLoading,
                 onBackClick = onBackClick,
@@ -95,15 +90,15 @@ fun MovieDetailsContent(
 
         item {
             OverviewSection(
-                overview = overview.ifBlank { "No overview available yet." }
+                overview = movie.overview.ifBlank { "No overview available yet." }
             )
         }
 
         item {
             MovieInfoSection(
-                releaseDate = releaseDate,
-                originalLanguage = originalLanguage,
-                popularityLabel = popularityLabel
+                releaseDate = movie.releaseDate,
+                originalLanguage = movie.originalLanguage,
+                popularityLabel = "%,d votes".format(movie.voteCount)
             )
         }
 
@@ -337,16 +332,24 @@ private val previewSimilarMovies = listOf(
 private fun MovieDetailsContentPreview() {
     ReelsTheme {
         MovieDetailsContent(
-            title = "Dune: Part Two",
-            backdropUrl = null,
-            posterUrl = null,
-            metadata = listOf("2024", "166 min", "PG-13"),
-            rating = "8.7",
-            genres = listOf("Sci-Fi", "Adventure", "Drama"),
-            overview = "Paul Atreides unites with Chani and the Fremen while seeking revenge against the conspirators who destroyed his family. Facing a choice between the love of his life and the fate of the universe, he must prevent a terrible future only he can foresee.",
-            releaseDate = "March 1, 2024",
-            originalLanguage = "English",
-            popularityLabel = "1,248 votes",
+            movie = MovieDetailsDataModel(
+                id = 1,
+                title = "Dune: Part Two",
+                overview = "Paul Atreides unites with Chani and the Fremen while seeking revenge against the conspirators who destroyed his family. Facing a choice between the love of his life and the fate of the universe, he must prevent a terrible future only he can foresee.",
+                posterPath = null,
+                backdropPath = null,
+                releaseDate = "2024-03-01",
+                runtime = 166,
+                voteAverage = 8.7,
+                originalLanguage = "English",
+                popularity = 1248.0,
+                voteCount = 1248,
+                genres = listOf(
+                    GenreDataModel(id = 1, name = "Sci-Fi"),
+                    GenreDataModel(id = 2, name = "Adventure"),
+                    GenreDataModel(id = 3, name = "Drama")
+                )
+            ),
             cast = previewCast,
             trailers = previewTrailers,
             similarMovies = previewSimilarMovies,
