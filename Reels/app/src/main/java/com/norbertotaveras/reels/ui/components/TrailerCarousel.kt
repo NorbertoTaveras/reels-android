@@ -34,7 +34,10 @@ fun TrailerCarousel(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)
     ) {
-        SectionHeader(title = "Trailers")
+        SectionHeader(
+            modifier = Modifier.padding(horizontal = ReelsSpacing.screenHorizontal),
+            title = "Trailers"
+        )
 
         LazyRow(
             contentPadding = PaddingValues(horizontal = ReelsSpacing.screenHorizontal),

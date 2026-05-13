@@ -25,4 +25,15 @@ data class MovieVideoDataModel(
         } else {
             null
         }
+
+    val isPlayableTrailer: Boolean
+        get() {
+            val supportedTypes = setOf("Trailer", "Teaser")
+
+            return site.equals("YouTube", ignoreCase = true) &&
+                    supportedTypes.any { supportedType ->
+                        type.equals(supportedType, ignoreCase = true)
+                    }
+        }
+
 }

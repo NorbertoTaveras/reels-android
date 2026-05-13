@@ -30,6 +30,7 @@ fun CastCarousel(
         verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)
     ) {
         SectionHeader(
+            modifier = Modifier.padding(horizontal = ReelsSpacing.screenHorizontal),
             title = "Cast",
             actionLabel = if (onSeeAllClick != null) "See all" else null,
             onActionClick = onSeeAllClick

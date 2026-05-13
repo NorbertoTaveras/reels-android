@@ -17,13 +17,17 @@ fun SimilarMoviesSection(
     onMovieClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (movies.isEmpty()) return
+    if (movies.isEmpty())
+        return
 
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)
     ) {
-        SectionHeader(title = "Similar Movies")
+        SectionHeader(
+            modifier = Modifier.padding(horizontal = ReelsSpacing.screenHorizontal),
+            title = "Similar Movies"
+        )
 
         PosterCarousel(
             items = movies,

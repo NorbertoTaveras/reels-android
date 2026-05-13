@@ -3,6 +3,7 @@ package com.norbertotaveras.reels.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -41,7 +42,11 @@ fun SectionHeader(
         )
 
         if (actionLabel != null && onActionClick != null) {
-            TextButton(onClick = onActionClick) {
+            TextButton(
+                onClick = onActionClick,
+                contentPadding = PaddingValues(horizontal = ReelsSpacing.xSmall)
+
+            ) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
                     verticalAlignment = Alignment.CenterVertically
