@@ -7,6 +7,7 @@ import com.norbertotaveras.reels.navigation.ReelsDestinations
 import com.norbertotaveras.reels.usecases.GetMovieCreditsUseCase
 import com.norbertotaveras.reels.usecases.GetMovieDetailsUseCase
 import com.norbertotaveras.reels.usecases.GetMovieVideosUseCase
+import com.norbertotaveras.reels.usecases.GetSimilarMoviesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -18,6 +19,7 @@ class MovieDetailsViewModel @Inject constructor(
     private val getMovieDetailsUseCase: GetMovieDetailsUseCase,
     private val getMovieCreditsUseCase: GetMovieCreditsUseCase,
     private val getMovieVideosUseCase: GetMovieVideosUseCase,
+    private val getSimilarMoviesUseCase: GetSimilarMoviesUseCase,
 ) : ViewModel() {
     val state = MovieDetailsUiState()
     private val movieId: Int = checkNotNull(
@@ -41,6 +43,7 @@ class MovieDetailsViewModel @Inject constructor(
 
                     val creditsDeferred = async { getMovieCreditsUseCase(movieId = movieId) }
                     val videosDeferred = async { getMovieVideosUseCase(movieId = movieId) }
+                    val similarDeferred = async { getSimilarMoviesUseCase(movieId = movieId) }
 
                     creditsDeferred.await().fold(
                         onSuccess = { credits ->
@@ -54,14 +57,20 @@ class MovieDetailsViewModel @Inject constructor(
                     videosDeferred.await().fold(
                         onSuccess = { videos ->
                             state.trailers = videos.videos
-                                .filter { video ->
-                                    video.site.equals("YouTube", ignoreCase = true) &&
-                                            video.type.equals("Trailer", ignoreCase = true)
-                                }
+                                .filter { video -> video.isPlayableTrailer }
                                 .take(10)
                         },
                         onFailure = {
                             state.trailers = emptyList()
+                        }
+                    )
+
+                    similarDeferred.await().fold(
+                        onSuccess = { movies ->
+                            state.similarMovies = movies.take(10)
+                        },
+                        onFailure = {
+                            state.similarMovies = emptyList()
                         }
                     )
 

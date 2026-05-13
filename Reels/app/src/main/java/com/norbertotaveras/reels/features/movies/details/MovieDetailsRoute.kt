@@ -9,6 +9,7 @@ fun MovieDetailsRoute(
     onBackClick: () -> Unit,
     onCastClick: (Int) -> Unit,
     onTrailerClick: (String) -> Unit,
+    onSimilarMovieClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MovieDetailsViewModel = hiltViewModel(),
 ) {
@@ -18,6 +19,7 @@ fun MovieDetailsRoute(
         onBackClick = onBackClick,
         onCastClick = onCastClick,
         onTrailerClick = onTrailerClick,
+        onSimilarMovieClick = onSimilarMovieClick,
         onRetry = viewModel::loadMovie
     )
 }

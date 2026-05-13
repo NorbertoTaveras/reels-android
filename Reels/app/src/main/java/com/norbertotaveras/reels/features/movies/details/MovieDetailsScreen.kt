@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.ui.components.CenteredErrorState
 import com.norbertotaveras.reels.ui.components.CenteredLoadingState
+import com.norbertotaveras.reels.ui.components.PosterCarouselItem
 import com.norbertotaveras.reels.ui.components.TrailerCarouselItem
 import com.norbertotaveras.reels.ui.extensions.toTmdbImageUrl
 
@@ -31,6 +32,7 @@ fun MovieDetailsScreen(
     onBackClick: () -> Unit,
     onCastClick: (Int) -> Unit,
     onTrailerClick: (String) -> Unit,
+    onSimilarMovieClick: (Int) -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -63,6 +65,14 @@ fun MovieDetailsScreen(
                         duration = null
                     )
                 },
+                similarMovies = state.similarMovies.map { movie ->
+                    PosterCarouselItem(
+                        id = movie.id,
+                        title = movie.title,
+                        posterUrl = movie.posterPath.toTmdbImageUrl(),
+                        releaseYear = movie.releaseDate?.take(4)
+                    )
+                },
                 onBackClick = onBackClick,
                 onFavoriteClick = {},
                 onCastClick = onCastClick,
@@ -73,7 +83,7 @@ fun MovieDetailsScreen(
                         ?.youtubeUrl
                         ?.let(onTrailerClick)
                 },
-                onSimilarMovieClick = {}
+                onSimilarMovieClick = onSimilarMovieClick
             )
         }
     }

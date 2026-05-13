@@ -47,7 +47,10 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
                 onCastClick = { personId ->
                     navController.navigate(ReelsDestinations.castDetailsRoute(personId))
                 },
-                onTrailerClick = openExternalUrl
+                onTrailerClick = openExternalUrl,
+                onSimilarMovieClick = { movieId ->
+                    navController.navigate(ReelsDestinations.movieDetailsRoute(movieId))
+                }
             )
         }
 
