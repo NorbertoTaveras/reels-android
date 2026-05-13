@@ -2,6 +2,7 @@ package com.norbertotaveras.reels.network
 
 import com.norbertotaveras.reels.model.dto.MovieCreditsDto
 import com.norbertotaveras.reels.model.dto.MovieDetailsDto
+import com.norbertotaveras.reels.model.dto.MovieVideosDto
 import com.norbertotaveras.reels.model.dto.MoviesResponseDto
 import com.norbertotaveras.reels.model.dto.PersonDetailsDto
 import com.norbertotaveras.reels.model.dto.PersonMovieCreditsDto
@@ -40,5 +41,11 @@ interface TMDBFwkService {
         @Path("personId") personId: Int,
         @Query("language") language: String?,
     ): PersonMovieCreditsDto
+
+    @GET("movie/{movieId}/videos")
+    suspend fun getMovieVideos(
+        @Path("movieId") movieId: Int,
+        @Query("language") language: String?,
+    ): MovieVideosDto
 
 }

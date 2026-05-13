@@ -2,6 +2,7 @@ package com.norbertotaveras.reels.network
 
 import com.norbertotaveras.reels.model.dto.MovieCreditsDto
 import com.norbertotaveras.reels.model.dto.MovieDetailsDto
+import com.norbertotaveras.reels.model.dto.MovieVideosDto
 import com.norbertotaveras.reels.model.dto.MoviesResponseDto
 import com.norbertotaveras.reels.model.dto.PersonDetailsDto
 import com.norbertotaveras.reels.model.dto.PersonMovieCreditsDto
@@ -61,4 +62,15 @@ class TMDBFwkRepositoryImpl @Inject constructor(
             language = language
         )
     }
+
+    override suspend fun getMovieVideos(
+        movieId: Int,
+        language: String?
+    ): MovieVideosDto {
+        return service.getMovieVideos(
+            movieId = movieId,
+            language = language
+        )
+    }
+
 }
