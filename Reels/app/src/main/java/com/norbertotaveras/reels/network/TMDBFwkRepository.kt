@@ -39,4 +39,10 @@ interface TMDBFwkRepository {
         language: String? = null
     ): MovieVideosDto
 
+    suspend fun getSimilarMovies(
+        movieId: Int,
+        language: String? = null,
+        page: Int? = null
+    ): MoviesResponseDto
+
 }

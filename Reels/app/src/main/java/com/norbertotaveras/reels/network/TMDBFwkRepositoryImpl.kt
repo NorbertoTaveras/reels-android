@@ -73,4 +73,16 @@ class TMDBFwkRepositoryImpl @Inject constructor(
         )
     }
 
+    override suspend fun getSimilarMovies(
+        movieId: Int,
+        language: String?,
+        page: Int?
+    ): MoviesResponseDto {
+        return service.getSimilarMovies(
+            movieId = movieId,
+            language = language,
+            page = page
+        )
+    }
+
 }

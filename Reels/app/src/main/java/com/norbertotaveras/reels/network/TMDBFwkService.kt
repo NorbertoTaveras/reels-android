@@ -48,4 +48,11 @@ interface TMDBFwkService {
         @Query("language") language: String?,
     ): MovieVideosDto
 
+    @GET("movie/{movieId}/similar")
+    suspend fun getSimilarMovies(
+        @Path("movieId") movieId: Int,
+        @Query("language") language: String?,
+        @Query("page") page: Int?
+    ): MoviesResponseDto
+
 }
