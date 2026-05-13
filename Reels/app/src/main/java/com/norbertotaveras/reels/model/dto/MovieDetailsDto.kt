@@ -23,6 +23,12 @@ data class MovieDetailsDto(
     val runtime: Int?,
     @SerializedName("vote_average")
     val voteAverage: Double,
+    @SerializedName("original_language")
+    val originalLanguage: String?,
+    @SerializedName("popularity")
+    val popularity: Double?,
+    @SerializedName("vote_count")
+    val voteCount: Int?,
     @SerializedName("genres")
     val genres: List<GenreDto>,
 ) : Parcelable{
@@ -36,6 +42,9 @@ data class MovieDetailsDto(
             releaseDate = releaseDate,
             runtime = runtime,
             voteAverage = voteAverage,
+            originalLanguage = originalLanguage,
+            popularity = popularity ?: 0.0,
+            voteCount = voteCount ?: 0,
             genres = genres.map { it.toGenreDataModel() }
         )
     }

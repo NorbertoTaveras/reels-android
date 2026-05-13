@@ -13,5 +13,8 @@ data class MovieDetailsDataModel(
     val releaseDate: String?,
     val runtime: Int?,
     val voteAverage: Double,
+    val originalLanguage: String?,
+    val popularity: Double,
+    val voteCount: Int,
     val genres: List<GenreDataModel>
 ) : Parcelable
