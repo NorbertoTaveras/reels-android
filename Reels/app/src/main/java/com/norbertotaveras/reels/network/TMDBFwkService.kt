@@ -1,11 +1,12 @@
 package com.norbertotaveras.reels.network
 
-import com.norbertotaveras.reels.model.dto.MovieCreditsDto
-import com.norbertotaveras.reels.model.dto.MovieDetailsDto
-import com.norbertotaveras.reels.model.dto.MovieVideosDto
-import com.norbertotaveras.reels.model.dto.MoviesResponseDto
-import com.norbertotaveras.reels.model.dto.PersonDetailsDto
-import com.norbertotaveras.reels.model.dto.PersonMovieCreditsDto
+import com.norbertotaveras.reels.model.dto.genre.GenresResponseDto
+import com.norbertotaveras.reels.model.dto.movie.MovieCreditsDto
+import com.norbertotaveras.reels.model.dto.movie.MovieDetailsDto
+import com.norbertotaveras.reels.model.dto.movie.MovieVideosDto
+import com.norbertotaveras.reels.model.dto.movie.MoviesResponseDto
+import com.norbertotaveras.reels.model.dto.person.PersonDetailsDto
+import com.norbertotaveras.reels.model.dto.person.PersonMovieCreditsDto
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -54,5 +55,18 @@ interface TMDBFwkService {
         @Query("language") language: String?,
         @Query("page") page: Int?
     ): MoviesResponseDto
+
+    @GET("search/movie")
+    suspend fun searchMovies(
+        @Query("query") query: String,
+        @Query("language") language: String?,
+        @Query("page") page: Int?,
+        @Query("include_adult") includeAdult: Boolean = false
+    ): MoviesResponseDto
+
+    @GET("genre/movie/list")
+    suspend fun getMovieGenres(
+        @Query("language") language: String?
+    ): GenresResponseDto
 
 }

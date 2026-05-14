@@ -1,11 +1,12 @@
 package com.norbertotaveras.reels.network
 
-import com.norbertotaveras.reels.model.dto.MovieCreditsDto
-import com.norbertotaveras.reels.model.dto.MovieDetailsDto
-import com.norbertotaveras.reels.model.dto.MovieVideosDto
-import com.norbertotaveras.reels.model.dto.MoviesResponseDto
-import com.norbertotaveras.reels.model.dto.PersonDetailsDto
-import com.norbertotaveras.reels.model.dto.PersonMovieCreditsDto
+import com.norbertotaveras.reels.model.dto.genre.GenresResponseDto
+import com.norbertotaveras.reels.model.dto.movie.MovieCreditsDto
+import com.norbertotaveras.reels.model.dto.movie.MovieDetailsDto
+import com.norbertotaveras.reels.model.dto.movie.MovieVideosDto
+import com.norbertotaveras.reels.model.dto.movie.MoviesResponseDto
+import com.norbertotaveras.reels.model.dto.person.PersonDetailsDto
+import com.norbertotaveras.reels.model.dto.person.PersonMovieCreditsDto
 import javax.inject.Inject
 
 class TMDBFwkRepositoryImpl @Inject constructor(
@@ -85,4 +86,25 @@ class TMDBFwkRepositoryImpl @Inject constructor(
         )
     }
 
+    override suspend fun searchMovies(
+        query: String,
+        language: String?,
+        page: Int?,
+        includeAdult: Boolean
+    ): MoviesResponseDto {
+        return service.searchMovies(
+            query = query,
+            language = language,
+            page = page,
+            includeAdult = includeAdult
+        )
+    }
+
+    override suspend fun getMovieGenres(
+        language: String?
+    ): GenresResponseDto {
+        return service.getMovieGenres(
+            language = language
+        )
+    }
 }
