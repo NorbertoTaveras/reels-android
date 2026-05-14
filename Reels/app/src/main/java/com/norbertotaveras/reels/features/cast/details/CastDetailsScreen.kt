@@ -2,8 +2,8 @@ package com.norbertotaveras.reels.features.cast.details
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.norbertotaveras.reels.ui.components.CenteredErrorState
-import com.norbertotaveras.reels.ui.components.CenteredLoadingState
+import com.norbertotaveras.reels.ui.components.common.CenteredErrorState
+import com.norbertotaveras.reels.ui.components.common.CenteredLoadingState
 import com.norbertotaveras.reels.ui.extensions.toTmdbImageUrl
 
 @Composable

@@ -4,10 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.norbertotaveras.reels.navigation.ReelsDestinations
-import com.norbertotaveras.reels.usecases.GetMovieCreditsUseCase
-import com.norbertotaveras.reels.usecases.GetMovieDetailsUseCase
-import com.norbertotaveras.reels.usecases.GetMovieVideosUseCase
-import com.norbertotaveras.reels.usecases.GetSimilarMoviesUseCase
+import com.norbertotaveras.reels.usecases.movie.GetMovieCreditsUseCase
+import com.norbertotaveras.reels.usecases.movie.GetMovieDetailsUseCase
+import com.norbertotaveras.reels.usecases.movie.GetMovieVideosUseCase
+import com.norbertotaveras.reels.usecases.movie.GetSimilarMoviesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch

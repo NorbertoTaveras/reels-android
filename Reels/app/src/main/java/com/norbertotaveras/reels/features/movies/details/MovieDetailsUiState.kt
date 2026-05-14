@@ -3,10 +3,10 @@ package com.norbertotaveras.reels.features.movies.details
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.norbertotaveras.reels.model.data.CastMemberDataModel
-import com.norbertotaveras.reels.model.data.MovieDataModel
-import com.norbertotaveras.reels.model.data.MovieDetailsDataModel
-import com.norbertotaveras.reels.model.data.MovieVideoDataModel
+import com.norbertotaveras.reels.model.data.cast.CastMemberDataModel
+import com.norbertotaveras.reels.model.data.movie.MovieDataModel
+import com.norbertotaveras.reels.model.data.movie.MovieDetailsDataModel
+import com.norbertotaveras.reels.model.data.movie.MovieVideoDataModel
 
 class MovieDetailsUiState {
     var isLoading by mutableStateOf(true)

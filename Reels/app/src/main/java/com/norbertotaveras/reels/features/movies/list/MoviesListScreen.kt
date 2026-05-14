@@ -18,9 +18,9 @@ import androidx.paging.compose.LazyPagingItems
 import com.norbertotaveras.reels.features.movies.list.components.MovieCategoryChips
 import com.norbertotaveras.reels.features.movies.list.components.MovieListItem
 import com.norbertotaveras.reels.model.constant.MovieCategory
-import com.norbertotaveras.reels.model.data.MovieDataModel
-import com.norbertotaveras.reels.ui.components.CenteredErrorState
-import com.norbertotaveras.reels.ui.components.CenteredLoadingState
+import com.norbertotaveras.reels.model.data.movie.MovieDataModel
+import com.norbertotaveras.reels.ui.components.common.CenteredErrorState
+import com.norbertotaveras.reels.ui.components.common.CenteredLoadingState
 
 @Composable
 fun MoviesListScreen(

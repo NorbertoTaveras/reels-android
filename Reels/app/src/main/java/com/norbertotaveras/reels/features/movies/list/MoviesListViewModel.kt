@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.norbertotaveras.reels.model.constant.MovieCategory
-import com.norbertotaveras.reels.usecases.GetMoviesUseCase
+import com.norbertotaveras.reels.usecases.movie.GetMoviesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged

@@ -4,8 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.norbertotaveras.reels.navigation.ReelsDestinations
-import com.norbertotaveras.reels.usecases.GetPersonDetailsUseCase
-import com.norbertotaveras.reels.usecases.GetPersonMovieCreditsUseCase
+import com.norbertotaveras.reels.usecases.person.GetPersonDetailsUseCase
+import com.norbertotaveras.reels.usecases.person.GetPersonMovieCreditsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import javax.inject.Inject
