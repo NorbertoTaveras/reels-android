@@ -9,9 +9,7 @@ import com.norbertotaveras.reels.ui.extensions.toTmdbImageUrl
 @Composable
 fun CastDetailsScreen(
     state: CastDetailsUiState,
-    onBackClick: () -> Unit,
-    onMovieClick: (Int) -> Unit,
-    onRetry: () -> Unit,
+    onEvent: (CastDetailsEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when {
@@ -24,7 +22,9 @@ fun CastDetailsScreen(
                 modifier = modifier,
                 message = state.errorMessage ?: "Unable to load cast details.",
                 retryLabel = "Retry",
-                onRetry = onRetry
+                onRetry = {
+                    onEvent(CastDetailsEvent.RetryClicked)
+                }
             )
         }
 
@@ -40,10 +40,16 @@ fun CastDetailsScreen(
                 knownFor = state.knownFor,
                 birthday = person.birthday,
                 placeOfBirth = person.placeOfBirth,
-                onBackClick = onBackClick,
-                onMovieClick = onMovieClick
+                onBackClick = {
+                    onEvent(CastDetailsEvent.BackClicked)
+                },
+                onMovieClick = { movieId ->
+                    onEvent(CastDetailsEvent.MovieClicked(movieId = movieId))
+                },
+                onFavoriteClick = {
+                    onEvent(CastDetailsEvent.FavoriteClicked)
+                }
             )
         }
     }
 }
-

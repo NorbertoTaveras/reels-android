@@ -8,6 +8,9 @@ import com.norbertotaveras.reels.usecases.person.GetPersonDetailsUseCase
 import com.norbertotaveras.reels.usecases.person.GetPersonMovieCreditsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
@@ -16,8 +19,11 @@ class CastDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getPersonDetailsUseCase: GetPersonDetailsUseCase,
     private val getPersonMovieCreditsUseCase: GetPersonMovieCreditsUseCase,
-    ) : ViewModel() {
+) : ViewModel() {
     val state = CastDetailsUiState()
+
+    private val _effect = MutableSharedFlow<CastDetailsEffect>()
+    val effect: SharedFlow<CastDetailsEffect> = _effect.asSharedFlow()
 
     private val personId: Int = checkNotNull(
         savedStateHandle.get<Int>(ReelsDestinations.PERSON_ID_ARG)
@@ -25,6 +31,15 @@ class CastDetailsViewModel @Inject constructor(
 
     init {
         loadPerson()
+    }
+
+    fun onEvent(event: CastDetailsEvent) {
+        when (event) {
+            CastDetailsEvent.BackClicked -> onBackClicked()
+            CastDetailsEvent.RetryClicked -> loadPerson()
+            CastDetailsEvent.FavoriteClicked -> Unit
+            is CastDetailsEvent.MovieClicked -> onMovieClicked(movieId = event.movieId)
+        }
     }
 
     fun loadPerson() {
@@ -65,4 +80,15 @@ class CastDetailsViewModel @Inject constructor(
         }
     }
 
+    private fun onBackClicked() {
+        viewModelScope.launch {
+            _effect.emit(CastDetailsEffect.NavigateBack)
+        }
+    }
+
+    private fun onMovieClicked(movieId: Int) {
+        viewModelScope.launch {
+            _effect.emit(CastDetailsEffect.NavigateToMovieDetails(movieId = movieId))
+        }
+    }
 }
