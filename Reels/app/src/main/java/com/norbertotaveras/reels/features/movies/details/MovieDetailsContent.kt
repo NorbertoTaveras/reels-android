@@ -53,6 +53,7 @@ fun MovieDetailsContent(
     modifier: Modifier = Modifier,
     isFavorite: Boolean = false,
     isFavoriteLoading: Boolean = false,
+    isOfflineFavorite: Boolean = false,
     cast: List<CastMemberDataModel> = emptyList(),
     trailers: List<TrailerCarouselItem> = emptyList(),
     similarMovies: List<PosterCarouselItem> = emptyList(),
@@ -86,6 +87,12 @@ fun MovieDetailsContent(
                 onBackClick = onBackClick,
                 onFavoriteClick = onFavoriteClick
             )
+        }
+
+        if (isOfflineFavorite) {
+            item {
+                OfflineFavoriteNotice()
+            }
         }
 
         item {
@@ -264,6 +271,30 @@ private fun MovieInfoIcon(
     )
 }
 
+@Composable
+private fun OfflineFavoriteNotice(
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = ReelsSpacing.screenHorizontal),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        border = androidx.compose.foundation.BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.16f)
+        )
+    ) {
+        Text(
+            modifier = Modifier.padding(ReelsSpacing.medium),
+            text = "Showing saved offline details",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
 
 private val previewCast = listOf(
     CastMemberDataModel(

@@ -15,6 +15,7 @@ fun MovieDetailsScreen(
     onCastClick: (Int) -> Unit,
     onTrailerClick: (String) -> Unit,
     onSimilarMovieClick: (Int) -> Unit,
+    onFavoriteClick: () -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -55,8 +56,11 @@ fun MovieDetailsScreen(
                         releaseYear = movie.releaseDate?.take(4)
                     )
                 },
+                isFavorite = state.isFavorite,
+                isFavoriteLoading = state.isFavoriteLoading,
+                isOfflineFavorite = state.isOfflineFavorite,
                 onBackClick = onBackClick,
-                onFavoriteClick = {},
+                onFavoriteClick = onFavoriteClick,
                 onCastClick = onCastClick,
                 onCastSeeAllClick = {},
                 onTrailerClick = { trailerId ->

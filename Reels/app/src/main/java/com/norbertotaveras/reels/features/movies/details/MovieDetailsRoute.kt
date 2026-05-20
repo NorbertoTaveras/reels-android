@@ -20,6 +20,7 @@ fun MovieDetailsRoute(
         onCastClick = onCastClick,
         onTrailerClick = onTrailerClick,
         onSimilarMovieClick = onSimilarMovieClick,
+        onFavoriteClick = viewModel::onFavoriteClick,
         onRetry = viewModel::loadMovie
     )
 }

@@ -129,6 +129,11 @@ dependencies {
     implementation(libs.io.coil.svg)
     implementation(libs.io.coil.okhttp)
 
+    // room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
     // test
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
