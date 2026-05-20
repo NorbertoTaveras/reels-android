@@ -17,7 +17,6 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.norbertotaveras.reels.features.movies.list.components.MovieCategoryChips
 import com.norbertotaveras.reels.features.movies.list.components.MovieListItem
-import com.norbertotaveras.reels.model.constant.MovieCategory
 import com.norbertotaveras.reels.model.data.movie.MovieDataModel
 import com.norbertotaveras.reels.ui.components.common.CenteredErrorState
 import com.norbertotaveras.reels.ui.components.common.CenteredLoadingState
@@ -26,8 +25,7 @@ import com.norbertotaveras.reels.ui.components.common.CenteredLoadingState
 fun MoviesListScreen(
     state: MoviesListState,
     movies: LazyPagingItems<MovieDataModel>,
-    onCategorySelected: (MovieCategory) -> Unit,
-    onMovieClick: (Int) -> Unit,
+    onEvent: (MoviesListEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val isAppending = movies.loadState.append is LoadState.Loading
@@ -75,7 +73,9 @@ fun MoviesListScreen(
             item {
                 MovieCategoryChips(
                     selectedCategory = state.category,
-                    onCategorySelected = onCategorySelected
+                    onCategorySelected = { category ->
+                        onEvent(MoviesListEvent.CategorySelected(category = category))
+                    }
                 )
             }
 
@@ -90,7 +90,9 @@ fun MoviesListScreen(
                 val movie = movies[index] ?: return@items
                 MovieListItem(
                     movie = movie,
-                    onClick = { onMovieClick(movie.id) }
+                    onClick = {
+                        onEvent(MoviesListEvent.MovieClicked(movieId = movie.id))
+                    }
                 )
             }
 
