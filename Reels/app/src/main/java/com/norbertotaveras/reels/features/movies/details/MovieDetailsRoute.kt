@@ -1,5 +1,6 @@
 package com.norbertotaveras.reels.features.movies.details
 
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -13,14 +14,26 @@ fun MovieDetailsRoute(
     modifier: Modifier = Modifier,
     viewModel: MovieDetailsViewModel = hiltViewModel(),
 ) {
+    LaunchedEffect(viewModel) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                MovieDetailsEffect.NavigateBack -> onBackClick()
+                is MovieDetailsEffect.NavigateToCastDetails -> {
+                    onCastClick(effect.personId)
+                }
+                is MovieDetailsEffect.OpenTrailer -> {
+                    onTrailerClick(effect.url)
+                }
+                is MovieDetailsEffect.NavigateToMovieDetails -> {
+                    onSimilarMovieClick(effect.movieId)
+                }
+            }
+        }
+    }
+
     MovieDetailsScreen(
         modifier = modifier,
         state = viewModel.state,
-        onBackClick = onBackClick,
-        onCastClick = onCastClick,
-        onTrailerClick = onTrailerClick,
-        onSimilarMovieClick = onSimilarMovieClick,
-        onFavoriteClick = viewModel::onFavoriteClick,
-        onRetry = viewModel::loadMovie
+        onEvent = viewModel::onEvent
     )
 }

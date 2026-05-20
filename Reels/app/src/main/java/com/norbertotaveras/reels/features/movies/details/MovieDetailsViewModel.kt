@@ -13,6 +13,9 @@ import com.norbertotaveras.reels.usecases.movie.GetMovieVideosUseCase
 import com.norbertotaveras.reels.usecases.movie.GetSimilarMoviesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,8 +30,12 @@ class MovieDetailsViewModel @Inject constructor(
     private val observeIsFavoriteUseCase: ObserveIsFavoriteUseCase,
     private val toggleFavoriteMovieUseCase: ToggleFavoriteMovieUseCase,
     private val getFavoriteMovieDetailsUseCase: GetFavoriteMovieDetailsUseCase,
-    ) : ViewModel() {
+) : ViewModel() {
     val state = MovieDetailsUiState()
+
+    private val _effect = MutableSharedFlow<MovieDetailsEffect>()
+    val effect: SharedFlow<MovieDetailsEffect> = _effect.asSharedFlow()
+
     private val movieId: Int = checkNotNull(
         savedStateHandle.get<Int>(ReelsDestinations.MOVIE_ID_ARG)
     )
@@ -36,6 +43,18 @@ class MovieDetailsViewModel @Inject constructor(
     init {
         observeFavoriteState()
         loadMovie()
+    }
+
+    fun onEvent(event: MovieDetailsEvent) {
+        when (event) {
+            MovieDetailsEvent.BackClicked -> onBackClicked()
+            MovieDetailsEvent.RetryClicked -> loadMovie()
+            MovieDetailsEvent.FavoriteClicked -> onFavoriteClick()
+            is MovieDetailsEvent.CastClicked -> onCastClicked(personId = event.personId)
+            MovieDetailsEvent.CastSeeAllClicked -> Unit
+            is MovieDetailsEvent.TrailerClicked -> onTrailerClicked(trailerId = event.trailerId)
+            is MovieDetailsEvent.SimilarMovieClicked -> onSimilarMovieClicked(movieId = event.movieId)
+        }
     }
 
     fun loadMovie() {
@@ -112,7 +131,13 @@ class MovieDetailsViewModel @Inject constructor(
         }
     }
 
-    fun onFavoriteClick() {
+    private fun onBackClicked() {
+        viewModelScope.launch {
+            _effect.emit(MovieDetailsEffect.NavigateBack)
+        }
+    }
+
+    private fun onFavoriteClick() {
         val movie = state.movie ?: return
 
         viewModelScope.launch {
@@ -129,4 +154,26 @@ class MovieDetailsViewModel @Inject constructor(
         }
     }
 
+    private fun onCastClicked(personId: Int) {
+        viewModelScope.launch {
+            _effect.emit(MovieDetailsEffect.NavigateToCastDetails(personId = personId))
+        }
+    }
+
+    private fun onTrailerClicked(trailerId: String) {
+        val trailerUrl = state.trailers
+            .firstOrNull { trailer -> trailer.id == trailerId }
+            ?.youtubeUrl
+            ?: return
+
+        viewModelScope.launch {
+            _effect.emit(MovieDetailsEffect.OpenTrailer(url = trailerUrl))
+        }
+    }
+
+    private fun onSimilarMovieClicked(movieId: Int) {
+        viewModelScope.launch {
+            _effect.emit(MovieDetailsEffect.NavigateToMovieDetails(movieId = movieId))
+        }
+    }
 }
