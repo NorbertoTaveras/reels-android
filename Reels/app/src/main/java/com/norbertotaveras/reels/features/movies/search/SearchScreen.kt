@@ -48,12 +48,7 @@ import com.norbertotaveras.reels.ui.theme.ReelsSpacing
 fun SearchScreen(
     state: SearchUiState,
     movies: LazyPagingItems<MovieDataModel>,
-    onQueryChanged: (String) -> Unit,
-    onClearQuery: () -> Unit,
-    onSearchSubmitted: () -> Unit,
-    onRecentSearchClick: (String) -> Unit,
-    onClearRecentSearches: () -> Unit,
-    onMovieClick: (Int) -> Unit,
+    onEvent: (SearchEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -74,7 +69,9 @@ fun SearchScreen(
                 .fillMaxWidth()
                 .padding(top = ReelsSpacing.large),
             value = state.query,
-            onValueChange = onQueryChanged,
+            onValueChange = { query ->
+                onEvent(SearchEvent.QueryChanged(query = query))
+            },
             singleLine = true,
             shape = MaterialTheme.shapes.large,
             placeholder = {
@@ -88,7 +85,11 @@ fun SearchScreen(
             },
             trailingIcon = {
                 if (state.query.isNotBlank()) {
-                    IconButton(onClick = onClearQuery) {
+                    IconButton(
+                        onClick = {
+                            onEvent(SearchEvent.ClearQueryClicked)
+                        }
+                    ) {
                         Icon(
                             imageVector = Icons.Filled.Close,
                             contentDescription = "Clear search"
@@ -101,7 +102,7 @@ fun SearchScreen(
             ),
             keyboardActions = KeyboardActions(
                 onSearch = {
-                    onSearchSubmitted()
+                    onEvent(SearchEvent.SearchSubmitted)
                 }
             ),
             colors = OutlinedTextFieldDefaults.colors(
@@ -131,8 +132,7 @@ fun SearchScreen(
                 item {
                     RecentSearchesSection(
                         recentSearches = state.recentSearches,
-                        onRecentSearchClick = onRecentSearchClick,
-                        onClearRecentSearches = onClearRecentSearches
+                        onEvent = onEvent
                     )
                 }
             }
@@ -204,7 +204,7 @@ fun SearchScreen(
                                     .take(2),
                                 rating = String.format("%.1f", movie.voteAverage),
                                 onClick = {
-                                    onMovieClick(movie.id)
+                                    onEvent(SearchEvent.MovieClicked(movieId = movie.id))
                                 }
                             )
                         }
@@ -238,8 +238,7 @@ fun SearchScreen(
 @Composable
 private fun RecentSearchesSection(
     recentSearches: List<String>,
-    onRecentSearchClick: (String) -> Unit,
-    onClearRecentSearches: () -> Unit,
+    onEvent: (SearchEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -261,7 +260,9 @@ private fun RecentSearchesSection(
                 text = "Clear all",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.clickable(onClick = onClearRecentSearches)
+                modifier = Modifier.clickable {
+                    onEvent(SearchEvent.ClearRecentSearchesClicked)
+                }
             )
         }
 
@@ -271,7 +272,9 @@ private fun RecentSearchesSection(
         ) {
             recentSearches.forEach { query ->
                 Surface(
-                    onClick = { onRecentSearchClick(query) },
+                    onClick = {
+                        onEvent(SearchEvent.RecentSearchClicked(query = query))
+                    },
                     shape = MaterialTheme.shapes.extraLarge,
                     color = MaterialTheme.colorScheme.surface,
                     contentColor = MaterialTheme.colorScheme.onSurface

@@ -13,6 +13,9 @@ import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
@@ -27,6 +30,9 @@ class SearchViewModel @Inject constructor(
     private val getMovieGenresUseCase: GetMovieGenresUseCase,
 ) : ViewModel() {
     val state = SearchUiState()
+
+    private val _effect = MutableSharedFlow<SearchEffect>()
+    val effect: SharedFlow<SearchEffect> = _effect.asSharedFlow()
 
     @OptIn(FlowPreview::class)
     val searchResults: Flow<PagingData<MovieDataModel>> = snapshotFlow { state.query }
@@ -46,15 +52,26 @@ class SearchViewModel @Inject constructor(
         loadGenres()
     }
 
-    fun onQueryChanged(query: String) {
+    fun onEvent(event: SearchEvent) {
+        when (event) {
+            is SearchEvent.QueryChanged -> onQueryChanged(event.query)
+            SearchEvent.ClearQueryClicked -> onClearQuery()
+            SearchEvent.SearchSubmitted -> onSearchSubmitted()
+            is SearchEvent.RecentSearchClicked -> onRecentSearchClicked(event.query)
+            SearchEvent.ClearRecentSearchesClicked -> onClearRecentSearches()
+            is SearchEvent.MovieClicked -> onMovieClicked(event.movieId)
+        }
+    }
+
+    private fun onQueryChanged(query: String) {
         state.query = query
     }
 
-    fun onClearQuery() {
+    private fun onClearQuery() {
         state.query = ""
     }
 
-    fun onSearchSubmitted() {
+    private fun onSearchSubmitted() {
         val query = state.query.trim()
 
         if (query.length < MIN_QUERY_LENGTH) return
@@ -67,12 +84,18 @@ class SearchViewModel @Inject constructor(
         }.take(MAX_RECENT_SEARCHES)
     }
 
-    fun onRecentSearchClicked(query: String) {
+    private fun onRecentSearchClicked(query: String) {
         state.query = query
     }
 
-    fun onClearRecentSearches() {
+    private fun onClearRecentSearches() {
         state.recentSearches = emptyList()
+    }
+
+    private fun onMovieClicked(movieId: Int) {
+        viewModelScope.launch {
+            _effect.emit(SearchEffect.NavigateToMovieDetails(movieId = movieId))
+        }
     }
 
     private fun loadGenres() {
