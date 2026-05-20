@@ -2,6 +2,8 @@ package com.norbertotaveras.reels.features.movies.search
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 
@@ -10,6 +12,7 @@ fun SearchRoute(
     onMovieClick: (Int) -> Unit,
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
+    val state by viewModel.state.collectAsState()
     val searchResults = viewModel.searchResults.collectAsLazyPagingItems()
 
     LaunchedEffect(viewModel) {
@@ -23,7 +26,7 @@ fun SearchRoute(
     }
 
     SearchScreen(
-        state = viewModel.state,
+        state = state,
         movies = searchResults,
         onEvent = viewModel::onEvent
     )

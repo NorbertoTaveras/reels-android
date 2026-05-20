@@ -1,6 +1,5 @@
 package com.norbertotaveras.reels.features.movies.search
 
-import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -14,13 +13,17 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -29,14 +32,15 @@ class SearchViewModel @Inject constructor(
     private val searchMoviesUseCase: SearchMoviesUseCase,
     private val getMovieGenresUseCase: GetMovieGenresUseCase,
 ) : ViewModel() {
-    val state = SearchUiState()
+    private val _state = MutableStateFlow(SearchUiState())
+    val state: StateFlow<SearchUiState> = _state.asStateFlow()
 
     private val _effect = MutableSharedFlow<SearchEffect>()
     val effect: SharedFlow<SearchEffect> = _effect.asSharedFlow()
 
     @OptIn(FlowPreview::class)
-    val searchResults: Flow<PagingData<MovieDataModel>> = snapshotFlow { state.query }
-        .map { query -> query.trim() }
+    val searchResults: Flow<PagingData<MovieDataModel>> = state
+        .map { uiState -> uiState.query.trim() }
         .debounce(400)
         .distinctUntilChanged()
         .flatMapLatest { query ->
@@ -64,32 +68,45 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun onQueryChanged(query: String) {
-        state.query = query
+        _state.update { currentState ->
+            currentState.copy(query = query)
+        }
     }
 
     private fun onClearQuery() {
-        state.query = ""
+        _state.update { currentState ->
+            currentState.copy(query = "")
+        }
     }
 
     private fun onSearchSubmitted() {
-        val query = state.query.trim()
+        val currentState = state.value
+        val query = currentState.query.trim()
 
         if (query.length < MIN_QUERY_LENGTH) return
 
-        state.recentSearches = buildList {
+        val recentSearches = buildList {
             add(query)
-            addAll(state.recentSearches.filterNot { recent ->
+            addAll(currentState.recentSearches.filterNot { recent ->
                 recent.equals(query, ignoreCase = true)
             })
         }.take(MAX_RECENT_SEARCHES)
+
+        _state.update {
+            it.copy(recentSearches = recentSearches)
+        }
     }
 
     private fun onRecentSearchClicked(query: String) {
-        state.query = query
+        _state.update { currentState ->
+            currentState.copy(query = query)
+        }
     }
 
     private fun onClearRecentSearches() {
-        state.recentSearches = emptyList()
+        _state.update { currentState ->
+            currentState.copy(recentSearches = emptyList())
+        }
     }
 
     private fun onMovieClicked(movieId: Int) {
@@ -102,12 +119,18 @@ class SearchViewModel @Inject constructor(
         viewModelScope.launch {
             getMovieGenresUseCase().fold(
                 onSuccess = { genres ->
-                    state.genreNamesById = genres.associate { genre ->
-                        genre.id to genre.name
+                    _state.update { currentState ->
+                        currentState.copy(
+                            genreNamesById = genres.associate { genre ->
+                                genre.id to genre.name
+                            }
+                        )
                     }
                 },
                 onFailure = {
-                    state.genreNamesById = emptyMap()
+                    _state.update { currentState ->
+                        currentState.copy(genreNamesById = emptyMap())
+                    }
                 }
             )
         }
