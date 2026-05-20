@@ -24,7 +24,7 @@ import com.norbertotaveras.reels.ui.theme.ReelsSpacing
 @Composable
 fun FavoritesScreen(
     state: FavoritesUiState,
-    onMovieClick: (Int) -> Unit,
+    onEvent: (FavoritesEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (state.movies.isEmpty()) {
@@ -91,7 +91,7 @@ fun FavoritesScreen(
                 releaseYear = movie.releaseDate?.take(4),
                 rating = String.format("%.1f", movie.voteAverage),
                 onClick = {
-                    onMovieClick(movie.id)
+                    onEvent(FavoritesEvent.MovieClicked(movieId = movie.id))
                 }
             )
         }
