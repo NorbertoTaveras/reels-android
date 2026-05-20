@@ -23,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.norbertotaveras.reels.features.cast.details.CastDetailsRoute
 import com.norbertotaveras.reels.features.movies.details.MovieDetailsRoute
+import com.norbertotaveras.reels.features.movies.favorites.FavoritesRoute
 import com.norbertotaveras.reels.features.movies.list.MoviesListRoute
 import com.norbertotaveras.reels.features.movies.search.SearchRoute
 
@@ -85,7 +86,11 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
             }
 
             composable(ReelsDestinations.FAVORITES) {
-                PlaceholderTabScreen(title = "Favorites")
+                FavoritesRoute(
+                    onMovieClick = { movieId ->
+                        navController.navigate(ReelsDestinations.movieDetailsRoute(movieId))
+                    }
+                )
             }
 
             composable(ReelsDestinations.SETTINGS) {
