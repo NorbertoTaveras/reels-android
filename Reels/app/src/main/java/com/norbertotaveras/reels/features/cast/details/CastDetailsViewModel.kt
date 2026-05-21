@@ -9,10 +9,14 @@ import com.norbertotaveras.reels.usecases.person.GetPersonMovieCreditsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import javax.inject.Inject
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class CastDetailsViewModel @Inject constructor(
@@ -20,7 +24,8 @@ class CastDetailsViewModel @Inject constructor(
     private val getPersonDetailsUseCase: GetPersonDetailsUseCase,
     private val getPersonMovieCreditsUseCase: GetPersonMovieCreditsUseCase,
 ) : ViewModel() {
-    val state = CastDetailsUiState()
+    private val _state = MutableStateFlow(CastDetailsUiState())
+    val state: StateFlow<CastDetailsUiState> = _state.asStateFlow()
 
     private val _effect = MutableSharedFlow<CastDetailsEffect>()
     val effect: SharedFlow<CastDetailsEffect> = _effect.asSharedFlow()
@@ -44,8 +49,12 @@ class CastDetailsViewModel @Inject constructor(
 
     fun loadPerson() {
         viewModelScope.launch {
-            state.isLoading = true
-            state.errorMessage = null
+            _state.update { currentState ->
+                currentState.copy(
+                    isLoading = true,
+                    errorMessage = null
+                )
+            }
 
             val personResultDeferred = async {
                 getPersonDetailsUseCase(personId = personId)
@@ -60,23 +69,35 @@ class CastDetailsViewModel @Inject constructor(
 
             personResult.fold(
                 onSuccess = { person ->
-                    state.person = person
+                    _state.update { currentState ->
+                        currentState.copy(person = person)
+                    }
                 },
                 onFailure = { error ->
-                    state.errorMessage = error.localizedMessage ?: "Unable to load cast details."
+                    _state.update { currentState ->
+                        currentState.copy(
+                            errorMessage = error.localizedMessage ?: "Unable to load cast details."
+                        )
+                    }
                 }
             )
 
             creditsResult.fold(
                 onSuccess = { credits ->
-                    state.knownFor = credits.cast.take(10)
+                    _state.update { currentState ->
+                        currentState.copy(knownFor = credits.cast.take(10))
+                    }
                 },
                 onFailure = {
-                    state.knownFor = emptyList()
+                    _state.update { currentState ->
+                        currentState.copy(knownFor = emptyList())
+                    }
                 }
             )
 
-            state.isLoading = false
+            _state.update { currentState ->
+                currentState.copy(isLoading = false)
+            }
         }
     }
 
