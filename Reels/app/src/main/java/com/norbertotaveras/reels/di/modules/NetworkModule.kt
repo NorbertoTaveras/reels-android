@@ -1,8 +1,8 @@
 package com.norbertotaveras.reels.di.modules
 
-import com.norbertotaveras.reels.network.TMDBFwkRepository
-import com.norbertotaveras.reels.network.TMDBFwkRepositoryImpl
-import com.norbertotaveras.reels.network.TMDBFwkService
+import com.norbertotaveras.reels.data.remote.TMDBFwkRepository
+import com.norbertotaveras.reels.data.remote.TMDBFwkRepositoryImpl
+import com.norbertotaveras.reels.data.remote.TMDBFwkService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

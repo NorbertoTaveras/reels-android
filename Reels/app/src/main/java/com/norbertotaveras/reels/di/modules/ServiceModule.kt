@@ -2,7 +2,7 @@ package com.norbertotaveras.reels.di.modules
 
 import com.google.gson.GsonBuilder
 import com.norbertotaveras.reels.BuildConfig
-import com.norbertotaveras.reels.network.TMDBFwkService
+import com.norbertotaveras.reels.data.remote.TMDBFwkService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

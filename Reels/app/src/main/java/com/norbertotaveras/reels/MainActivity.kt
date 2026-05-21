@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.norbertotaveras.reels.navigation.ReelsNavHost
-import com.norbertotaveras.reels.ui.theme.ReelsTheme
+import com.norbertotaveras.reels.presentation.navigation.ReelsNavHost
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

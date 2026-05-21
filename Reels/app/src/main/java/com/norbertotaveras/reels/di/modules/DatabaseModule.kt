@@ -2,8 +2,8 @@ package com.norbertotaveras.reels.di.modules
 
 import android.content.Context
 import androidx.room.Room
-import com.norbertotaveras.reels.model.local.dao.FavoriteMovieDao
-import com.norbertotaveras.reels.model.local.db.ReelsDatabase
+import com.norbertotaveras.reels.data.local.dao.FavoriteMovieDao
+import com.norbertotaveras.reels.data.local.db.ReelsDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

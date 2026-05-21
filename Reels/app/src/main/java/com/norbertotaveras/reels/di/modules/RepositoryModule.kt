@@ -1,7 +1,7 @@
 package com.norbertotaveras.reels.di.modules
 
-import com.norbertotaveras.reels.repository.favorites.FavoriteMoviesRepository
-import com.norbertotaveras.reels.repository.favorites.FavoriteMoviesRepositoryImpl
+import com.norbertotaveras.reels.domain.repository.favorites.FavoriteMoviesRepository
+import com.norbertotaveras.reels.data.repository.favorites.FavoriteMoviesRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
