@@ -2,6 +2,8 @@ package com.norbertotaveras.reels.features.movies.details
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
@@ -14,6 +16,8 @@ fun MovieDetailsRoute(
     modifier: Modifier = Modifier,
     viewModel: MovieDetailsViewModel = hiltViewModel(),
 ) {
+    val state by viewModel.state.collectAsState()
+
     LaunchedEffect(viewModel) {
         viewModel.effect.collect { effect ->
             when (effect) {
@@ -33,7 +37,7 @@ fun MovieDetailsRoute(
 
     MovieDetailsScreen(
         modifier = modifier,
-        state = viewModel.state,
+        state = state,
         onEvent = viewModel::onEvent
     )
 }

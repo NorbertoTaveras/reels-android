@@ -14,9 +14,13 @@ import com.norbertotaveras.reels.usecases.movie.GetSimilarMoviesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,7 +35,8 @@ class MovieDetailsViewModel @Inject constructor(
     private val toggleFavoriteMovieUseCase: ToggleFavoriteMovieUseCase,
     private val getFavoriteMovieDetailsUseCase: GetFavoriteMovieDetailsUseCase,
 ) : ViewModel() {
-    val state = MovieDetailsUiState()
+    private val _state = MutableStateFlow(MovieDetailsUiState())
+    val state: StateFlow<MovieDetailsUiState> = _state.asStateFlow()
 
     private val _effect = MutableSharedFlow<MovieDetailsEffect>()
     val effect: SharedFlow<MovieDetailsEffect> = _effect.asSharedFlow()
@@ -59,64 +64,94 @@ class MovieDetailsViewModel @Inject constructor(
 
     fun loadMovie() {
         viewModelScope.launch {
-            state.isLoading = true
-            state.errorMessage = null
+            _state.update { currentState ->
+                currentState.copy(
+                    isLoading = true,
+                    errorMessage = null
+                )
+            }
 
             val movieResult = getMovieDetailsUseCase(movieId = movieId)
 
             movieResult.fold(
                 onSuccess = { movie ->
-                    state.movie = movie
-                    state.isOfflineFavorite = false
+                    _state.update { currentState ->
+                        currentState.copy(
+                            movie = movie,
+                            isOfflineFavorite = false
+                        )
+                    }
+
                     val creditsDeferred = async { getMovieCreditsUseCase(movieId = movieId) }
                     val videosDeferred = async { getMovieVideosUseCase(movieId = movieId) }
                     val similarDeferred = async { getSimilarMoviesUseCase(movieId = movieId) }
 
                     creditsDeferred.await().fold(
                         onSuccess = { credits ->
-                            state.cast = credits.cast.take(10)
+                            _state.update { currentState ->
+                                currentState.copy(cast = credits.cast.take(10))
+                            }
                         },
                         onFailure = {
-                            state.cast = emptyList()
+                            _state.update { currentState ->
+                                currentState.copy(cast = emptyList())
+                            }
                         }
                     )
 
                     videosDeferred.await().fold(
                         onSuccess = { videos ->
-                            state.trailers = videos.videos
-                                .filter { video -> video.isPlayableTrailer }
-                                .take(10)
+                            _state.update { currentState ->
+                                currentState.copy(
+                                    trailers = videos.videos
+                                        .filter { video -> video.isPlayableTrailer }
+                                        .take(10)
+                                )
+                            }
                         },
                         onFailure = {
-                            state.trailers = emptyList()
+                            _state.update { currentState ->
+                                currentState.copy(trailers = emptyList())
+                            }
                         }
                     )
 
                     similarDeferred.await().fold(
                         onSuccess = { movies ->
-                            state.similarMovies = movies.take(10)
+                            _state.update { currentState ->
+                                currentState.copy(similarMovies = movies.take(10))
+                            }
                         },
                         onFailure = {
-                            state.similarMovies = emptyList()
+                            _state.update { currentState ->
+                                currentState.copy(similarMovies = emptyList())
+                            }
                         }
                     )
 
-                    state.isLoading = false
+                    _state.update { currentState ->
+                        currentState.copy(isLoading = false)
+                    }
                 },
                 onFailure = { error ->
                     val offlineFavorite = getFavoriteMovieDetailsUseCase(movieId = movieId)
-                    state.apply {
+                    _state.update { currentState ->
                         if (offlineFavorite != null) {
-                            movie = offlineFavorite
-                            cast = emptyList()
-                            trailers = emptyList()
-                            similarMovies = emptyList()
-                            isOfflineFavorite = true
-                            errorMessage = null
+                            currentState.copy(
+                                movie = offlineFavorite,
+                                cast = emptyList(),
+                                trailers = emptyList(),
+                                similarMovies = emptyList(),
+                                isOfflineFavorite = true,
+                                errorMessage = null,
+                                isLoading = false
+                            )
                         } else {
-                            errorMessage = error.localizedMessage ?: "Unable to load movie details."
+                            currentState.copy(
+                                errorMessage = error.localizedMessage ?: "Unable to load movie details.",
+                                isLoading = false
+                            )
                         }
-                        isLoading = false
                     }
                 }
             )
@@ -126,7 +161,9 @@ class MovieDetailsViewModel @Inject constructor(
     private fun observeFavoriteState() {
         viewModelScope.launch {
             observeIsFavoriteUseCase(movieId = movieId).collectLatest { isFavorite ->
-                state.isFavorite = isFavorite
+                _state.update { currentState ->
+                    currentState.copy(isFavorite = isFavorite)
+                }
             }
         }
     }
@@ -138,17 +175,23 @@ class MovieDetailsViewModel @Inject constructor(
     }
 
     private fun onFavoriteClick() {
-        val movie = state.movie ?: return
+        val movie = state.value.movie ?: return
 
         viewModelScope.launch {
-            state.isFavoriteLoading = true
+            _state.update { currentState ->
+                currentState.copy(isFavoriteLoading = true)
+            }
 
             toggleFavoriteMovieUseCase(movie = movie).fold(
                 onSuccess = {
-                    state.isFavoriteLoading = false
+                    _state.update { currentState ->
+                        currentState.copy(isFavoriteLoading = false)
+                    }
                 },
                 onFailure = {
-                    state.isFavoriteLoading = false
+                    _state.update { currentState ->
+                        currentState.copy(isFavoriteLoading = false)
+                    }
                 }
             )
         }
@@ -161,7 +204,7 @@ class MovieDetailsViewModel @Inject constructor(
     }
 
     private fun onTrailerClicked(trailerId: String) {
-        val trailerUrl = state.trailers
+        val trailerUrl = state.value.trailers
             .firstOrNull { trailer -> trailer.id == trailerId }
             ?.youtubeUrl
             ?: return
