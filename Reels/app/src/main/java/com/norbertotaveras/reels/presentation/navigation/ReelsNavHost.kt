@@ -26,6 +26,7 @@ import com.norbertotaveras.reels.presentation.features.movies.details.MovieDetai
 import com.norbertotaveras.reels.presentation.features.movies.favorites.FavoritesRoute
 import com.norbertotaveras.reels.presentation.features.movies.list.MoviesListRoute
 import com.norbertotaveras.reels.presentation.features.movies.search.SearchRoute
+import com.norbertotaveras.reels.presentation.features.settings.SettingsScreen
 
 @Composable
 fun ReelsNavHost(modifier: Modifier = Modifier) {
@@ -94,7 +95,7 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
             }
 
             composable(ReelsDestinations.SETTINGS) {
-                PlaceholderTabScreen(title = "Settings")
+                SettingsScreen()
             }
 
             composable(
@@ -182,4 +183,3 @@ private fun ReelsBottomNavigationBar(
         }
     }
 }
-
