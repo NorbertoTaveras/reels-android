@@ -11,21 +11,22 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.HighQuality
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -36,11 +37,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsAccent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
@@ -58,18 +61,18 @@ fun SettingsScreen(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = ReelsSpacing.screenHorizontal)
             .padding(top = ReelsSpacing.xLarge, bottom = ReelsSpacing.xxLarge),
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xLarge)
+        verticalArrangement = Arrangement.spacedBy(28.dp)
     ) {
         Text(
             text = "Settings",
-            style = MaterialTheme.typography.headlineSmall,
+            style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.Bold
         )
 
         SettingsSection(title = "APP PREFERENCES") {
             SettingsRow(
-                icon = Icons.Filled.HighQuality,
+                icon = Icons.Filled.Image,
                 title = "Image Quality",
                 subtitle = "High quality posters and backdrops"
             )
@@ -103,7 +106,7 @@ fun SettingsScreen(
             SettingsRow(
                 icon = Icons.Filled.DeleteOutline,
                 title = "Clear Image Cache",
-                subtitle = "Free up locally cached poster storage"
+                subtitle = "Free up locally cached poster images"
             )
         }
 
@@ -120,19 +123,11 @@ fun SettingsScreen(
             SettingsRow(
                 icon = Icons.Filled.Shield,
                 title = "Privacy",
-                subtitle = "Review app data practices"
-            )
-
-            SettingsDivider()
-
-            SettingsRow(
-                icon = Icons.Filled.Policy,
-                title = "TMDB Attribution",
-                subtitle = "Movie data provided by The Movie Database"
+                subtitle = "Local favorites stay on this device"
             )
         }
 
-        TmdbAttributionNotice()
+        TmdbAttributionSection()
     }
 }
 
@@ -144,14 +139,17 @@ private fun SettingsSection(
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
+        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
     ) {
         Text(
             text = title,
-            modifier = Modifier.padding(horizontal = ReelsSpacing.xSmall),
-            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.padding(horizontal = 4.dp),
+            style = MaterialTheme.typography.labelLarge.copy(
+                fontSize = 14.sp,
+                letterSpacing = 0.sp
+            ),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.Bold
         )
 
         Surface(
@@ -160,9 +158,9 @@ private fun SettingsSection(
                 .border(
                     width = 1.dp,
                     color = ReelsBorder,
-                    shape = MaterialTheme.shapes.large
+                    shape = MaterialTheme.shapes.extraLarge
                 ),
-            shape = MaterialTheme.shapes.large,
+            shape = MaterialTheme.shapes.extraLarge,
             color = MaterialTheme.colorScheme.surface
         ) {
             Column(content = content)
@@ -188,12 +186,13 @@ private fun SettingsRow(
     Row(
         modifier = rowModifier
             .fillMaxWidth()
-            .padding(horizontal = ReelsSpacing.medium, vertical = ReelsSpacing.medium),
+            .heightIn(min = 74.dp)
+            .padding(horizontal = ReelsSpacing.large, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
-                .size(36.dp)
+                .size(42.dp)
                 .clip(MaterialTheme.shapes.medium)
                 .background(ReelsSurfaceHigh),
             contentAlignment = Alignment.Center
@@ -201,30 +200,31 @@ private fun SettingsRow(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(22.dp),
                 tint = ReelsAccent
             )
         }
 
-        Spacer(modifier = Modifier.width(ReelsSpacing.medium))
+        Spacer(modifier = Modifier.width(ReelsSpacing.large))
 
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(2.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
             Text(
                 text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -234,7 +234,7 @@ private fun SettingsRow(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
-                modifier = Modifier.size(22.dp),
+                modifier = Modifier.size(24.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -246,49 +246,150 @@ private fun SettingsDivider(
     modifier: Modifier = Modifier,
 ) {
     HorizontalDivider(
-        modifier = modifier.padding(start = 60.dp),
+        modifier = modifier,
         thickness = 1.dp,
         color = ReelsBorder
     )
 }
 
 @Composable
-private fun TmdbAttributionNotice(
+private fun TmdbAttributionSection(
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
+    ) {
+        Text(
+            text = "TMDB ATTRIBUTION",
+            modifier = Modifier.padding(horizontal = 4.dp),
+            style = MaterialTheme.typography.labelLarge.copy(
+                fontSize = 14.sp,
+                letterSpacing = 0.sp
+            ),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.Bold
+        )
+
+        TmdbAttributionCard()
+    }
+}
+
+@Composable
+private fun TmdbAttributionCard(
+    modifier: Modifier = Modifier,
+) {
+    Column(
         modifier = modifier
             .fillMaxWidth()
             .border(
                 width = 1.dp,
                 color = ReelsBorder,
-                shape = MaterialTheme.shapes.large
+                shape = MaterialTheme.shapes.extraLarge
             )
-            .padding(ReelsSpacing.medium),
-        verticalAlignment = Alignment.CenterVertically
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = MaterialTheme.shapes.extraLarge
+            )
+            .padding(ReelsSpacing.xLarge),
+        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)
     ) {
-        Box(
-            modifier = Modifier
-                .size(36.dp)
-                .clip(CircleShape)
-                .background(ReelsAccent.copy(alpha = 0.18f)),
-            contentAlignment = Alignment.Center
+        Row(
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "TM",
-                style = MaterialTheme.typography.labelMedium,
-                color = ReelsAccent,
-                fontWeight = FontWeight.Bold
-            )
-        }
+            TmdbLogoMark()
 
-        Spacer(modifier = Modifier.width(ReelsSpacing.medium))
+            Spacer(modifier = Modifier.width(ReelsSpacing.large))
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Text(
+                    text = "The Movie Database",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = "Powered by TMDB API",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
 
         Text(
             text = "This product uses the TMDB API but is not endorsed or certified by TMDB.",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.SemiBold
         )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "Visit themoviedb.org",
+                style = MaterialTheme.typography.bodyMedium,
+                color = ReelsAccent,
+                fontWeight = FontWeight.Bold
+            )
+
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = ReelsAccent
+            )
+        }
+    }
+}
+
+@Composable
+private fun TmdbLogoMark(
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .size(56.dp)
+            .clip(MaterialTheme.shapes.large)
+            .background(Color(0xFF01B4E4)),
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "TM",
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.width(2.dp))
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(3.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(22.dp)
+                        .height(5.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .background(Color.White)
+                )
+                Text(
+                    text = "D",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
     }
 }
 
