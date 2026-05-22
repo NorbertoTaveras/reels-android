@@ -10,7 +10,7 @@ import com.norbertotaveras.reels.data.remote.dto.person.PersonMovieCreditsDto
 import javax.inject.Inject
 
 class TmdbRemoteDataSourceImpl @Inject constructor(
-    private val service: TMDBFwkService
+    private val service: TmdbService
 ) : TmdbRemoteDataSource {
     override suspend fun getMovies(
         category: String,

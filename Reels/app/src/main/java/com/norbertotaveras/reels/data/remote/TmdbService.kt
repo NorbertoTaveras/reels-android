@@ -11,7 +11,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-interface TMDBFwkService {
+interface TmdbService {
     @GET("movie/{category}")
     suspend fun getMovies(
         @Path("category") category: String,

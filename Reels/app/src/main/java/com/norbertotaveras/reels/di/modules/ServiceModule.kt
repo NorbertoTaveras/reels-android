@@ -2,7 +2,7 @@ package com.norbertotaveras.reels.di.modules
 
 import com.google.gson.GsonBuilder
 import com.norbertotaveras.reels.BuildConfig
-import com.norbertotaveras.reels.data.remote.TMDBFwkService
+import com.norbertotaveras.reels.data.remote.TmdbService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,9 +21,9 @@ import javax.inject.Singleton
 object ServiceModule {
     @Singleton
     @get:Provides
-    val flickrFwkService: TMDBFwkService by lazy {
+    val tmdbService: TmdbService by lazy {
         buildService(
-            clazz = TMDBFwkService::class.java,
+            clazz = TmdbService::class.java,
             baseUrl = BuildConfig.BASE_URL,
             key = BuildConfig.TMDB_API_KEY,
             token = BuildConfig.TMDB_READ_TOKEN,

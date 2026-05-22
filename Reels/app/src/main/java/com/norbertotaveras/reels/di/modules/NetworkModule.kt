@@ -2,7 +2,7 @@ package com.norbertotaveras.reels.di.modules
 
 import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
 import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSourceImpl
-import com.norbertotaveras.reels.data.remote.TMDBFwkService
+import com.norbertotaveras.reels.data.remote.TmdbService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,7 +14,7 @@ import javax.inject.Singleton
 object NetworkModule {
     @Singleton
     @Provides
-    fun provideTmdbRemoteDataSource(service: TMDBFwkService): TmdbRemoteDataSource {
+    fun provideTmdbRemoteDataSource(service: TmdbService): TmdbRemoteDataSource {
         return TmdbRemoteDataSourceImpl(service)
     }
 }

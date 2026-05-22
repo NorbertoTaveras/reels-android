@@ -12,7 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -261,7 +261,7 @@ private fun MovieInfoIcon(
     val imageVector = when (icon) {
         MovieInfoIcon.ReleaseDate -> Icons.Filled.CalendarToday
         MovieInfoIcon.Language -> Icons.Filled.Language
-        MovieInfoIcon.Popularity -> Icons.Filled.TrendingUp
+        MovieInfoIcon.Popularity -> Icons.AutoMirrored.Filled.TrendingUp
     }
 
     Icon(
