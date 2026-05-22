@@ -8,7 +8,7 @@ import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
 import com.norbertotaveras.reels.data.remote.dto.person.PersonDetailsDto
 import com.norbertotaveras.reels.data.remote.dto.person.PersonMovieCreditsDto
 
-interface TMDBFwkRepository {
+interface TmdbRemoteDataSource {
     suspend fun getMovies(
         category: String,
         language: String? = null,

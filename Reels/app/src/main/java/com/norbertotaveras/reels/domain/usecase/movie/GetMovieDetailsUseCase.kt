@@ -1,21 +1,19 @@
 package com.norbertotaveras.reels.domain.usecase.movie
 
 import com.norbertotaveras.reels.domain.model.movie.MovieDetailsDataModel
-import com.norbertotaveras.reels.data.remote.TMDBFwkRepository
+import com.norbertotaveras.reels.domain.repository.movie.MovieRepository
 import javax.inject.Inject
 
 class GetMovieDetailsUseCase @Inject constructor(
-    private val repository: TMDBFwkRepository
+    private val repository: MovieRepository
 ) {
     suspend operator fun invoke(
         movieId: Int,
         language: String = "en-US"
     ): Result<MovieDetailsDataModel> {
-        return runCatching {
-            repository.getMovieDetails(
-                movieId = movieId,
-                language = language
-            ).toMovieDetailsDataModel()
-        }
+        return repository.getMovieDetails(
+            movieId = movieId,
+            language = language
+        )
     }
 }

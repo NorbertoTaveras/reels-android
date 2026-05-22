@@ -5,10 +5,10 @@ import androidx.paging.PagingState
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
-import com.norbertotaveras.reels.data.remote.TMDBFwkRepository
+import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
 
 class MoviesPagingSource(
-    private val repository: TMDBFwkRepository,
+    private val remoteDataSource: TmdbRemoteDataSource,
     private val category: MovieCategory,
     private val language: String,
 ) : PagingSource<Int, MovieDto>() {
@@ -21,7 +21,7 @@ class MoviesPagingSource(
         return try {
             val page = params.key ?: 1
 
-            val response: MoviesResponseDto = repository.getMovies(
+            val response: MoviesResponseDto = remoteDataSource.getMovies(
                 category = category.value,
                 language = language,
                 page = page
