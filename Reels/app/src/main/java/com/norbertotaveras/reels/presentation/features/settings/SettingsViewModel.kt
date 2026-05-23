@@ -2,6 +2,7 @@ package com.norbertotaveras.reels.presentation.features.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.norbertotaveras.reels.BuildConfig
 import com.norbertotaveras.reels.domain.model.settings.AppSettings
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateImageQualityUseCase
@@ -25,7 +26,9 @@ class SettingsViewModel @Inject constructor(
     private val updateLanguageRegionUseCase: UpdateLanguageRegionUseCase,
     private val updateThemeUseCase: UpdateThemeUseCase,
 ) : ViewModel() {
-    private val _state = MutableStateFlow(SettingsUiState())
+    private val _state = MutableStateFlow(
+        SettingsUiState(appVersionLabel = BuildConfig.VERSION_NAME)
+    )
     val state: StateFlow<SettingsUiState> = _state.asStateFlow()
 
     private val _effect = MutableSharedFlow<SettingsEffect>()
