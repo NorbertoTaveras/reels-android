@@ -2,7 +2,6 @@ package com.norbertotaveras.reels.presentation.features.movies.favorites
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
 import com.norbertotaveras.reels.presentation.ui.components.movie.MoviePosterCard
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
@@ -28,7 +28,7 @@ fun FavoritesScreen(
     modifier: Modifier = Modifier,
 ) {
     if (state.movies.isEmpty()) {
-        EmptyFavoritesState(modifier = modifier)
+        EmptyFavoritesState(modifier = modifier.fillMaxSize())
         return
     }
 
@@ -102,17 +102,22 @@ fun FavoritesScreen(
 private fun EmptyFavoritesState(
     modifier: Modifier = Modifier,
 ) {
-    Box(
+    androidx.compose.foundation.layout.Column(
         modifier = modifier
-            .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .padding(ReelsSpacing.screenHorizontal),
-        contentAlignment = Alignment.Center
+        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xLarge)
     ) {
         Text(
-            text = "No favorites yet",
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            modifier = Modifier.padding(top = ReelsSpacing.xLarge),
+            text = "Favorites",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
+        EmptyState(
+            title = "No saved movies yet",
+            message = "Tap the heart on a movie details screen to keep it available offline."
         )
     }
 }

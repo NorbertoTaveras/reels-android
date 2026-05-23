@@ -19,7 +19,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,6 +37,8 @@ import androidx.paging.compose.LazyPagingItems
 import com.norbertotaveras.reels.extensions.toRelativeReleaseAge
 import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
+import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
+import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
 import com.norbertotaveras.reels.presentation.ui.components.movie.MovieResultRow
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
@@ -148,10 +149,9 @@ fun SearchScreen(
             when {
                 state.query.length < 2 -> {
                     item {
-                        Text(
-                            text = "Search for a movie to get started.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        EmptyState(
+                            title = "Search for a movie",
+                            message = "Enter at least two characters to find movies from TMDB."
                         )
                     }
                 }
@@ -169,8 +169,9 @@ fun SearchScreen(
 
                 movies.loadState.refresh is LoadState.Error -> {
                     item {
-                        SearchErrorState(
+                        InlineRetryState(
                             message = "Unable to load search results.",
+                            retryLabel = "Retry",
                             onRetry = movies::retry
                         )
                     }
@@ -178,10 +179,9 @@ fun SearchScreen(
 
                 movies.itemCount == 0 -> {
                     item {
-                        Text(
-                            text = "No movies found.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        EmptyState(
+                            title = "No movies found",
+                            message = "Try a different title or check the spelling."
                         )
                     }
                 }
@@ -223,8 +223,9 @@ fun SearchScreen(
 
                     if (movies.loadState.append is LoadState.Error) {
                         item {
-                            SearchErrorState(
+                            InlineRetryState(
                                 message = "Unable to load more results.",
+                                retryLabel = "Retry",
                                 onRetry = movies::retry
                             )
                         }
@@ -290,29 +291,6 @@ private fun RecentSearchesSection(
                 }
 
             }
-        }
-    }
-}
-
-@Composable
-private fun SearchErrorState(
-    message: String,
-    onRetry: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
-    ) {
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        Button(onClick = onRetry) {
-            Text(text = "Retry")
         }
     }
 }

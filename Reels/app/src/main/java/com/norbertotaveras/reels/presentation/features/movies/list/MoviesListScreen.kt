@@ -20,6 +20,8 @@ import com.norbertotaveras.reels.presentation.features.movies.list.components.Mo
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.CenteredErrorState
 import com.norbertotaveras.reels.presentation.ui.components.common.CenteredLoadingState
+import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
+import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
 
 @Composable
 fun MoviesListScreen(
@@ -99,10 +101,11 @@ fun MoviesListScreen(
             when (val appendState = movies.loadState.append) {
                 is LoadState.Error -> {
                     item {
-                        Text(
-                            text = appendState.error.localizedMessage ?: "Unable to load more movies.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.error
+                        InlineRetryState(
+                            message = appendState.error.localizedMessage
+                                ?: "Unable to load more movies.",
+                            retryLabel = "Retry",
+                            onRetry = movies::retry
                         )
                     }
                 }
@@ -110,9 +113,9 @@ fun MoviesListScreen(
                 is LoadState.NotLoading -> {
                     if (movies.itemCount == 0) {
                         item {
-                            Text(
-                                text = "No movies found for this category.",
-                                style = MaterialTheme.typography.bodyLarge
+                            EmptyState(
+                                title = "No movies found",
+                                message = "Try another category or refresh again in a moment."
                             )
                         }
                     }
