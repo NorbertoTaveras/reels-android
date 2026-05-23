@@ -28,11 +28,13 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -139,6 +141,45 @@ fun SettingsScreen(
             onClick = { onEvent(SettingsEvent.TmdbAttributionClicked) }
         )
     }
+
+    if (state.isPrivacyNoticeVisible) {
+        PrivacyNoticeDialog(
+            onDismiss = { onEvent(SettingsEvent.PrivacyNoticeDismissed) }
+        )
+    }
+}
+
+@Composable
+private fun PrivacyNoticeDialog(
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    AlertDialog(
+        modifier = modifier,
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Privacy",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Text(
+                text = "Reels stores favorites and preferences on this device. Movie data, images, cast details, and trailers are loaded from TMDB when you browse the app. Reels does not use TMDB account login, collect personal account data, or sync your favorites to TMDB.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = "Got it")
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surface,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
+        textContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+    )
 }
 
 @Composable

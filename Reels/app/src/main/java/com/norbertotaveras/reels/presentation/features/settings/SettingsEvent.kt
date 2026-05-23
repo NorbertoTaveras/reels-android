@@ -7,5 +7,6 @@ sealed interface SettingsEvent {
     data object SavedMoviesClicked : SettingsEvent
     data object ClearImageCacheClicked : SettingsEvent
     data object PrivacyClicked : SettingsEvent
+    data object PrivacyNoticeDismissed : SettingsEvent
     data object TmdbAttributionClicked : SettingsEvent
 }

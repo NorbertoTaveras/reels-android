@@ -8,4 +8,5 @@ data class SettingsUiState(
     val clearImageCacheLabel: String = "Free up locally cached poster images",
     val appVersionLabel: String = "1.0.0",
     val privacyLabel: String = "Local favorites stay on this device",
+    val isPrivacyNoticeVisible: Boolean = false,
 )
