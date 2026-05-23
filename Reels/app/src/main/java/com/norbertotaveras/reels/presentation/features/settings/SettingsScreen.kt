@@ -52,6 +52,8 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 
 @Composable
 fun SettingsScreen(
+    state: SettingsUiState,
+    onEvent: (SettingsEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -74,7 +76,8 @@ fun SettingsScreen(
             SettingsRow(
                 icon = Icons.Filled.Image,
                 title = "Image Quality",
-                subtitle = "High quality posters and backdrops"
+                subtitle = state.imageQualityLabel,
+                onClick = { onEvent(SettingsEvent.ImageQualityClicked) }
             )
 
             SettingsDivider()
@@ -82,7 +85,8 @@ fun SettingsScreen(
             SettingsRow(
                 icon = Icons.Filled.Language,
                 title = "Language & Region",
-                subtitle = "English · United States"
+                subtitle = state.languageRegionLabel,
+                onClick = { onEvent(SettingsEvent.LanguageRegionClicked) }
             )
 
             SettingsDivider()
@@ -90,7 +94,8 @@ fun SettingsScreen(
             SettingsRow(
                 icon = Icons.Filled.Palette,
                 title = "Theme",
-                subtitle = "Use system setting"
+                subtitle = state.themeLabel,
+                onClick = { onEvent(SettingsEvent.ThemeClicked) }
             )
         }
 
@@ -98,7 +103,8 @@ fun SettingsScreen(
             SettingsRow(
                 icon = Icons.Filled.Download,
                 title = "Saved Movies",
-                subtitle = "Manage movies saved on this device"
+                subtitle = state.savedMoviesLabel,
+                onClick = { onEvent(SettingsEvent.SavedMoviesClicked) }
             )
 
             SettingsDivider()
@@ -106,7 +112,8 @@ fun SettingsScreen(
             SettingsRow(
                 icon = Icons.Filled.DeleteOutline,
                 title = "Clear Image Cache",
-                subtitle = "Free up locally cached poster images"
+                subtitle = state.clearImageCacheLabel,
+                onClick = { onEvent(SettingsEvent.ClearImageCacheClicked) }
             )
         }
 
@@ -114,7 +121,7 @@ fun SettingsScreen(
             SettingsRow(
                 icon = Icons.Filled.Info,
                 title = "App Version",
-                subtitle = "1.0.0",
+                subtitle = state.appVersionLabel,
                 showsChevron = false
             )
 
@@ -123,11 +130,14 @@ fun SettingsScreen(
             SettingsRow(
                 icon = Icons.Filled.Shield,
                 title = "Privacy",
-                subtitle = "Local favorites stay on this device"
+                subtitle = state.privacyLabel,
+                onClick = { onEvent(SettingsEvent.PrivacyClicked) }
             )
         }
 
-        TmdbAttributionSection()
+        TmdbAttributionSection(
+            onClick = { onEvent(SettingsEvent.TmdbAttributionClicked) }
+        )
     }
 }
 
@@ -254,6 +264,7 @@ private fun SettingsDivider(
 
 @Composable
 private fun TmdbAttributionSection(
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -271,17 +282,19 @@ private fun TmdbAttributionSection(
             fontWeight = FontWeight.Bold
         )
 
-        TmdbAttributionCard()
+        TmdbAttributionCard(onClick = onClick)
     }
 }
 
 @Composable
 private fun TmdbAttributionCard(
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .clickable(onClick = onClick)
             .border(
                 width = 1.dp,
                 color = ReelsBorder,
@@ -397,6 +410,9 @@ private fun TmdbLogoMark(
 @Composable
 private fun SettingsScreenPreview() {
     ReelsTheme {
-        SettingsScreen()
+        SettingsScreen(
+            state = SettingsUiState(),
+            onEvent = {}
+        )
     }
 }

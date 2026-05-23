@@ -26,7 +26,7 @@ import com.norbertotaveras.reels.presentation.features.movies.details.MovieDetai
 import com.norbertotaveras.reels.presentation.features.movies.favorites.FavoritesRoute
 import com.norbertotaveras.reels.presentation.features.movies.list.MoviesListRoute
 import com.norbertotaveras.reels.presentation.features.movies.search.SearchRoute
-import com.norbertotaveras.reels.presentation.features.settings.SettingsScreen
+import com.norbertotaveras.reels.presentation.features.settings.SettingsRoute
 
 @Composable
 fun ReelsNavHost(modifier: Modifier = Modifier) {
@@ -95,7 +95,7 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
             }
 
             composable(ReelsDestinations.SETTINGS) {
-                SettingsScreen()
+                SettingsRoute(onOpenExternalUrl = openExternalUrl)
             }
 
             composable(
