@@ -11,6 +11,7 @@ import com.norbertotaveras.reels.domain.usecase.movie.GetMovieCreditsUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.GetMovieDetailsUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.GetMovieVideosUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.GetSimilarMoviesUseCase
+import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,6 +21,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,6 +37,7 @@ class MovieDetailsViewModel @Inject constructor(
     private val observeIsFavoriteUseCase: ObserveIsFavoriteUseCase,
     private val toggleFavoriteMovieUseCase: ToggleFavoriteMovieUseCase,
     private val getFavoriteMovieDetailsUseCase: GetFavoriteMovieDetailsUseCase,
+    private val observeSettingsUseCase: ObserveSettingsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(MovieDetailsUiState())
     val state: StateFlow<MovieDetailsUiState> = _state.asStateFlow()
@@ -44,16 +48,17 @@ class MovieDetailsViewModel @Inject constructor(
     private val movieId: Int = checkNotNull(
         savedStateHandle.get<Int>(ReelsDestinations.MOVIE_ID_ARG)
     )
+    private var currentLanguage: String = DEFAULT_LANGUAGE
 
     init {
         observeFavoriteState()
-        loadMovie()
+        observeSettings()
     }
 
     fun onEvent(event: MovieDetailsEvent) {
         when (event) {
             MovieDetailsEvent.BackClicked -> onBackClicked()
-            MovieDetailsEvent.RetryClicked -> loadMovie()
+            MovieDetailsEvent.RetryClicked -> loadMovie(language = currentLanguage)
             MovieDetailsEvent.FavoriteClicked -> onFavoriteClick()
             is MovieDetailsEvent.CastClicked -> onCastClicked(personId = event.personId)
             MovieDetailsEvent.CastSeeAllClicked -> Unit
@@ -62,7 +67,7 @@ class MovieDetailsViewModel @Inject constructor(
         }
     }
 
-    fun loadMovie() {
+    fun loadMovie(language: String = currentLanguage) {
         viewModelScope.launch {
             _state.update { currentState ->
                 currentState.copy(
@@ -71,7 +76,10 @@ class MovieDetailsViewModel @Inject constructor(
                 )
             }
 
-            val movieResult = getMovieDetailsUseCase(movieId = movieId)
+            val movieResult = getMovieDetailsUseCase(
+                movieId = movieId,
+                language = language
+            )
 
             movieResult.fold(
                 onSuccess = { movie ->
@@ -82,9 +90,24 @@ class MovieDetailsViewModel @Inject constructor(
                         )
                     }
 
-                    val creditsDeferred = async { getMovieCreditsUseCase(movieId = movieId) }
-                    val videosDeferred = async { getMovieVideosUseCase(movieId = movieId) }
-                    val similarDeferred = async { getSimilarMoviesUseCase(movieId = movieId) }
+                    val creditsDeferred = async {
+                        getMovieCreditsUseCase(
+                            movieId = movieId,
+                            language = language
+                        )
+                    }
+                    val videosDeferred = async {
+                        getMovieVideosUseCase(
+                            movieId = movieId,
+                            language = language
+                        )
+                    }
+                    val similarDeferred = async {
+                        getSimilarMoviesUseCase(
+                            movieId = movieId,
+                            language = language
+                        )
+                    }
 
                     creditsDeferred.await().fold(
                         onSuccess = { credits ->
@@ -168,6 +191,18 @@ class MovieDetailsViewModel @Inject constructor(
         }
     }
 
+    private fun observeSettings() {
+        viewModelScope.launch {
+            observeSettingsUseCase()
+                .map { settings -> settings.languageRegion.languageCode }
+                .distinctUntilChanged()
+                .collect { language ->
+                    currentLanguage = language
+                    loadMovie(language = language)
+                }
+        }
+    }
+
     private fun onBackClicked() {
         viewModelScope.launch {
             _effect.emit(MovieDetailsEffect.NavigateBack)
@@ -218,5 +253,9 @@ class MovieDetailsViewModel @Inject constructor(
         viewModelScope.launch {
             _effect.emit(MovieDetailsEffect.NavigateToMovieDetails(movieId = movieId))
         }
+    }
+
+    private companion object {
+        const val DEFAULT_LANGUAGE = "en-US"
     }
 }

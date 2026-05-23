@@ -7,6 +7,7 @@ import androidx.paging.cachedIn
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.domain.usecase.movie.GetMovieGenresUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.SearchMoviesUseCase
+import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -31,6 +32,7 @@ import kotlinx.coroutines.launch
 class SearchViewModel @Inject constructor(
     private val searchMoviesUseCase: SearchMoviesUseCase,
     private val getMovieGenresUseCase: GetMovieGenresUseCase,
+    private val observeSettingsUseCase: ObserveSettingsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(SearchUiState())
     val state: StateFlow<SearchUiState> = _state.asStateFlow()
@@ -40,20 +42,23 @@ class SearchViewModel @Inject constructor(
 
     @OptIn(FlowPreview::class)
     val searchResults: Flow<PagingData<MovieDataModel>> = state
-        .map { uiState -> uiState.query.trim() }
+        .map { uiState -> uiState.query.trim() to uiState.language }
         .debounce(400)
         .distinctUntilChanged()
-        .flatMapLatest { query ->
+        .flatMapLatest { (query, language) ->
             if (query.length < MIN_QUERY_LENGTH) {
                 flowOf(PagingData.empty())
             } else {
-                searchMoviesUseCase(query = query)
+                searchMoviesUseCase(
+                    query = query,
+                    language = language
+                )
             }
         }
         .cachedIn(viewModelScope)
 
     init {
-        loadGenres()
+        observeSettings()
     }
 
     fun onEvent(event: SearchEvent) {
@@ -115,9 +120,23 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private fun loadGenres() {
+    private fun observeSettings() {
         viewModelScope.launch {
-            getMovieGenresUseCase().fold(
+            observeSettingsUseCase()
+                .map { settings -> settings.languageRegion.languageCode }
+                .distinctUntilChanged()
+                .collect { language ->
+                    _state.update { currentState ->
+                        currentState.copy(language = language)
+                    }
+                    loadGenres(language = language)
+                }
+        }
+    }
+
+    private fun loadGenres(language: String) {
+        viewModelScope.launch {
+            getMovieGenresUseCase(language = language).fold(
                 onSuccess = { genres ->
                     _state.update { currentState ->
                         currentState.copy(

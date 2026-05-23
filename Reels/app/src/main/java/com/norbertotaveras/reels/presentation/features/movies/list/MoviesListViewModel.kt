@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 import com.norbertotaveras.reels.domain.usecase.movie.GetMoviesUseCase
+import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,7 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
 class MoviesListViewModel @Inject constructor(
-    private val getMoviesUseCase: GetMoviesUseCase
+    private val getMoviesUseCase: GetMoviesUseCase,
+    private val observeSettingsUseCase: ObserveSettingsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(MoviesListState())
     val state: StateFlow<MoviesListState> = _state.asStateFlow()
@@ -42,6 +44,10 @@ class MoviesListViewModel @Inject constructor(
         }
         .cachedIn(viewModelScope)
 
+    init {
+        observeSettings()
+    }
+
     fun onEvent(event: MoviesListEvent) {
         when (event) {
             is MoviesListEvent.CategorySelected -> onCategorySelected(category = event.category)
@@ -52,6 +58,19 @@ class MoviesListViewModel @Inject constructor(
     private fun onCategorySelected(category: MovieCategory) {
         _state.update { currentState ->
             currentState.copy(category = category)
+        }
+    }
+
+    private fun observeSettings() {
+        viewModelScope.launch {
+            observeSettingsUseCase()
+                .map { settings -> settings.languageRegion.languageCode }
+                .distinctUntilChanged()
+                .collect { language ->
+                    _state.update { currentState ->
+                        currentState.copy(language = language)
+                    }
+                }
         }
     }
 
