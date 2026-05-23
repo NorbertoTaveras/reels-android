@@ -472,8 +472,6 @@ private fun PersonalInfoSection(
                     value = knownCreditsCount.toString()
                 )
 
-                PersonalInfoDivider()
-
                 if (!alsoKnownAs.isNullOrBlank()) {
                     PersonalInfoDivider()
 

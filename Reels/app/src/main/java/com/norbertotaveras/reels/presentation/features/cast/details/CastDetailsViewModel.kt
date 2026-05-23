@@ -47,7 +47,7 @@ class CastDetailsViewModel @Inject constructor(
         when (event) {
             CastDetailsEvent.BackClicked -> onBackClicked()
             CastDetailsEvent.RetryClicked -> loadPerson(language = currentLanguage)
-            CastDetailsEvent.FavoriteClicked -> Unit
+            CastDetailsEvent.FavoriteClicked -> onFavoriteClicked()
             is CastDetailsEvent.MovieClicked -> onMovieClicked(movieId = event.movieId)
         }
     }
@@ -133,6 +133,16 @@ class CastDetailsViewModel @Inject constructor(
     private fun onMovieClicked(movieId: Int) {
         viewModelScope.launch {
             _effect.emit(CastDetailsEffect.NavigateToMovieDetails(movieId = movieId))
+        }
+    }
+
+    private fun onFavoriteClicked() {
+        viewModelScope.launch {
+            _effect.emit(
+                CastDetailsEffect.ShowMessage(
+                    message = "Person favorites are not available in this version."
+                )
+            )
         }
     }
 
