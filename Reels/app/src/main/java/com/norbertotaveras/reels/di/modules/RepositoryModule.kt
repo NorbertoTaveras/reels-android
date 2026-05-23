@@ -2,9 +2,11 @@ package com.norbertotaveras.reels.di.modules
 
 import com.norbertotaveras.reels.data.repository.TmdbRepositoryImpl
 import com.norbertotaveras.reels.data.repository.favorites.FavoriteMoviesRepositoryImpl
+import com.norbertotaveras.reels.data.repository.settings.SettingsRepositoryImpl
 import com.norbertotaveras.reels.domain.repository.favorites.FavoriteMoviesRepository
 import com.norbertotaveras.reels.domain.repository.movie.MovieRepository
 import com.norbertotaveras.reels.domain.repository.person.PersonRepository
+import com.norbertotaveras.reels.domain.repository.settings.SettingsRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -31,4 +33,10 @@ abstract class RepositoryModule {
     abstract fun bindPersonRepository(
         implementation: TmdbRepositoryImpl
     ): PersonRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSettingsRepository(
+        implementation: SettingsRepositoryImpl
+    ): SettingsRepository
 }
