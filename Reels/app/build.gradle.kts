@@ -68,7 +68,7 @@ android {
             applicationIdSuffix = ".stage"
             versionNameSuffix = "-stage"
             buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/\"")
-            buildConfigField("String", "BASE_IMAGE_URL", "\"https://image.tmdb.org/t/p/w500\"")
+            buildConfigField("String", "BASE_IMAGE_URL", "\"https://image.tmdb.org/t/p/\"")
             buildConfigField("String", "TMDB_API_KEY", "\"$apiKey\"")
             buildConfigField("String", "TMDB_READ_TOKEN", "\"$apiToken\"")
         }
@@ -77,7 +77,7 @@ android {
             applicationIdSuffix = ".prod"
             versionNameSuffix = "-prod"
             buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/\"")
-            buildConfigField("String", "BASE_IMAGE_URL", "\"https://image.tmdb.org/t/p/w500\"")
+            buildConfigField("String", "BASE_IMAGE_URL", "\"https://image.tmdb.org/t/p/\"")
             buildConfigField("String", "TMDB_API_KEY", "\"$apiKey\"")
             buildConfigField("String", "TMDB_READ_TOKEN", "\"$apiToken\"")
         }

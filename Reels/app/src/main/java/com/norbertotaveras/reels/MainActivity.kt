@@ -39,7 +39,10 @@ class MainActivity : ComponentActivity() {
                 AppTheme.Light -> false
             }
 
-            ReelsTheme(darkTheme = darkTheme) {
+            ReelsTheme(
+                darkTheme = darkTheme,
+                imageQuality = settings.imageQuality
+            ) {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = MaterialTheme.colorScheme.background

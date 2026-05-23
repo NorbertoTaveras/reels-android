@@ -4,6 +4,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import com.norbertotaveras.reels.domain.model.settings.ImageQuality
 
 private val DarkColorScheme = darkColorScheme(
     primary = ReelsAccent,
@@ -38,14 +40,17 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun ReelsTheme(
     darkTheme: Boolean = true,
+    imageQuality: ImageQuality = ImageQuality.High,
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        shapes = ReelsShapes,
-        content = content
-    )
+    CompositionLocalProvider(LocalImageQuality provides imageQuality) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            shapes = ReelsShapes,
+            content = content
+        )
+    }
 }
