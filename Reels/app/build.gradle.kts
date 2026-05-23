@@ -45,8 +45,14 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("Boolean", "LOG_NETWORK", "true")
+        }
+
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            buildConfigField("Boolean", "LOG_NETWORK", "false")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -74,8 +80,6 @@ android {
         }
         create("production") {
             dimension = "environment"
-            applicationIdSuffix = ".prod"
-            versionNameSuffix = "-prod"
             buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/\"")
             buildConfigField("String", "BASE_IMAGE_URL", "\"https://image.tmdb.org/t/p/\"")
             buildConfigField("String", "TMDB_API_KEY", "\"$apiKey\"")
@@ -88,6 +92,10 @@ kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_11)
     }
+}
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 dependencies {

@@ -25,11 +25,9 @@ object ServiceModule {
         buildService(
             clazz = TmdbService::class.java,
             baseUrl = BuildConfig.BASE_URL,
-            key = BuildConfig.TMDB_API_KEY,
             token = BuildConfig.TMDB_READ_TOKEN,
             addAuth = true,
-            addExpose = false,
-            format = ""
+            addExpose = false
         )
     }
 
@@ -38,14 +36,21 @@ object ServiceModule {
         baseUrl: String,
         addAuth: Boolean,
         addExpose: Boolean,
-        format: String,
-        key: String,
         token: String,
     ): T {
-        val gson = when(addExpose) {
+        val gson = when (addExpose) {
             true -> GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
             else -> GsonBuilder().create()
         }
+
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = if (BuildConfig.LOG_NETWORK) {
+                HttpLoggingInterceptor.Level.BASIC
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
+        }
+
         val retrofit = Retrofit
             .Builder()
             .baseUrl(baseUrl)
@@ -53,12 +58,7 @@ object ServiceModule {
                 OkHttpClient.Builder().apply {
                     this.connectTimeout(30L, TimeUnit.SECONDS)
                     this.readTimeout(30L, TimeUnit.SECONDS)
-                }.addInterceptor(HttpLoggingInterceptor().apply {
-                    this.level =
-                        if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.NONE
-                        else HttpLoggingInterceptor.Level.NONE
-
-                }).addInterceptor(Interceptor { chain ->
+                }.addInterceptor(loggingInterceptor).addInterceptor(Interceptor { chain ->
                     val request: Request = chain.request().newBuilder()
                         .apply {
                             if (addAuth) {
@@ -67,7 +67,6 @@ object ServiceModule {
                             }
                         }
                         .build()
-                    //Logger.d("RequestURLInterceptor", "Request URL: ${request.url}")
                     chain.proceed(request)
                 })
                     .build()

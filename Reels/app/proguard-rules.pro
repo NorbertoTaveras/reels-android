@@ -19,3 +19,9 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Gson reads TMDB DTOs through reflection. Keep their shape stable when R8
+# minifies release builds.
+-keep class com.norbertotaveras.reels.data.remote.dto.** { *; }
+-keepattributes Signature
+-keepattributes RuntimeVisibleAnnotations
