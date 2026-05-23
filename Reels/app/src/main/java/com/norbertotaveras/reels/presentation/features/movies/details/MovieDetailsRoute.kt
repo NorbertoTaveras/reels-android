@@ -1,8 +1,14 @@
 package com.norbertotaveras.reels.presentation.features.movies.details
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -17,8 +23,9 @@ fun MovieDetailsRoute(
     viewModel: MovieDetailsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(viewModel) {
+    LaunchedEffect(viewModel, snackbarHostState) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 MovieDetailsEffect.NavigateBack -> onBackClick()
@@ -31,13 +38,23 @@ fun MovieDetailsRoute(
                 is MovieDetailsEffect.NavigateToMovieDetails -> {
                     onSimilarMovieClick(effect.movieId)
                 }
+                is MovieDetailsEffect.ShowMessage -> {
+                    snackbarHostState.showSnackbar(message = effect.message)
+                }
             }
         }
     }
 
-    MovieDetailsScreen(
-        modifier = modifier,
-        state = state,
-        onEvent = viewModel::onEvent
-    )
+    Box(modifier = modifier.fillMaxSize()) {
+        MovieDetailsScreen(
+            modifier = Modifier.fillMaxSize(),
+            state = state,
+            onEvent = viewModel::onEvent
+        )
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
+    }
 }

@@ -227,6 +227,11 @@ class MovieDetailsViewModel @Inject constructor(
                     _state.update { currentState ->
                         currentState.copy(isFavoriteLoading = false)
                     }
+                    _effect.emit(
+                        MovieDetailsEffect.ShowMessage(
+                            message = "Unable to update saved movie."
+                        )
+                    )
                 }
             )
         }
