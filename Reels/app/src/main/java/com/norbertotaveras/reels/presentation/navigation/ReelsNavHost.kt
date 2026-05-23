@@ -95,7 +95,18 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
             }
 
             composable(ReelsDestinations.SETTINGS) {
-                SettingsRoute(onOpenExternalUrl = openExternalUrl)
+                SettingsRoute(
+                    onNavigateToFavorites = {
+                        navController.navigate(ReelsDestinations.FAVORITES) {
+                            popUpTo(ReelsDestinations.HOME) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onOpenExternalUrl = openExternalUrl
+                )
             }
 
             composable(

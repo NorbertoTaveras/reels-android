@@ -42,8 +42,8 @@ class SettingsViewModel @Inject constructor(
             SettingsEvent.ImageQualityClicked -> onImageQualityClicked()
             SettingsEvent.LanguageRegionClicked -> onLanguageRegionClicked()
             SettingsEvent.ThemeClicked -> onThemeClicked()
-            SettingsEvent.SavedMoviesClicked -> Unit
-            SettingsEvent.ClearImageCacheClicked -> Unit
+            SettingsEvent.SavedMoviesClicked -> onSavedMoviesClicked()
+            SettingsEvent.ClearImageCacheClicked -> onClearImageCacheClicked()
             SettingsEvent.PrivacyClicked -> Unit
             SettingsEvent.TmdbAttributionClicked -> onTmdbAttributionClicked()
         }
@@ -79,6 +79,18 @@ class SettingsViewModel @Inject constructor(
     private fun onThemeClicked() {
         viewModelScope.launch {
             updateThemeUseCase(currentSettings.theme.next())
+        }
+    }
+
+    private fun onSavedMoviesClicked() {
+        viewModelScope.launch {
+            _effect.emit(SettingsEffect.NavigateToFavorites)
+        }
+    }
+
+    private fun onClearImageCacheClicked() {
+        viewModelScope.launch {
+            _effect.emit(SettingsEffect.ClearImageCache)
         }
     }
 
