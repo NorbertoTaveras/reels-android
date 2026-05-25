@@ -38,6 +38,12 @@ object ServiceModule {
         addExpose: Boolean,
         token: String,
     ): T {
+        if (addAuth) {
+            require(token.isNotBlank()) {
+                "TMDB_READ_TOKEN is missing. Add it to local.properties, an environment variable, or a Gradle property."
+            }
+        }
+
         val gson = when (addExpose) {
             true -> GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
             else -> GsonBuilder().create()

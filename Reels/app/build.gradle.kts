@@ -16,11 +16,6 @@ val props = Properties().apply {
     if (f.exists()) f.inputStream().use { load(it) }
 }
 
-val apiKey = props.getProperty("TMDB_API_KEY")
-    ?: System.getenv("TMDB_API_KEY")
-    ?: (project.findProperty("TMDB_API_KEY") as String?)
-    ?: ""
-
 val apiToken = props.getProperty("TMDB_READ_TOKEN")
     ?: System.getenv("TMDB_READ_TOKEN")
     ?: (project.findProperty("TMDB_READ_TOKEN") as String?)
@@ -75,14 +70,12 @@ android {
             versionNameSuffix = "-stage"
             buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/\"")
             buildConfigField("String", "BASE_IMAGE_URL", "\"https://image.tmdb.org/t/p/\"")
-            buildConfigField("String", "TMDB_API_KEY", "\"$apiKey\"")
             buildConfigField("String", "TMDB_READ_TOKEN", "\"$apiToken\"")
         }
         create("production") {
             dimension = "environment"
             buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/\"")
             buildConfigField("String", "BASE_IMAGE_URL", "\"https://image.tmdb.org/t/p/\"")
-            buildConfigField("String", "TMDB_API_KEY", "\"$apiKey\"")
             buildConfigField("String", "TMDB_READ_TOKEN", "\"$apiToken\"")
         }
     }
