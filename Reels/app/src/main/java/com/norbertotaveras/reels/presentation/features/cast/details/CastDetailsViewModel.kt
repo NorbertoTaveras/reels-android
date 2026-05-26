@@ -7,6 +7,7 @@ import com.norbertotaveras.reels.domain.usecase.person.GetPersonDetailsUseCase
 import com.norbertotaveras.reels.domain.usecase.person.GetPersonMovieCreditsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.presentation.navigation.ReelsDestinations
+import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -87,7 +88,9 @@ class CastDetailsViewModel @Inject constructor(
                 onFailure = { error ->
                     _state.update { currentState ->
                         currentState.copy(
-                            errorMessage = error.localizedMessage ?: "Unable to load cast details."
+                            errorMessage = error.toUserMessage(
+                                fallback = "Unable to load cast details."
+                            )
                         )
                     }
                 }

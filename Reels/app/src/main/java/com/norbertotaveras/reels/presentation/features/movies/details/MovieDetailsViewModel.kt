@@ -12,6 +12,7 @@ import com.norbertotaveras.reels.domain.usecase.movie.GetMovieDetailsUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.GetMovieVideosUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.GetSimilarMoviesUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
+import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -171,7 +172,9 @@ class MovieDetailsViewModel @Inject constructor(
                             )
                         } else {
                             currentState.copy(
-                                errorMessage = error.localizedMessage ?: "Unable to load movie details.",
+                                errorMessage = error.toUserMessage(
+                                    fallback = "Unable to load movie details."
+                                ),
                                 isLoading = false
                             )
                         }

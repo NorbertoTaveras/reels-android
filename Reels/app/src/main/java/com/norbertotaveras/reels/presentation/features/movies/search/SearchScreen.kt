@@ -41,6 +41,7 @@ import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
 import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
 import com.norbertotaveras.reels.presentation.ui.components.movie.MovieResultRow
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
+import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -172,8 +173,9 @@ fun SearchScreen(
                 refreshState is LoadState.Error -> {
                     item {
                         InlineRetryState(
-                            message = refreshState.error.localizedMessage
-                                ?: "Unable to load search results.",
+                            message = refreshState.error.toUserMessage(
+                                fallback = "Unable to load search results."
+                            ),
                             retryLabel = "Retry",
                             onRetry = movies::retry
                         )
@@ -228,8 +230,9 @@ fun SearchScreen(
                         is LoadState.Error -> {
                             item {
                                 InlineRetryState(
-                                    message = appendState.error.localizedMessage
-                                        ?: "Unable to load more results.",
+                                    message = appendState.error.toUserMessage(
+                                        fallback = "Unable to load more results."
+                                    ),
                                     retryLabel = "Retry",
                                     onRetry = movies::retry
                                 )

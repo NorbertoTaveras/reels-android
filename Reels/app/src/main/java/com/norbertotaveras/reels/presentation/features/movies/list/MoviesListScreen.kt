@@ -22,6 +22,7 @@ import com.norbertotaveras.reels.presentation.ui.components.common.CenteredError
 import com.norbertotaveras.reels.presentation.ui.components.common.CenteredLoadingState
 import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
 import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
+import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 
 @Composable
 fun MoviesListScreen(
@@ -41,7 +42,9 @@ fun MoviesListScreen(
         is LoadState.Error -> {
             CenteredErrorState(
                 modifier = modifier,
-                message = refreshState.error.localizedMessage ?: "Unable to load movies right now.",
+                message = refreshState.error.toUserMessage(
+                    fallback = "Unable to load movies right now."
+                ),
                 retryLabel = "Try Again",
                 onRetry = movies::retry
             )
@@ -102,8 +105,9 @@ fun MoviesListScreen(
                 is LoadState.Error -> {
                     item {
                         InlineRetryState(
-                            message = appendState.error.localizedMessage
-                                ?: "Unable to load more movies.",
+                            message = appendState.error.toUserMessage(
+                                fallback = "Unable to load more movies."
+                            ),
                             retryLabel = "Retry",
                             onRetry = movies::retry
                         )
