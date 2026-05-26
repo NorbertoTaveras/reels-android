@@ -8,6 +8,7 @@ import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
 import com.norbertotaveras.reels.data.remote.paging.MoviesPagingSource
 import com.norbertotaveras.reels.data.remote.paging.SearchMoviesPagingSource
+import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieCreditsDataModel
@@ -20,12 +21,15 @@ import com.norbertotaveras.reels.domain.repository.movie.MovieRepository
 import com.norbertotaveras.reels.domain.repository.person.PersonRepository
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 @Singleton
 class TmdbRepositoryImpl @Inject constructor(
     private val remoteDataSource: TmdbRemoteDataSource,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : MovieRepository, PersonRepository {
     override fun getMovies(
         category: MovieCategory,
@@ -153,7 +157,9 @@ class TmdbRepositoryImpl @Inject constructor(
 
     private suspend fun <T> tmdbResult(block: suspend () -> T): Result<T> {
         return runCatching {
-            block()
+            withContext(ioDispatcher) {
+                block()
+            }
         }.fold(
             onSuccess = { value -> Result.success(value) },
             onFailure = { error -> Result.failure(error.toTmdbNetworkException()) }

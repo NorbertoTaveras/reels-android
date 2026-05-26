@@ -6,27 +6,38 @@ import com.norbertotaveras.reels.domain.model.settings.AppTheme
 import com.norbertotaveras.reels.domain.model.settings.ImageQuality
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 import com.norbertotaveras.reels.domain.repository.settings.SettingsRepository
+import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 
 @Singleton
 class SettingsRepositoryImpl @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : SettingsRepository {
     override fun observeSettings(): Flow<AppSettings> {
-        return settingsDataStore.settings
+        return settingsDataStore.settings.flowOn(ioDispatcher)
     }
 
     override suspend fun updateImageQuality(imageQuality: ImageQuality) {
-        settingsDataStore.updateImageQuality(imageQuality = imageQuality)
+        withContext(ioDispatcher) {
+            settingsDataStore.updateImageQuality(imageQuality = imageQuality)
+        }
     }
 
     override suspend fun updateLanguageRegion(languageRegion: LanguageRegion) {
-        settingsDataStore.updateLanguageRegion(languageRegion = languageRegion)
+        withContext(ioDispatcher) {
+            settingsDataStore.updateLanguageRegion(languageRegion = languageRegion)
+        }
     }
 
     override suspend fun updateTheme(theme: AppTheme) {
-        settingsDataStore.updateTheme(theme = theme)
+        withContext(ioDispatcher) {
+            settingsDataStore.updateTheme(theme = theme)
+        }
     }
 }

@@ -6,35 +6,45 @@ import com.norbertotaveras.reels.data.local.dao.FavoriteMovieDao
 import com.norbertotaveras.reels.data.local.mapper.toFavoriteMovieDataModel
 import com.norbertotaveras.reels.data.local.mapper.toFavoriteMovieEntity
 import com.norbertotaveras.reels.data.local.mapper.toMovieDetailsDataModel
+import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.repository.favorites.FavoriteMoviesRepository
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 class FavoriteMoviesRepositoryImpl @Inject constructor(
-    private val favoriteMovieDao: FavoriteMovieDao
+    private val favoriteMovieDao: FavoriteMovieDao,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : FavoriteMoviesRepository {
     override fun observeFavoriteMovies(): Flow<List<FavoriteMovieDataModel>> {
         return favoriteMovieDao.observeFavoriteMovies().map { favorites ->
             favorites.map { favorite -> favorite.toFavoriteMovieDataModel() }
-        }
+        }.flowOn(ioDispatcher)
     }
 
     override fun observeIsFavorite(movieId: Int): Flow<Boolean> {
         return favoriteMovieDao.observeIsFavorite(movieId = movieId)
+            .flowOn(ioDispatcher)
     }
 
     override suspend fun toggleFavoriteMovie(movie: MovieDetailsDataModel) {
-        val existingFavorite = favoriteMovieDao.getFavoriteMovie(movieId = movie.id)
+        withContext(ioDispatcher) {
+            val existingFavorite = favoriteMovieDao.getFavoriteMovie(movieId = movie.id)
 
-        if (existingFavorite == null) {
-            favoriteMovieDao.upsertFavoriteMovie(movie.toFavoriteMovieEntity())
-        } else {
-            favoriteMovieDao.deleteFavoriteMovie(movieId = movie.id)
+            if (existingFavorite == null) {
+                favoriteMovieDao.upsertFavoriteMovie(movie.toFavoriteMovieEntity())
+            } else {
+                favoriteMovieDao.deleteFavoriteMovie(movieId = movie.id)
+            }
         }
     }
 
     override suspend fun getFavoriteMovieDetails(movieId: Int): MovieDetailsDataModel? {
-        return favoriteMovieDao.getFavoriteMovie(movieId = movieId)?.toMovieDetailsDataModel()
+        return withContext(ioDispatcher) {
+            favoriteMovieDao.getFavoriteMovie(movieId = movieId)?.toMovieDetailsDataModel()
+        }
     }
 }
