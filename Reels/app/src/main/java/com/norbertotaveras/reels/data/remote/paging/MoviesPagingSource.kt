@@ -6,17 +6,13 @@ import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
 import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
+import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
 
 class MoviesPagingSource(
     private val remoteDataSource: TmdbRemoteDataSource,
     private val category: MovieCategory,
     private val language: String,
 ) : PagingSource<Int, MovieDto>() {
-
-    companion object {
-        private const val TAG = "MoviesPagingSource"
-    }
-
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MovieDto> {
         return try {
             val page = params.key ?: 1
@@ -32,8 +28,8 @@ class MoviesPagingSource(
                 prevKey = if (page == 1) null else page - 1,
                 nextKey = if (page >= response.totalPages) null else page + 1
             )
-        } catch (e: Exception) {
-            LoadResult.Error(e)
+        } catch (error: Exception) {
+            LoadResult.Error(error.toTmdbNetworkException())
         }
     }
 

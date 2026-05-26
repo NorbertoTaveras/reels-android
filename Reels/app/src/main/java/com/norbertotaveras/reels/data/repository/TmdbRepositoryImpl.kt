@@ -5,6 +5,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
+import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
 import com.norbertotaveras.reels.data.remote.paging.MoviesPagingSource
 import com.norbertotaveras.reels.data.remote.paging.SearchMoviesPagingSource
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
@@ -68,15 +69,11 @@ class TmdbRepositoryImpl @Inject constructor(
         movieId: Int,
         language: String,
     ): Result<MovieDetailsDataModel> {
-        return runCatching {
+        return tmdbResult {
             remoteDataSource.getMovieDetails(
                 movieId = movieId,
                 language = language
-            )
-        }.mapCatching {
-            Result.success(it.toMovieDetailsDataModel())
-        }.getOrElse {
-            Result.failure(it)
+            ).toMovieDetailsDataModel()
         }
     }
 
@@ -84,15 +81,11 @@ class TmdbRepositoryImpl @Inject constructor(
         movieId: Int,
         language: String,
     ): Result<MovieCreditsDataModel> {
-        return runCatching {
+        return tmdbResult {
             remoteDataSource.getMovieCredits(
                 movieId = movieId,
                 language = language
-            )
-        }.mapCatching {
-            Result.success(it.toMovieCreditsDataModel())
-        }.getOrElse {
-            Result.failure(it)
+            ).toMovieCreditsDataModel()
         }
     }
 
@@ -100,15 +93,11 @@ class TmdbRepositoryImpl @Inject constructor(
         movieId: Int,
         language: String,
     ): Result<MovieVideosDataModel> {
-        return runCatching {
+        return tmdbResult {
             remoteDataSource.getMovieVideos(
                 movieId = movieId,
                 language = language
-            )
-        }.mapCatching {
-            Result.success(it.toMovieVideosDataModel())
-        }.getOrElse {
-            Result.failure(it)
+            ).toMovieVideosDataModel()
         }
     }
 
@@ -117,7 +106,7 @@ class TmdbRepositoryImpl @Inject constructor(
         language: String,
         page: Int,
     ): Result<List<MovieDataModel>> {
-        return runCatching {
+        return tmdbResult {
             remoteDataSource.getSimilarMovies(
                 movieId = movieId,
                 language = language,
@@ -131,14 +120,10 @@ class TmdbRepositoryImpl @Inject constructor(
     override suspend fun getMovieGenres(
         language: String,
     ): Result<List<GenreDataModel>> {
-        return runCatching {
+        return tmdbResult {
             remoteDataSource.getMovieGenres(
                 language = language
-            )
-        }.mapCatching {
-            Result.success(it.genres?.map { genreDto -> genreDto.toGenreDataModel() } ?: emptyList() )
-        }.getOrElse {
-            Result.failure(it)
+            ).genres?.map { genreDto -> genreDto.toGenreDataModel() } ?: emptyList()
         }
     }
 
@@ -146,15 +131,11 @@ class TmdbRepositoryImpl @Inject constructor(
         personId: Int,
         language: String,
     ): Result<PersonDetailsDataModel> {
-        return runCatching {
+        return tmdbResult {
             remoteDataSource.getPersonDetails(
                 personId = personId,
                 language = language
-            )
-        }.mapCatching {
-            Result.success(it.toPersonDetailsDataModel())
-        }.getOrElse {
-            Result.failure(it)
+            ).toPersonDetailsDataModel()
         }
     }
 
@@ -162,16 +143,21 @@ class TmdbRepositoryImpl @Inject constructor(
         personId: Int,
         language: String,
     ): Result<PersonMovieCreditsDataModel> {
-        return runCatching {
+        return tmdbResult {
             remoteDataSource.getPersonMovieCredits(
                 personId = personId,
                 language = language
-            )
-        }.mapCatching {
-            Result.success(it.toPersonMovieCreditsDataModel())
-        }.getOrElse {
-            Result.failure(it)
+            ).toPersonMovieCreditsDataModel()
         }
+    }
+
+    private suspend fun <T> tmdbResult(block: suspend () -> T): Result<T> {
+        return runCatching {
+            block()
+        }.fold(
+            onSuccess = { value -> Result.success(value) },
+            onFailure = { error -> Result.failure(error.toTmdbNetworkException()) }
+        )
     }
 
     private fun defaultPagingConfig(): PagingConfig {

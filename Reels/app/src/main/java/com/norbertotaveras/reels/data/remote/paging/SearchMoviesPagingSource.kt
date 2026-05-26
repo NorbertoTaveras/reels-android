@@ -4,6 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieDto
 import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
+import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
 
 class SearchMoviesPagingSource(
     private val remoteDataSource: TmdbRemoteDataSource,
@@ -29,7 +30,7 @@ class SearchMoviesPagingSource(
                 nextKey = if (page >= response.totalPages) null else page + 1
             )
         } catch (error: Exception) {
-            LoadResult.Error(error)
+            LoadResult.Error(error.toTmdbNetworkException())
         }
     }
 
