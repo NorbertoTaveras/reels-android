@@ -146,6 +146,8 @@ fun SearchScreen(
                 )
             }
 
+            val refreshState = movies.loadState.refresh
+
             when {
                 state.query.length < 2 -> {
                     item {
@@ -156,7 +158,7 @@ fun SearchScreen(
                     }
                 }
 
-                movies.loadState.refresh is LoadState.Loading -> {
+                refreshState is LoadState.Loading -> {
                     item {
                         Box(
                             modifier = Modifier.fillMaxWidth(),
@@ -167,10 +169,11 @@ fun SearchScreen(
                     }
                 }
 
-                movies.loadState.refresh is LoadState.Error -> {
+                refreshState is LoadState.Error -> {
                     item {
                         InlineRetryState(
-                            message = "Unable to load search results.",
+                            message = refreshState.error.localizedMessage
+                                ?: "Unable to load search results.",
                             retryLabel = "Retry",
                             onRetry = movies::retry
                         )
@@ -186,7 +189,7 @@ fun SearchScreen(
                     }
                 }
 
-                else -> {
+                refreshState is LoadState.NotLoading -> {
                     items(
                         count = movies.itemCount,
                         key = { index -> movies[index]?.id ?: index }
@@ -210,25 +213,30 @@ fun SearchScreen(
                         }
                     }
 
-                    if (movies.loadState.append is LoadState.Loading) {
-                        item {
-                            Box(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
+                    when (val appendState = movies.loadState.append) {
+                        is LoadState.Loading -> {
+                            item {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
                             }
                         }
-                    }
 
-                    if (movies.loadState.append is LoadState.Error) {
-                        item {
-                            InlineRetryState(
-                                message = "Unable to load more results.",
-                                retryLabel = "Retry",
-                                onRetry = movies::retry
-                            )
+                        is LoadState.Error -> {
+                            item {
+                                InlineRetryState(
+                                    message = appendState.error.localizedMessage
+                                        ?: "Unable to load more results.",
+                                    retryLabel = "Retry",
+                                    onRetry = movies::retry
+                                )
+                            }
                         }
+
+                        is LoadState.NotLoading -> Unit
                     }
                 }
             }
