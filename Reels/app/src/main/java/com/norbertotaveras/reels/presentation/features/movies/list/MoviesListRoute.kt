@@ -29,7 +29,10 @@ fun MoviesListRoute(
     MoviesListScreen(
         modifier = modifier,
         state = state,
-        movies = viewModel.movies.collectAsLazyPagingItems(),
+        popularMovies = viewModel.popularMovies.collectAsLazyPagingItems(),
+        nowPlayingMovies = viewModel.nowPlayingMovies.collectAsLazyPagingItems(),
+        upcomingMovies = viewModel.upcomingMovies.collectAsLazyPagingItems(),
+        topRatedMovies = viewModel.topRatedMovies.collectAsLazyPagingItems(),
         onEvent = viewModel::onEvent
     )
 }

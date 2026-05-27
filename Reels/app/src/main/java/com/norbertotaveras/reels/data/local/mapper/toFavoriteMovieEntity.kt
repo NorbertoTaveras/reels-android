@@ -32,6 +32,7 @@ fun FavoriteMovieEntity.toMovieDataModel(): MovieDataModel {
         title = title,
         overview = overview,
         posterPath = posterPath,
+        backdropPath = backdropPath,
         releaseDate = releaseDate,
         voteAverage = voteAverage,
         genreIds = emptyList()
@@ -77,4 +78,3 @@ fun FavoriteMovieEntity.toFavoriteMovieDataModel(): FavoriteMovieDataModel {
         favoritedAt = favoritedAt
     )
 }
-

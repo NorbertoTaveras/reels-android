@@ -33,10 +33,15 @@ class MoviesListViewModel @Inject constructor(
     private val _effect = MutableSharedFlow<MoviesListEffect>()
     val effect: SharedFlow<MoviesListEffect> = _effect.asSharedFlow()
 
-    val movies = state
-        .map { uiState -> uiState.category to uiState.language }
+    val popularMovies = moviesForCategory(MovieCategory.POPULAR)
+    val nowPlayingMovies = moviesForCategory(MovieCategory.NOW_PLAYING)
+    val upcomingMovies = moviesForCategory(MovieCategory.UPCOMING)
+    val topRatedMovies = moviesForCategory(MovieCategory.TOP_RATED)
+
+    private fun moviesForCategory(category: MovieCategory) = state
+        .map { uiState -> uiState.language }
         .distinctUntilChanged()
-        .flatMapLatest { (category, language) ->
+        .flatMapLatest { language ->
             getMoviesUseCase(
                 category = category,
                 language = language
