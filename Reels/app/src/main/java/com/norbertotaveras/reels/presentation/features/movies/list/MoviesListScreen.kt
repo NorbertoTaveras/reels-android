@@ -49,6 +49,7 @@ import com.norbertotaveras.reels.presentation.ui.components.common.CenteredError
 import com.norbertotaveras.reels.presentation.ui.components.common.CenteredLoadingState
 import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
 import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
@@ -91,10 +92,10 @@ fun MoviesListScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
         contentPadding = PaddingValues(
-            top = 12.dp,
+            top = ReelsDimensions.topPadding,
             bottom = ReelsSpacing.xxLarge
         ),
-        verticalArrangement = Arrangement.spacedBy(34.dp)
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.sectionSpacing)
     ) {
         item {
             HomeHeader()
@@ -158,7 +159,7 @@ private fun HomeHeader(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = ReelsSpacing.screenHorizontal),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.headerTextSpacing)
     ) {
         Text(
             text = "Reels",
@@ -203,7 +204,7 @@ private fun FeaturedMovieCarousel(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = ReelsSpacing.screenHorizontal)
-            .aspectRatio(1.18f)
+            .aspectRatio(ReelsDimensions.heroCardAspectRatio)
             .clip(MaterialTheme.shapes.extraLarge),
         animationSpec = tween(durationMillis = HERO_CROSSFADE_DURATION_MS),
         label = "Featured movie crossfade"
@@ -259,8 +260,11 @@ private fun FeaturedMovieHero(
         Column(
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .padding(horizontal = ReelsSpacing.medium, vertical = ReelsSpacing.medium),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+                .padding(
+                    horizontal = ReelsDimensions.heroContentHorizontalPadding,
+                    vertical = ReelsDimensions.heroContentVerticalPadding
+                ),
+            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.heroContentSpacing)
         ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
@@ -323,8 +327,16 @@ private fun RatingBadge(
     ) {
         Row(
             modifier = Modifier.padding(
-                horizontal = if (compact) 8.dp else ReelsSpacing.medium,
-                vertical = if (compact) 4.dp else ReelsSpacing.small
+                horizontal = if (compact) {
+                    ReelsDimensions.compactRatingBadgeHorizontalPadding
+                } else {
+                    ReelsSpacing.medium
+                },
+                vertical = if (compact) {
+                    ReelsDimensions.compactRatingBadgeVerticalPadding
+                } else {
+                    ReelsSpacing.small
+                }
             ),
             horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
             verticalAlignment = Alignment.CenterVertically
@@ -332,7 +344,9 @@ private fun RatingBadge(
             Icon(
                 imageVector = Icons.Filled.Star,
                 contentDescription = null,
-                modifier = Modifier.size(if (compact) 13.dp else 16.dp)
+                modifier = Modifier.size(
+                    if (compact) ReelsDimensions.compactRatingBadgeIconSize else 16.dp
+                )
             )
 
             Text(
@@ -369,7 +383,14 @@ private fun HeroPagerDots(
             Surface(
                 modifier = Modifier
                     .padding(horizontal = 4.dp)
-                    .size(width = if (index == activePage) 22.dp else 8.dp, height = 8.dp),
+                    .size(
+                        width = if (index == activePage) {
+                            ReelsDimensions.heroActiveDotWidth
+                        } else {
+                            ReelsDimensions.heroInactiveDotSize
+                        },
+                        height = ReelsDimensions.heroInactiveDotSize
+                    ),
                 shape = MaterialTheme.shapes.extraLarge,
                 color = if (index == activePage) {
                     MaterialTheme.colorScheme.primary
@@ -392,7 +413,7 @@ private fun HomeMovieSection(
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.sectionHeaderToRowSpacing)
     ) {
         HomeSectionHeader(
             modifier = Modifier.padding(horizontal = ReelsSpacing.screenHorizontal),
@@ -507,7 +528,7 @@ private fun MoviePosterRow(
     LazyRow(
         modifier = modifier.fillMaxWidth(),
         contentPadding = PaddingValues(horizontal = ReelsSpacing.screenHorizontal),
-        horizontalArrangement = Arrangement.spacedBy(26.dp)
+        horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.posterRowSpacing)
     ) {
         items(
             count = minOf(movies.itemCount, HOME_SECTION_LIMIT),
@@ -565,9 +586,9 @@ private fun HomePosterCard(
 ) {
     Column(
         modifier = modifier
-            .width(128.dp)
+            .width(ReelsDimensions.posterCardWidth)
             .clickable(onClick = onClick),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.posterTextSpacing)
     ) {
         Box(
             modifier = Modifier
@@ -585,7 +606,7 @@ private fun HomePosterCard(
             RatingBadge(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(7.dp),
+                    .padding(ReelsDimensions.compactRatingBadgeEdgePadding),
                 rating = movie.voteAverage,
                 compact = true
             )
