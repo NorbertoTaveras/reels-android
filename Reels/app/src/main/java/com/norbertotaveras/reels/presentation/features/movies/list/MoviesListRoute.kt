@@ -11,6 +11,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 @Composable
 fun MoviesListRoute(
     onMovieClick: (Int) -> Unit,
+    onSeeAllClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MoviesListViewModel = hiltViewModel(),
 ) {
@@ -21,6 +22,9 @@ fun MoviesListRoute(
             when (effect) {
                 is MoviesListEffect.NavigateToMovieDetails -> {
                     onMovieClick(effect.movieId)
+                }
+                is MoviesListEffect.NavigateToMovieCategory -> {
+                    onSeeAllClick(effect.categoryValue)
                 }
             }
         }

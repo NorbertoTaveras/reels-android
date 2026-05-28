@@ -4,5 +4,6 @@ import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 
 sealed interface MoviesListEvent {
     data class CategorySelected(val category: MovieCategory) : MoviesListEvent
+    data class SeeAllClicked(val category: MovieCategory) : MoviesListEvent
     data class MovieClicked(val movieId: Int) : MoviesListEvent
 }

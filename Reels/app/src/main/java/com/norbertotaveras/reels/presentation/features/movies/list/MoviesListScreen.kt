@@ -420,7 +420,7 @@ private fun HomeMovieSection(
             title = title,
             actionLabel = "See all",
             onActionClick = {
-                onEvent(MoviesListEvent.CategorySelected(category = category))
+                onEvent(MoviesListEvent.SeeAllClicked(category = category))
             }
         )
 

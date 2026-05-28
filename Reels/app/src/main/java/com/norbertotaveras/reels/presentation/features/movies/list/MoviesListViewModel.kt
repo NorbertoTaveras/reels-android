@@ -56,6 +56,7 @@ class MoviesListViewModel @Inject constructor(
     fun onEvent(event: MoviesListEvent) {
         when (event) {
             is MoviesListEvent.CategorySelected -> onCategorySelected(category = event.category)
+            is MoviesListEvent.SeeAllClicked -> onSeeAllClicked(category = event.category)
             is MoviesListEvent.MovieClicked -> onMovieClicked(movieId = event.movieId)
         }
     }
@@ -82,6 +83,12 @@ class MoviesListViewModel @Inject constructor(
     private fun onMovieClicked(movieId: Int) {
         viewModelScope.launch {
             _effect.emit(MoviesListEffect.NavigateToMovieDetails(movieId = movieId))
+        }
+    }
+
+    private fun onSeeAllClicked(category: MovieCategory) {
+        viewModelScope.launch {
+            _effect.emit(MoviesListEffect.NavigateToMovieCategory(categoryValue = category.value))
         }
     }
 }
