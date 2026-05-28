@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
@@ -80,10 +81,10 @@ fun MovieCategoryScreen(
             .background(MaterialTheme.colorScheme.background),
         columns = GridCells.Fixed(3),
         contentPadding = PaddingValues(
-            start = ReelsSpacing.screenHorizontal,
-            top = ReelsSpacing.xLarge,
-            end = ReelsSpacing.screenHorizontal,
-            bottom = ReelsSpacing.xxLarge
+            start = ReelsDimensions.categoryScreenHorizontalPadding,
+            top = ReelsDimensions.categoryScreenTopPadding,
+            end = ReelsDimensions.categoryScreenHorizontalPadding,
+            bottom = ReelsDimensions.categoryScreenBottomPadding
         ),
         horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.categoryGridHorizontalSpacing),
         verticalArrangement = Arrangement.spacedBy(ReelsDimensions.categoryGridVerticalSpacing)
@@ -166,7 +167,7 @@ private fun MovieCategoryHeader(
     ) {
         Surface(
             modifier = Modifier.size(ReelsDimensions.categoryBackButtonSize),
-            shape = MaterialTheme.shapes.extraLarge,
+            shape = CircleShape,
             color = MaterialTheme.colorScheme.surface,
             tonalElevation = 0.dp,
             shadowElevation = 0.dp,
@@ -188,8 +189,8 @@ private fun MovieCategoryHeader(
         Text(
             text = title,
             style = MaterialTheme.typography.headlineMedium.copy(
-                fontSize = 34.sp,
-                lineHeight = 40.sp
+                fontSize = 30.sp,
+                lineHeight = 36.sp
             ),
             color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.Bold,
@@ -233,8 +234,8 @@ private fun MovieCategoryPosterCard(
         Text(
             text = movie.title,
             style = MaterialTheme.typography.bodyLarge.copy(
-                fontSize = 20.sp,
-                lineHeight = 26.sp
+                fontSize = 17.sp,
+                lineHeight = 22.sp
             ),
             color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.SemiBold,
@@ -246,8 +247,8 @@ private fun MovieCategoryPosterCard(
             Text(
                 text = year,
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 18.sp,
-                    lineHeight = 24.sp
+                    fontSize = 16.sp,
+                    lineHeight = 22.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,

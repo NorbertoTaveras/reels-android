@@ -24,12 +24,15 @@ object ReelsDimensions {
     val compactRatingBadgeEdgePadding = 8.dp
     val compactRatingBadgeIconSize = 13.dp
 
+    val categoryScreenHorizontalPadding = 20.dp
+    val categoryScreenTopPadding = 0.dp
+    val categoryScreenBottomPadding = 32.dp
     val categoryGridHorizontalSpacing = 20.dp
     val categoryGridVerticalSpacing = 28.dp
-    val categoryHeaderBottomPadding = 18.dp
-    val categoryHeaderTextSpacing = 24.dp
-    val categoryBackButtonSize = 58.dp
-    val categoryBackIconSize = 32.dp
+    val categoryHeaderBottomPadding = 0.dp
+    val categoryHeaderTextSpacing = 18.dp
+    val categoryBackButtonSize = 48.dp
+    val categoryBackIconSize = 28.dp
     val categoryPosterTextSpacing = 10.dp
     val categoryRatingEdgePadding = 10.dp
     val categoryRatingHorizontalPadding = 10.dp
