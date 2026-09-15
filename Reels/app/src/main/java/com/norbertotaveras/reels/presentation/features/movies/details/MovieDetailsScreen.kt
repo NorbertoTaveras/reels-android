@@ -1,12 +1,33 @@
 package com.norbertotaveras.reels.presentation.features.movies.details
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.MaterialTheme
 import com.norbertotaveras.reels.presentation.ui.components.common.CenteredErrorState
-import com.norbertotaveras.reels.presentation.ui.components.common.CenteredLoadingState
 import com.norbertotaveras.reels.presentation.ui.components.movie.PosterCarouselItem
 import com.norbertotaveras.reels.presentation.ui.components.trailer.TrailerCarouselItem
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun MovieDetailsScreen(
@@ -16,7 +37,7 @@ fun MovieDetailsScreen(
 ) {
     when {
         state.isLoading -> {
-            CenteredLoadingState(modifier = modifier)
+            MovieDetailsLoadingState(modifier = modifier)
         }
 
         state.errorMessage != null -> {
@@ -77,4 +98,151 @@ fun MovieDetailsScreen(
             )
         }
     }
+}
+
+@Composable
+private fun MovieDetailsLoadingState(
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        contentPadding = PaddingValues(bottom = ReelsSpacing.xxLarge),
+        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xLarge)
+    ) {
+        item {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(360.dp)
+                    .background(detailsPlaceholderColor())
+            ) {
+                PlaceholderBox(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(start = ReelsSpacing.screenHorizontal, bottom = ReelsSpacing.large)
+                        .width(96.dp)
+                        .aspectRatio(ReelsRatios.poster)
+                )
+
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(
+                            start = 132.dp,
+                            end = ReelsSpacing.screenHorizontal,
+                            bottom = ReelsSpacing.large
+                        ),
+                    verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
+                ) {
+                    PlaceholderBar(width = 180.dp, height = 22.dp)
+                    PlaceholderBar(width = 156.dp, height = 16.dp)
+                    Row(horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small)) {
+                        PlaceholderBar(width = 72.dp, height = 28.dp)
+                        PlaceholderBar(width = 52.dp, height = 28.dp)
+                    }
+                }
+            }
+        }
+
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = ReelsSpacing.screenHorizontal),
+                verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
+            ) {
+                PlaceholderBar(width = 118.dp, height = 24.dp)
+                PlaceholderBar(width = 280.dp, height = 18.dp)
+                PlaceholderBar(width = 310.dp, height = 18.dp)
+                PlaceholderBar(width = 230.dp, height = 18.dp)
+            }
+        }
+
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = ReelsSpacing.screenHorizontal),
+                verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
+            ) {
+                repeat(3) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        PlaceholderBox(modifier = Modifier.size(40.dp))
+                        Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)) {
+                            PlaceholderBar(width = 96.dp, height = 14.dp)
+                            PlaceholderBar(width = 132.dp, height = 16.dp)
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = ReelsSpacing.screenHorizontal),
+                horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
+            ) {
+                items(5) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
+                    ) {
+                        PlaceholderBox(modifier = Modifier.size(70.dp))
+                        PlaceholderBar(width = 68.dp, height = 12.dp)
+                    }
+                }
+            }
+        }
+
+        item {
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = ReelsSpacing.screenHorizontal),
+                horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
+            ) {
+                items(2) {
+                    PlaceholderBox(
+                        modifier = Modifier
+                            .width(190.dp)
+                            .height(108.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PlaceholderBox(
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .clip(MaterialTheme.shapes.large)
+            .background(detailsPlaceholderColor())
+    )
+}
+
+@Composable
+private fun PlaceholderBar(
+    width: androidx.compose.ui.unit.Dp,
+    height: androidx.compose.ui.unit.Dp,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .width(width)
+            .height(height)
+            .clip(MaterialTheme.shapes.medium)
+            .background(detailsPlaceholderColor())
+    )
+}
+
+@Composable
+private fun detailsPlaceholderColor(): Color {
+    return MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.52f)
 }
