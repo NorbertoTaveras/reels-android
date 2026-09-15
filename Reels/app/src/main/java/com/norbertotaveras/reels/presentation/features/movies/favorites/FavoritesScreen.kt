@@ -3,6 +3,7 @@ package com.norbertotaveras.reels.presentation.features.movies.favorites
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -17,6 +18,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -31,12 +33,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.favorite.FavoriteMovieDataModel
-import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
@@ -252,22 +255,62 @@ private fun FavoriteMovieCard(
 private fun EmptyFavoritesState(
     modifier: Modifier = Modifier,
 ) {
-    androidx.compose.foundation.layout.Column(
+    Column(
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
             .padding(ReelsSpacing.screenHorizontal),
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xLarge)
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesEmptyTopPadding)
     ) {
         Text(
-            modifier = Modifier.padding(top = ReelsSpacing.xLarge),
+            modifier = Modifier.padding(top = ReelsDimensions.favoritesScreenTopPadding),
             text = "Favorites",
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
 
-        EmptyState(
-            title = "No saved movies yet",
-            message = "Tap the heart on a movie details screen to keep it available offline."
-        )
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.large,
+            color = MaterialTheme.colorScheme.surface,
+            border = androidx.compose.foundation.BorderStroke(
+                width = 1.dp,
+                color = ReelsBorder
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(ReelsDimensions.favoritesEmptyCardPadding),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesEmptyContentSpacing)
+            ) {
+                Surface(
+                    modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconContainerSize),
+                    shape = MaterialTheme.shapes.large,
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Outlined.FavoriteBorder,
+                            contentDescription = null,
+                            modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconSize)
+                        )
+                    }
+                }
+
+                Text(
+                    text = "No saved movies yet",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = "Save movies from details to keep their posters, ratings, and key info available offline.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            }
+        }
     }
 }

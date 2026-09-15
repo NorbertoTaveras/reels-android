@@ -62,4 +62,9 @@ object ReelsDimensions {
     val favoritesHeartButtonSize = 30.dp
     val favoritesHeartIconSize = 16.dp
     val favoritesTextSpacing = 6.dp
+    val favoritesEmptyTopPadding = 104.dp
+    val favoritesEmptyCardPadding = 24.dp
+    val favoritesEmptyIconContainerSize = 72.dp
+    val favoritesEmptyIconSize = 34.dp
+    val favoritesEmptyContentSpacing = 14.dp
 }
