@@ -532,7 +532,10 @@ private fun MoviePosterRow(
     ) {
         items(
             count = minOf(movies.itemCount, HOME_SECTION_LIMIT),
-            key = { index -> movies[index]?.id ?: index }
+            key = { index ->
+                val movie = movies.peek(index)
+                "${movie?.id ?: "placeholder"}-$index"
+            }
         ) { index ->
             val movie = movies[index] ?: return@items
 

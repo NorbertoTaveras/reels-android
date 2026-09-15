@@ -10,9 +10,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -31,7 +35,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.norbertotaveras.reels.extensions.toRelativeReleaseAge
@@ -42,6 +51,7 @@ import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetrySt
 import com.norbertotaveras.reels.presentation.ui.components.movie.MovieResultRow
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -53,23 +63,19 @@ fun SearchScreen(
     onEvent: (SearchEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val trimmedQuery = state.query.trim()
+    val hasSearchableQuery = trimmedQuery.length >= MIN_SEARCH_QUERY_LENGTH
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = ReelsSpacing.screenHorizontal)
     ) {
-        Text(
-            modifier = Modifier.padding(top = ReelsSpacing.xLarge),
-            text = "Search",
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = ReelsSpacing.large),
+                .padding(top = ReelsDimensions.searchScreenTopPadding),
             value = state.query,
             onValueChange = { query ->
                 onEvent(SearchEvent.QueryChanged(query = query))
@@ -77,7 +83,10 @@ fun SearchScreen(
             singleLine = true,
             shape = MaterialTheme.shapes.large,
             placeholder = {
-                Text(text = "Search movies")
+                Text(
+                    text = "Search movies",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             },
             leadingIcon = {
                 Icon(
@@ -126,9 +135,9 @@ fun SearchScreen(
         LazyColumn(
             modifier = Modifier
                 .weight(1f)
-                .padding(top = ReelsSpacing.large),
-            contentPadding = PaddingValues(bottom = ReelsSpacing.xxLarge),
-            verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
+                .padding(top = ReelsDimensions.searchFieldToContentSpacing),
+            contentPadding = PaddingValues(bottom = ReelsDimensions.searchContentBottomPadding),
+            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.searchResultSpacing)
         ) {
             if (state.recentSearches.isNotEmpty()) {
                 item {
@@ -139,111 +148,215 @@ fun SearchScreen(
                 }
             }
 
-            item {
-                Text(
-                    text = "Search Results",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-            }
-
-            val refreshState = movies.loadState.refresh
-
-            when {
-                state.query.length < 2 -> {
-                    item {
-                        EmptyState(
-                            title = "Search for a movie",
-                            message = "Enter at least two characters to find movies from TMDB."
-                        )
-                    }
+            if (!hasSearchableQuery) {
+                item {
+                    SearchPromptState(query = trimmedQuery)
+                }
+            } else {
+                item {
+                    SearchResultsHeader()
                 }
 
-                refreshState is LoadState.Loading -> {
-                    item {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
+                when (val refreshState = movies.loadState.refresh) {
+                    is LoadState.Loading -> {
+                        item {
+                            SearchResultLoadingState()
                         }
                     }
-                }
 
-                refreshState is LoadState.Error -> {
-                    item {
-                        InlineRetryState(
-                            message = refreshState.error.toUserMessage(
-                                fallback = "Unable to load search results."
-                            ),
-                            retryLabel = "Retry",
-                            onRetry = movies::retry
-                        )
-                    }
-                }
-
-                movies.itemCount == 0 -> {
-                    item {
-                        EmptyState(
-                            title = "No movies found",
-                            message = "Try a different title or check the spelling."
-                        )
-                    }
-                }
-
-                refreshState is LoadState.NotLoading -> {
-                    items(
-                        count = movies.itemCount,
-                        key = { index -> movies[index]?.id ?: index }
-                    ) { index ->
-                        val movie = movies[index]
-
-                        if (movie != null) {
-                            MovieResultRow(
-                                title = movie.title,
-                                posterUrl = movie.posterPath.toTmdbImageUrl(),
-                                releaseYear = movie.releaseDate.toReleaseYear(),
-                                secondaryMetadata = movie.releaseDate.toRelativeReleaseAge(),
-                                genres = movie.genreIds
-                                    .mapNotNull { genreId -> state.genreNamesById[genreId] }
-                                    .take(2),
-                                rating = String.format("%.1f", movie.voteAverage),
-                                onClick = {
-                                    onEvent(SearchEvent.MovieClicked(movieId = movie.id))
-                                }
+                    is LoadState.Error -> {
+                        item {
+                            InlineRetryState(
+                                modifier = Modifier.padding(top = ReelsSpacing.medium),
+                                message = refreshState.error.toUserMessage(
+                                    fallback = "Unable to load search results."
+                                ),
+                                retryLabel = "Retry",
+                                onRetry = movies::retry
                             )
                         }
                     }
 
-                    when (val appendState = movies.loadState.append) {
-                        is LoadState.Loading -> {
+                    is LoadState.NotLoading -> {
+                        if (movies.itemCount == 0) {
                             item {
-                                Box(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator()
-                                }
-                            }
-                        }
-
-                        is LoadState.Error -> {
-                            item {
-                                InlineRetryState(
-                                    message = appendState.error.toUserMessage(
-                                        fallback = "Unable to load more results."
-                                    ),
-                                    retryLabel = "Retry",
-                                    onRetry = movies::retry
+                                EmptyState(
+                                    title = "No movies found",
+                                    message = "Try a different title or check the spelling."
                                 )
                             }
-                        }
+                        } else {
+                            items(
+                                count = movies.itemCount,
+                                key = { index ->
+                                    val movie = movies.peek(index)
+                                    "${movie?.id ?: "placeholder"}-$index"
+                                }
+                            ) { index ->
+                                val movie = movies[index]
 
-                        is LoadState.NotLoading -> Unit
+                                if (movie != null) {
+                                    MovieResultRow(
+                                        title = movie.title,
+                                        posterUrl = movie.posterPath.toTmdbImageUrl(),
+                                        releaseYear = movie.releaseDate.toReleaseYear(),
+                                        secondaryMetadata = movie.releaseDate.toRelativeReleaseAge(),
+                                        genres = movie.genreIds
+                                            .mapNotNull { genreId -> state.genreNamesById[genreId] }
+                                            .take(3),
+                                        rating = String.format("%.1f", movie.voteAverage),
+                                        onClick = {
+                                            onEvent(SearchEvent.MovieClicked(movieId = movie.id))
+                                        }
+                                    )
+                                }
+                            }
+
+                            when (val appendState = movies.loadState.append) {
+                                is LoadState.Loading -> {
+                                    item {
+                                        SearchAppendLoadingState()
+                                    }
+                                }
+
+                                is LoadState.Error -> {
+                                    item {
+                                        InlineRetryState(
+                                            modifier = Modifier.padding(vertical = ReelsSpacing.medium),
+                                            message = appendState.error.toUserMessage(
+                                                fallback = "Unable to load more results."
+                                            ),
+                                            retryLabel = "Retry",
+                                            onRetry = movies::retry
+                                        )
+                                    }
+                                }
+
+                                is LoadState.NotLoading -> Unit
+                            }
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun SearchResultsHeader(
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        modifier = modifier,
+        text = "Search Results",
+        style = MaterialTheme.typography.titleMedium.copy(
+            fontSize = 16.sp,
+            lineHeight = 22.sp
+        ),
+        color = MaterialTheme.colorScheme.onBackground,
+        fontWeight = FontWeight.Bold
+    )
+}
+
+@Composable
+private fun SearchPromptState(
+    query: String,
+    modifier: Modifier = Modifier,
+) {
+    EmptyState(
+        modifier = modifier.padding(top = ReelsSpacing.medium),
+        title = if (query.isBlank()) "Search for a movie" else "Keep typing",
+        message = if (query.isBlank()) {
+            "Enter at least two characters to find movies from TMDB."
+        } else {
+            "Add one more character to start searching."
+        }
+    )
+}
+
+@Composable
+private fun SearchResultLoadingState(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.searchResultSpacing)
+    ) {
+        repeat(3) {
+            SearchResultPlaceholderRow()
+        }
+    }
+}
+
+@Composable
+private fun SearchResultPlaceholderRow(
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 0.dp
+    ) {
+        Row(
+            modifier = Modifier.padding(ReelsDimensions.searchResultCardPadding),
+            horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.searchResultContentSpacing),
+            verticalAlignment = Alignment.Top
+        ) {
+            Spacer(
+                modifier = Modifier
+                    .width(ReelsDimensions.searchResultPosterWidth)
+                    .height(116.dp)
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f))
+            )
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
+            ) {
+                PlaceholderBar(width = 180.dp, height = 18.dp)
+                PlaceholderBar(width = 118.dp, height = 14.dp)
+                PlaceholderBar(width = 74.dp, height = 28.dp)
+
+                Row(horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small)) {
+                    PlaceholderBar(width = 74.dp, height = 28.dp)
+                    PlaceholderBar(width = 94.dp, height = 28.dp)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PlaceholderBar(
+    width: androidx.compose.ui.unit.Dp,
+    height: androidx.compose.ui.unit.Dp,
+    modifier: Modifier = Modifier,
+) {
+    Spacer(
+        modifier = modifier
+            .width(width)
+            .height(height)
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f))
+    )
+}
+
+@Composable
+private fun SearchAppendLoadingState(
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = ReelsSpacing.medium),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(24.dp),
+            strokeWidth = 2.dp
+        )
     }
 }
 
@@ -255,7 +368,7 @@ private fun RecentSearchesSection(
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.searchSectionSpacing)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -264,13 +377,20 @@ private fun RecentSearchesSection(
         ) {
             Text(
                 text = "Recent Searches",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onBackground
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontSize = 16.sp,
+                    lineHeight = 22.sp
+                ),
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Bold
             )
 
             Text(
                 text = "Clear all",
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = 13.sp,
+                    lineHeight = 16.sp
+                ),
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.clickable {
                     onEvent(SearchEvent.ClearRecentSearchesClicked)
@@ -288,16 +408,19 @@ private fun RecentSearchesSection(
                         onEvent(SearchEvent.RecentSearchClicked(query = query))
                     },
                     shape = MaterialTheme.shapes.extraLarge,
-                    color = MaterialTheme.colorScheme.surface,
+                    color = Color(0xFF2F3035),
                     contentColor = MaterialTheme.colorScheme.onSurface
                 ) {
                     Text(
                         modifier = Modifier.padding(
-                            horizontal = ReelsSpacing.medium,
-                            vertical = ReelsSpacing.small
+                            horizontal = ReelsDimensions.searchChipHorizontalPadding,
+                            vertical = ReelsDimensions.searchChipVerticalPadding
                         ),
                         text = query,
-                        style = MaterialTheme.typography.labelLarge
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontSize = 14.sp,
+                            lineHeight = 18.sp
+                        )
                     )
                 }
 
@@ -305,3 +428,5 @@ private fun RecentSearchesSection(
         }
     }
 }
+
+private const val MIN_SEARCH_QUERY_LENGTH = 2
