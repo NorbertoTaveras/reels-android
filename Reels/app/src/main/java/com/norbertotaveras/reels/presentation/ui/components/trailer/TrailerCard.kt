@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
@@ -43,7 +44,7 @@ fun TrailerCard(
 ) {
     Column(
         modifier = modifier
-            .width(240.dp)
+            .width(ReelsDimensions.detailsTrailerWidth)
             .clickable(onClick = onClick),
         verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
     ) {
@@ -70,7 +71,7 @@ fun TrailerCard(
                 Surface(
                     modifier = Modifier
                         .align(Alignment.Center)
-                        .size(56.dp),
+                        .size(ReelsDimensions.detailsTrailerPlayButtonSize),
                     shape = CircleShape,
                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.92f),
                     contentColor = MaterialTheme.colorScheme.onPrimary
@@ -81,7 +82,7 @@ fun TrailerCard(
                         Icon(
                             imageVector = Icons.Filled.PlayArrow,
                             contentDescription = "Play trailer",
-                            modifier = Modifier.size(30.dp)
+                            modifier = Modifier.size(ReelsDimensions.detailsTrailerPlayIconSize)
                         )
                     }
                 }

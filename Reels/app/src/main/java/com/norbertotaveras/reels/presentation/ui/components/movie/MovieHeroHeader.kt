@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
@@ -64,14 +65,14 @@ fun MovieHeroHeader(
                 contentDescription = title,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp),
+                    .height(ReelsDimensions.detailsHeroHeight),
                 contentScale = ContentScale.Crop
             )
 
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp)
+                    .height(ReelsDimensions.detailsHeroHeight)
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(
@@ -87,9 +88,9 @@ fun MovieHeroHeader(
                 modifier = Modifier
                     .padding(
                         start = ReelsSpacing.screenHorizontal,
-                        top = 48.dp
+                        top = ReelsDimensions.detailsHeroTopActionPadding
                     )
-                    .size(40.dp),
+                    .size(ReelsDimensions.detailsBackButtonSize),
                 onClick = onBackClick,
                 colors = IconButtonDefaults.filledIconButtonColors(
                     containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.86f),
@@ -107,13 +108,13 @@ fun MovieHeroHeader(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = ReelsSpacing.screenHorizontal)
-                .offset(y = (-48).dp),
+                .offset(y = -ReelsDimensions.detailsPosterOverlap),
             horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
             verticalAlignment = Alignment.Bottom
         ) {
             Card(
                 modifier = Modifier
-                    .width(96.dp)
+                    .width(ReelsDimensions.detailsPosterWidth)
                     .aspectRatio(ReelsRatios.poster),
                 shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.cardColors(
@@ -158,7 +159,7 @@ fun MovieHeroHeader(
         GenreChipRow(
             modifier = Modifier
                 .padding(horizontal = ReelsSpacing.screenHorizontal)
-                .offset(y = (-32).dp),
+                .offset(y = -ReelsDimensions.detailsGenreOverlap),
             genres = genres
         )
     }
@@ -228,7 +229,7 @@ private fun HeroRatingButton(
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = modifier.height(40.dp),
+        modifier = modifier.height(ReelsDimensions.detailsActionButtonHeight),
         shape = MaterialTheme.shapes.large,
         color = Color(0xFF3A2D24),
         contentColor = MaterialTheme.colorScheme.primary
@@ -241,7 +242,7 @@ private fun HeroRatingButton(
             Icon(
                 imageVector = Icons.Filled.Star,
                 contentDescription = null,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(ReelsDimensions.detailsHeroRatingIconSize)
             )
 
             Text(
@@ -261,7 +262,10 @@ private fun HeroFavoriteButton(
 ) {
     Surface(
         modifier = modifier
-            .size(width = 64.dp, height = 40.dp)
+            .size(
+                width = ReelsDimensions.detailsFavoriteButtonWidth,
+                height = ReelsDimensions.detailsActionButtonHeight
+            )
             .clickable(
                 enabled = !isLoading,
                 onClick = onClick

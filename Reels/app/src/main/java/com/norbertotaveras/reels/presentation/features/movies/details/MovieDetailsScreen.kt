@@ -24,6 +24,7 @@ import com.norbertotaveras.reels.presentation.ui.components.common.CenteredError
 import com.norbertotaveras.reels.presentation.ui.components.movie.PosterCarouselItem
 import com.norbertotaveras.reels.presentation.ui.components.trailer.TrailerCarouselItem
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import androidx.compose.ui.Alignment
@@ -109,20 +110,20 @@ private fun MovieDetailsLoadingState(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
         contentPadding = PaddingValues(bottom = ReelsSpacing.xxLarge),
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xLarge)
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.detailsSectionSpacing)
     ) {
         item {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(360.dp)
+                    .height(ReelsDimensions.detailsLoadingHeroHeight)
                     .background(detailsPlaceholderColor())
             ) {
                 PlaceholderBox(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .padding(start = ReelsSpacing.screenHorizontal, bottom = ReelsSpacing.large)
-                        .width(96.dp)
+                        .width(ReelsDimensions.detailsPosterWidth)
                         .aspectRatio(ReelsRatios.poster)
                 )
 
@@ -130,7 +131,9 @@ private fun MovieDetailsLoadingState(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .padding(
-                            start = 132.dp,
+                            start = ReelsSpacing.screenHorizontal +
+                                ReelsDimensions.detailsPosterWidth +
+                                ReelsSpacing.medium,
                             end = ReelsSpacing.screenHorizontal,
                             bottom = ReelsSpacing.large
                         ),
@@ -172,7 +175,9 @@ private fun MovieDetailsLoadingState(
                         horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        PlaceholderBox(modifier = Modifier.size(40.dp))
+                        PlaceholderBox(
+                            modifier = Modifier.size(ReelsDimensions.detailsInfoIconContainerSize)
+                        )
                         Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)) {
                             PlaceholderBar(width = 96.dp, height = 14.dp)
                             PlaceholderBar(width = 132.dp, height = 16.dp)
@@ -207,7 +212,7 @@ private fun MovieDetailsLoadingState(
                 items(2) {
                     PlaceholderBox(
                         modifier = Modifier
-                            .width(190.dp)
+                            .width(ReelsDimensions.detailsTrailerWidth)
                             .height(108.dp)
                     )
                 }

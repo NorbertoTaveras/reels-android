@@ -1,6 +1,7 @@
 package com.norbertotaveras.reels.presentation.features.movies.details
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,8 +38,12 @@ import com.norbertotaveras.reels.presentation.ui.components.trailer.TrailerCarou
 import com.norbertotaveras.reels.presentation.ui.components.trailer.TrailerCarouselItem
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 private data class MovieInfoRowData(
     val label: String,
@@ -74,7 +79,7 @@ fun MovieDetailsContent(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
         contentPadding = PaddingValues(bottom = ReelsSpacing.xxLarge),
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xLarge)
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.detailsSectionSpacing)
     ) {
         item {
             MovieHeroHeader(
@@ -153,7 +158,7 @@ private fun OverviewSection(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = ReelsSpacing.screenHorizontal),
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.detailsSectionContentSpacing)
     ) {
         Text(
             text = "Overview",
@@ -180,14 +185,14 @@ private fun MovieInfoSection(
         releaseDate?.takeIf { it.isNotBlank() }?.let {
             MovieInfoRowData(
                 label = "Release Date",
-                value = it,
+                value = it.toDisplayReleaseDate(),
                 icon = MovieInfoIcon.ReleaseDate
             )
         },
         originalLanguage?.takeIf { it.isNotBlank() }?.let {
             MovieInfoRowData(
                 label = "Original Language",
-                value = it,
+                value = it.toDisplayLanguageName(),
                 icon = MovieInfoIcon.Language
             )
         },
@@ -206,7 +211,7 @@ private fun MovieInfoSection(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = ReelsSpacing.screenHorizontal),
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.detailsInfoRowSpacing)
     ) {
         rows.forEach { row ->
             MovieInfoRow(row = row)
@@ -220,7 +225,7 @@ private fun MovieInfoRow(
     row: MovieInfoRowData,
     modifier: Modifier = Modifier,
 ) {
-    androidx.compose.foundation.layout.Row(
+    Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
         verticalAlignment = Alignment.CenterVertically
@@ -229,13 +234,13 @@ private fun MovieInfoRow(
             color = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.primary,
             shape = MaterialTheme.shapes.medium,
-            border = androidx.compose.foundation.BorderStroke(
+            border = BorderStroke(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.outline.copy(alpha = 0.22f)
             )
         ) {
-            androidx.compose.foundation.layout.Box(
-                modifier = Modifier.size(40.dp),
+            Box(
+                modifier = Modifier.size(ReelsDimensions.detailsInfoIconContainerSize),
                 contentAlignment = Alignment.Center
             ) {
                 MovieInfoIcon(icon = row.icon)
@@ -272,8 +277,33 @@ private fun MovieInfoIcon(
     Icon(
         imageVector = imageVector,
         contentDescription = null,
-        modifier = modifier.size(16.dp)
+        modifier = modifier.size(ReelsDimensions.detailsInfoIconSize)
     )
+}
+
+private fun String.toDisplayReleaseDate(): String {
+    val parser = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+    val formatter = SimpleDateFormat("MMMM d, yyyy", Locale.US)
+
+    return try {
+        formatter.format(parser.parse(this) ?: return this)
+    } catch (_: ParseException) {
+        this
+    }
+}
+
+private fun String.toDisplayLanguageName(): String {
+    return Locale.forLanguageTag(this)
+        .getDisplayLanguage(Locale.US)
+        .replaceFirstChar { firstChar ->
+            if (firstChar.isLowerCase()) {
+                firstChar.titlecase(Locale.US)
+            } else {
+                firstChar.toString()
+            }
+        }
+        .takeIf { language -> language.isNotBlank() }
+        ?: this
 }
 
 @Composable
@@ -287,7 +317,7 @@ private fun OfflineFavoriteNotice(
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface,
-        border = androidx.compose.foundation.BorderStroke(
+        border = BorderStroke(
             width = 1.dp,
             color = ReelsBorder
         )
@@ -298,7 +328,7 @@ private fun OfflineFavoriteNotice(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Surface(
-                modifier = Modifier.size(42.dp),
+                modifier = Modifier.size(ReelsDimensions.detailsOfflineIconContainerSize),
                 shape = MaterialTheme.shapes.medium,
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 contentColor = MaterialTheme.colorScheme.secondary
@@ -307,7 +337,7 @@ private fun OfflineFavoriteNotice(
                     Icon(
                         imageVector = Icons.Filled.DownloadDone,
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(ReelsDimensions.detailsOfflineIconSize)
                     )
                 }
             }
