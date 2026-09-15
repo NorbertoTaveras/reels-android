@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -46,7 +47,6 @@ import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.CenteredErrorState
-import com.norbertotaveras.reels.presentation.ui.components.common.CenteredLoadingState
 import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
 import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
@@ -70,7 +70,7 @@ fun MoviesListScreen(
 
     when {
         popularRefreshState is LoadState.Loading && popularMovies.itemCount == 0 -> {
-            CenteredLoadingState(modifier = modifier)
+            HomeLoadingState(modifier = modifier)
             return
         }
 
@@ -509,14 +509,120 @@ private fun HomeSectionHeader(
 private fun SectionLoadingState(
     modifier: Modifier = Modifier,
 ) {
+    LazyRow(
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(horizontal = ReelsSpacing.screenHorizontal),
+        horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.posterRowSpacing)
+    ) {
+        items(SECTION_PLACEHOLDER_COUNT) {
+            PosterPlaceholderCard()
+        }
+    }
+}
+
+@Composable
+private fun HomeLoadingState(
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        contentPadding = PaddingValues(
+            top = ReelsDimensions.topPadding,
+            bottom = ReelsSpacing.xxLarge
+        ),
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.sectionSpacing)
+    ) {
+        item {
+            HomeHeader()
+        }
+
+        item {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = ReelsSpacing.screenHorizontal)
+                    .aspectRatio(ReelsDimensions.heroCardAspectRatio)
+                    .clip(MaterialTheme.shapes.extraLarge)
+                    .background(placeholderColor())
+            ) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(
+                            horizontal = ReelsDimensions.heroContentHorizontalPadding,
+                            vertical = ReelsDimensions.heroContentVerticalPadding
+                        ),
+                    verticalArrangement = Arrangement.spacedBy(ReelsDimensions.heroContentSpacing)
+                ) {
+                    PlaceholderBar(width = 92.dp, height = 34.dp)
+                    PlaceholderBar(width = 226.dp, height = 24.dp)
+                    PlaceholderBar(width = 280.dp, height = 18.dp)
+                    PlaceholderBar(width = 208.dp, height = 18.dp)
+                }
+            }
+        }
+
+        HOME_LOADING_SECTION_TITLES.forEach { title ->
+            item {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(ReelsDimensions.sectionHeaderToRowSpacing)
+                ) {
+                    HomeSectionHeader(
+                        modifier = Modifier.padding(horizontal = ReelsSpacing.screenHorizontal),
+                        title = title,
+                        actionLabel = "See all",
+                        onActionClick = {}
+                    )
+
+                    SectionLoadingState()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PosterPlaceholderCard(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.width(ReelsDimensions.posterCardWidth),
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.posterTextSpacing)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(ReelsRatios.poster)
+                .clip(MaterialTheme.shapes.large)
+                .background(placeholderColor())
+        )
+
+        PlaceholderBar(width = ReelsDimensions.posterCardWidth, height = 18.dp)
+        PlaceholderBar(width = 64.dp, height = 16.dp)
+    }
+}
+
+@Composable
+private fun PlaceholderBar(
+    width: androidx.compose.ui.unit.Dp,
+    height: androidx.compose.ui.unit.Dp,
+    modifier: Modifier = Modifier,
+) {
     Box(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(ReelsSpacing.xLarge),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator()
-    }
+            .width(width)
+            .size(width = width, height = height)
+            .clip(MaterialTheme.shapes.medium)
+            .background(placeholderColor())
+    )
+}
+
+@Composable
+private fun placeholderColor(): Color {
+    return MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.52f)
 }
 
 @Composable
@@ -646,3 +752,9 @@ private const val HERO_MOVIE_LIMIT = 3
 private const val HERO_AUTO_SCROLL_DELAY_MS = 2_800L
 private const val HERO_CROSSFADE_DURATION_MS = 650
 private const val HOME_SECTION_LIMIT = 10
+private const val SECTION_PLACEHOLDER_COUNT = 4
+private val HOME_LOADING_SECTION_TITLES = listOf(
+    MovieCategory.POPULAR.label,
+    MovieCategory.NOW_PLAYING.label,
+    MovieCategory.UPCOMING.label
+)

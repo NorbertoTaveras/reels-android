@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -28,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -38,7 +40,6 @@ import androidx.paging.compose.LazyPagingItems
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.CenteredErrorState
-import com.norbertotaveras.reels.presentation.ui.components.common.CenteredLoadingState
 import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
 import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
@@ -56,7 +57,13 @@ fun MovieCategoryScreen(
 ) {
     when (val refreshState = movies.loadState.refresh) {
         is LoadState.Loading -> {
-            CenteredLoadingState(modifier = modifier)
+            MovieCategoryLoadingState(
+                modifier = modifier,
+                title = state.category.label,
+                onBackClick = {
+                    onEvent(MovieCategoryEvent.BackClicked)
+                }
+            )
             return
         }
 
@@ -204,6 +211,80 @@ private fun MovieCategoryHeader(
 }
 
 @Composable
+private fun MovieCategoryLoadingState(
+    title: String,
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyVerticalGrid(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        columns = GridCells.Fixed(3),
+        contentPadding = PaddingValues(
+            start = ReelsDimensions.categoryScreenHorizontalPadding,
+            top = ReelsDimensions.categoryScreenTopPadding,
+            end = ReelsDimensions.categoryScreenHorizontalPadding,
+            bottom = ReelsDimensions.categoryScreenBottomPadding
+        ),
+        horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.categoryGridHorizontalSpacing),
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.categoryGridVerticalSpacing)
+    ) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            MovieCategoryHeader(
+                title = title,
+                onBackClick = onBackClick
+            )
+        }
+
+        items(CATEGORY_PLACEHOLDER_COUNT) {
+            MovieCategoryPlaceholderCard()
+        }
+    }
+}
+
+@Composable
+private fun MovieCategoryPlaceholderCard(
+    modifier: Modifier = Modifier,
+) {
+    androidx.compose.foundation.layout.Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.categoryPosterTextSpacing)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(ReelsRatios.poster)
+                .clip(MaterialTheme.shapes.large)
+                .background(categoryPlaceholderColor())
+        )
+
+        CategoryPlaceholderBar(widthFraction = 0.92f, height = 18.dp)
+        CategoryPlaceholderBar(widthFraction = 0.45f, height = 16.dp)
+    }
+}
+
+@Composable
+private fun CategoryPlaceholderBar(
+    widthFraction: Float,
+    height: androidx.compose.ui.unit.Dp,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth(widthFraction)
+            .height(height)
+            .clip(MaterialTheme.shapes.medium)
+            .background(categoryPlaceholderColor())
+    )
+}
+
+@Composable
+private fun categoryPlaceholderColor(): Color {
+    return MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.52f)
+}
+
+@Composable
 private fun MovieCategoryPosterCard(
     movie: MovieDataModel,
     onClick: () -> Unit,
@@ -297,3 +378,5 @@ private fun CategoryRatingBadge(
         }
     }
 }
+
+private const val CATEGORY_PLACEHOLDER_COUNT = 12
