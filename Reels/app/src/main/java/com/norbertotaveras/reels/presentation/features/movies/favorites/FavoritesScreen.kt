@@ -2,23 +2,43 @@ package com.norbertotaveras.reels.presentation.features.movies.favorites
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DownloadDone
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
+import com.norbertotaveras.reels.domain.model.favorite.FavoriteMovieDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
-import com.norbertotaveras.reels.presentation.ui.components.movie.MoviePosterCard
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
 @Composable
@@ -39,16 +59,16 @@ fun FavoritesScreen(
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(
             start = ReelsSpacing.screenHorizontal,
-            top = ReelsSpacing.xLarge,
+            top = ReelsDimensions.favoritesScreenTopPadding,
             end = ReelsSpacing.screenHorizontal,
-            bottom = ReelsSpacing.xxLarge
+            bottom = ReelsDimensions.favoritesScreenBottomPadding
         ),
-        horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)
+        horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesGridHorizontalSpacing),
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesGridVerticalSpacing)
     ) {
         item(
             span = {
-                androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan)
+                GridItemSpan(maxLineSpan)
             }
         ) {
             Text(
@@ -60,23 +80,28 @@ fun FavoritesScreen(
 
         item(
             span = {
-                androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan)
+                GridItemSpan(maxLineSpan)
             }
         ) {
-            androidx.compose.foundation.layout.Row(
+            Row(
+                modifier = Modifier.padding(
+                    top = ReelsDimensions.favoritesHeaderToBadgeSpacing,
+                    bottom = ReelsDimensions.favoritesBadgeToGridSpacing
+                ),
                 horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     imageVector = Icons.Filled.DownloadDone,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.size(ReelsDimensions.favoritesHeartIconSize)
                 )
 
                 Text(
                     text = "Available offline",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.secondary
                 )
             }
         }
@@ -85,15 +110,140 @@ fun FavoritesScreen(
             items = state.movies,
             key = { movie -> movie.id }
         ) { movie ->
-            MoviePosterCard(
-                title = movie.title,
-                posterUrl = movie.posterPath.toTmdbImageUrl(),
-                releaseYear = movie.releaseDate?.take(4),
-                rating = String.format("%.1f", movie.voteAverage),
-                onClick = {
-                    onEvent(FavoritesEvent.MovieClicked(movieId = movie.id))
-                }
+            FavoriteMovieCard(
+                movie = movie,
+                onClick = { onEvent(FavoritesEvent.MovieClicked(movieId = movie.id)) }
             )
+        }
+    }
+}
+
+@Composable
+private fun FavoriteMovieCard(
+    movie: FavoriteMovieDataModel,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    androidx.compose.foundation.layout.Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesTextSpacing)
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(ReelsRatios.poster),
+            shape = MaterialTheme.shapes.large,
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            ),
+            onClick = onClick
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                AsyncImage(
+                    model = movie.posterPath.toTmdbImageUrl(),
+                    contentDescription = movie.title,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(MaterialTheme.shapes.large),
+                    contentScale = ContentScale.Crop
+                )
+
+                Surface(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(ReelsSpacing.small)
+                        .size(ReelsDimensions.favoritesOfflineBadgeSize),
+                    shape = MaterialTheme.shapes.extraLarge,
+                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.88f),
+                    contentColor = MaterialTheme.colorScheme.background
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Filled.DownloadDone,
+                            contentDescription = "Available offline",
+                            modifier = Modifier.size(13.dp)
+                        )
+                    }
+                }
+
+                Surface(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(ReelsSpacing.small),
+                    shape = MaterialTheme.shapes.extraLarge,
+                    color = Color(0xFF1B1B1E).copy(alpha = 0.88f),
+                    contentColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Row(
+                        modifier = Modifier.padding(
+                            horizontal = ReelsSpacing.small,
+                            vertical = ReelsSpacing.xSmall
+                        ),
+                        horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Star,
+                            contentDescription = null,
+                            modifier = Modifier.size(12.dp)
+                        )
+
+                        Text(
+                            text = String.format("%.1f", movie.voteAverage),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                }
+            }
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
+            verticalAlignment = Alignment.Top
+        ) {
+            androidx.compose.foundation.layout.Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
+            ) {
+                Text(
+                    text = movie.title,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Text(
+                    text = movie.releaseDate?.take(4).orEmpty(),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            IconButton(
+                modifier = Modifier.size(ReelsDimensions.favoritesHeartButtonSize),
+                onClick = onClick
+            ) {
+                Surface(
+                    shape = MaterialTheme.shapes.small,
+                    color = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Box(
+                        modifier = Modifier.size(ReelsDimensions.favoritesHeartButtonSize),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Favorite,
+                            contentDescription = "Open favorite movie",
+                            modifier = Modifier.size(ReelsDimensions.favoritesHeartIconSize)
+                        )
+                    }
+                }
+            }
         }
     }
 }

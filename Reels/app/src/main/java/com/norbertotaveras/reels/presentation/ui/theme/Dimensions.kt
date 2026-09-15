@@ -50,4 +50,16 @@ object ReelsDimensions {
     val searchResultCardPadding = 12.dp
     val searchResultContentSpacing = 8.dp
     val searchResultRatingIconSize = 14.dp
+
+    val favoritesScreenTopPadding = 24.dp
+    val favoritesScreenBottomPadding = 32.dp
+    val favoritesHeaderToBadgeSpacing = 8.dp
+    val favoritesBadgeToGridSpacing = 18.dp
+    val favoritesGridHorizontalSpacing = 14.dp
+    val favoritesGridVerticalSpacing = 22.dp
+    val favoritesPosterCornerSize = 10.dp
+    val favoritesOfflineBadgeSize = 22.dp
+    val favoritesHeartButtonSize = 30.dp
+    val favoritesHeartIconSize = 16.dp
+    val favoritesTextSpacing = 6.dp
 }
