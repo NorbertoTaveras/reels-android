@@ -68,4 +68,13 @@ object ReelsDimensions {
     val favoritesEmptyIconContainerSize = 72.dp
     val favoritesEmptyIconSize = 34.dp
     val favoritesEmptyContentSpacing = 14.dp
+
+    val stateCardPadding = 24.dp
+    val stateCardContentSpacing = 14.dp
+    val stateIconContainerSize = 58.dp
+    val stateIconSize = 28.dp
+    val inlineStateCardPadding = 18.dp
+    val inlineStateContentSpacing = 10.dp
+    val inlineStateIconContainerSize = 44.dp
+    val inlineStateIconSize = 22.dp
 }
