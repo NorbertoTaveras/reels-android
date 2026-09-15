@@ -1,6 +1,7 @@
 package com.norbertotaveras.reels.presentation.features.movies.favorites
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -23,7 +25,6 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -36,6 +37,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.shape.RoundedCornerShape
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.favorite.FavoriteMovieDataModel
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
@@ -128,14 +130,14 @@ private fun FavoriteMovieCard(
     modifier: Modifier = Modifier,
 ) {
     androidx.compose.foundation.layout.Column(
-        modifier = modifier,
+        modifier = modifier.width(ReelsDimensions.favoritesPosterWidth),
         verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesTextSpacing)
     ) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.poster),
-            shape = MaterialTheme.shapes.large,
+            shape = RoundedCornerShape(ReelsDimensions.favoritesPosterCornerSize),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant
             ),
@@ -147,7 +149,7 @@ private fun FavoriteMovieCard(
                     contentDescription = movie.title,
                     modifier = Modifier
                         .fillMaxSize()
-                        .clip(MaterialTheme.shapes.large),
+                        .clip(RoundedCornerShape(ReelsDimensions.favoritesPosterCornerSize)),
                     contentScale = ContentScale.Crop
                 )
 
@@ -226,25 +228,20 @@ private fun FavoriteMovieCard(
                 )
             }
 
-            IconButton(
-                modifier = Modifier.size(ReelsDimensions.favoritesHeartButtonSize),
-                onClick = onClick
+            Surface(
+                modifier = Modifier
+                    .size(ReelsDimensions.favoritesHeartButtonSize)
+                    .clickable(onClick = onClick),
+                shape = MaterialTheme.shapes.small,
+                color = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.primary
             ) {
-                Surface(
-                    shape = MaterialTheme.shapes.small,
-                    color = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.primary
-                ) {
-                    Box(
-                        modifier = Modifier.size(ReelsDimensions.favoritesHeartButtonSize),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Favorite,
-                            contentDescription = "Open favorite movie",
-                            modifier = Modifier.size(ReelsDimensions.favoritesHeartIconSize)
-                        )
-                    }
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Filled.Favorite,
+                        contentDescription = "Open favorite movie",
+                        modifier = Modifier.size(ReelsDimensions.favoritesHeartIconSize)
+                    )
                 }
             }
         }

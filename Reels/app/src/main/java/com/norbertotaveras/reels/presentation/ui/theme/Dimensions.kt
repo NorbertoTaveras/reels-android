@@ -57,6 +57,7 @@ object ReelsDimensions {
     val favoritesBadgeToGridSpacing = 18.dp
     val favoritesGridHorizontalSpacing = 14.dp
     val favoritesGridVerticalSpacing = 22.dp
+    val favoritesPosterWidth = 150.dp
     val favoritesPosterCornerSize = 10.dp
     val favoritesOfflineBadgeSize = 22.dp
     val favoritesHeartButtonSize = 30.dp
