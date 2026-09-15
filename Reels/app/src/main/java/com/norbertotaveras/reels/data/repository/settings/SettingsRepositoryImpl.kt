@@ -40,4 +40,10 @@ class SettingsRepositoryImpl @Inject constructor(
             settingsDataStore.updateTheme(theme = theme)
         }
     }
+
+    override suspend fun updateRecentSearches(recentSearches: List<String>) {
+        withContext(ioDispatcher) {
+            settingsDataStore.updateRecentSearches(recentSearches = recentSearches)
+        }
+    }
 }

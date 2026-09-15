@@ -8,6 +8,7 @@ import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.domain.usecase.movie.GetMovieGenresUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.SearchMoviesUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
+import com.norbertotaveras.reels.domain.usecase.settings.UpdateRecentSearchesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,6 +34,7 @@ class SearchViewModel @Inject constructor(
     private val searchMoviesUseCase: SearchMoviesUseCase,
     private val getMovieGenresUseCase: GetMovieGenresUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
+    private val updateRecentSearchesUseCase: UpdateRecentSearchesUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(SearchUiState())
     val state: StateFlow<SearchUiState> = _state.asStateFlow()
@@ -85,21 +87,7 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun onSearchSubmitted() {
-        val currentState = state.value
-        val query = currentState.query.trim()
-
-        if (query.length < MIN_QUERY_LENGTH) return
-
-        val recentSearches = buildList {
-            add(query)
-            addAll(currentState.recentSearches.filterNot { recent ->
-                recent.equals(query, ignoreCase = true)
-            })
-        }.take(MAX_RECENT_SEARCHES)
-
-        _state.update {
-            it.copy(recentSearches = recentSearches)
-        }
+        saveCurrentQueryAsRecentSearch()
     }
 
     private fun onRecentSearchClicked(query: String) {
@@ -112,26 +100,75 @@ class SearchViewModel @Inject constructor(
         _state.update { currentState ->
             currentState.copy(recentSearches = emptyList())
         }
+
+        viewModelScope.launch {
+            updateRecentSearchesUseCase(recentSearches = emptyList())
+        }
     }
 
     private fun onMovieClicked(movieId: Int) {
+        saveCurrentQueryAsRecentSearch()
+
         viewModelScope.launch {
             _effect.emit(SearchEffect.NavigateToMovieDetails(movieId = movieId))
         }
     }
 
+    private fun saveCurrentQueryAsRecentSearch() {
+        val currentState = state.value
+        val query = currentState.query.trim()
+
+        if (query.length < MIN_QUERY_LENGTH) return
+
+        val recentSearches = buildRecentSearches(
+            query = query,
+            currentRecentSearches = currentState.recentSearches
+        )
+
+        _state.update { currentState ->
+            currentState.copy(recentSearches = recentSearches)
+        }
+
+        viewModelScope.launch {
+            updateRecentSearchesUseCase(recentSearches = recentSearches)
+        }
+    }
+
     private fun observeSettings() {
         viewModelScope.launch {
+            var loadedGenreLanguage: String? = null
+
             observeSettingsUseCase()
-                .map { settings -> settings.languageRegion.languageCode }
-                .distinctUntilChanged()
-                .collect { language ->
+                .collect { settings ->
+                    val language = settings.languageRegion.languageCode
+
                     _state.update { currentState ->
-                        currentState.copy(language = language)
+                        currentState.copy(
+                            language = language,
+                            recentSearches = settings.recentSearches
+                        )
                     }
-                    loadGenres(language = language)
+
+                    if (loadedGenreLanguage != language) {
+                        loadedGenreLanguage = language
+                        loadGenres(language = language)
+                    }
                 }
         }
+    }
+
+    private fun buildRecentSearches(
+        query: String,
+        currentRecentSearches: List<String>,
+    ): List<String> {
+        return buildList {
+            add(query)
+            addAll(
+                currentRecentSearches.filterNot { recent ->
+                    recent.equals(query, ignoreCase = true)
+                }
+            )
+        }.take(MAX_RECENT_SEARCHES)
     }
 
     private fun loadGenres(language: String) {

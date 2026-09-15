@@ -11,4 +11,5 @@ interface SettingsRepository {
     suspend fun updateImageQuality(imageQuality: ImageQuality)
     suspend fun updateLanguageRegion(languageRegion: LanguageRegion)
     suspend fun updateTheme(theme: AppTheme)
+    suspend fun updateRecentSearches(recentSearches: List<String>)
 }
