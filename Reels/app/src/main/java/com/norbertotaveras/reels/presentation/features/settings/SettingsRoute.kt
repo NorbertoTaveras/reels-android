@@ -1,14 +1,23 @@
 package com.norbertotaveras.reels.presentation.features.settings
 
-import android.widget.Toast
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.SingletonImageLoader
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsAccent
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsSurfaceHigh
 
 @Composable
 fun SettingsRoute(
@@ -19,8 +28,9 @@ fun SettingsRoute(
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(viewModel, context) {
+    LaunchedEffect(viewModel, context, snackbarHostState) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 SettingsEffect.NavigateToFavorites -> {
@@ -31,7 +41,7 @@ fun SettingsRoute(
                     val imageLoader = SingletonImageLoader.get(context)
                     imageLoader.memoryCache?.clear()
                     imageLoader.diskCache?.clear()
-                    Toast.makeText(context, "Image cache cleared", Toast.LENGTH_SHORT).show()
+                    snackbarHostState.showSnackbar(message = "Image cache cleared")
                 }
 
                 is SettingsEffect.OpenExternalUrl -> {
@@ -41,9 +51,23 @@ fun SettingsRoute(
         }
     }
 
-    SettingsScreen(
-        state = state,
-        onEvent = viewModel::onEvent,
-        modifier = modifier
-    )
+    Box(modifier = modifier.fillMaxSize()) {
+        SettingsScreen(
+            state = state,
+            onEvent = viewModel::onEvent,
+            modifier = Modifier.fillMaxSize()
+        )
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        ) { snackbarData ->
+            Snackbar(
+                snackbarData = snackbarData,
+                containerColor = ReelsSurfaceHigh,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                actionColor = ReelsAccent
+            )
+        }
+    }
 }

@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsAccent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSurfaceHigh
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
@@ -64,12 +65,15 @@ fun SettingsScreen(
             .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = ReelsSpacing.screenHorizontal)
-            .padding(top = ReelsSpacing.xLarge, bottom = ReelsSpacing.xxLarge),
-        verticalArrangement = Arrangement.spacedBy(28.dp)
+            .padding(
+                top = ReelsDimensions.settingsScreenTopPadding,
+                bottom = ReelsDimensions.settingsScreenBottomPadding
+            ),
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.settingsSectionSpacing)
     ) {
         Text(
             text = "Settings",
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.Bold
         )
@@ -190,13 +194,15 @@ private fun SettingsSection(
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.settingsSectionContentSpacing)
     ) {
         Text(
             text = title,
-            modifier = Modifier.padding(horizontal = 4.dp),
+            modifier = Modifier.padding(
+                horizontal = ReelsDimensions.settingsSectionTitleHorizontalPadding
+            ),
             style = MaterialTheme.typography.labelLarge.copy(
-                fontSize = 14.sp,
+                fontSize = ReelsDimensions.settingsSectionTitleSize,
                 letterSpacing = 0.sp
             ),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -228,22 +234,28 @@ private fun SettingsRow(
     showsChevron: Boolean = true,
     onClick: (() -> Unit)? = null,
 ) {
-    val rowModifier = if (onClick != null) {
-        modifier.clickable(onClick = onClick)
-    } else {
-        modifier
-    }
+    val rowModifier = modifier
+        .fillMaxWidth()
+        .heightIn(min = ReelsDimensions.settingsRowMinHeight)
+        .then(
+            if (onClick != null) {
+                Modifier.clickable(onClick = onClick)
+            } else {
+                Modifier
+            }
+        )
 
     Row(
         modifier = rowModifier
-            .fillMaxWidth()
-            .heightIn(min = 74.dp)
-            .padding(horizontal = ReelsSpacing.large, vertical = 14.dp),
+            .padding(
+                horizontal = ReelsDimensions.settingsRowHorizontalPadding,
+                vertical = ReelsDimensions.settingsRowVerticalPadding
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
-                .size(42.dp)
+                .size(ReelsDimensions.settingsRowIconContainerSize)
                 .clip(MaterialTheme.shapes.medium)
                 .background(ReelsSurfaceHigh),
             contentAlignment = Alignment.Center
@@ -251,7 +263,7 @@ private fun SettingsRow(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(22.dp),
+                modifier = Modifier.size(ReelsDimensions.settingsRowIconSize),
                 tint = ReelsAccent
             )
         }
@@ -264,7 +276,7 @@ private fun SettingsRow(
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
@@ -273,7 +285,7 @@ private fun SettingsRow(
 
             Text(
                 text = subtitle,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
@@ -285,7 +297,7 @@ private fun SettingsRow(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(ReelsDimensions.settingsChevronSize),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -298,7 +310,7 @@ private fun SettingsDivider(
 ) {
     HorizontalDivider(
         modifier = modifier,
-        thickness = 1.dp,
+        thickness = ReelsDimensions.settingsDividerThickness,
         color = ReelsBorder
     )
 }
@@ -314,9 +326,11 @@ private fun TmdbAttributionSection(
     ) {
         Text(
             text = "TMDB ATTRIBUTION",
-            modifier = Modifier.padding(horizontal = 4.dp),
+            modifier = Modifier.padding(
+                horizontal = ReelsDimensions.settingsSectionTitleHorizontalPadding
+            ),
             style = MaterialTheme.typography.labelLarge.copy(
-                fontSize = 14.sp,
+                fontSize = ReelsDimensions.settingsSectionTitleSize,
                 letterSpacing = 0.sp
             ),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -345,7 +359,7 @@ private fun TmdbAttributionCard(
                 color = MaterialTheme.colorScheme.surface,
                 shape = MaterialTheme.shapes.extraLarge
             )
-            .padding(ReelsSpacing.xLarge),
+            .padding(ReelsDimensions.settingsTmdbCardPadding),
         verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)
     ) {
         Row(
@@ -360,14 +374,14 @@ private fun TmdbAttributionCard(
             ) {
                 Text(
                     text = "The Movie Database",
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
                     text = "Powered by TMDB API",
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -376,7 +390,7 @@ private fun TmdbAttributionCard(
 
         Text(
             text = "This product uses the TMDB API but is not endorsed or certified by TMDB.",
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.SemiBold
         )
@@ -387,7 +401,7 @@ private fun TmdbAttributionCard(
         ) {
             Text(
                 text = "Visit themoviedb.org",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = ReelsAccent,
                 fontWeight = FontWeight.Bold
             )
@@ -395,7 +409,7 @@ private fun TmdbAttributionCard(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.OpenInNew,
                 contentDescription = null,
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(ReelsDimensions.settingsExternalIconSize),
                 tint = ReelsAccent
             )
         }
@@ -408,7 +422,7 @@ private fun TmdbLogoMark(
 ) {
     Box(
         modifier = modifier
-            .size(56.dp)
+            .size(ReelsDimensions.settingsTmdbLogoSize)
             .clip(MaterialTheme.shapes.large)
             .background(Color(0xFF01B4E4)),
         contentAlignment = Alignment.Center
@@ -431,8 +445,8 @@ private fun TmdbLogoMark(
             ) {
                 Box(
                     modifier = Modifier
-                        .width(22.dp)
-                        .height(5.dp)
+                        .width(ReelsDimensions.settingsTmdbLogoPillWidth)
+                        .height(ReelsDimensions.settingsTmdbLogoPillHeight)
                         .clip(MaterialTheme.shapes.small)
                         .background(Color.White)
                 )

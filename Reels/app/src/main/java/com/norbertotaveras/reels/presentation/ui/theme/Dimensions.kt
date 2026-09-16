@@ -1,6 +1,7 @@
 package com.norbertotaveras.reels.presentation.ui.theme
 
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 object ReelsDimensions {
     val topPadding = 20.dp
@@ -114,6 +115,25 @@ object ReelsDimensions {
     val castDetailsInfoIconSize = 16.dp
     val castDetailsBiographyFadeHeight = 42.dp
     val castDetailsBiographyToggleIconSize = 18.dp
+
+    val settingsScreenTopPadding = 24.dp
+    val settingsScreenBottomPadding = 32.dp
+    val settingsSectionSpacing = 24.dp
+    val settingsSectionContentSpacing = 12.dp
+    val settingsSectionTitleHorizontalPadding = 4.dp
+    val settingsSectionTitleSize = 14.sp
+    val settingsRowMinHeight = 64.dp
+    val settingsRowHorizontalPadding = 14.dp
+    val settingsRowVerticalPadding = 12.dp
+    val settingsRowIconContainerSize = 36.dp
+    val settingsRowIconSize = 19.dp
+    val settingsChevronSize = 22.dp
+    val settingsDividerThickness = 1.dp
+    val settingsTmdbCardPadding = 20.dp
+    val settingsTmdbLogoSize = 48.dp
+    val settingsTmdbLogoPillWidth = 18.dp
+    val settingsTmdbLogoPillHeight = 4.dp
+    val settingsExternalIconSize = 18.dp
 
     val stateCardPadding = 24.dp
     val stateCardContentSpacing = 14.dp
