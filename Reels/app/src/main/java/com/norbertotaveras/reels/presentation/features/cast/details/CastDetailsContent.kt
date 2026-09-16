@@ -45,6 +45,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.person.PersonMovieCreditDataModel
+import com.norbertotaveras.reels.extensions.toDisplayAge
+import com.norbertotaveras.reels.extensions.toDisplayTmdbDate
 import com.norbertotaveras.reels.presentation.ui.components.movie.PosterCarousel
 import com.norbertotaveras.reels.presentation.ui.components.movie.PosterCarouselItem
 import com.norbertotaveras.reels.presentation.ui.components.common.SectionHeader
@@ -52,9 +54,6 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 
 @Composable
 fun CastDetailsContent(
@@ -256,7 +255,7 @@ private fun CastQuickInfoSection(
             CastInfoRow(
                 icon = Icons.Filled.CalendarToday,
                 label = "Birthday",
-                value = birthday.toDisplayBirthday()
+                value = birthday.toDisplayTmdbDate().orEmpty()
             )
         }
 
@@ -472,7 +471,7 @@ private fun PersonalInfoSection(
             Column {
                 PersonalInfoRow(
                     label = "Age",
-                    value = birthday?.let { calculateDisplayAge(it) } ?: "Unknown"
+                    value = birthday.toDisplayAge() ?: "Unknown"
                 )
 
                 PersonalInfoDivider()
@@ -530,34 +529,6 @@ private fun PersonalInfoDivider() {
         color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f)
     )
 }
-
-private fun calculateDisplayAge(birthday: String): String {
-    val birthdayDate = parseTmdbDate(birthday) ?: return "Unknown"
-    val birthDate = Calendar.getInstance().apply { time = birthdayDate }
-    val today = Calendar.getInstance()
-
-    var age = today.get(Calendar.YEAR) - birthDate.get(Calendar.YEAR)
-    if (
-        today.get(Calendar.DAY_OF_YEAR) < birthDate.get(Calendar.DAY_OF_YEAR)
-    ) {
-        age--
-    }
-
-    return "$age years old"
-}
-
-private fun String.toDisplayBirthday(): String {
-    val birthdayDate = parseTmdbDate(this) ?: return this
-    return birthdayOutputFormat.format(birthdayDate)
-}
-
-private fun parseTmdbDate(value: String) = runCatching {
-    birthdayInputFormat.parse(value)
-}.getOrNull()
-
-private val birthdayInputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-private val birthdayOutputFormat = SimpleDateFormat("MMMM d, yyyy", Locale.US)
-
 
 @Preview(showBackground = true)
 @Composable

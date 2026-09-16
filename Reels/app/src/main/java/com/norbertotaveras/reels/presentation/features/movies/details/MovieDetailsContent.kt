@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.norbertotaveras.reels.domain.model.cast.CastMemberDataModel
 import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDetailsDataModel
+import com.norbertotaveras.reels.extensions.toDisplayTmdbDate
 import com.norbertotaveras.reels.presentation.ui.components.cast.CastCarousel
 import com.norbertotaveras.reels.presentation.ui.components.movie.MovieHeroHeader
 import com.norbertotaveras.reels.presentation.ui.components.movie.PosterCarouselItem
@@ -41,8 +42,6 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
-import java.text.ParseException
-import java.text.SimpleDateFormat
 import java.util.Locale
 
 private data class MovieInfoRowData(
@@ -185,7 +184,7 @@ private fun MovieInfoSection(
         releaseDate?.takeIf { it.isNotBlank() }?.let {
             MovieInfoRowData(
                 label = "Release Date",
-                value = it.toDisplayReleaseDate(),
+                value = it.toDisplayTmdbDate() ?: it,
                 icon = MovieInfoIcon.ReleaseDate
             )
         },
@@ -279,17 +278,6 @@ private fun MovieInfoIcon(
         contentDescription = null,
         modifier = modifier.size(ReelsDimensions.detailsInfoIconSize)
     )
-}
-
-private fun String.toDisplayReleaseDate(): String {
-    val parser = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-    val formatter = SimpleDateFormat("MMMM d, yyyy", Locale.US)
-
-    return try {
-        formatter.format(parser.parse(this) ?: return this)
-    } catch (_: ParseException) {
-        this
-    }
 }
 
 private fun String.toDisplayLanguageName(): String {
