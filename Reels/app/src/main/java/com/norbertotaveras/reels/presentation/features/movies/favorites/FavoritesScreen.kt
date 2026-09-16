@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.favorite.FavoriteMovieDataModel
+import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
@@ -117,7 +118,8 @@ fun FavoritesScreen(
         ) { movie ->
             FavoriteMovieCard(
                 movie = movie,
-                onClick = { onEvent(FavoritesEvent.MovieClicked(movieId = movie.id)) }
+                onClick = { onEvent(FavoritesEvent.MovieClicked(movieId = movie.id)) },
+                onFavoriteClick = { onEvent(FavoritesEvent.FavoriteClicked(movieId = movie.id)) }
             )
         }
     }
@@ -127,9 +129,10 @@ fun FavoritesScreen(
 private fun FavoriteMovieCard(
     movie: FavoriteMovieDataModel,
     onClick: () -> Unit,
+    onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    androidx.compose.foundation.layout.Column(
+    Column(
         modifier = modifier.width(ReelsDimensions.favoritesPosterWidth),
         verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesTextSpacing)
     ) {
@@ -166,7 +169,7 @@ private fun FavoriteMovieCard(
                         Icon(
                             imageVector = Icons.Filled.DownloadDone,
                             contentDescription = "Available offline",
-                            modifier = Modifier.size(13.dp)
+                            modifier = Modifier.size(ReelsDimensions.favoritesOfflineBadgeIconSize)
                         )
                     }
                 }
@@ -190,7 +193,7 @@ private fun FavoriteMovieCard(
                         Icon(
                             imageVector = Icons.Filled.Star,
                             contentDescription = null,
-                            modifier = Modifier.size(12.dp)
+                            modifier = Modifier.size(ReelsDimensions.favoritesRatingIconSize)
                         )
 
                         Text(
@@ -207,7 +210,7 @@ private fun FavoriteMovieCard(
             horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
             verticalAlignment = Alignment.Top
         ) {
-            androidx.compose.foundation.layout.Column(
+            Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
             ) {
@@ -220,7 +223,7 @@ private fun FavoriteMovieCard(
                 )
 
                 Text(
-                    text = movie.releaseDate?.take(4).orEmpty(),
+                    text = movie.releaseDate.toReleaseYear().orEmpty(),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
@@ -231,7 +234,7 @@ private fun FavoriteMovieCard(
             Surface(
                 modifier = Modifier
                     .size(ReelsDimensions.favoritesHeartButtonSize)
-                    .clickable(onClick = onClick),
+                    .clickable(onClick = onFavoriteClick),
                 shape = MaterialTheme.shapes.small,
                 color = MaterialTheme.colorScheme.surface,
                 contentColor = MaterialTheme.colorScheme.primary
@@ -239,7 +242,7 @@ private fun FavoriteMovieCard(
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Filled.Favorite,
-                        contentDescription = "Open favorite movie",
+                        contentDescription = "Remove favorite movie",
                         modifier = Modifier.size(ReelsDimensions.favoritesHeartIconSize)
                     )
                 }

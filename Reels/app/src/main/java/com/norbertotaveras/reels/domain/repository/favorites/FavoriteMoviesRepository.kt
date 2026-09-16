@@ -8,5 +8,6 @@ interface FavoriteMoviesRepository {
     fun observeFavoriteMovies(): Flow<List<FavoriteMovieDataModel>>
     fun observeIsFavorite(movieId: Int): Flow<Boolean>
     suspend fun toggleFavoriteMovie(movie: MovieDetailsDataModel)
+    suspend fun removeFavoriteMovie(movieId: Int)
     suspend fun getFavoriteMovieDetails(movieId: Int): MovieDetailsDataModel?
 }

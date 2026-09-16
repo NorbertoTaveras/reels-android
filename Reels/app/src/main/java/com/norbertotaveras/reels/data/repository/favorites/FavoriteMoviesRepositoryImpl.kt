@@ -42,6 +42,12 @@ class FavoriteMoviesRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun removeFavoriteMovie(movieId: Int) {
+        withContext(ioDispatcher) {
+            favoriteMovieDao.deleteFavoriteMovie(movieId = movieId)
+        }
+    }
+
     override suspend fun getFavoriteMovieDetails(movieId: Int): MovieDetailsDataModel? {
         return withContext(ioDispatcher) {
             favoriteMovieDao.getFavoriteMovie(movieId = movieId)?.toMovieDetailsDataModel()

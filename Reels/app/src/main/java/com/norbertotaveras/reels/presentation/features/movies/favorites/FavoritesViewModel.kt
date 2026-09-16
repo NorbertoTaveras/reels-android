@@ -3,6 +3,8 @@ package com.norbertotaveras.reels.presentation.features.movies.favorites
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveFavoriteMoviesUseCase
+import com.norbertotaveras.reels.domain.usecase.favorites.RemoveFavoriteMovieUseCase
+import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,7 +19,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class FavoritesViewModel @Inject constructor(
-    private val observeFavoriteMoviesUseCase: ObserveFavoriteMoviesUseCase
+    private val observeFavoriteMoviesUseCase: ObserveFavoriteMoviesUseCase,
+    private val removeFavoriteMovieUseCase: RemoveFavoriteMovieUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(FavoritesUiState())
     val state: StateFlow<FavoritesUiState> = _state.asStateFlow()
@@ -32,6 +35,7 @@ class FavoritesViewModel @Inject constructor(
     fun onEvent(event: FavoritesEvent) {
         when (event) {
             is FavoritesEvent.MovieClicked -> onMovieClicked(movieId = event.movieId)
+            is FavoritesEvent.FavoriteClicked -> onFavoriteClicked(movieId = event.movieId)
         }
     }
 
@@ -39,7 +43,10 @@ class FavoritesViewModel @Inject constructor(
         viewModelScope.launch {
             observeFavoriteMoviesUseCase().collectLatest { movies ->
                 _state.update { currentState ->
-                    currentState.copy(movies = movies)
+                    currentState.copy(
+                        movies = movies,
+                        errorMessage = null
+                    )
                 }
             }
         }
@@ -48,6 +55,20 @@ class FavoritesViewModel @Inject constructor(
     private fun onMovieClicked(movieId: Int) {
         viewModelScope.launch {
             _effect.emit(FavoritesEffect.NavigateToMovieDetails(movieId = movieId))
+        }
+    }
+
+    private fun onFavoriteClicked(movieId: Int) {
+        viewModelScope.launch {
+            removeFavoriteMovieUseCase(movieId = movieId).onFailure { error ->
+                _state.update { currentState ->
+                    currentState.copy(
+                        errorMessage = error.toUserMessage(
+                            fallback = "Unable to remove favorite."
+                        )
+                    )
+                }
+            }
         }
     }
 }
