@@ -49,8 +49,12 @@ import com.norbertotaveras.reels.presentation.ui.components.movie.PosterCarousel
 import com.norbertotaveras.reels.presentation.ui.components.movie.PosterCarouselItem
 import com.norbertotaveras.reels.presentation.ui.components.common.SectionHeader
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 @Composable
 fun CastDetailsContent(
@@ -127,7 +131,7 @@ private fun CastHeroHeader(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(420.dp)
+            .height(ReelsDimensions.castDetailsHeroHeight)
     ) {
         AsyncImage(
             model = profileUrl,
@@ -153,8 +157,11 @@ private fun CastHeroHeader(
         FilledIconButton(
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(start = ReelsSpacing.screenHorizontal, top = 48.dp)
-                .size(40.dp),
+                .padding(
+                    start = ReelsSpacing.screenHorizontal,
+                    top = ReelsDimensions.castDetailsHeroActionTopPadding
+                )
+                .size(ReelsDimensions.castDetailsHeroActionButtonSize),
             onClick = onBackClick,
             colors = IconButtonDefaults.filledIconButtonColors(
                 containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.82f),
@@ -170,8 +177,11 @@ private fun CastHeroHeader(
         FilledIconButton(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(end = ReelsSpacing.screenHorizontal, top = 48.dp)
-                .size(40.dp),
+                .padding(
+                    end = ReelsSpacing.screenHorizontal,
+                    top = ReelsDimensions.castDetailsHeroActionTopPadding
+                )
+                .size(ReelsDimensions.castDetailsHeroActionButtonSize),
             onClick = onFavoriteClick,
             colors = IconButtonDefaults.filledIconButtonColors(
                 containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.82f),
@@ -217,7 +227,7 @@ private fun CastHeroHeader(
                     Icon(
                         imageVector = Icons.Filled.Work,
                         contentDescription = null,
-                        modifier = Modifier.size(16.dp),
+                        modifier = Modifier.size(ReelsDimensions.castDetailsDepartmentIconSize),
                         tint = MaterialTheme.colorScheme.primary
                     )
 
@@ -240,13 +250,13 @@ private fun CastQuickInfoSection(
 ) {
     Column(
         modifier = modifier.padding(horizontal = ReelsSpacing.screenHorizontal),
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.castDetailsQuickInfoSpacing)
     ) {
         if (!birthday.isNullOrBlank()) {
             CastInfoRow(
                 icon = Icons.Filled.CalendarToday,
                 label = "Birthday",
-                value = birthday
+                value = birthday.toDisplayBirthday()
             )
         }
 
@@ -273,7 +283,7 @@ private fun CastInfoRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Surface(
-            modifier = Modifier.size(40.dp),
+            modifier = Modifier.size(ReelsDimensions.castDetailsInfoIconContainerSize),
             shape = MaterialTheme.shapes.medium,
             color = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.primary,
@@ -286,7 +296,7 @@ private fun CastInfoRow(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(ReelsDimensions.castDetailsInfoIconSize)
                 )
             }
         }
@@ -346,7 +356,7 @@ private fun BiographySection(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()
-                        .height(42.dp)
+                        .height(ReelsDimensions.castDetailsBiographyFadeHeight)
                         .background(
                             Brush.verticalGradient(
                                 colors = listOf(
@@ -388,7 +398,7 @@ private fun BiographySection(
                             Icons.Filled.KeyboardArrowDown
                         },
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(ReelsDimensions.castDetailsBiographyToggleIconSize)
                     )
                 }
             }
@@ -522,10 +532,31 @@ private fun PersonalInfoDivider() {
 }
 
 private fun calculateDisplayAge(birthday: String): String {
-    val birthYear = birthday.take(4).toIntOrNull() ?: return "Unknown"
-    val age = 2026 - birthYear
+    val birthdayDate = parseTmdbDate(birthday) ?: return "Unknown"
+    val birthDate = Calendar.getInstance().apply { time = birthdayDate }
+    val today = Calendar.getInstance()
+
+    var age = today.get(Calendar.YEAR) - birthDate.get(Calendar.YEAR)
+    if (
+        today.get(Calendar.DAY_OF_YEAR) < birthDate.get(Calendar.DAY_OF_YEAR)
+    ) {
+        age--
+    }
+
     return "$age years old"
 }
+
+private fun String.toDisplayBirthday(): String {
+    val birthdayDate = parseTmdbDate(this) ?: return this
+    return birthdayOutputFormat.format(birthdayDate)
+}
+
+private fun parseTmdbDate(value: String) = runCatching {
+    birthdayInputFormat.parse(value)
+}.getOrNull()
+
+private val birthdayInputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+private val birthdayOutputFormat = SimpleDateFormat("MMMM d, yyyy", Locale.US)
 
 
 @Preview(showBackground = true)

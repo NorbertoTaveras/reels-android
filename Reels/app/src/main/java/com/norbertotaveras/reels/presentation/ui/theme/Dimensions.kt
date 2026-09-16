@@ -103,6 +103,16 @@ object ReelsDimensions {
     val fullCastRowTextSpacing = 2.dp
     val fullCastBorderWidth = 1.dp
 
+    val castDetailsHeroHeight = 420.dp
+    val castDetailsHeroActionTopPadding = 48.dp
+    val castDetailsHeroActionButtonSize = 40.dp
+    val castDetailsDepartmentIconSize = 16.dp
+    val castDetailsQuickInfoSpacing = 18.dp
+    val castDetailsInfoIconContainerSize = 40.dp
+    val castDetailsInfoIconSize = 16.dp
+    val castDetailsBiographyFadeHeight = 42.dp
+    val castDetailsBiographyToggleIconSize = 18.dp
+
     val stateCardPadding = 24.dp
     val stateCardContentSpacing = 14.dp
     val stateIconContainerSize = 58.dp
