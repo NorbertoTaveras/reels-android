@@ -7,12 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -39,7 +37,6 @@ import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 
@@ -160,7 +157,7 @@ private fun MovieCastHeader(
 
         Text(
             text = "Full Cast",
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
@@ -195,8 +192,7 @@ private fun MovieCastRow(
                 model = castMember.profilePath.toTmdbImageUrl(),
                 contentDescription = castMember.name,
                 modifier = Modifier
-                    .width(ReelsDimensions.fullCastProfileWidth)
-                    .aspectRatio(ReelsRatios.poster)
+                    .size(ReelsDimensions.fullCastProfileSize)
                     .clip(MaterialTheme.shapes.medium),
                 contentScale = ContentScale.Crop
             )

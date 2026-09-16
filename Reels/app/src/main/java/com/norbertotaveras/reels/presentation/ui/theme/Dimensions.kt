@@ -92,15 +92,15 @@ object ReelsDimensions {
 
     val fullCastScreenTopPadding = 24.dp
     val fullCastScreenBottomPadding = 32.dp
-    val fullCastHeaderSpacing = 18.dp
+    val fullCastHeaderSpacing = 14.dp
     val fullCastHeaderBottomPadding = 22.dp
-    val fullCastBackButtonSize = 48.dp
-    val fullCastBackIconSize = 28.dp
-    val fullCastRowSpacing = 10.dp
-    val fullCastRowPadding = 10.dp
-    val fullCastProfileWidth = 64.dp
-    val fullCastRowContentSpacing = 14.dp
-    val fullCastRowTextSpacing = 3.dp
+    val fullCastBackButtonSize = 44.dp
+    val fullCastBackIconSize = 26.dp
+    val fullCastRowSpacing = 8.dp
+    val fullCastRowPadding = 8.dp
+    val fullCastProfileSize = 56.dp
+    val fullCastRowContentSpacing = 12.dp
+    val fullCastRowTextSpacing = 2.dp
     val fullCastBorderWidth = 1.dp
 
     val stateCardPadding = 24.dp
