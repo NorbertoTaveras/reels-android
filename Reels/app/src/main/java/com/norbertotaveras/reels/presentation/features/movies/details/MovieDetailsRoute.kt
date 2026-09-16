@@ -17,6 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun MovieDetailsRoute(
     onBackClick: () -> Unit,
     onCastClick: (Int) -> Unit,
+    onCastSeeAllClick: (Int) -> Unit,
     onTrailerClick: (String) -> Unit,
     onSimilarMovieClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -31,6 +32,9 @@ fun MovieDetailsRoute(
                 MovieDetailsEffect.NavigateBack -> onBackClick()
                 is MovieDetailsEffect.NavigateToCastDetails -> {
                     onCastClick(effect.personId)
+                }
+                is MovieDetailsEffect.NavigateToMovieCast -> {
+                    onCastSeeAllClick(effect.movieId)
                 }
                 is MovieDetailsEffect.OpenTrailer -> {
                     onTrailerClick(effect.url)

@@ -62,7 +62,7 @@ class MovieDetailsViewModel @Inject constructor(
             MovieDetailsEvent.RetryClicked -> loadMovie(language = currentLanguage)
             MovieDetailsEvent.FavoriteClicked -> onFavoriteClick()
             is MovieDetailsEvent.CastClicked -> onCastClicked(personId = event.personId)
-            MovieDetailsEvent.CastSeeAllClicked -> Unit
+            MovieDetailsEvent.CastSeeAllClicked -> onCastSeeAllClicked()
             is MovieDetailsEvent.TrailerClicked -> onTrailerClicked(trailerId = event.trailerId)
             is MovieDetailsEvent.SimilarMovieClicked -> onSimilarMovieClicked(movieId = event.movieId)
         }
@@ -243,6 +243,12 @@ class MovieDetailsViewModel @Inject constructor(
     private fun onCastClicked(personId: Int) {
         viewModelScope.launch {
             _effect.emit(MovieDetailsEffect.NavigateToCastDetails(personId = personId))
+        }
+    }
+
+    private fun onCastSeeAllClicked() {
+        viewModelScope.launch {
+            _effect.emit(MovieDetailsEffect.NavigateToMovieCast(movieId = movieId))
         }
     }
 

@@ -11,11 +11,14 @@ object ReelsDestinations {
     const val MOVIE_CATEGORY = "movieCategory"
     const val MOVIE_CATEGORY_ARG = "category"
     const val MOVIE_CATEGORY_ROUTE = "$MOVIE_CATEGORY/{$MOVIE_CATEGORY_ARG}"
+    const val MOVIE_CAST = "movieCast"
+    const val MOVIE_CAST_ROUTE = "$MOVIE_CAST/{$MOVIE_ID_ARG}"
     const val PERSON_ID_ARG = "personId"
     const val CAST_DETAILS = "castDetails"
     const val CAST_DETAILS_ROUTE = "$CAST_DETAILS/{$PERSON_ID_ARG}"
     fun movieDetailsRoute(movieId: Int): String = "$MOVIE_DETAILS/$movieId"
     fun movieCategoryRoute(category: String): String = "$MOVIE_CATEGORY/$category"
+    fun movieCastRoute(movieId: Int): String = "$MOVIE_CAST/$movieId"
     fun castDetailsRoute(personId: Int): String = "$CAST_DETAILS/$personId"
 
 }
