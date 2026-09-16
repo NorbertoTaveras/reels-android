@@ -4,5 +4,4 @@ import com.norbertotaveras.reels.domain.model.favorite.FavoriteMovieDataModel
 
 data class FavoritesUiState(
     val movies: List<FavoriteMovieDataModel> = emptyList(),
-    val errorMessage: String? = null,
 )

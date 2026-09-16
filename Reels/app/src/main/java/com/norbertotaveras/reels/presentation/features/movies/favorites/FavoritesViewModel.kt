@@ -43,10 +43,7 @@ class FavoritesViewModel @Inject constructor(
         viewModelScope.launch {
             observeFavoriteMoviesUseCase().collectLatest { movies ->
                 _state.update { currentState ->
-                    currentState.copy(
-                        movies = movies,
-                        errorMessage = null
-                    )
+                    currentState.copy(movies = movies)
                 }
             }
         }
@@ -61,13 +58,13 @@ class FavoritesViewModel @Inject constructor(
     private fun onFavoriteClicked(movieId: Int) {
         viewModelScope.launch {
             removeFavoriteMovieUseCase(movieId = movieId).onFailure { error ->
-                _state.update { currentState ->
-                    currentState.copy(
-                        errorMessage = error.toUserMessage(
+                _effect.emit(
+                    FavoritesEffect.ShowMessage(
+                        message = error.toUserMessage(
                             fallback = "Unable to remove favorite."
                         )
                     )
-                }
+                )
             }
         }
     }
