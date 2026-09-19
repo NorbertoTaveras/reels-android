@@ -1,5 +1,9 @@
 package com.norbertotaveras.reels.presentation.navigation
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
@@ -13,7 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -33,9 +37,17 @@ import com.norbertotaveras.reels.presentation.features.settings.SettingsRoute
 @Composable
 fun ReelsNavHost(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
-    val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
     val openExternalUrl: (String) -> Unit = { url ->
-        uriHandler.openUri(url)
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+            addCategory(Intent.CATEGORY_BROWSABLE)
+        }
+
+        try {
+            context.startActivity(intent)
+        } catch (_: ActivityNotFoundException) {
+            Toast.makeText(context, "No app can open this link", Toast.LENGTH_SHORT).show()
+        }
     }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()

@@ -219,11 +219,21 @@ private fun PrivacyNoticeDialog(
             )
         },
         text = {
-            Text(
-                text = "Reels stores favorites and preferences on this device. Movie data, images, cast details, and trailers are loaded from TMDB when you browse the app. Reels does not use TMDB account login, collect personal account data, or sync your favorites to TMDB.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
+            ) {
+                PrivacyNoticeText(
+                    text = "Favorites and preferences stay on this device."
+                )
+
+                PrivacyNoticeText(
+                    text = "Movie data, artwork, cast details, and trailers are loaded from TMDB as you browse."
+                )
+
+                PrivacyNoticeText(
+                    text = "Reels does not use TMDB account login, collect personal account data, or sync your favorites to TMDB."
+                )
+            }
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
@@ -233,6 +243,19 @@ private fun PrivacyNoticeDialog(
         containerColor = MaterialTheme.colorScheme.surface,
         titleContentColor = MaterialTheme.colorScheme.onSurface,
         textContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+}
+
+@Composable
+private fun PrivacyNoticeText(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
     )
 }
 
