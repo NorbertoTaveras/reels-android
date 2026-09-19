@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -58,7 +57,11 @@ fun MovieHeroHeader(
     modifier: Modifier = Modifier,
     isFavoriteLoading: Boolean = false,
 ) {
-    Column(modifier = modifier.fillMaxWidth()) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(ReelsDimensions.detailsHeaderHeight)
+    ) {
         Box {
             AsyncImage(
                 model = backdropUrl,
@@ -108,7 +111,7 @@ fun MovieHeroHeader(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = ReelsSpacing.screenHorizontal)
-                .offset(y = -ReelsDimensions.detailsPosterOverlap),
+                .padding(top = ReelsDimensions.detailsPosterRowTopPadding),
             horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
             verticalAlignment = Alignment.Bottom
         ) {
@@ -158,8 +161,9 @@ fun MovieHeroHeader(
 
         GenreChipRow(
             modifier = Modifier
+                .align(Alignment.BottomStart)
                 .padding(horizontal = ReelsSpacing.screenHorizontal)
-                .offset(y = -ReelsDimensions.detailsGenreOverlap),
+                .padding(bottom = ReelsSpacing.small),
             genres = genres
         )
     }

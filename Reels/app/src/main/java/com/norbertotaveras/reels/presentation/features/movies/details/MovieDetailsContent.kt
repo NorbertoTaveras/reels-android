@@ -79,7 +79,7 @@ fun MovieDetailsContent(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
         contentPadding = PaddingValues(bottom = ReelsSpacing.xxLarge),
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.detailsSectionSpacing)
+        verticalArrangement = Arrangement.spacedBy(0.dp)
     ) {
         item {
             MovieHeroHeader(
@@ -101,19 +101,24 @@ fun MovieDetailsContent(
 
         if (isOfflineFavorite) {
             item {
-                OfflineFavoriteNotice()
+                OfflineFavoriteNotice(
+                    modifier = Modifier.padding(top = ReelsDimensions.detailsOverviewTopSpacing)
+                )
             }
 
             if (cast.isEmpty() && trailers.isEmpty() && similarMovies.isEmpty()) {
                 item {
-                    OfflineExtrasUnavailableNotice()
+                    OfflineExtrasUnavailableNotice(
+                        modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing)
+                    )
                 }
             }
         }
 
         item {
             OverviewSection(
-                overview = movie.overview.ifBlank { "No overview available yet." }
+                overview = movie.overview.ifBlank { "No overview available yet." },
+                modifier = Modifier.padding(top = ReelsDimensions.detailsOverviewTopSpacing)
             )
         }
 
@@ -121,13 +126,15 @@ fun MovieDetailsContent(
             MovieInfoSection(
                 releaseDate = movie.releaseDate,
                 originalLanguage = movie.originalLanguage,
-                popularityLabel = "%,d votes".format(movie.voteCount)
+                popularityLabel = "%,d votes".format(movie.voteCount),
+                modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing)
             )
         }
 
         if (cast.isNotEmpty()) {
             item {
                 CastCarousel(
+                    modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
                     cast = cast,
                     onCastClick = onCastClick,
                     onSeeAllClick = onCastSeeAllClick
@@ -138,6 +145,7 @@ fun MovieDetailsContent(
         if (trailers.isNotEmpty()) {
             item {
                 TrailerCarousel(
+                    modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
                     trailers = trailers,
                     onTrailerClick = onTrailerClick
                 )
@@ -147,6 +155,7 @@ fun MovieDetailsContent(
         if (similarMovies.isNotEmpty()) {
             item {
                 SimilarMoviesSection(
+                    modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
                     movies = similarMovies,
                     onMovieClick = onSimilarMovieClick
                 )
