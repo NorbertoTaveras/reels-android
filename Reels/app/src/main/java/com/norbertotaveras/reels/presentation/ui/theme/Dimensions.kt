@@ -134,6 +134,8 @@ object ReelsDimensions {
     val settingsTmdbLogoPillWidth = 18.dp
     val settingsTmdbLogoPillHeight = 4.dp
     val settingsExternalIconSize = 18.dp
+    val settingsOptionRowMinHeight = 52.dp
+    val settingsOptionRowHorizontalPadding = 4.dp
 
     val stateCardPadding = 24.dp
     val stateCardContentSpacing = 14.dp

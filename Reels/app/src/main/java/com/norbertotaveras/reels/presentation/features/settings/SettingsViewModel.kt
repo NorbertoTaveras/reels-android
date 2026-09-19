@@ -3,7 +3,9 @@ package com.norbertotaveras.reels.presentation.features.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.norbertotaveras.reels.BuildConfig
-import com.norbertotaveras.reels.domain.model.settings.AppSettings
+import com.norbertotaveras.reels.domain.model.settings.AppTheme
+import com.norbertotaveras.reels.domain.model.settings.ImageQuality
+import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateImageQualityUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateLanguageRegionUseCase
@@ -34,8 +36,6 @@ class SettingsViewModel @Inject constructor(
     private val _effect = MutableSharedFlow<SettingsEffect>()
     val effect: SharedFlow<SettingsEffect> = _effect.asSharedFlow()
 
-    private var currentSettings = AppSettings()
-
     init {
         observeSettings()
     }
@@ -43,8 +43,12 @@ class SettingsViewModel @Inject constructor(
     fun onEvent(event: SettingsEvent) {
         when (event) {
             SettingsEvent.ImageQualityClicked -> onImageQualityClicked()
+            is SettingsEvent.ImageQualitySelected -> onImageQualitySelected(event.imageQuality)
             SettingsEvent.LanguageRegionClicked -> onLanguageRegionClicked()
+            is SettingsEvent.LanguageRegionSelected -> onLanguageRegionSelected(event.languageRegion)
             SettingsEvent.ThemeClicked -> onThemeClicked()
+            is SettingsEvent.ThemeSelected -> onThemeSelected(event.theme)
+            SettingsEvent.PreferenceDialogDismissed -> onPreferenceDialogDismissed()
             SettingsEvent.SavedMoviesClicked -> onSavedMoviesClicked()
             SettingsEvent.ClearImageCacheClicked -> onClearImageCacheClicked()
             SettingsEvent.PrivacyClicked -> onPrivacyClicked()
@@ -56,12 +60,14 @@ class SettingsViewModel @Inject constructor(
     private fun observeSettings() {
         viewModelScope.launch {
             observeSettingsUseCase().collect { settings ->
-                currentSettings = settings
                 _state.update { currentState ->
                     currentState.copy(
                         imageQualityLabel = settings.imageQuality.label,
                         languageRegionLabel = settings.languageRegion.label,
-                        themeLabel = settings.theme.label
+                        themeLabel = settings.theme.label,
+                        selectedImageQuality = settings.imageQuality,
+                        selectedLanguageRegion = settings.languageRegion,
+                        selectedTheme = settings.theme
                     )
                 }
             }
@@ -69,20 +75,51 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun onImageQualityClicked() {
+        showPreferenceDialog(SettingsPreferenceDialog.ImageQuality)
+    }
+
+    private fun onImageQualitySelected(imageQuality: ImageQuality) {
         viewModelScope.launch {
-            updateImageQualityUseCase(currentSettings.imageQuality.next())
+            dismissPreferenceDialog()
+            updateImageQualityUseCase(imageQuality)
         }
     }
 
     private fun onLanguageRegionClicked() {
+        showPreferenceDialog(SettingsPreferenceDialog.LanguageRegion)
+    }
+
+    private fun onLanguageRegionSelected(languageRegion: LanguageRegion) {
         viewModelScope.launch {
-            updateLanguageRegionUseCase(currentSettings.languageRegion.next())
+            dismissPreferenceDialog()
+            updateLanguageRegionUseCase(languageRegion)
         }
     }
 
     private fun onThemeClicked() {
+        showPreferenceDialog(SettingsPreferenceDialog.Theme)
+    }
+
+    private fun onThemeSelected(theme: AppTheme) {
         viewModelScope.launch {
-            updateThemeUseCase(currentSettings.theme.next())
+            dismissPreferenceDialog()
+            updateThemeUseCase(theme)
+        }
+    }
+
+    private fun onPreferenceDialogDismissed() {
+        dismissPreferenceDialog()
+    }
+
+    private fun showPreferenceDialog(dialog: SettingsPreferenceDialog) {
+        _state.update { currentState ->
+            currentState.copy(activePreferenceDialog = dialog)
+        }
+    }
+
+    private fun dismissPreferenceDialog() {
+        _state.update { currentState ->
+            currentState.copy(activePreferenceDialog = null)
         }
     }
 

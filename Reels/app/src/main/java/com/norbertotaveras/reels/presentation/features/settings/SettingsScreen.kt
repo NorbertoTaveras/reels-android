@@ -32,6 +32,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -46,6 +47,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.norbertotaveras.reels.domain.model.settings.AppTheme
+import com.norbertotaveras.reels.domain.model.settings.ImageQuality
+import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsAccent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
@@ -151,6 +155,52 @@ fun SettingsScreen(
             onDismiss = { onEvent(SettingsEvent.PrivacyNoticeDismissed) }
         )
     }
+
+    when (state.activePreferenceDialog) {
+        SettingsPreferenceDialog.ImageQuality -> {
+            SettingsOptionDialog(
+                title = "Image Quality",
+                description = "Choose how large TMDB poster and backdrop images should be when Reels loads movie artwork.",
+                options = ImageQuality.values().toList(),
+                selectedOption = state.selectedImageQuality,
+                optionLabel = ImageQuality::label,
+                onOptionSelected = { imageQuality ->
+                    onEvent(SettingsEvent.ImageQualitySelected(imageQuality))
+                },
+                onDismiss = { onEvent(SettingsEvent.PreferenceDialogDismissed) }
+            )
+        }
+
+        SettingsPreferenceDialog.LanguageRegion -> {
+            SettingsOptionDialog(
+                title = "Language & Region",
+                description = "Choose the language and region Reels sends to TMDB for browse, search, and detail requests.",
+                options = LanguageRegion.values().toList(),
+                selectedOption = state.selectedLanguageRegion,
+                optionLabel = LanguageRegion::label,
+                onOptionSelected = { languageRegion ->
+                    onEvent(SettingsEvent.LanguageRegionSelected(languageRegion))
+                },
+                onDismiss = { onEvent(SettingsEvent.PreferenceDialogDismissed) }
+            )
+        }
+
+        SettingsPreferenceDialog.Theme -> {
+            SettingsOptionDialog(
+                title = "Theme",
+                description = "Choose whether Reels follows the device theme or uses a fixed light or dark appearance.",
+                options = AppTheme.values().toList(),
+                selectedOption = state.selectedTheme,
+                optionLabel = AppTheme::label,
+                onOptionSelected = { theme ->
+                    onEvent(SettingsEvent.ThemeSelected(theme))
+                },
+                onDismiss = { onEvent(SettingsEvent.PreferenceDialogDismissed) }
+            )
+        }
+
+        null -> Unit
+    }
 }
 
 @Composable
@@ -184,6 +234,91 @@ private fun PrivacyNoticeDialog(
         titleContentColor = MaterialTheme.colorScheme.onSurface,
         textContentColor = MaterialTheme.colorScheme.onSurfaceVariant
     )
+}
+
+@Composable
+private fun <T> SettingsOptionDialog(
+    title: String,
+    description: String,
+    options: List<T>,
+    selectedOption: T,
+    optionLabel: (T) -> String,
+    onOptionSelected: (T) -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    AlertDialog(
+        modifier = modifier,
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
+            ) {
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Column {
+                    options.forEach { option ->
+                        SettingsOptionRow(
+                            label = optionLabel(option),
+                            selected = option == selectedOption,
+                            onClick = { onOptionSelected(option) }
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = "Cancel")
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surface,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
+        textContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+}
+
+@Composable
+private fun SettingsOptionRow(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = ReelsDimensions.settingsOptionRowMinHeight)
+            .clip(MaterialTheme.shapes.medium)
+            .clickable(onClick = onClick)
+            .padding(horizontal = ReelsDimensions.settingsOptionRowHorizontalPadding),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioButton(
+            selected = selected,
+            onClick = onClick
+        )
+
+        Spacer(modifier = Modifier.width(ReelsSpacing.small))
+
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold
+        )
+    }
 }
 
 @Composable
