@@ -17,6 +17,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
@@ -27,7 +28,8 @@ fun SectionHeader(
     title: String,
     modifier: Modifier = Modifier,
     actionLabel: String? = null,
-    onActionClick: (() -> Unit)? = null
+    onActionClick: (() -> Unit)? = null,
+    titleStyle: TextStyle = MaterialTheme.typography.titleLarge
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -36,7 +38,7 @@ fun SectionHeader(
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleLarge,
+            style = titleStyle,
             color = MaterialTheme.colorScheme.onBackground
         )
 

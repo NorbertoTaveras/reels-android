@@ -29,14 +29,14 @@ fun MovieMetadataRow(
         visibleItems.forEachIndexed { index, item ->
             Text(
                 text = item,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             if (index < visibleItems.lastIndex) {
                 Text(
                     text = "•",
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

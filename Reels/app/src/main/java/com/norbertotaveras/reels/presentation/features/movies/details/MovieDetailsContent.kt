@@ -168,13 +168,13 @@ private fun OverviewSection(
     ) {
         Text(
             text = "Overview",
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
 
         Text(
             text = overview,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
@@ -262,7 +262,7 @@ private fun MovieInfoRow(
 
             Text(
                 text = row.value,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onBackground
             )
         }

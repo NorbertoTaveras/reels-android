@@ -28,7 +28,8 @@ fun SimilarMoviesSection(
     ) {
         SectionHeader(
             modifier = Modifier.padding(horizontal = ReelsSpacing.screenHorizontal),
-            title = "Similar Movies"
+            title = "Similar Movies",
+            titleStyle = MaterialTheme.typography.titleMedium
         )
 
         PosterCarousel(

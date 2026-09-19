@@ -34,7 +34,8 @@ fun CastCarousel(
             modifier = Modifier.padding(horizontal = ReelsSpacing.screenHorizontal),
             title = "Cast",
             actionLabel = if (onSeeAllClick != null) "See all" else null,
-            onActionClick = onSeeAllClick
+            onActionClick = onSeeAllClick,
+            titleStyle = MaterialTheme.typography.titleMedium
         )
 
         LazyRow(

@@ -138,7 +138,7 @@ fun MovieHeroHeader(
             ) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
@@ -247,7 +247,7 @@ private fun HeroRatingButton(
 
             Text(
                 text = rating,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleSmall
             )
         }
     }
