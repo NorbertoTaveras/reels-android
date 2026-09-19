@@ -213,7 +213,9 @@ class MovieDetailsViewModel @Inject constructor(
     }
 
     private fun onFavoriteClick() {
-        val movie = state.value.movie ?: return
+        val currentState = state.value
+        val movie = currentState.movie ?: return
+        val wasFavorite = currentState.isFavorite
 
         viewModelScope.launch {
             _state.update { currentState ->
@@ -225,6 +227,15 @@ class MovieDetailsViewModel @Inject constructor(
                     _state.update { currentState ->
                         currentState.copy(isFavoriteLoading = false)
                     }
+                    _effect.emit(
+                        MovieDetailsEffect.ShowMessage(
+                            message = if (wasFavorite) {
+                                "Removed from favorites"
+                            } else {
+                                "Added to favorites"
+                            }
+                        )
+                    )
                 },
                 onFailure = {
                     _state.update { currentState ->
