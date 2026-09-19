@@ -2,6 +2,8 @@ package com.norbertotaveras.reels.presentation.features.movies.details
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
@@ -12,6 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsAccent
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsSurfaceHigh
 
 @Composable
 fun MovieDetailsRoute(
@@ -59,6 +63,13 @@ fun MovieDetailsRoute(
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
-        )
+        ) { snackbarData ->
+            Snackbar(
+                snackbarData = snackbarData,
+                containerColor = ReelsSurfaceHigh,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                actionColor = ReelsAccent
+            )
+        }
     }
 }

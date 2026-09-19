@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -101,6 +102,12 @@ fun MovieDetailsContent(
         if (isOfflineFavorite) {
             item {
                 OfflineFavoriteNotice()
+            }
+
+            if (cast.isEmpty() && trailers.isEmpty() && similarMovies.isEmpty()) {
+                item {
+                    OfflineExtrasUnavailableNotice()
+                }
             }
         }
 
@@ -292,6 +299,60 @@ private fun String.toDisplayLanguageName(): String {
         }
         .takeIf { language -> language.isNotBlank() }
         ?: this
+}
+
+@Composable
+private fun OfflineExtrasUnavailableNotice(
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = ReelsSpacing.screenHorizontal),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        border = BorderStroke(
+            width = 1.dp,
+            color = ReelsBorder
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(ReelsSpacing.medium),
+            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Surface(
+                modifier = Modifier.size(ReelsDimensions.detailsOfflineIconContainerSize),
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = MaterialTheme.colorScheme.primary
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Filled.WifiOff,
+                        contentDescription = null,
+                        modifier = Modifier.size(ReelsDimensions.detailsOfflineIconSize)
+                    )
+                }
+            }
+
+            Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)) {
+                Text(
+                    text = "Extras unavailable offline",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = "Cast, trailers, and similar movies need a network refresh.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
 }
 
 @Composable
