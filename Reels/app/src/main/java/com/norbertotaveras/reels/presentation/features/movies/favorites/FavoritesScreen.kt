@@ -1,6 +1,7 @@
 package com.norbertotaveras.reels.presentation.features.movies.favorites
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -32,7 +32,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,6 +44,7 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsSurface
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
 @Composable
@@ -77,38 +77,32 @@ fun FavoritesScreen(
                 GridItemSpan(maxLineSpan)
             }
         ) {
-            Text(
-                text = "Favorites",
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-        }
-
-        item(
-            span = {
-                GridItemSpan(maxLineSpan)
-            }
-        ) {
-            Row(
-                modifier = Modifier.padding(
-                    top = ReelsDimensions.favoritesHeaderToBadgeSpacing,
-                    bottom = ReelsDimensions.favoritesBadgeToGridSpacing
-                ),
-                horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesHeaderToBadgeSpacing)
             ) {
-                Icon(
-                    imageVector = Icons.Filled.DownloadDone,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.size(ReelsDimensions.favoritesHeartIconSize)
+                Text(
+                    text = "Favorites",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
 
-                Text(
-                    text = "Available offline",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondary
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.DownloadDone,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(ReelsDimensions.favoritesHeartIconSize)
+                    )
+
+                    Text(
+                        text = "Available offline",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
             }
         }
 
@@ -133,7 +127,7 @@ private fun FavoriteMovieCard(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.width(ReelsDimensions.favoritesPosterWidth),
+        modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesTextSpacing)
     ) {
         Card(
@@ -162,7 +156,7 @@ private fun FavoriteMovieCard(
                         .padding(ReelsSpacing.small)
                         .size(ReelsDimensions.favoritesOfflineBadgeSize),
                     shape = MaterialTheme.shapes.extraLarge,
-                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.88f),
+                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.9f),
                     contentColor = MaterialTheme.colorScheme.background
                 ) {
                     Box(contentAlignment = Alignment.Center) {
@@ -179,7 +173,7 @@ private fun FavoriteMovieCard(
                         .align(Alignment.TopEnd)
                         .padding(ReelsSpacing.small),
                     shape = MaterialTheme.shapes.extraLarge,
-                    color = Color(0xFF1B1B1E).copy(alpha = 0.88f),
+                    color = ReelsSurface.copy(alpha = 0.88f),
                     contentColor = MaterialTheme.colorScheme.primary
                 ) {
                     Row(
@@ -237,7 +231,11 @@ private fun FavoriteMovieCard(
                     .clickable(onClick = onFavoriteClick),
                 shape = MaterialTheme.shapes.small,
                 color = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.primary
+                contentColor = MaterialTheme.colorScheme.primary,
+                border = BorderStroke(
+                    width = 1.dp,
+                    color = ReelsBorder
+                )
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
