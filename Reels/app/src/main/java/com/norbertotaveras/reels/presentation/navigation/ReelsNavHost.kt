@@ -38,8 +38,17 @@ import com.norbertotaveras.reels.presentation.features.settings.SettingsRoute
 fun ReelsNavHost(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     val context = LocalContext.current
-    val openExternalUrl: (String) -> Unit = { url ->
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+    val openExternalUrl: (String) -> Unit = openExternalUrl@{ url ->
+        val uri = Uri.parse(url)
+        val isSupportedScheme = uri.scheme.equals("http", ignoreCase = true) ||
+            uri.scheme.equals("https", ignoreCase = true)
+
+        if (!isSupportedScheme) {
+            Toast.makeText(context, "Unsupported link", Toast.LENGTH_SHORT).show()
+            return@openExternalUrl
+        }
+
+        val intent = Intent(Intent.ACTION_VIEW, uri).apply {
             addCategory(Intent.CATEGORY_BROWSABLE)
         }
 
