@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsSurfaceHigh
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 
@@ -32,13 +33,13 @@ fun GenreChipRow(
         visibleGenres.forEach { genre ->
             Surface(
                 shape = MaterialTheme.shapes.medium,
-                color = MaterialTheme.colorScheme.surfaceVariant,
+                color = ReelsSurfaceHigh,
                 contentColor = MaterialTheme.colorScheme.onSurface
             ) {
                 Text(
                     modifier = Modifier.padding(
                         horizontal = ReelsSpacing.medium,
-                        vertical = ReelsSpacing.small
+                        vertical = ReelsSpacing.xSmall
                     ),
                     text = genre,
                     style = MaterialTheme.typography.labelMedium
@@ -63,4 +64,3 @@ private fun GenreChipRowPreview() {
         }
     }
 }
-

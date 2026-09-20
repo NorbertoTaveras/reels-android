@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.norbertotaveras.reels.presentation.ui.components.common.SectionHeader
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 
@@ -24,7 +25,7 @@ fun SimilarMoviesSection(
 
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.detailsCarouselHeaderSpacing)
     ) {
         SectionHeader(
             modifier = Modifier.padding(horizontal = ReelsSpacing.screenHorizontal),

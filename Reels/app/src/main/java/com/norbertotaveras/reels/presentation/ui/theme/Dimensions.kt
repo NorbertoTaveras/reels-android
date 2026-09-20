@@ -87,9 +87,12 @@ object ReelsDimensions {
     val detailsSectionContentSpacing = 14.dp
     val detailsInfoRowSpacing = 14.dp
     val detailsOverviewTopSpacing = 10.dp
-    val detailsTrailerWidth = 240.dp
-    val detailsTrailerPlayButtonSize = 54.dp
-    val detailsTrailerPlayIconSize = 30.dp
+    val detailsCarouselHeaderSpacing = 14.dp
+    val detailsCastCardWidth = 92.dp
+    val detailsCastTextSpacing = 6.dp
+    val detailsTrailerWidth = 224.dp
+    val detailsTrailerPlayButtonSize = 48.dp
+    val detailsTrailerPlayIconSize = 28.dp
     val detailsOfflineIconContainerSize = 42.dp
     val detailsOfflineIconSize = 20.dp
     val detailsLoadingHeroHeight = 360.dp

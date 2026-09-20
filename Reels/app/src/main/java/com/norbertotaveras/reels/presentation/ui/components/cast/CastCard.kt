@@ -20,8 +20,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
@@ -36,9 +36,9 @@ fun CastCard(
 ) {
     Column(
         modifier = modifier
-            .width(100.dp)
+            .width(ReelsDimensions.detailsCastCardWidth)
             .clickable(onClick = onClick),
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.detailsCastTextSpacing)
     ) {
         Card(
             modifier = Modifier
@@ -100,4 +100,3 @@ private fun CastCardPreview() {
         }
     }
 }
-
