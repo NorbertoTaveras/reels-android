@@ -156,6 +156,13 @@ fun SettingsScreen(
         )
     }
 
+    if (state.isClearImageCacheDialogVisible) {
+        ClearImageCacheDialog(
+            onConfirm = { onEvent(SettingsEvent.ClearImageCacheConfirmed) },
+            onDismiss = { onEvent(SettingsEvent.ClearImageCacheDismissed) }
+        )
+    }
+
     when (state.activePreferenceDialog) {
         SettingsPreferenceDialog.ImageQuality -> {
             SettingsOptionDialog(
@@ -201,6 +208,45 @@ fun SettingsScreen(
 
         null -> Unit
     }
+}
+
+@Composable
+private fun ClearImageCacheDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    AlertDialog(
+        modifier = modifier,
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Clear Image Cache?",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Text(
+                text = "Reels will remove locally cached poster and backdrop images. Movie data and favorites will stay saved.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(text = "Clear")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = "Cancel")
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surface,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
+        textContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+    )
 }
 
 @Composable

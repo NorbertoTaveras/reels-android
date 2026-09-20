@@ -51,6 +51,8 @@ class SettingsViewModel @Inject constructor(
             SettingsEvent.PreferenceDialogDismissed -> onPreferenceDialogDismissed()
             SettingsEvent.SavedMoviesClicked -> onSavedMoviesClicked()
             SettingsEvent.ClearImageCacheClicked -> onClearImageCacheClicked()
+            SettingsEvent.ClearImageCacheConfirmed -> onClearImageCacheConfirmed()
+            SettingsEvent.ClearImageCacheDismissed -> onClearImageCacheDismissed()
             SettingsEvent.PrivacyClicked -> onPrivacyClicked()
             SettingsEvent.PrivacyNoticeDismissed -> onPrivacyNoticeDismissed()
             SettingsEvent.TmdbAttributionClicked -> onTmdbAttributionClicked()
@@ -130,8 +132,23 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun onClearImageCacheClicked() {
+        _state.update { currentState ->
+            currentState.copy(isClearImageCacheDialogVisible = true)
+        }
+    }
+
+    private fun onClearImageCacheConfirmed() {
         viewModelScope.launch {
+            _state.update { currentState ->
+                currentState.copy(isClearImageCacheDialogVisible = false)
+            }
             _effect.emit(SettingsEffect.ClearImageCache)
+        }
+    }
+
+    private fun onClearImageCacheDismissed() {
+        _state.update { currentState ->
+            currentState.copy(isClearImageCacheDialogVisible = false)
         }
     }
 

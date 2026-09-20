@@ -16,6 +16,7 @@ data class SettingsUiState(
     val appVersionLabel: String = "1.0.0",
     val privacyLabel: String = "Local favorites stay on this device",
     val activePreferenceDialog: SettingsPreferenceDialog? = null,
+    val isClearImageCacheDialogVisible: Boolean = false,
     val isPrivacyNoticeVisible: Boolean = false,
 )
 
