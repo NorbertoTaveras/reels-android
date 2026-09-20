@@ -57,14 +57,32 @@ class FavoritesViewModel @Inject constructor(
 
     private fun onFavoriteClicked(movieId: Int) {
         viewModelScope.launch {
-            removeFavoriteMovieUseCase(movieId = movieId).onFailure { error ->
-                _effect.emit(
-                    FavoritesEffect.ShowMessage(
-                        message = error.toUserMessage(
-                            fallback = "Unable to remove favorite."
+            if (_state.value.removingMovieIds.contains(movieId)) return@launch
+
+            _state.update { currentState ->
+                currentState.copy(
+                    removingMovieIds = currentState.removingMovieIds + movieId
+                )
+            }
+
+            try {
+                removeFavoriteMovieUseCase(movieId = movieId).onSuccess {
+                    _effect.emit(FavoritesEffect.ShowMessage(message = "Removed from favorites."))
+                }.onFailure { error ->
+                    _effect.emit(
+                        FavoritesEffect.ShowMessage(
+                            message = error.toUserMessage(
+                                fallback = "Unable to remove favorite."
+                            )
                         )
                     )
-                )
+                }
+            } finally {
+                _state.update { currentState ->
+                    currentState.copy(
+                        removingMovieIds = currentState.removingMovieIds - movieId
+                    )
+                }
             }
         }
     }

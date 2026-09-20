@@ -24,6 +24,7 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -36,6 +37,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.favorite.FavoriteMovieDataModel
@@ -112,6 +114,7 @@ fun FavoritesScreen(
         ) { movie ->
             FavoriteMovieCard(
                 movie = movie,
+                isRemoving = state.removingMovieIds.contains(movie.id),
                 onClick = { onEvent(FavoritesEvent.MovieClicked(movieId = movie.id)) },
                 onFavoriteClick = { onEvent(FavoritesEvent.FavoriteClicked(movieId = movie.id)) }
             )
@@ -122,6 +125,7 @@ fun FavoritesScreen(
 @Composable
 private fun FavoriteMovieCard(
     movie: FavoriteMovieDataModel,
+    isRemoving: Boolean,
     onClick: () -> Unit,
     onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -192,7 +196,11 @@ private fun FavoriteMovieCard(
 
                         Text(
                             text = String.format("%.1f", movie.voteAverage),
-                            style = MaterialTheme.typography.labelMedium
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontSize = 12.sp,
+                                lineHeight = 16.sp
+                            ),
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
                 }
@@ -210,8 +218,12 @@ private fun FavoriteMovieCard(
             ) {
                 Text(
                     text = movie.title,
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = 15.sp,
+                        lineHeight = 20.sp
+                    ),
                     color = MaterialTheme.colorScheme.onBackground,
+                    fontWeight = FontWeight.SemiBold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -228,7 +240,10 @@ private fun FavoriteMovieCard(
             Surface(
                 modifier = Modifier
                     .size(ReelsDimensions.favoritesHeartButtonSize)
-                    .clickable(onClick = onFavoriteClick),
+                    .clickable(
+                        enabled = !isRemoving,
+                        onClick = onFavoriteClick
+                    ),
                 shape = MaterialTheme.shapes.small,
                 color = MaterialTheme.colorScheme.surface,
                 contentColor = MaterialTheme.colorScheme.primary,
@@ -238,11 +253,19 @@ private fun FavoriteMovieCard(
                 )
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Filled.Favorite,
-                        contentDescription = "Remove favorite movie",
-                        modifier = Modifier.size(ReelsDimensions.favoritesHeartIconSize)
-                    )
+                    if (isRemoving) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(ReelsDimensions.favoritesHeartIconSize),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Filled.Favorite,
+                            contentDescription = "Remove favorite movie",
+                            modifier = Modifier.size(ReelsDimensions.favoritesHeartIconSize)
+                        )
+                    }
                 }
             }
         }
