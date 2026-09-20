@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -18,8 +19,10 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,11 +43,11 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
-import com.norbertotaveras.reels.presentation.ui.components.common.CenteredErrorState
 import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
 import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
@@ -68,13 +72,17 @@ fun MovieCategoryScreen(
         }
 
         is LoadState.Error -> {
-            CenteredErrorState(
+            MovieCategoryErrorState(
                 modifier = modifier,
+                title = state.category.label,
                 message = refreshState.error.toUserMessage(
                     fallback = "Unable to load ${state.category.label} movies."
                 ),
                 retryLabel = "Try Again",
-                onRetry = movies::retry
+                onBackClick = {
+                    onEvent(MovieCategoryEvent.BackClicked)
+                },
+                onRetry = movies::retry,
             )
             return
         }
@@ -239,6 +247,87 @@ private fun MovieCategoryLoadingState(
 
         items(CATEGORY_PLACEHOLDER_COUNT) {
             MovieCategoryPlaceholderCard()
+        }
+    }
+}
+
+@Composable
+private fun MovieCategoryErrorState(
+    title: String,
+    message: String,
+    retryLabel: String,
+    onBackClick: () -> Unit,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(
+                start = ReelsDimensions.categoryScreenHorizontalPadding,
+                top = ReelsDimensions.categoryScreenTopPadding,
+                end = ReelsDimensions.categoryScreenHorizontalPadding,
+                bottom = ReelsDimensions.categoryScreenBottomPadding
+            ),
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.sectionSpacing)
+    ) {
+        MovieCategoryHeader(
+            title = title,
+            onBackClick = onBackClick
+        )
+
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.large,
+            color = MaterialTheme.colorScheme.surface,
+            border = androidx.compose.foundation.BorderStroke(
+                width = 1.dp,
+                color = ReelsBorder
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(ReelsDimensions.stateCardPadding),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(ReelsDimensions.stateCardContentSpacing)
+            ) {
+                Surface(
+                    modifier = Modifier.size(ReelsDimensions.stateIconContainerSize),
+                    shape = MaterialTheme.shapes.large,
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Outlined.CloudOff,
+                            contentDescription = null,
+                            modifier = Modifier.size(ReelsDimensions.stateIconSize)
+                        )
+                    }
+                }
+
+                Text(
+                    text = "Unable to load ${title.lowercase()}",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
+
+                FilledTonalButton(
+                    modifier = Modifier.padding(top = ReelsSpacing.small),
+                    onClick = onRetry
+                ) {
+                    Text(text = retryLabel)
+                }
+            }
         }
     }
 }

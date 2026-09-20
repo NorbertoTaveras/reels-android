@@ -756,5 +756,6 @@ private const val SECTION_PLACEHOLDER_COUNT = 4
 private val HOME_LOADING_SECTION_TITLES = listOf(
     MovieCategory.POPULAR.label,
     MovieCategory.NOW_PLAYING.label,
-    MovieCategory.UPCOMING.label
+    MovieCategory.UPCOMING.label,
+    MovieCategory.TOP_RATED.label
 )
