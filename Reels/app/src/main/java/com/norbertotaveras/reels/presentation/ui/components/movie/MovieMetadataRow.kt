@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 
@@ -29,14 +30,20 @@ fun MovieMetadataRow(
         visibleItems.forEachIndexed { index, item ->
             Text(
                 text = item,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 13.sp,
+                    lineHeight = 18.sp
+                ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             if (index < visibleItems.lastIndex) {
                 Text(
                     text = "•",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = 13.sp,
+                        lineHeight = 18.sp
+                    ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

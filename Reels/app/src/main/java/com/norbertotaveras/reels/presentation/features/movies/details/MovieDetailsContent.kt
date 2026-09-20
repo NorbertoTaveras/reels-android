@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.domain.model.cast.CastMemberDataModel
 import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDetailsDataModel
@@ -361,13 +362,19 @@ private fun MovieInfoRow(
         Column {
             Text(
                 text = row.label,
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
+                ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Text(
                 text = row.value,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 13.sp,
+                    lineHeight = 18.sp
+                ),
                 color = MaterialTheme.colorScheme.onBackground
             )
         }

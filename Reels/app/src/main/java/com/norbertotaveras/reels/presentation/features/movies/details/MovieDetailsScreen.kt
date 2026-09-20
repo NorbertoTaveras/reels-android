@@ -135,24 +135,32 @@ private fun MovieDetailsLoadingState(
         verticalArrangement = Arrangement.spacedBy(ReelsDimensions.detailsSectionSpacing)
     ) {
         item {
-            MovieDetailsStateHeader(
-                title = "Movie Details",
-                onBackClick = onBackClick,
-                modifier = Modifier.padding(
-                    start = ReelsSpacing.screenHorizontal,
-                    top = ReelsSpacing.large,
-                    end = ReelsSpacing.screenHorizontal
-                )
-            )
-        }
-
-        item {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(ReelsDimensions.detailsLoadingHeroHeight)
                     .background(detailsPlaceholderColor())
             ) {
+                Surface(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(
+                            start = ReelsSpacing.screenHorizontal,
+                            top = ReelsDimensions.detailsHeroTopActionPadding
+                        )
+                        .size(ReelsDimensions.detailsBackButtonSize),
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.86f),
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                ) {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
+
                 PlaceholderBox(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
