@@ -17,9 +17,9 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DownloadDone
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -46,7 +47,7 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsSurface
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsSurfaceHigh
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
 @Composable
@@ -96,7 +97,7 @@ fun FavoritesScreen(
                         imageVector = Icons.Filled.DownloadDone,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.size(ReelsDimensions.favoritesHeartIconSize)
+                        modifier = Modifier.size(ReelsDimensions.favoritesOfflineBadgeIconSize)
                     )
 
                     Text(
@@ -159,8 +160,8 @@ private fun FavoriteMovieCard(
                         .align(Alignment.TopStart)
                         .padding(ReelsSpacing.small)
                         .size(ReelsDimensions.favoritesOfflineBadgeSize),
-                    shape = MaterialTheme.shapes.extraLarge,
-                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.9f),
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.88f),
                     contentColor = MaterialTheme.colorScheme.background
                 ) {
                     Box(contentAlignment = Alignment.Center) {
@@ -175,15 +176,15 @@ private fun FavoriteMovieCard(
                 Surface(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(ReelsSpacing.small),
+                        .padding(ReelsDimensions.favoritesRatingEdgePadding),
                     shape = MaterialTheme.shapes.extraLarge,
-                    color = ReelsSurface.copy(alpha = 0.88f),
+                    color = ReelsSurfaceHigh.copy(alpha = 0.82f),
                     contentColor = MaterialTheme.colorScheme.primary
                 ) {
                     Row(
                         modifier = Modifier.padding(
-                            horizontal = ReelsSpacing.small,
-                            vertical = ReelsSpacing.xSmall
+                            horizontal = ReelsDimensions.favoritesRatingHorizontalPadding,
+                            vertical = ReelsDimensions.favoritesRatingVerticalPadding
                         ),
                         horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
                         verticalAlignment = Alignment.CenterVertically
@@ -209,7 +210,7 @@ private fun FavoriteMovieCard(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
+            horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesCardActionSpacing),
             verticalAlignment = Alignment.Top
         ) {
             Column(
@@ -242,9 +243,10 @@ private fun FavoriteMovieCard(
                     .size(ReelsDimensions.favoritesHeartButtonSize)
                     .clickable(
                         enabled = !isRemoving,
+                        role = Role.Button,
                         onClick = onFavoriteClick
                     ),
-                shape = MaterialTheme.shapes.small,
+                shape = MaterialTheme.shapes.medium,
                 color = MaterialTheme.colorScheme.surface,
                 contentColor = MaterialTheme.colorScheme.primary,
                 border = BorderStroke(
@@ -261,7 +263,7 @@ private fun FavoriteMovieCard(
                         )
                     } else {
                         Icon(
-                            imageVector = Icons.Filled.Favorite,
+                            imageVector = Icons.Outlined.FavoriteBorder,
                             contentDescription = "Remove favorite movie",
                             modifier = Modifier.size(ReelsDimensions.favoritesHeartIconSize)
                         )

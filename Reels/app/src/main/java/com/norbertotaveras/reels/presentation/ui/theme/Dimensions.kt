@@ -60,9 +60,13 @@ object ReelsDimensions {
     val favoritesPosterCornerSize = 12.dp
     val favoritesOfflineBadgeSize = 22.dp
     val favoritesOfflineBadgeIconSize = 13.dp
-    val favoritesHeartButtonSize = 30.dp
-    val favoritesHeartIconSize = 16.dp
+    val favoritesHeartButtonSize = 32.dp
+    val favoritesHeartIconSize = 17.dp
     val favoritesRatingIconSize = 12.dp
+    val favoritesRatingHorizontalPadding = 8.dp
+    val favoritesRatingVerticalPadding = 5.dp
+    val favoritesRatingEdgePadding = 8.dp
+    val favoritesCardActionSpacing = 8.dp
     val favoritesTextSpacing = 6.dp
     val favoritesEmptyTopPadding = 104.dp
     val favoritesEmptyCardPadding = 24.dp
