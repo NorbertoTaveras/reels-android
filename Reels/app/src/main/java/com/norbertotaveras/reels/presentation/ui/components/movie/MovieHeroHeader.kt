@@ -107,65 +107,63 @@ fun MovieHeroHeader(
             }
         }
 
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = ReelsSpacing.screenHorizontal)
                 .padding(top = ReelsDimensions.detailsPosterRowTopPadding),
-            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
-            verticalAlignment = Alignment.Bottom
+            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.detailsPosterRowToChipsSpacing)
         ) {
-            Card(
-                modifier = Modifier
-                    .width(ReelsDimensions.detailsPosterWidth)
-                    .aspectRatio(ReelsRatios.poster),
-                shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
+                verticalAlignment = Alignment.Bottom
             ) {
-                AsyncImage(
-                    model = posterUrl,
-                    contentDescription = title,
+                Card(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(ReelsRatios.poster)
-                        .clip(MaterialTheme.shapes.large),
-                    contentScale = ContentScale.Crop
-                )
+                        .width(ReelsDimensions.detailsPosterWidth)
+                        .aspectRatio(ReelsRatios.poster),
+                    shape = MaterialTheme.shapes.large,
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    AsyncImage(
+                        model = posterUrl,
+                        contentDescription = title,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(ReelsRatios.poster)
+                            .clip(MaterialTheme.shapes.large),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
+                ) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    MovieMetadataRow(items = metadata)
+
+                    HeroActionRow(
+                        rating = rating,
+                        isFavorite = isFavorite,
+                        isFavoriteLoading = isFavoriteLoading,
+                        onFavoriteClick = onFavoriteClick
+                    )
+                }
             }
 
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                MovieMetadataRow(items = metadata)
-
-                HeroActionRow(
-                    rating = rating,
-                    isFavorite = isFavorite,
-                    isFavoriteLoading = isFavoriteLoading,
-                    onFavoriteClick = onFavoriteClick
-                )
-
-            }
+            GenreChipRow(genres = genres)
         }
-
-        GenreChipRow(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(horizontal = ReelsSpacing.screenHorizontal)
-                .padding(bottom = ReelsSpacing.small),
-            genres = genres
-        )
     }
 }
 

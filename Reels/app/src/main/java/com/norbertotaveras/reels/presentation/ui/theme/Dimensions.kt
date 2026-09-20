@@ -73,11 +73,15 @@ object ReelsDimensions {
     val favoritesEmptyContentSpacing = 14.dp
 
     val detailsHeroHeight = 270.dp
-    val detailsHeaderHeight = 402.dp
+    val detailsHeaderHeight = 424.dp
     val detailsHeroTopActionPadding = 48.dp
     val detailsBackButtonSize = 40.dp
     val detailsPosterWidth = 96.dp
     val detailsPosterRowTopPadding = 224.dp
+    val detailsPosterRowToChipsSpacing = 18.dp
+    val detailsGenreChipHorizontalPadding = 12.dp
+    val detailsGenreChipVerticalPadding = 6.dp
+    val detailsGenreChipSpacing = 8.dp
     val detailsFavoriteButtonWidth = 64.dp
     val detailsActionButtonHeight = 40.dp
     val detailsHeroRatingIconSize = 20.dp
@@ -86,7 +90,7 @@ object ReelsDimensions {
     val detailsSectionSpacing = 22.dp
     val detailsSectionContentSpacing = 14.dp
     val detailsInfoRowSpacing = 14.dp
-    val detailsOverviewTopSpacing = 10.dp
+    val detailsOverviewTopSpacing = 8.dp
     val detailsCarouselHeaderSpacing = 14.dp
     val detailsCastCardWidth = 92.dp
     val detailsCastTextSpacing = 6.dp
