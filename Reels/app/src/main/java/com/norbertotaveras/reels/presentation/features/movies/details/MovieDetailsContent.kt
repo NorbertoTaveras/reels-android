@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
@@ -131,7 +132,30 @@ fun MovieDetailsContent(
             )
         }
 
-        if (cast.isNotEmpty()) {
+        val hasMissingOnlineExtras = !isOfflineFavorite &&
+            (cast.isEmpty() || trailers.isEmpty() || similarMovies.isEmpty())
+        val areAllOnlineExtrasMissing = !isOfflineFavorite &&
+            cast.isEmpty() &&
+            trailers.isEmpty() &&
+            similarMovies.isEmpty()
+
+        if (areAllOnlineExtrasMissing) {
+            item {
+                MovieDetailsInlineNotice(
+                    modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
+                    title = "Extras unavailable",
+                    message = "Cast, trailers, and similar movies are not available for this title yet."
+                )
+            }
+        } else if (hasMissingOnlineExtras && cast.isEmpty()) {
+            item {
+                MovieDetailsInlineNotice(
+                    modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
+                    title = "Cast unavailable",
+                    message = "TMDB has not provided cast details for this title yet."
+                )
+            }
+        } else if (cast.isNotEmpty()) {
             item {
                 CastCarousel(
                     modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
@@ -142,7 +166,15 @@ fun MovieDetailsContent(
             }
         }
 
-        if (trailers.isNotEmpty()) {
+        if (!areAllOnlineExtrasMissing && !isOfflineFavorite && trailers.isEmpty()) {
+            item {
+                MovieDetailsInlineNotice(
+                    modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
+                    title = "No trailers available",
+                    message = "There are no playable YouTube trailers for this movie right now."
+                )
+            }
+        } else if (trailers.isNotEmpty()) {
             item {
                 TrailerCarousel(
                     modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
@@ -152,12 +184,76 @@ fun MovieDetailsContent(
             }
         }
 
-        if (similarMovies.isNotEmpty()) {
+        if (!areAllOnlineExtrasMissing && !isOfflineFavorite && similarMovies.isEmpty()) {
+            item {
+                MovieDetailsInlineNotice(
+                    modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
+                    title = "No similar movies yet",
+                    message = "TMDB has not returned recommendations for this movie."
+                )
+            }
+        } else if (similarMovies.isNotEmpty()) {
             item {
                 SimilarMoviesSection(
                     modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
                     movies = similarMovies,
                     onMovieClick = onSimilarMovieClick
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun MovieDetailsInlineNotice(
+    title: String,
+    message: String,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = ReelsSpacing.screenHorizontal),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        border = BorderStroke(
+            width = 1.dp,
+            color = ReelsBorder
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(ReelsDimensions.inlineStateCardPadding),
+            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Surface(
+                modifier = Modifier.size(ReelsDimensions.inlineStateIconContainerSize),
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = MaterialTheme.colorScheme.primary
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Filled.Info,
+                        contentDescription = null,
+                        modifier = Modifier.size(ReelsDimensions.inlineStateIconSize)
+                    )
+                }
+            }
+
+            Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
