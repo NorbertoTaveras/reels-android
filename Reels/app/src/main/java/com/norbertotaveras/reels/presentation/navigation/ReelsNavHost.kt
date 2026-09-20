@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -66,13 +67,7 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
                     currentRoute = currentRoute,
                     onItemClick = { route ->
                         if (route != currentRoute) {
-                            navController.navigate(route) {
-                                popUpTo(ReelsDestinations.HOME) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
+                            navController.navigateToBottomNavRoute(route)
                         }
                     }
                 )
@@ -87,10 +82,10 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
             composable(ReelsDestinations.HOME) {
                 MoviesListRoute(
                     onMovieClick = { movieId ->
-                        navController.navigate(ReelsDestinations.movieDetailsRoute(movieId))
+                        navController.navigateToMovieDetails(movieId)
                     },
                     onSeeAllClick = { category ->
-                        navController.navigate(ReelsDestinations.movieCategoryRoute(category))
+                        navController.navigateToMovieCategory(category)
                     }
                 )
             }
@@ -106,7 +101,7 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
                 MovieCategoryRoute(
                     onBackClick = navController::navigateUp,
                     onMovieClick = { movieId ->
-                        navController.navigate(ReelsDestinations.movieDetailsRoute(movieId))
+                        navController.navigateToMovieDetails(movieId)
                     }
                 )
             }
@@ -114,7 +109,7 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
             composable(ReelsDestinations.SEARCH) {
                 SearchRoute(
                     onMovieClick = { movieId ->
-                        navController.navigate(ReelsDestinations.movieDetailsRoute(movieId))
+                        navController.navigateToMovieDetails(movieId)
                     }
                 )
             }
@@ -122,7 +117,7 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
             composable(ReelsDestinations.FAVORITES) {
                 FavoritesRoute(
                     onMovieClick = { movieId ->
-                        navController.navigate(ReelsDestinations.movieDetailsRoute(movieId))
+                        navController.navigateToMovieDetails(movieId)
                     }
                 )
             }
@@ -130,13 +125,7 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
             composable(ReelsDestinations.SETTINGS) {
                 SettingsRoute(
                     onNavigateToFavorites = {
-                        navController.navigate(ReelsDestinations.FAVORITES) {
-                            popUpTo(ReelsDestinations.HOME) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
+                        navController.navigateToBottomNavRoute(ReelsDestinations.FAVORITES)
                     },
                     onOpenExternalUrl = openExternalUrl
                 )
@@ -153,14 +142,14 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
                 MovieDetailsRoute(
                     onBackClick = navController::navigateUp,
                     onCastClick = { personId ->
-                        navController.navigate(ReelsDestinations.castDetailsRoute(personId))
+                        navController.navigateToCastDetails(personId)
                     },
                     onCastSeeAllClick = { movieId ->
-                        navController.navigate(ReelsDestinations.movieCastRoute(movieId))
+                        navController.navigateToMovieCast(movieId)
                     },
                     onTrailerClick = openExternalUrl,
                     onSimilarMovieClick = { movieId ->
-                        navController.navigate(ReelsDestinations.movieDetailsRoute(movieId))
+                        navController.navigateToMovieDetails(movieId)
                     }
                 )
             }
@@ -176,7 +165,7 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
                 MovieCastRoute(
                     onBackClick = navController::navigateUp,
                     onCastClick = { personId ->
-                        navController.navigate(ReelsDestinations.castDetailsRoute(personId))
+                        navController.navigateToCastDetails(personId)
                     }
                 )
             }
@@ -192,12 +181,88 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
                 CastDetailsRoute(
                     onBackClick = navController::navigateUp,
                     onMovieClick = { movieId ->
-                        navController.navigate(ReelsDestinations.movieDetailsRoute(movieId))
+                        navController.navigateToMovieDetails(movieId)
                     }
                 )
             }
         }
     }
+}
+
+private fun NavHostController.navigateToBottomNavRoute(route: String) {
+    navigate(route) {
+        popUpTo(ReelsDestinations.HOME) {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
+    }
+}
+
+private fun NavHostController.navigateToMovieDetails(movieId: Int) {
+    navigateIfNotCurrent(
+        route = ReelsDestinations.movieDetailsRoute(movieId),
+        destinationRoute = ReelsDestinations.MOVIE_DETAILS_ROUTE,
+        argumentName = ReelsDestinations.MOVIE_ID_ARG,
+        argumentValue = movieId
+    )
+}
+
+private fun NavHostController.navigateToMovieCategory(category: String) {
+    navigateIfNotCurrent(
+        route = ReelsDestinations.movieCategoryRoute(category),
+        destinationRoute = ReelsDestinations.MOVIE_CATEGORY_ROUTE,
+        argumentName = ReelsDestinations.MOVIE_CATEGORY_ARG,
+        argumentValue = category
+    )
+}
+
+private fun NavHostController.navigateToMovieCast(movieId: Int) {
+    navigateIfNotCurrent(
+        route = ReelsDestinations.movieCastRoute(movieId),
+        destinationRoute = ReelsDestinations.MOVIE_CAST_ROUTE,
+        argumentName = ReelsDestinations.MOVIE_ID_ARG,
+        argumentValue = movieId
+    )
+}
+
+private fun NavHostController.navigateToCastDetails(personId: Int) {
+    navigateIfNotCurrent(
+        route = ReelsDestinations.castDetailsRoute(personId),
+        destinationRoute = ReelsDestinations.CAST_DETAILS_ROUTE,
+        argumentName = ReelsDestinations.PERSON_ID_ARG,
+        argumentValue = personId
+    )
+}
+
+private fun NavHostController.navigateIfNotCurrent(
+    route: String,
+    destinationRoute: String,
+    argumentName: String,
+    argumentValue: Int,
+) {
+    val currentEntry = currentBackStackEntry
+    val isCurrentDestination = currentEntry?.destination?.route == destinationRoute
+    val isCurrentArgument = currentEntry?.arguments?.getInt(argumentName) == argumentValue
+
+    if (isCurrentDestination && isCurrentArgument) return
+
+    navigate(route)
+}
+
+private fun NavHostController.navigateIfNotCurrent(
+    route: String,
+    destinationRoute: String,
+    argumentName: String,
+    argumentValue: String,
+) {
+    val currentEntry = currentBackStackEntry
+    val isCurrentDestination = currentEntry?.destination?.route == destinationRoute
+    val isCurrentArgument = currentEntry?.arguments?.getString(argumentName) == argumentValue
+
+    if (isCurrentDestination && isCurrentArgument) return
+
+    navigate(route)
 }
 
 @Composable
