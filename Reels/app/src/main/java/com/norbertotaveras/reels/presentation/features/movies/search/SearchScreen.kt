@@ -23,6 +23,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.MovieFilter
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,6 +53,7 @@ import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetrySt
 import com.norbertotaveras.reels.presentation.ui.components.movie.MovieResultRow
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
@@ -169,7 +172,7 @@ fun SearchScreen(
                             InlineRetryState(
                                 modifier = Modifier.padding(top = ReelsSpacing.medium),
                                 message = refreshState.error.toUserMessage(
-                                    fallback = "Unable to load search results."
+                                    fallback = "Unable to search for \"$trimmedQuery\"."
                                 ),
                                 retryLabel = "Retry",
                                 onRetry = movies::retry
@@ -182,7 +185,7 @@ fun SearchScreen(
                             item {
                                 EmptyState(
                                     title = "No movies found",
-                                    message = "Try a different title or check the spelling."
+                                    message = "No results for \"$trimmedQuery\". Try a different title or check the spelling."
                                 )
                             }
                         } else {
@@ -263,15 +266,57 @@ private fun SearchPromptState(
     query: String,
     modifier: Modifier = Modifier,
 ) {
-    EmptyState(
-        modifier = modifier.padding(top = ReelsSpacing.medium),
-        title = if (query.isBlank()) "Search for a movie" else "Keep typing",
-        message = if (query.isBlank()) {
-            "Enter at least two characters to find movies from TMDB."
-        } else {
-            "Add one more character to start searching."
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(top = ReelsSpacing.medium),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surface,
+        border = androidx.compose.foundation.BorderStroke(
+            width = 1.dp,
+            color = ReelsBorder
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(ReelsDimensions.stateCardPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.stateCardContentSpacing)
+        ) {
+            Surface(
+                modifier = Modifier.size(ReelsDimensions.stateIconContainerSize),
+                shape = MaterialTheme.shapes.large,
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = MaterialTheme.colorScheme.primary
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Outlined.MovieFilter,
+                        contentDescription = null,
+                        modifier = Modifier.size(ReelsDimensions.stateIconSize)
+                    )
+                }
+            }
+
+            Text(
+                text = if (query.isBlank()) "Find your next movie" else "Keep typing",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold
+            )
+
+            Text(
+                text = if (query.isBlank()) {
+                    "Search by movie title, then save favorites for offline access."
+                } else {
+                    "Add one more character to search TMDB."
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
         }
-    )
+    }
 }
 
 @Composable
