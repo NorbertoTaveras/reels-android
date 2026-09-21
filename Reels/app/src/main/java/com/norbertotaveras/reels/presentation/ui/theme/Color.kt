@@ -14,7 +14,11 @@ val ReelsError = Color(0xFFFFB4AB)
 
 val ReelsLightBackground = Color(0xFFFAF6EF)
 val ReelsLightSurface = Color(0xFFFFFBF5)
+val ReelsLightSurfaceHigh = Color(0xFFF0ECE5)
+val ReelsLightSurfacePressed = Color(0xFFE8E0D4)
 val ReelsLightText = Color(0xFF16110C)
+val ReelsLightTextSecondary = Color(0xFF6F675F)
+val ReelsLightBorder = Color(0xFFE0D8CC)
 
 val ReelsBackground = Color(0xFF0B0B0D)
 val ReelsSurface = Color(0xFF18181B)
@@ -29,3 +33,8 @@ val ReelsAccent = Color(0xFFD9A25F)
 val ReelsAccentMuted = Color(0xFF8A6335)
 
 val ReelsBorder = Color(0xFF2A2A2F)
+
+val ReelsRatingContainer = Color(0xFF3A2D24)
+val ReelsLightRatingContainer = Color(0xFFF0DFC9)
+val ReelsGenreChipContainer = Color(0xFF2F3035)
+val ReelsLightGenreChipContainer = Color(0xFFEDE8E1)

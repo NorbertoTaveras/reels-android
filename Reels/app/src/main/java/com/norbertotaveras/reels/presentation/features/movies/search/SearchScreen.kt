@@ -55,7 +55,10 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsGenreChipContainer
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightGenreChipContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import com.norbertotaveras.reels.presentation.ui.theme.isReelsLightTheme
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -453,7 +456,11 @@ private fun RecentSearchesSection(
                         onEvent(SearchEvent.RecentSearchClicked(query = query))
                     },
                     shape = MaterialTheme.shapes.extraLarge,
-                    color = Color(0xFF2F3035),
+                    color = if (isReelsLightTheme()) {
+                        ReelsLightGenreChipContainer
+                    } else {
+                        ReelsGenreChipContainer
+                    },
                     contentColor = MaterialTheme.colorScheme.onSurface
                 ) {
                     Text(

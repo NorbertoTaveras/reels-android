@@ -43,7 +43,6 @@ import com.norbertotaveras.reels.presentation.ui.components.trailer.TrailerCarou
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsSurfaceHigh
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 import java.util.Locale
@@ -344,12 +343,12 @@ private fun MovieInfoRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Surface(
-            color = ReelsSurfaceHigh,
+            color = MaterialTheme.colorScheme.surfaceVariant,
             contentColor = MaterialTheme.colorScheme.primary,
             shape = MaterialTheme.shapes.medium,
             border = BorderStroke(
                 width = 1.dp,
-                color = ReelsBorder
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
             )
         ) {
             Box(

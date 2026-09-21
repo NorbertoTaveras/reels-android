@@ -20,20 +20,24 @@ private val DarkColorScheme = darkColorScheme(
     onSurface = ReelsTextPrimary,
     surfaceVariant = ReelsSurfaceHigh,
     onSurfaceVariant = ReelsTextSecondary,
+    outline = ReelsBorder,
+    outlineVariant = ReelsBorder,
     error = ReelsError
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = ReelsCopperDark,
-    onPrimary = ReelsBone,
+    primary = ReelsAccent,
+    onPrimary = ReelsLightText,
     secondary = ReelsTeal,
     onSecondary = ReelsLightText,
     background = ReelsLightBackground,
     onBackground = ReelsLightText,
     surface = ReelsLightSurface,
     onSurface = ReelsLightText,
-    surfaceVariant = ReelsBone,
-    onSurfaceVariant = ReelsCopperDark,
+    surfaceVariant = ReelsLightSurfaceHigh,
+    onSurfaceVariant = ReelsLightTextSecondary,
+    outline = ReelsLightBorder,
+    outlineVariant = ReelsLightBorder,
     error = ReelsCopperDark
 )
 
@@ -53,4 +57,9 @@ fun ReelsTheme(
             content = content
         )
     }
+}
+
+@Composable
+fun isReelsLightTheme(): Boolean {
+    return MaterialTheme.colorScheme.background == ReelsLightBackground
 }

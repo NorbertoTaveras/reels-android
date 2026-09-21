@@ -17,9 +17,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsSurfaceHigh
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightGenreChipContainer
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsGenreChipContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
+import com.norbertotaveras.reels.presentation.ui.theme.isReelsLightTheme
 
 @Composable
 fun GenreChipRow(
@@ -37,7 +39,11 @@ fun GenreChipRow(
         visibleGenres.forEach { genre ->
             Surface(
                 shape = RoundedCornerShape(8.dp),
-                color = ReelsSurfaceHigh,
+                color = if (isReelsLightTheme()) {
+                    ReelsLightGenreChipContainer
+                } else {
+                    ReelsGenreChipContainer
+                },
                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant
             ) {
                 Text(

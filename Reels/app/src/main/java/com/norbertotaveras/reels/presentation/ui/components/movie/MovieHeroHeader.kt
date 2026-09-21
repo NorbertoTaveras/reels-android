@@ -41,9 +41,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightRatingContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
+import com.norbertotaveras.reels.presentation.ui.theme.isReelsLightTheme
 
 @Composable
 fun MovieHeroHeader(
@@ -239,7 +242,11 @@ private fun HeroRatingButton(
     Surface(
         modifier = modifier.height(ReelsDimensions.detailsActionButtonHeight),
         shape = MaterialTheme.shapes.large,
-        color = Color(0xFF3A2D24),
+        color = if (isReelsLightTheme()) {
+            ReelsLightRatingContainer
+        } else {
+            ReelsRatingContainer
+        },
         contentColor = MaterialTheme.colorScheme.primary
     ) {
         Row(

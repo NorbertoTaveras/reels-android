@@ -55,7 +55,6 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsAccent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsSurfaceHigh
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 
 @Composable
@@ -471,7 +470,7 @@ private fun SettingsRow(
             modifier = Modifier
                 .size(ReelsDimensions.settingsRowIconContainerSize)
                 .clip(MaterialTheme.shapes.medium)
-                .background(ReelsSurfaceHigh),
+                .background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
             Icon(

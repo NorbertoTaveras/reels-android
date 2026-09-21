@@ -24,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -33,9 +32,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsGenreChipContainer
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightGenreChipContainer
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightRatingContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
+import com.norbertotaveras.reels.presentation.ui.theme.isReelsLightTheme
 
 @Composable
 fun MovieResultRow(
@@ -177,7 +181,11 @@ private fun RatingPill(
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.medium,
-        color = Color(0xFF493527),
+        color = if (isReelsLightTheme()) {
+            ReelsLightRatingContainer
+        } else {
+            ReelsRatingContainer
+        },
         contentColor = MaterialTheme.colorScheme.primary
     ) {
         Row(
@@ -219,7 +227,11 @@ private fun GenrePillRow(
         genres.take(3).forEach { genre ->
             Surface(
                 shape = MaterialTheme.shapes.medium,
-                color = Color(0xFF2F3035),
+                color = if (isReelsLightTheme()) {
+                    ReelsLightGenreChipContainer
+                } else {
+                    ReelsGenreChipContainer
+                },
                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant
             ) {
                 Text(
