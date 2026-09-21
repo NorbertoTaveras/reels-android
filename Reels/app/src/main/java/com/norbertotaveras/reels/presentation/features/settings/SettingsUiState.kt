@@ -14,6 +14,7 @@ data class SettingsUiState(
     val savedMoviesLabel: String = "Manage movies saved on this device",
     val clearImageCacheLabel: String = "Free up locally cached poster images",
     val appVersionLabel: String = "1.0.0",
+    val appConfigurationLabel: String = "Production Debug · Token configured",
     val privacyLabel: String = "Local favorites stay on this device",
     val activePreferenceDialog: SettingsPreferenceDialog? = null,
     val isClearImageCacheDialogVisible: Boolean = false,

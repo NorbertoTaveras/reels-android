@@ -29,7 +29,10 @@ class SettingsViewModel @Inject constructor(
     private val updateThemeUseCase: UpdateThemeUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(
-        SettingsUiState(appVersionLabel = BuildConfig.VERSION_NAME)
+        SettingsUiState(
+            appVersionLabel = BuildConfig.VERSION_NAME,
+            appConfigurationLabel = buildAppConfigurationLabel()
+        )
     )
     val state: StateFlow<SettingsUiState> = _state.asStateFlow()
 
@@ -174,5 +177,27 @@ class SettingsViewModel @Inject constructor(
 
     private companion object {
         const val TMDB_WEBSITE_URL = "https://www.themoviedb.org/"
+
+        fun buildAppConfigurationLabel(): String {
+            val flavorLabel = BuildConfig.FLAVOR.toDisplayLabel()
+            val buildTypeLabel = BuildConfig.BUILD_TYPE.toDisplayLabel()
+            val tokenStatusLabel = if (BuildConfig.TMDB_READ_TOKEN.isBlank()) {
+                "Token missing"
+            } else {
+                "Token configured"
+            }
+
+            return "$flavorLabel $buildTypeLabel · $tokenStatusLabel"
+        }
+
+        fun String.toDisplayLabel(): String {
+            return replaceFirstChar { character ->
+                if (character.isLowerCase()) {
+                    character.titlecase()
+                } else {
+                    character.toString()
+                }
+            }
+        }
     }
 }

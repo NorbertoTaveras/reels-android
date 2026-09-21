@@ -21,6 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Image
@@ -132,6 +133,15 @@ fun SettingsScreen(
                 icon = Icons.Filled.Info,
                 title = "App Version",
                 subtitle = state.appVersionLabel,
+                showsChevron = false
+            )
+
+            SettingsDivider()
+
+            SettingsRow(
+                icon = Icons.Filled.Build,
+                title = "Configuration",
+                subtitle = state.appConfigurationLabel,
                 showsChevron = false
             )
 
