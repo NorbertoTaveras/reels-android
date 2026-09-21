@@ -60,6 +60,20 @@ fun String?.toRelativeReleaseAge(
 
     val period = Period.between(releaseDate, now)
 
+    if (releaseDate.isAfter(now)) {
+        val futurePeriod = Period.between(now, releaseDate)
+
+        return when {
+            futurePeriod.years > 1 -> "in ${futurePeriod.years} years"
+            futurePeriod.years == 1 -> "in 1 year"
+            futurePeriod.months > 1 -> "in ${futurePeriod.months} months"
+            futurePeriod.months == 1 -> "in 1 month"
+            futurePeriod.days > 1 -> "in ${futurePeriod.days} days"
+            futurePeriod.days == 1 -> "tomorrow"
+            else -> null
+        }
+    }
+
     return when {
         period.years > 1 -> "${period.years} years ago"
         period.years == 1 -> "1 year ago"
@@ -68,7 +82,6 @@ fun String?.toRelativeReleaseAge(
         period.days > 1 -> "${period.days} days ago"
         period.days == 1 -> "1 day ago"
         period.days == 0 -> "Released today"
-        period.days < 0 -> "Coming soon"
         else -> null
     }
 }
