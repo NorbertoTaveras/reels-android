@@ -184,7 +184,7 @@ private fun RatingBadge(
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f),
+        color = ReelsRatingContainer,
         contentColor = MaterialTheme.colorScheme.primary
     ) {
         Row(

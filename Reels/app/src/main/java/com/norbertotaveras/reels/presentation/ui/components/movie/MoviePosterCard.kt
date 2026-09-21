@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
@@ -68,7 +69,7 @@ fun MoviePosterCard(
                             .align(Alignment.TopEnd)
                             .padding(ReelsSpacing.small),
                         shape = MaterialTheme.shapes.extraLarge,
-                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.86f),
+                        color = ReelsRatingContainer,
                         contentColor = MaterialTheme.colorScheme.primary
                     ) {
                         Text(
