@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
@@ -36,7 +35,7 @@ fun EmptyState(
         color = MaterialTheme.colorScheme.surface,
         border = androidx.compose.foundation.BorderStroke(
             width = 1.dp,
-            color = ReelsBorder
+            color = MaterialTheme.colorScheme.outline
         )
     ) {
         Column(

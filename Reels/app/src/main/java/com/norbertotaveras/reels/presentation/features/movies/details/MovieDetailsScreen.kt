@@ -34,7 +34,6 @@ import com.norbertotaveras.reels.presentation.ui.components.movie.PosterCarousel
 import com.norbertotaveras.reels.presentation.ui.components.trailer.TrailerCarouselItem
 import com.norbertotaveras.reels.presentation.ui.extensions.toErrorTitle
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
@@ -295,7 +294,7 @@ private fun MovieDetailsErrorState(
             color = MaterialTheme.colorScheme.surface,
             border = BorderStroke(
                 width = 1.dp,
-                color = ReelsBorder
+                color = MaterialTheme.colorScheme.outline
             )
         ) {
             Column(

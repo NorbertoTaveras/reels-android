@@ -44,7 +44,6 @@ import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.favorite.FavoriteMovieDataModel
 import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSurfaceHigh
@@ -251,7 +250,7 @@ private fun FavoriteMovieCard(
                 contentColor = MaterialTheme.colorScheme.primary,
                 border = BorderStroke(
                     width = 1.dp,
-                    color = ReelsBorder
+                    color = MaterialTheme.colorScheme.outline
                 )
             ) {
                 Box(contentAlignment = Alignment.Center) {
@@ -297,7 +296,7 @@ private fun EmptyFavoritesState(
             color = MaterialTheme.colorScheme.surface,
             border = androidx.compose.foundation.BorderStroke(
                 width = 1.dp,
-                color = ReelsBorder
+                color = MaterialTheme.colorScheme.outline
             )
         ) {
             Column(

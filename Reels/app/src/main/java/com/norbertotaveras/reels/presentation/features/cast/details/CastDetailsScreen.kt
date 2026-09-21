@@ -35,7 +35,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.norbertotaveras.reels.presentation.ui.extensions.toErrorTitle
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
@@ -239,7 +238,7 @@ private fun CastDetailsErrorState(
             color = MaterialTheme.colorScheme.surface,
             border = BorderStroke(
                 width = 1.dp,
-                color = ReelsBorder
+                color = MaterialTheme.colorScheme.outline
             )
         ) {
             Column(

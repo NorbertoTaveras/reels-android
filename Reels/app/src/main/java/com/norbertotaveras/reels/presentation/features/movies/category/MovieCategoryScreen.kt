@@ -48,7 +48,6 @@ import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetrySt
 import com.norbertotaveras.reels.presentation.ui.extensions.toErrorTitle
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
@@ -284,7 +283,7 @@ private fun MovieCategoryErrorState(
             color = MaterialTheme.colorScheme.surface,
             border = androidx.compose.foundation.BorderStroke(
                 width = 1.dp,
-                color = ReelsBorder
+                color = MaterialTheme.colorScheme.outline
             )
         ) {
             Column(

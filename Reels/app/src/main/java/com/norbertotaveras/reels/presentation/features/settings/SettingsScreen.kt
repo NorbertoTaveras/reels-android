@@ -21,7 +21,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Image
@@ -52,7 +51,6 @@ import com.norbertotaveras.reels.domain.model.settings.AppTheme
 import com.norbertotaveras.reels.domain.model.settings.ImageQuality
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsAccent
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
@@ -132,15 +130,6 @@ fun SettingsScreen(
                 icon = Icons.Filled.Info,
                 title = "App Version",
                 subtitle = state.appVersionLabel,
-                showsChevron = false
-            )
-
-            SettingsDivider()
-
-            SettingsRow(
-                icon = Icons.Filled.Build,
-                title = "Configuration",
-                subtitle = state.appConfigurationLabel,
                 showsChevron = false
             )
 
@@ -427,7 +416,7 @@ private fun SettingsSection(
                 .fillMaxWidth()
                 .border(
                     width = 1.dp,
-                    color = ReelsBorder,
+                    color = MaterialTheme.colorScheme.outline,
                     shape = MaterialTheme.shapes.extraLarge
                 ),
             shape = MaterialTheme.shapes.extraLarge,
@@ -524,7 +513,7 @@ private fun SettingsDivider(
     HorizontalDivider(
         modifier = modifier,
         thickness = ReelsDimensions.settingsDividerThickness,
-        color = ReelsBorder
+        color = MaterialTheme.colorScheme.outline
     )
 }
 
@@ -565,7 +554,7 @@ private fun TmdbAttributionCard(
             .clickable(onClick = onClick)
             .border(
                 width = 1.dp,
-                color = ReelsBorder,
+                color = MaterialTheme.colorScheme.outline,
                 shape = MaterialTheme.shapes.extraLarge
             )
             .background(

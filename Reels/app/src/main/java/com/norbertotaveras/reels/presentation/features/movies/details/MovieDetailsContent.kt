@@ -41,7 +41,6 @@ import com.norbertotaveras.reels.presentation.ui.components.movie.SimilarMoviesS
 import com.norbertotaveras.reels.presentation.ui.components.trailer.TrailerCarousel
 import com.norbertotaveras.reels.presentation.ui.components.trailer.TrailerCarouselItem
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
@@ -220,7 +219,7 @@ private fun MovieDetailsInlineNotice(
         contentColor = MaterialTheme.colorScheme.onSurface,
         border = BorderStroke(
             width = 1.dp,
-            color = ReelsBorder
+            color = MaterialTheme.colorScheme.outline
         )
     ) {
         Row(
@@ -428,7 +427,7 @@ private fun OfflineExtrasUnavailableNotice(
         contentColor = MaterialTheme.colorScheme.onSurface,
         border = BorderStroke(
             width = 1.dp,
-            color = ReelsBorder
+            color = MaterialTheme.colorScheme.outline
         )
     ) {
         Row(
@@ -482,7 +481,7 @@ private fun OfflineFavoriteNotice(
         contentColor = MaterialTheme.colorScheme.onSurface,
         border = BorderStroke(
             width = 1.dp,
-            color = ReelsBorder
+            color = MaterialTheme.colorScheme.outline
         )
     ) {
         Row(

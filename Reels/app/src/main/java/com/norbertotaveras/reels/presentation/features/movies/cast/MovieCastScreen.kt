@@ -43,7 +43,6 @@ import com.norbertotaveras.reels.domain.model.cast.CastMemberDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
 import com.norbertotaveras.reels.presentation.ui.extensions.toErrorTitle
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
@@ -151,7 +150,7 @@ private fun MovieCastErrorState(
             color = MaterialTheme.colorScheme.surface,
             border = BorderStroke(
                 width = ReelsDimensions.fullCastBorderWidth,
-                color = ReelsBorder
+                color = MaterialTheme.colorScheme.outline
             )
         ) {
             Column(
@@ -265,7 +264,7 @@ private fun MovieCastHeader(
             color = MaterialTheme.colorScheme.surface,
             border = BorderStroke(
                 width = ReelsDimensions.fullCastBorderWidth,
-                color = ReelsBorder
+                color = MaterialTheme.colorScheme.outline
             )
         ) {
             IconButton(onClick = onBackClick) {
@@ -303,7 +302,7 @@ private fun MovieCastRow(
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(
             width = ReelsDimensions.fullCastBorderWidth,
-            color = ReelsBorder
+            color = MaterialTheme.colorScheme.outline
         )
     ) {
         Row(
@@ -371,7 +370,7 @@ private fun MovieCastPlaceholderRow(
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(
             width = ReelsDimensions.fullCastBorderWidth,
-            color = ReelsBorder
+            color = MaterialTheme.colorScheme.outline
         )
     ) {
         Row(
