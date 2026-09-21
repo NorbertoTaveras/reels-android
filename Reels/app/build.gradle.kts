@@ -38,7 +38,7 @@ android {
         minSdk = 23
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -65,6 +65,7 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+        resValues = true
     }
     flavorDimensions.add("environment")
     productFlavors {
@@ -72,12 +73,14 @@ android {
             dimension = "environment"
             applicationIdSuffix = ".stage"
             versionNameSuffix = "-stage"
+            resValue("string", "app_name", "Reels Stage")
             buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/\"")
             buildConfigField("String", "BASE_IMAGE_URL", "\"https://image.tmdb.org/t/p/\"")
             buildConfigField("String", "TMDB_READ_TOKEN", apiToken.asBuildConfigString())
         }
         create("production") {
             dimension = "environment"
+            resValue("string", "app_name", "Reels")
             buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/\"")
             buildConfigField("String", "BASE_IMAGE_URL", "\"https://image.tmdb.org/t/p/\"")
             buildConfigField("String", "TMDB_READ_TOKEN", apiToken.asBuildConfigString())
