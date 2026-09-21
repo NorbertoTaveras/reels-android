@@ -20,8 +20,10 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
-# Gson reads TMDB DTOs through reflection. Keep their shape stable when R8
-# minifies release builds.
--keep class com.norbertotaveras.reels.data.remote.dto.** { *; }
+# Gson reads TMDB DTO fields through reflection. DTO fields use explicit
+# @SerializedName values, so field names may still be obfuscated.
+-keepclassmembers,allowobfuscation class com.norbertotaveras.reels.data.remote.dto.** {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
 -keepattributes Signature
 -keepattributes RuntimeVisibleAnnotations
