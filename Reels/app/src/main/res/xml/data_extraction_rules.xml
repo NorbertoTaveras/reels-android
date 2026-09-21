@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <data-extraction-rules>
     <cloud-backup>
+        <!-- Favorites and settings are local-only app data. -->
         <exclude domain="database" path="." />
         <exclude domain="file" path="." />
         <exclude domain="sharedpref" path="." />
     </cloud-backup>
     <device-transfer>
+        <!-- Keep device-to-device transfers aligned with cloud backup behavior. -->
         <exclude domain="database" path="." />
         <exclude domain="file" path="." />
         <exclude domain="sharedpref" path="." />
