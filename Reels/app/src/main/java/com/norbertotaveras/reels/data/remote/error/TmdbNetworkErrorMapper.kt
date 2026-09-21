@@ -4,6 +4,10 @@ import java.io.IOException
 import java.net.SocketTimeoutException
 import retrofit2.HttpException
 
+class TmdbConfigurationException(
+    message: String,
+) : IOException(message)
+
 class TmdbNetworkException(
     override val message: String,
     cause: Throwable? = null,
@@ -12,6 +16,7 @@ class TmdbNetworkException(
 fun Throwable.toTmdbNetworkException(): TmdbNetworkException {
     val userMessage = when (this) {
         is TmdbNetworkException -> message
+        is TmdbConfigurationException -> message ?: "TMDB API token is missing. Check the app configuration."
         is SocketTimeoutException -> "TMDB took too long to respond. Please try again."
         is IOException -> "Check your internet connection and try again."
         is HttpException -> toUserMessage()
