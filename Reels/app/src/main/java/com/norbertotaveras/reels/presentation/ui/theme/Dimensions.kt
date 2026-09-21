@@ -80,8 +80,8 @@ object ReelsDimensions {
     val detailsBackButtonSize = 40.dp
     val detailsPosterWidth = 96.dp
     val detailsPosterRowTopPadding = 236.dp
-    val detailsPosterRowToChipsSpacing = 16.dp
-    val detailsGenreChipHorizontalPadding = 12.dp
+    val detailsPosterRowToChipsSpacing = 14.dp
+    val detailsGenreChipHorizontalPadding = 10.dp
     val detailsGenreChipVerticalPadding = 6.dp
     val detailsGenreChipSpacing = 8.dp
     val detailsFavoriteButtonWidth = 64.dp
