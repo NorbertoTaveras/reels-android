@@ -52,6 +52,7 @@ import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetrySt
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
+import com.norbertotaveras.reels.presentation.ui.extensions.toErrorTitle
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import kotlinx.coroutines.delay
@@ -75,11 +76,13 @@ fun MoviesListScreen(
         }
 
         popularRefreshState is LoadState.Error && popularMovies.itemCount == 0 -> {
+            val message = popularRefreshState.error.toUserMessage(
+                fallback = "Unable to load movies right now."
+            )
             CenteredErrorState(
                 modifier = modifier,
-                message = popularRefreshState.error.toUserMessage(
-                    fallback = "Unable to load movies right now."
-                ),
+                title = message.toErrorTitle(fallback = "Unable to load movies"),
+                message = message,
                 retryLabel = "Try Again",
                 onRetry = popularMovies::retry
             )

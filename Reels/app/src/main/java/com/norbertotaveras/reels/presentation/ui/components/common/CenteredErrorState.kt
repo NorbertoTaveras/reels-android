@@ -26,6 +26,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
 @Composable
 fun CenteredErrorState(
+    title: String,
     message: String,
     retryLabel: String,
     onRetry: () -> Unit,
@@ -68,7 +69,7 @@ fun CenteredErrorState(
                 }
 
                 Text(
-                    text = "Unable to load movies",
+                    text = title,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center,

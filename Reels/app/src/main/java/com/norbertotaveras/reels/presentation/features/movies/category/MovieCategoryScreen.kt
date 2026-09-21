@@ -45,6 +45,7 @@ import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
 import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
+import com.norbertotaveras.reels.presentation.ui.extensions.toErrorTitle
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsBorder
@@ -307,7 +308,7 @@ private fun MovieCategoryErrorState(
                 }
 
                 Text(
-                    text = "Unable to load ${title.lowercase()}",
+                    text = message.toErrorTitle(fallback = "Unable to load ${title.lowercase()}"),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center,
