@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -309,14 +310,31 @@ private fun MovieCastRow(
             horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.fullCastRowContentSpacing),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            AsyncImage(
-                model = castMember.profilePath.toTmdbImageUrl(),
-                contentDescription = castMember.name,
+            Box(
                 modifier = Modifier
                     .size(ReelsDimensions.fullCastProfileSize)
-                    .clip(MaterialTheme.shapes.medium),
-                contentScale = ContentScale.Crop
-            )
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
+            ) {
+                val profileUrl = castMember.profilePath.toTmdbImageUrl()
+
+                if (profileUrl.isNullOrBlank()) {
+                    Icon(
+                        imageVector = Icons.Outlined.AccountCircle,
+                        contentDescription = null,
+                        modifier = Modifier.size(30.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    AsyncImage(
+                        model = profileUrl,
+                        contentDescription = castMember.name,
+                        modifier = Modifier.matchParentSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
 
             Column(
                 modifier = Modifier.weight(1f),
