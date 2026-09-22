@@ -26,6 +26,8 @@ Common local commands:
 ./gradlew :app:assembleProductionRelease
 ```
 
+Before preparing a signed build, review the [release checklist](docs/release-checklist.md).
+
 ## Architecture
 
 The app uses MVVM with unidirectional UI state/events:
