@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -112,12 +113,14 @@ fun FavoritesScreen(
             items = state.movies,
             key = { movie -> movie.id }
         ) { movie ->
-            FavoriteMovieCard(
-                movie = movie,
-                isRemoving = state.removingMovieIds.contains(movie.id),
-                onClick = { onEvent(FavoritesEvent.MovieClicked(movieId = movie.id)) },
-                onFavoriteClick = { onEvent(FavoritesEvent.FavoriteClicked(movieId = movie.id)) }
-            )
+            Box(modifier = Modifier.fillMaxWidth()) {
+                FavoriteMovieCard(
+                    movie = movie,
+                    isRemoving = state.removingMovieIds.contains(movie.id),
+                    onClick = { onEvent(FavoritesEvent.MovieClicked(movieId = movie.id)) },
+                    onFavoriteClick = { onEvent(FavoritesEvent.FavoriteClicked(movieId = movie.id)) }
+                )
+            }
         }
     }
 }
@@ -131,7 +134,7 @@ private fun FavoriteMovieCard(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.width(ReelsDimensions.favoritesPosterCardWidth),
         verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesTextSpacing)
     ) {
         Card(
