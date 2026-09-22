@@ -11,6 +11,16 @@
   Reels is a movies-first Android app powered by The Movie Database API. It demonstrates production-minded Android development with Kotlin, Jetpack Compose, Material 3, Hilt, Retrofit/OkHttp, Paging, Room, Coroutines, Flow, and MVVM with unidirectional UI state and events.
 </p>
 
+## Demo
+
+<p align="center">
+  <video src="Reels/docs/assets/reels-demo.mp4" width="320" controls></video>
+</p>
+
+<p align="center">
+  <a href="Reels/docs/assets/reels-demo.mp4">Watch the Reels demo video</a>
+</p>
+
 ## About
 
 Reels focuses on a polished movie browsing experience inspired by premium streaming and movie discovery apps. The v1 experience includes browsing movie categories, search, movie details, cast details, trailers, favorites, settings, offline favorite access, and release-ready app configuration.
