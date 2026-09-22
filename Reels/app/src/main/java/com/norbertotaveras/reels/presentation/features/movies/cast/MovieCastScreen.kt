@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.cast.CastMemberDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
@@ -303,10 +304,14 @@ private fun MovieCastRow(
         border = BorderStroke(
             width = ReelsDimensions.fullCastBorderWidth,
             color = MaterialTheme.colorScheme.outline
+                .copy(alpha = 0.46f)
         )
     ) {
         Row(
-            modifier = Modifier.padding(ReelsDimensions.fullCastRowPadding),
+            modifier = Modifier.padding(
+                horizontal = ReelsDimensions.fullCastRowHorizontalPadding,
+                vertical = ReelsDimensions.fullCastRowVerticalPadding
+            ),
             horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.fullCastRowContentSpacing),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -323,7 +328,7 @@ private fun MovieCastRow(
                     Icon(
                         imageVector = Icons.Outlined.AccountCircle,
                         contentDescription = null,
-                        modifier = Modifier.size(30.dp),
+                        modifier = Modifier.size(28.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 } else {
@@ -342,7 +347,10 @@ private fun MovieCastRow(
             ) {
                 Text(
                     text = castMember.name,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontSize = 17.sp,
+                        lineHeight = 22.sp
+                    ),
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -350,7 +358,10 @@ private fun MovieCastRow(
 
                 Text(
                     text = castMember.characterName.ifBlank { "Character unavailable" },
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = 14.sp,
+                        lineHeight = 19.sp
+                    ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -371,10 +382,14 @@ private fun MovieCastPlaceholderRow(
         border = BorderStroke(
             width = ReelsDimensions.fullCastBorderWidth,
             color = MaterialTheme.colorScheme.outline
+                .copy(alpha = 0.46f)
         )
     ) {
         Row(
-            modifier = Modifier.padding(ReelsDimensions.fullCastRowPadding),
+            modifier = Modifier.padding(
+                horizontal = ReelsDimensions.fullCastRowHorizontalPadding,
+                vertical = ReelsDimensions.fullCastRowVerticalPadding
+            ),
             horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.fullCastRowContentSpacing),
             verticalAlignment = Alignment.CenterVertically
         ) {

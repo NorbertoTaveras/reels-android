@@ -97,7 +97,7 @@ fun MoviesListScreen(
             .background(MaterialTheme.colorScheme.background),
         contentPadding = PaddingValues(
             top = ReelsDimensions.topPadding,
-            bottom = ReelsSpacing.xxLarge
+            bottom = ReelsDimensions.homeScreenBottomPadding
         ),
         verticalArrangement = Arrangement.spacedBy(ReelsDimensions.sectionSpacing)
     ) {

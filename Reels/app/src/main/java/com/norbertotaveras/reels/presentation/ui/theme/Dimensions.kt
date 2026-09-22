@@ -5,6 +5,7 @@ import androidx.compose.ui.unit.sp
 
 object ReelsDimensions {
     val topPadding = 20.dp
+    val homeScreenBottomPadding = 72.dp
     val sectionSpacing = 38.dp
     val headerTextSpacing = 6.dp
     val sectionHeaderToRowSpacing = 24.dp
@@ -111,9 +112,10 @@ object ReelsDimensions {
     val fullCastBackButtonSize = 44.dp
     val fullCastBackIconSize = 26.dp
     val fullCastRowSpacing = 8.dp
-    val fullCastRowPadding = 8.dp
-    val fullCastProfileSize = 56.dp
-    val fullCastRowContentSpacing = 12.dp
+    val fullCastRowHorizontalPadding = 10.dp
+    val fullCastRowVerticalPadding = 8.dp
+    val fullCastProfileSize = 48.dp
+    val fullCastRowContentSpacing = 10.dp
     val fullCastRowTextSpacing = 2.dp
     val fullCastBorderWidth = 1.dp
 
