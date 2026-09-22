@@ -14,11 +14,11 @@
 ## Demo
 
 <p align="center">
-  <video src="Reels/docs/assets/reels-demo.mp4" width="320" controls></video>
+  <img src="Reels/docs/assets/reels-demo.gif" width="320" alt="Reels app demo"/>
 </p>
 
 <p align="center">
-  <a href="Reels/docs/assets/reels-demo.mp4">Watch the Reels demo video</a>
+  <a href="Reels/docs/assets/reels-demo.gif">View the Reels demo GIF</a>
 </p>
 
 ## About
