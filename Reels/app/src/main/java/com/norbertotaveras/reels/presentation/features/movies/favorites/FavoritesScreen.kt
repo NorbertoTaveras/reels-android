@@ -246,6 +246,7 @@ private fun FavoriteMovieCard(
                     .clickable(
                         enabled = !isRemoving,
                         role = Role.Button,
+                        onClickLabel = "Remove ${movie.title} from favorites",
                         onClick = onFavoriteClick
                     ),
                 shape = MaterialTheme.shapes.medium,
@@ -266,7 +267,7 @@ private fun FavoriteMovieCard(
                     } else {
                         Icon(
                             imageVector = Icons.Outlined.FavoriteBorder,
-                            contentDescription = "Remove favorite movie",
+                            contentDescription = null,
                             modifier = Modifier.size(ReelsDimensions.favoritesHeartIconSize)
                         )
                     }

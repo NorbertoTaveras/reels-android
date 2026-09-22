@@ -34,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -283,6 +284,12 @@ private fun HeroFavoriteButton(
             )
             .clickable(
                 enabled = !isLoading,
+                role = Role.Button,
+                onClickLabel = if (isFavorite) {
+                    "Remove from favorites"
+                } else {
+                    "Add to favorites"
+                },
                 onClick = onClick
             ),
         shape = MaterialTheme.shapes.large,
@@ -311,11 +318,7 @@ private fun HeroFavoriteButton(
                     } else {
                         Icons.Outlined.FavoriteBorder
                     },
-                    contentDescription = if (isFavorite) {
-                        "Remove from favorites"
-                    } else {
-                        "Add to favorites"
-                    },
+                    contentDescription = null,
                     modifier = Modifier.size(24.dp)
                 )
             }
