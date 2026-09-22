@@ -17,6 +17,23 @@
   <img src="Reels/docs/assets/reels-demo.gif" width="320" alt="Reels app demo"/>
 </p>
 
+## Screenshots
+
+<p align="center">
+  <img src="Reels/docs/assets/reels-screenshots.png" alt="Reels screenshots"/>
+</p>
+
+## Download
+
+Downloadable APKs will be published through [GitHub Releases](https://github.com/NorbertoTaveras/android_reels/releases).
+
+Until a release artifact is attached, you can build the production debug APK locally:
+
+```bash
+cd Reels
+./gradlew :app:assembleProductionDebug
+```
+
 ## About
 
 Reels focuses on a polished movie browsing experience inspired by premium streaming and movie discovery apps. The v1 experience includes browsing movie categories, search, movie details, cast details, trailers, favorites, settings, offline favorite access, and release-ready app configuration.
@@ -101,6 +118,10 @@ Before preparing a signed build, review the [release checklist](Reels/docs/relea
 
 ## Architecture
 
+<p align="center">
+  <img src="Reels/docs/assets/reels-architecture.svg" alt="Reels architecture diagram"/>
+</p>
+
 Reels uses MVVM with MVI-inspired input/output discipline inside each screen:
 
 - UI state is exposed as immutable screen state.
@@ -127,11 +148,15 @@ Current offline scope:
 - Movie details can fall back to locally saved favorite data when network details fail.
 - Full browse/search response caching is intentionally left outside v1.
 
-## TMDB API
+## Open API
+
+<p align="center">
+  <img src="Reels/docs/assets/tmdb-attribution.svg" width="520" alt="The Movie Database attribution"/>
+</p>
 
 Reels uses [The Movie Database API](https://developer.themoviedb.org/reference/intro/getting-started) for movie data, including popular movies, now playing movies, upcoming movies, top rated movies, movie search, movie details, credits, videos, similar movies, and person details.
 
-This product uses the TMDB API but is not endorsed or certified by TMDB.
+This product uses the TMDB API but is not endorsed or certified by TMDB. See TMDB's [logos and attribution guidance](https://www.themoviedb.org/about/logos-attribution).
 
 ## Production Readiness
 

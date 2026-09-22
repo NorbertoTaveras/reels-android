@@ -1,0 +1,11 @@
+<svg width="500" height="180" viewBox="0 0 500 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="500" height="180" rx="24" fill="#0B0B0D"/>
+  <rect x="36" y="42" width="96" height="96" rx="22" fill="#01B4E4"/>
+  <text x="58" y="98" fill="white" font-family="Arial, sans-serif" font-size="28" font-weight="800">TM</text>
+  <rect x="94" y="74" width="22" height="10" rx="5" fill="white"/>
+  <rect x="62" y="104" width="54" height="10" rx="5" fill="white"/>
+  <text x="90" y="121" fill="white" font-family="Arial, sans-serif" font-size="26" font-weight="800">D</text>
+  <text x="160" y="78" fill="#F4F1F3" font-family="Arial, sans-serif" font-size="28" font-weight="800">The Movie Database</text>
+  <text x="160" y="112" fill="#A8A4AE" font-family="Arial, sans-serif" font-size="19" font-weight="600">Powered by TMDB API</text>
+  <text x="160" y="140" fill="#A8A4AE" font-family="Arial, sans-serif" font-size="14">This product uses the TMDB API but is not endorsed or certified by TMDB.</text>
+</svg>
