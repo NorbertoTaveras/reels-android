@@ -17,10 +17,6 @@
   <img src="Reels/docs/assets/reels-demo.gif" width="320" alt="Reels app demo"/>
 </p>
 
-<p align="center">
-  <a href="Reels/docs/assets/reels-demo.gif">View the Reels demo GIF</a>
-</p>
-
 ## About
 
 Reels focuses on a polished movie browsing experience inspired by premium streaming and movie discovery apps. The v1 experience includes browsing movie categories, search, movie details, cast details, trailers, favorites, settings, offline favorite access, and release-ready app configuration.
