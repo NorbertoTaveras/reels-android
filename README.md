@@ -151,7 +151,7 @@ Current offline scope:
 ## Open API
 
 <p align="center">
-  <img src="Reels/docs/assets/tmdb-attribution.svg" width="520" alt="The Movie Database attribution"/>
+  <img src="Reels/docs/assets/tmdb-logo.svg" width="180" alt="The Movie Database logo"/>
 </p>
 
 Reels uses [The Movie Database API](https://developer.themoviedb.org/reference/intro/getting-started) for movie data, including popular movies, now playing movies, upcoming movies, top rated movies, movie search, movie details, credits, videos, similar movies, and person details.
