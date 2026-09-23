@@ -12,7 +12,6 @@ import androidx.room.Room
 import com.norbertotaveras.reels.data.local.dao.FavoriteMovieDao
 import com.norbertotaveras.reels.data.local.dao.SavedPersonDao
 import com.norbertotaveras.reels.data.local.db.ReelsDatabase
-import com.norbertotaveras.reels.data.local.db.ReelsDatabaseMigrations
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,7 +32,6 @@ object DatabaseModule {
             klass = ReelsDatabase::class.java,
             name = "reels.db"
         )
-            .addMigrations(*ReelsDatabaseMigrations.all)
             .build()
     }
 

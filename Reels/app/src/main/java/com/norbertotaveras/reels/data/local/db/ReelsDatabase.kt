@@ -10,6 +10,7 @@ package com.norbertotaveras.reels.data.local.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.AutoMigration
 import com.norbertotaveras.reels.data.local.converter.ReelsTypeConverters
 import com.norbertotaveras.reels.data.local.dao.FavoriteMovieDao
 import com.norbertotaveras.reels.data.local.dao.SavedPersonDao
@@ -24,7 +25,10 @@ import com.norbertotaveras.reels.data.local.entity.SavedPersonKnownForEntity
         SavedPersonKnownForEntity::class
     ],
     version = 2,
-    exportSchema = true
+    exportSchema = true,
+    autoMigrations = [
+        AutoMigration(from = 1, to = 2)
+    ]
 )
 @TypeConverters(ReelsTypeConverters::class)
 abstract class ReelsDatabase : RoomDatabase() {
