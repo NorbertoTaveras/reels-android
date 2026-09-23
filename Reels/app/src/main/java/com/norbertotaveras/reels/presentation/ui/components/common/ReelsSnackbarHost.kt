@@ -25,9 +25,9 @@ fun ReelsSnackbarHost(
     ) { snackbarData ->
         Snackbar(
             snackbarData = snackbarData,
-            containerColor = MaterialTheme.colorScheme.inverseSurface,
-            contentColor = MaterialTheme.colorScheme.inverseOnSurface,
-            actionColor = MaterialTheme.colorScheme.inversePrimary
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            actionColor = MaterialTheme.colorScheme.primary
         )
     }
 }
