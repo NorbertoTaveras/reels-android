@@ -1,103 +1,138 @@
-<svg width="1180" height="760" viewBox="0 0 1180 760" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+<svg width="1280" height="820" viewBox="0 0 1280 820" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">Reels Android architecture diagram</title>
-  <desc id="desc">Diagram showing Reels as a Jetpack Compose Android app using MVVM with MVI-inspired events, state, and effects across presentation, domain, data, remote TMDB API, local Room and DataStore, and Hilt dependency injection.</desc>
+  <desc id="desc">A professional architecture diagram for Reels showing presentation, domain, data, local storage, TMDB API, and Hilt dependency injection boundaries.</desc>
 
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1180" y2="760" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#08080A"/>
-      <stop offset="1" stop-color="#111114"/>
-    </linearGradient>
-    <linearGradient id="accent" x1="166" y1="84" x2="1014" y2="676" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#EAB56A"/>
-      <stop offset="1" stop-color="#90CEA1"/>
-    </linearGradient>
-    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
-      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000000" flood-opacity="0.35"/>
+    <filter id="cardShadow" x="-16" y="-16" width="420" height="220" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#000000" flood-opacity="0.28"/>
     </filter>
-    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
-      <path d="M2 2L10 6L2 10" stroke="#EAB56A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <marker id="arrowPrimary" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2 2L10 6L2 10" stroke="#D8A45D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
     </marker>
-    <marker id="mutedArrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
-      <path d="M2 2L10 6L2 10" stroke="#7A7680" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <marker id="arrowMuted" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2 2L10 6L2 10" stroke="#73717A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
     </marker>
+    <style>
+      .title { font: 700 36px Inter, Arial, sans-serif; fill: #F5F2F4; }
+      .subtitle { font: 400 17px Inter, Arial, sans-serif; fill: #A6A2AC; }
+      .eyebrow { font: 700 12px Inter, Arial, sans-serif; letter-spacing: 1.8px; fill: #8F8B96; }
+      .section { font: 700 19px Inter, Arial, sans-serif; fill: #F5F2F4; }
+      .label { font: 700 16px Inter, Arial, sans-serif; fill: #F5F2F4; }
+      .body { font: 400 14px Inter, Arial, sans-serif; fill: #A6A2AC; }
+      .small { font: 600 12px Inter, Arial, sans-serif; fill: #9C98A2; }
+      .accent { fill: #D8A45D; }
+      .green { fill: #90CEA1; }
+      .blue { fill: #3CBEC9; }
+      .purple { fill: #B7A7FF; }
+    </style>
   </defs>
 
-  <rect width="1180" height="760" rx="34" fill="url(#bg)"/>
-  <rect x="28" y="28" width="1124" height="704" rx="28" stroke="#24242A"/>
+  <rect width="1280" height="820" rx="32" fill="#0B0B0D"/>
+  <rect x="28" y="28" width="1224" height="764" rx="28" fill="#101013" stroke="#25252C"/>
 
-  <text x="64" y="82" fill="#F4F1F3" font-family="Arial, sans-serif" font-size="34" font-weight="700">Reels Architecture</text>
-  <text x="64" y="114" fill="#A8A4AE" font-family="Arial, sans-serif" font-size="17">Clean Architecture for a TMDB-powered Android app</text>
+  <text x="68" y="82" class="title">Reels Architecture</text>
+  <text x="68" y="113" class="subtitle">MVVM with MVI-inspired state, events, and effects built on Clean Architecture boundaries.</text>
 
-  <rect x="858" y="58" width="238" height="54" rx="27" fill="#251F18" stroke="#443421"/>
-  <circle cx="891" cy="85" r="12" fill="#EAB56A"/>
-  <text x="914" y="91" fill="#F4F1F3" font-family="Arial, sans-serif" font-size="17" font-weight="700">Hilt wires dependencies</text>
-
-  <g filter="url(#softShadow)">
-    <rect x="78" y="160" width="1024" height="122" rx="24" fill="#17171B" stroke="#2D2D34"/>
-    <rect x="78" y="160" width="8" height="122" rx="4" fill="#EAB56A"/>
-    <text x="110" y="198" fill="#EAB56A" font-family="Arial, sans-serif" font-size="20" font-weight="700">Presentation</text>
-    <text x="110" y="228" fill="#F4F1F3" font-family="Arial, sans-serif" font-size="18" font-weight="700">Jetpack Compose screens, navigation, and ViewModels</text>
-    <text x="110" y="256" fill="#A8A4AE" font-family="Arial, sans-serif" font-size="16">Home, Search, Details, Favorites, Settings, Cast, Category routes</text>
-
-    <rect x="706" y="186" width="164" height="40" rx="20" fill="#222228" stroke="#34343C"/>
-    <text x="737" y="212" fill="#F4F1F3" font-family="Arial, sans-serif" font-size="15" font-weight="700">UI State</text>
-    <rect x="886" y="186" width="164" height="40" rx="20" fill="#222228" stroke="#34343C"/>
-    <text x="927" y="212" fill="#F4F1F3" font-family="Arial, sans-serif" font-size="15" font-weight="700">Events</text>
-    <rect x="796" y="234" width="164" height="40" rx="20" fill="#222228" stroke="#34343C"/>
-    <text x="833" y="260" fill="#F4F1F3" font-family="Arial, sans-serif" font-size="15" font-weight="700">Effects</text>
+  <g>
+    <rect x="972" y="58" width="206" height="44" rx="22" fill="#1A1713" stroke="#3B2C1A"/>
+    <circle cx="1000" cy="80" r="7" fill="#D8A45D"/>
+    <text x="1016" y="86" class="small">Hilt dependency graph</text>
   </g>
 
-  <g filter="url(#softShadow)">
-    <rect x="78" y="340" width="1024" height="122" rx="24" fill="#17171B" stroke="#2D2D34"/>
-    <rect x="78" y="340" width="8" height="122" rx="4" fill="#90CEA1"/>
-    <text x="110" y="378" fill="#90CEA1" font-family="Arial, sans-serif" font-size="20" font-weight="700">Domain</text>
-    <text x="110" y="408" fill="#F4F1F3" font-family="Arial, sans-serif" font-size="18" font-weight="700">Use cases, repository contracts, and app-facing models</text>
-    <text x="110" y="436" fill="#A8A4AE" font-family="Arial, sans-serif" font-size="16">Business rules stay independent from Retrofit, Room, DataStore, and Compose</text>
+  <text x="78" y="165" class="eyebrow">APPLICATION BOUNDARY</text>
+  <rect x="68" y="182" width="875" height="478" rx="26" fill="#131317" stroke="#2B2B32"/>
 
-    <rect x="714" y="366" width="158" height="40" rx="20" fill="#1E2621" stroke="#2E4436"/>
-    <text x="750" y="392" fill="#F4F1F3" font-family="Arial, sans-serif" font-size="15" font-weight="700">Use Cases</text>
-    <rect x="888" y="366" width="158" height="40" rx="20" fill="#1E2621" stroke="#2E4436"/>
-    <text x="919" y="392" fill="#F4F1F3" font-family="Arial, sans-serif" font-size="15" font-weight="700">Contracts</text>
-    <rect x="801" y="414" width="158" height="40" rx="20" fill="#1E2621" stroke="#2E4436"/>
-    <text x="844" y="440" fill="#F4F1F3" font-family="Arial, sans-serif" font-size="15" font-weight="700">Models</text>
+  <text x="986" y="165" class="eyebrow">PLATFORM / SERVICES</text>
+  <rect x="968" y="182" width="226" height="478" rx="26" fill="#131317" stroke="#2B2B32"/>
+
+  <g filter="url(#cardShadow)">
+    <rect x="104" y="226" width="210" height="364" rx="22" fill="#19191F" stroke="#303039"/>
+    <rect x="104" y="226" width="210" height="8" rx="4" fill="#D8A45D"/>
+    <text x="128" y="266" class="eyebrow">PRESENTATION</text>
+    <text x="128" y="299" class="section">Compose UI</text>
+    <text x="128" y="326" class="body">Screens, routes, reusable</text>
+    <text x="128" y="347" class="body">components, theme tokens,</text>
+    <text x="128" y="368" class="body">navigation graph</text>
+
+    <rect x="128" y="406" width="162" height="42" rx="12" fill="#222229" stroke="#34343C"/>
+    <text x="148" y="432" class="label">ViewModels</text>
+    <rect x="128" y="462" width="162" height="42" rx="12" fill="#222229" stroke="#34343C"/>
+    <text x="148" y="488" class="label">State / Events</text>
+    <rect x="128" y="518" width="162" height="42" rx="12" fill="#222229" stroke="#34343C"/>
+    <text x="148" y="544" class="label">Effects</text>
   </g>
 
-  <g filter="url(#softShadow)">
-    <rect x="78" y="520" width="312" height="132" rx="24" fill="#17171B" stroke="#2D2D34"/>
-    <rect x="78" y="520" width="8" height="132" rx="4" fill="#3CBEC9"/>
-    <text x="110" y="558" fill="#3CBEC9" font-family="Arial, sans-serif" font-size="20" font-weight="700">Data Repositories</text>
-    <text x="110" y="588" fill="#F4F1F3" font-family="Arial, sans-serif" font-size="17" font-weight="700">Implement domain contracts</text>
-    <text x="110" y="616" fill="#A8A4AE" font-family="Arial, sans-serif" font-size="15">Map DTOs and entities into</text>
-    <text x="110" y="640" fill="#A8A4AE" font-family="Arial, sans-serif" font-size="15">stable domain data models</text>
+  <g filter="url(#cardShadow)">
+    <rect x="368" y="226" width="210" height="364" rx="22" fill="#19191F" stroke="#303039"/>
+    <rect x="368" y="226" width="210" height="8" rx="4" fill="#90CEA1"/>
+    <text x="392" y="266" class="eyebrow">DOMAIN</text>
+    <text x="392" y="299" class="section">Business Rules</text>
+    <text x="392" y="326" class="body">App-facing models and</text>
+    <text x="392" y="347" class="body">use cases that stay free</text>
+    <text x="392" y="368" class="body">of Android framework code</text>
 
-    <rect x="434" y="520" width="312" height="132" rx="24" fill="#17171B" stroke="#2D2D34"/>
-    <rect x="434" y="520" width="8" height="132" rx="4" fill="#01B4E4"/>
-    <text x="466" y="558" fill="#01B4E4" font-family="Arial, sans-serif" font-size="20" font-weight="700">Remote Source</text>
-    <text x="466" y="588" fill="#F4F1F3" font-family="Arial, sans-serif" font-size="17" font-weight="700">TMDB API boundary</text>
-    <text x="466" y="616" fill="#A8A4AE" font-family="Arial, sans-serif" font-size="15">Retrofit, OkHttp auth, DTOs,</text>
-    <text x="466" y="640" fill="#A8A4AE" font-family="Arial, sans-serif" font-size="15">network errors, Paging sources</text>
-
-    <rect x="790" y="520" width="312" height="132" rx="24" fill="#17171B" stroke="#2D2D34"/>
-    <rect x="790" y="520" width="8" height="132" rx="4" fill="#805BE7"/>
-    <text x="822" y="558" fill="#C3B5FF" font-family="Arial, sans-serif" font-size="20" font-weight="700">Local Source</text>
-    <text x="822" y="588" fill="#F4F1F3" font-family="Arial, sans-serif" font-size="17" font-weight="700">Offline and preferences</text>
-    <text x="822" y="616" fill="#A8A4AE" font-family="Arial, sans-serif" font-size="15">Room favorites, DataStore settings,</text>
-    <text x="822" y="640" fill="#A8A4AE" font-family="Arial, sans-serif" font-size="15">entities, DAO, migrations</text>
+    <rect x="392" y="406" width="162" height="42" rx="12" fill="#1E2621" stroke="#314436"/>
+    <text x="412" y="432" class="label">Use Cases</text>
+    <rect x="392" y="462" width="162" height="42" rx="12" fill="#1E2621" stroke="#314436"/>
+    <text x="412" y="488" class="label">Repositories</text>
+    <rect x="392" y="518" width="162" height="42" rx="12" fill="#1E2621" stroke="#314436"/>
+    <text x="412" y="544" class="label">Domain Models</text>
   </g>
 
-  <path d="M590 282V328" stroke="#EAB56A" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/>
-  <path d="M590 462V502" stroke="#EAB56A" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/>
-  <path d="M390 586H416" stroke="#7A7680" stroke-width="3" stroke-linecap="round" marker-end="url(#mutedArrow)"/>
-  <path d="M746 586H772" stroke="#7A7680" stroke-width="3" stroke-linecap="round" marker-end="url(#mutedArrow)"/>
+  <g filter="url(#cardShadow)">
+    <rect x="632" y="226" width="275" height="364" rx="22" fill="#19191F" stroke="#303039"/>
+    <rect x="632" y="226" width="275" height="8" rx="4" fill="#3CBEC9"/>
+    <text x="656" y="266" class="eyebrow">DATA</text>
+    <text x="656" y="299" class="section">Repository Implementations</text>
+    <text x="656" y="326" class="body">Coordinates remote and local</text>
+    <text x="656" y="347" class="body">sources, maps DTOs/entities,</text>
+    <text x="656" y="368" class="body">and exposes domain contracts</text>
 
-  <path d="M234 520C234 488 358 470 520 470" stroke="#7A7680" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 10"/>
-  <path d="M946 520C946 488 822 470 660 470" stroke="#7A7680" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 10"/>
+    <rect x="656" y="406" width="102" height="92" rx="14" fill="#172529" stroke="#2E4A51"/>
+    <text x="676" y="434" class="label">Remote</text>
+    <text x="676" y="460" class="body">Retrofit</text>
+    <text x="676" y="481" class="body">Paging</text>
 
-  <rect x="76" y="686" width="1028" height="28" rx="14" fill="#111114" stroke="#2D2D34"/>
-  <circle cx="108" cy="700" r="6" fill="#EAB56A"/>
-  <text x="124" y="705" fill="#A8A4AE" font-family="Arial, sans-serif" font-size="14">Dependency direction flows inward through domain contracts</text>
-  <circle cx="470" cy="700" r="6" fill="#90CEA1"/>
-  <text x="486" y="705" fill="#A8A4AE" font-family="Arial, sans-serif" font-size="14">UI observes state and sends events to ViewModels</text>
-  <circle cx="820" cy="700" r="6" fill="#01B4E4"/>
-  <text x="836" y="705" fill="#A8A4AE" font-family="Arial, sans-serif" font-size="14">Remote and local data are implementation details</text>
+    <rect x="780" y="406" width="102" height="92" rx="14" fill="#211F2A" stroke="#3B3556"/>
+    <text x="800" y="434" class="label">Local</text>
+    <text x="800" y="460" class="body">Room</text>
+    <text x="800" y="481" class="body">DataStore</text>
+
+    <rect x="656" y="518" width="226" height="42" rx="12" fill="#222229" stroke="#34343C"/>
+    <text x="676" y="544" class="label">Mappers and error handling</text>
+  </g>
+
+  <g>
+    <rect x="1000" y="226" width="162" height="120" rx="20" fill="#172529" stroke="#2E4A51"/>
+    <text x="1024" y="266" class="label blue">TMDB API</text>
+    <text x="1024" y="296" class="body">Movies, search,</text>
+    <text x="1024" y="317" class="body">credits, videos,</text>
+    <text x="1024" y="338" class="body">person details</text>
+
+    <rect x="1000" y="386" width="162" height="120" rx="20" fill="#211F2A" stroke="#3B3556"/>
+    <text x="1024" y="426" class="label purple">Device Storage</text>
+    <text x="1024" y="456" class="body">Favorites, settings,</text>
+    <text x="1024" y="477" class="body">recent searches,</text>
+    <text x="1024" y="498" class="body">offline detail fallback</text>
+
+    <rect x="1000" y="546" width="162" height="72" rx="20" fill="#1A1713" stroke="#3B2C1A"/>
+    <text x="1024" y="587" class="label accent">YouTube Intent</text>
+  </g>
+
+  <path d="M314 408H350" stroke="#D8A45D" stroke-width="3" stroke-linecap="round" marker-end="url(#arrowPrimary)"/>
+  <path d="M578 408H614" stroke="#D8A45D" stroke-width="3" stroke-linecap="round" marker-end="url(#arrowPrimary)"/>
+  <path d="M907 286H984" stroke="#73717A" stroke-width="3" stroke-linecap="round" marker-end="url(#arrowMuted)"/>
+  <path d="M907 446H984" stroke="#73717A" stroke-width="3" stroke-linecap="round" marker-end="url(#arrowMuted)"/>
+  <path d="M907 566H984" stroke="#73717A" stroke-width="3" stroke-linecap="round" marker-end="url(#arrowMuted)"/>
+
+  <path d="M209 590V631C209 646 221 658 236 658H768C783 658 795 646 795 631V590" stroke="#4C4B54" stroke-width="2" stroke-linecap="round" stroke-dasharray="7 9"/>
+  <text x="360" y="680" class="small">One-off effects handle navigation, snackbars, and external intents</text>
+
+  <rect x="68" y="706" width="1126" height="52" rx="18" fill="#151519" stroke="#2B2B32"/>
+  <circle cx="98" cy="732" r="6" fill="#D8A45D"/>
+  <text x="114" y="737" class="small">UI depends on domain contracts</text>
+  <circle cx="430" cy="732" r="6" fill="#90CEA1"/>
+  <text x="446" y="737" class="small">Domain models stay isolated</text>
+  <circle cx="738" cy="732" r="6" fill="#3CBEC9"/>
+  <text x="754" y="737" class="small">Remote and local sources are implementation details</text>
 </svg>
