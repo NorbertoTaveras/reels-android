@@ -10,7 +10,9 @@ package com.norbertotaveras.reels.presentation.features.movies.favorites
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveFavoriteMoviesUseCase
+import com.norbertotaveras.reels.domain.usecase.favorites.ObserveSavedPeopleUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.RemoveFavoriteMovieUseCase
+import com.norbertotaveras.reels.domain.usecase.favorites.RemoveSavedPersonUseCase
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -27,7 +29,9 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class FavoritesViewModel @Inject constructor(
     private val observeFavoriteMoviesUseCase: ObserveFavoriteMoviesUseCase,
+    private val observeSavedPeopleUseCase: ObserveSavedPeopleUseCase,
     private val removeFavoriteMovieUseCase: RemoveFavoriteMovieUseCase,
+    private val removeSavedPersonUseCase: RemoveSavedPersonUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(FavoritesUiState())
     val state: StateFlow<FavoritesUiState> = _state.asStateFlow()
@@ -41,8 +45,11 @@ class FavoritesViewModel @Inject constructor(
 
     fun onEvent(event: FavoritesEvent) {
         when (event) {
+            is FavoritesEvent.TabSelected -> onTabSelected(tab = event.tab)
             is FavoritesEvent.MovieClicked -> onMovieClicked(movieId = event.movieId)
+            is FavoritesEvent.PersonClicked -> onPersonClicked(personId = event.personId)
             is FavoritesEvent.FavoriteClicked -> onFavoriteClicked(movieId = event.movieId)
+            is FavoritesEvent.SavedPersonClicked -> onSavedPersonClicked(personId = event.personId)
         }
     }
 
@@ -54,11 +61,31 @@ class FavoritesViewModel @Inject constructor(
                 }
             }
         }
+
+        viewModelScope.launch {
+            observeSavedPeopleUseCase().collectLatest { people ->
+                _state.update { currentState ->
+                    currentState.copy(people = people)
+                }
+            }
+        }
+    }
+
+    private fun onTabSelected(tab: LibraryTab) {
+        _state.update { currentState ->
+            currentState.copy(selectedTab = tab)
+        }
     }
 
     private fun onMovieClicked(movieId: Int) {
         viewModelScope.launch {
             _effect.emit(FavoritesEffect.NavigateToMovieDetails(movieId = movieId))
+        }
+    }
+
+    private fun onPersonClicked(personId: Int) {
+        viewModelScope.launch {
+            _effect.emit(FavoritesEffect.NavigateToCastDetails(personId = personId))
         }
     }
 
@@ -88,6 +115,38 @@ class FavoritesViewModel @Inject constructor(
                 _state.update { currentState ->
                     currentState.copy(
                         removingMovieIds = currentState.removingMovieIds - movieId
+                    )
+                }
+            }
+        }
+    }
+
+    private fun onSavedPersonClicked(personId: Int) {
+        viewModelScope.launch {
+            if (_state.value.removingPersonIds.contains(personId)) return@launch
+
+            _state.update { currentState ->
+                currentState.copy(
+                    removingPersonIds = currentState.removingPersonIds + personId
+                )
+            }
+
+            try {
+                removeSavedPersonUseCase(personId = personId).onSuccess {
+                    _effect.emit(FavoritesEffect.ShowMessage(message = "Removed from library."))
+                }.onFailure { error ->
+                    _effect.emit(
+                        FavoritesEffect.ShowMessage(
+                            message = error.toUserMessage(
+                                fallback = "Unable to remove saved person."
+                            )
+                        )
+                    )
+                }
+            } finally {
+                _state.update { currentState ->
+                    currentState.copy(
+                        removingPersonIds = currentState.removingPersonIds - personId
                     )
                 }
             }

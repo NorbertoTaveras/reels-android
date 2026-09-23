@@ -133,6 +133,9 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
                 FavoritesRoute(
                     onMovieClick = { movieId ->
                         navController.navigateToMovieDetails(movieId)
+                    },
+                    onPersonClick = { personId ->
+                        navController.navigateToCastDetails(personId)
                     }
                 )
             }

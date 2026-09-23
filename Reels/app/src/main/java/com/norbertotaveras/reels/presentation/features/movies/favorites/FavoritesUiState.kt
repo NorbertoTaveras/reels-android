@@ -8,8 +8,39 @@
 package com.norbertotaveras.reels.presentation.features.movies.favorites
 
 import com.norbertotaveras.reels.domain.model.favorite.FavoriteMovieDataModel
+import com.norbertotaveras.reels.domain.model.favorite.SavedPersonDataModel
 
 data class FavoritesUiState(
     val movies: List<FavoriteMovieDataModel> = emptyList(),
+    val people: List<SavedPersonDataModel> = emptyList(),
+    val selectedTab: LibraryTab = LibraryTab.Movies,
     val removingMovieIds: Set<Int> = emptySet(),
+    val removingPersonIds: Set<Int> = emptySet(),
 )
+
+enum class LibraryTab(
+    val title: String,
+) {
+    Movies(title = "Movies"),
+    People(title = "People")
+}
+
+val FavoritesUiState.selectedItemCount: Int
+    get() = when (selectedTab) {
+        LibraryTab.Movies -> movies.size
+        LibraryTab.People -> people.size
+    }
+
+val FavoritesUiState.hasSavedItems: Boolean
+    get() = movies.isNotEmpty() || people.isNotEmpty()
+
+val FavoritesUiState.hasSelectedTabItems: Boolean
+    get() = selectedItemCount > 0
+
+val FavoritesUiState.offlineLabel: String
+    get() = buildList {
+        if (movies.isNotEmpty()) add("${movies.size} movies")
+        if (people.isNotEmpty()) add("${people.size} people")
+    }.joinToString(" · ").ifBlank {
+        "Available offline"
+    }

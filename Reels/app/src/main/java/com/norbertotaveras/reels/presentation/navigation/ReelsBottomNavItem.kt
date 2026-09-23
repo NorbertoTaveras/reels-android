@@ -40,7 +40,7 @@ val reelsBottomNavItems = listOf(
     ),
     ReelsBottomNavItem(
         route = ReelsDestinations.FAVORITES,
-        label = "Favorites",
+        label = "Library",
         selectedIcon = Icons.Filled.Favorite,
         unselectedIcon = Icons.Outlined.FavoriteBorder
     ),

@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 @Composable
 fun FavoritesRoute(
     onMovieClick: (Int) -> Unit,
+    onPersonClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FavoritesViewModel = hiltViewModel(),
 ) {
@@ -34,6 +35,9 @@ fun FavoritesRoute(
             when (effect) {
                 is FavoritesEffect.NavigateToMovieDetails -> {
                     onMovieClick(effect.movieId)
+                }
+                is FavoritesEffect.NavigateToCastDetails -> {
+                    onPersonClick(effect.personId)
                 }
                 is FavoritesEffect.ShowMessage -> {
                     snackbarHostState.showSnackbar(message = effect.message)
