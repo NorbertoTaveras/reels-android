@@ -24,12 +24,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -75,6 +77,8 @@ fun CastDetailsContent(
     onMovieClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     isFavorite: Boolean = false,
+    isFavoriteLoading: Boolean = false,
+    isOfflineSavedPerson: Boolean = false,
     onFavoriteClick: () -> Unit = {},
 ) {
     LazyColumn(
@@ -90,6 +94,8 @@ fun CastDetailsContent(
                 profileUrl = profileUrl,
                 knownForDepartment = knownForDepartment,
                 isFavorite = isFavorite,
+                isFavoriteLoading = isFavoriteLoading,
+                isOfflineSavedPerson = isOfflineSavedPerson,
                 onBackClick = onBackClick,
                 onFavoriteClick = onFavoriteClick
             )
@@ -130,6 +136,8 @@ private fun CastHeroHeader(
     profileUrl: String?,
     knownForDepartment: String?,
     isFavorite: Boolean,
+    isFavoriteLoading: Boolean,
+    isOfflineSavedPerson: Boolean,
     onBackClick: () -> Unit,
     onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -188,6 +196,7 @@ private fun CastHeroHeader(
                     top = ReelsDimensions.castDetailsHeroActionTopPadding
                 )
                 .size(ReelsDimensions.castDetailsHeroActionButtonSize),
+            enabled = !isFavoriteLoading,
             onClick = onFavoriteClick,
             colors = IconButtonDefaults.filledIconButtonColors(
                 containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.82f),
@@ -198,18 +207,26 @@ private fun CastHeroHeader(
                 }
             )
         ) {
-            Icon(
-                imageVector = if (isFavorite) {
-                    Icons.Filled.Favorite
-                } else {
-                    Icons.Outlined.FavoriteBorder
-                },
-                contentDescription = if (isFavorite) {
-                    "Remove from favorites"
-                } else {
-                    "Add to favorites"
-                }
-            )
+            if (isFavoriteLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(ReelsDimensions.castDetailsDepartmentIconSize),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            } else {
+                Icon(
+                    imageVector = if (isFavorite) {
+                        Icons.Filled.Favorite
+                    } else {
+                        Icons.Outlined.FavoriteBorder
+                    },
+                    contentDescription = if (isFavorite) {
+                        "Remove from library"
+                    } else {
+                        "Save to library"
+                    }
+                )
+            }
         }
 
         Column(
@@ -241,6 +258,26 @@ private fun CastHeroHeader(
                         text = knownForDepartment,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            if (isOfflineSavedPerson) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.DownloadDone,
+                        contentDescription = null,
+                        modifier = Modifier.size(ReelsDimensions.castDetailsDepartmentIconSize),
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+
+                    Text(
+                        text = "Available offline",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             }

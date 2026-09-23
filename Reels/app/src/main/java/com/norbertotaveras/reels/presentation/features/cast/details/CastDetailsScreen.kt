@@ -87,6 +87,9 @@ fun CastDetailsScreen(
                 knownFor = state.knownFor,
                 birthday = person.birthday,
                 placeOfBirth = person.placeOfBirth,
+                isFavorite = state.isSaved,
+                isFavoriteLoading = state.isSaving,
+                isOfflineSavedPerson = state.isOfflineSavedPerson,
                 onBackClick = {
                     onEvent(CastDetailsEvent.BackClicked)
                 },

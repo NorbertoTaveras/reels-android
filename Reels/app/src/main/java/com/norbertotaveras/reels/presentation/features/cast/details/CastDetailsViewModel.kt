@@ -10,6 +10,11 @@ package com.norbertotaveras.reels.presentation.features.cast.details
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.norbertotaveras.reels.domain.model.favorite.SavedPersonDataModel
+import com.norbertotaveras.reels.domain.model.person.PersonDetailsDataModel
+import com.norbertotaveras.reels.domain.usecase.favorites.GetSavedPersonDetailsUseCase
+import com.norbertotaveras.reels.domain.usecase.favorites.ObserveIsPersonSavedUseCase
+import com.norbertotaveras.reels.domain.usecase.favorites.ToggleSavedPersonUseCase
 import com.norbertotaveras.reels.domain.usecase.person.GetPersonDetailsUseCase
 import com.norbertotaveras.reels.domain.usecase.person.GetPersonMovieCreditsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
@@ -35,6 +40,9 @@ class CastDetailsViewModel @Inject constructor(
     private val getPersonDetailsUseCase: GetPersonDetailsUseCase,
     private val getPersonMovieCreditsUseCase: GetPersonMovieCreditsUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
+    private val observeIsPersonSavedUseCase: ObserveIsPersonSavedUseCase,
+    private val getSavedPersonDetailsUseCase: GetSavedPersonDetailsUseCase,
+    private val toggleSavedPersonUseCase: ToggleSavedPersonUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(CastDetailsUiState())
     val state: StateFlow<CastDetailsUiState> = _state.asStateFlow()
@@ -49,6 +57,7 @@ class CastDetailsViewModel @Inject constructor(
 
     init {
         observeSettings()
+        observeSavedStatus()
     }
 
     fun onEvent(event: CastDetailsEvent) {
@@ -65,6 +74,7 @@ class CastDetailsViewModel @Inject constructor(
             _state.update { currentState ->
                 currentState.copy(
                     isLoading = true,
+                    isOfflineSavedPerson = false,
                     errorMessage = null
                 )
             }
@@ -86,38 +96,68 @@ class CastDetailsViewModel @Inject constructor(
             val personResult = personResultDeferred.await()
             val creditsResult = creditsResultDeferred.await()
 
+            val savedPerson = if (personResult.isFailure) {
+                getSavedPersonDetailsUseCase(personId = personId)
+            } else {
+                null
+            }
+
             personResult.fold(
                 onSuccess = { person ->
                     _state.update { currentState ->
-                        currentState.copy(person = person)
+                        currentState.copy(
+                            person = person,
+                            isOfflineSavedPerson = false
+                        )
                     }
                 },
                 onFailure = { error ->
                     _state.update { currentState ->
-                        currentState.copy(
-                            errorMessage = error.toUserMessage(
-                                fallback = "Unable to load cast details."
+                        if (savedPerson != null) {
+                            currentState.copy(
+                                person = savedPerson.toPersonDetails(),
+                                knownFor = savedPerson.knownFor,
+                                isOfflineSavedPerson = true,
+                                errorMessage = null
                             )
-                        )
+                        } else {
+                            currentState.copy(
+                                errorMessage = error.toUserMessage(
+                                    fallback = "Unable to load cast details."
+                                )
+                            )
+                        }
                     }
                 }
             )
 
-            creditsResult.fold(
-                onSuccess = { credits ->
-                    _state.update { currentState ->
-                        currentState.copy(knownFor = credits.cast.take(10))
+            if (savedPerson == null) {
+                creditsResult.fold(
+                    onSuccess = { credits ->
+                        _state.update { currentState ->
+                            currentState.copy(knownFor = credits.cast.take(10))
+                        }
+                    },
+                    onFailure = {
+                        _state.update { currentState ->
+                            currentState.copy(knownFor = emptyList())
+                        }
                     }
-                },
-                onFailure = {
-                    _state.update { currentState ->
-                        currentState.copy(knownFor = emptyList())
-                    }
-                }
-            )
+                )
+            }
 
             _state.update { currentState ->
                 currentState.copy(isLoading = false)
+            }
+        }
+    }
+
+    private fun observeSavedStatus() {
+        viewModelScope.launch {
+            observeIsPersonSavedUseCase(personId = personId).collect { isSaved ->
+                _state.update { currentState ->
+                    currentState.copy(isSaved = isSaved)
+                }
             }
         }
     }
@@ -148,15 +188,58 @@ class CastDetailsViewModel @Inject constructor(
 
     private fun onFavoriteClicked() {
         viewModelScope.launch {
-            _effect.emit(
-                CastDetailsEffect.ShowMessage(
-                    message = "Person favorites are not available in this version."
-                )
-            )
+            val person = _state.value.person
+            if (person == null || _state.value.isSaving) return@launch
+
+            _state.update { currentState ->
+                currentState.copy(isSaving = true)
+            }
+
+            try {
+                toggleSavedPersonUseCase(
+                    isSaved = _state.value.isSaved,
+                    person = person,
+                    knownFor = _state.value.knownFor
+                ).onSuccess { isSaved ->
+                    _effect.emit(
+                        CastDetailsEffect.ShowMessage(
+                            message = if (isSaved) {
+                                "Saved to library."
+                            } else {
+                                "Removed from library."
+                            }
+                        )
+                    )
+                }.onFailure { error ->
+                    _effect.emit(
+                        CastDetailsEffect.ShowMessage(
+                            message = error.toUserMessage(
+                                fallback = "Unable to update library."
+                            )
+                        )
+                    )
+                }
+            } finally {
+                _state.update { currentState ->
+                    currentState.copy(isSaving = false)
+                }
+            }
         }
     }
 
     private companion object {
         const val DEFAULT_LANGUAGE = "en-US"
     }
+}
+
+private fun SavedPersonDataModel.toPersonDetails(): PersonDetailsDataModel {
+    return PersonDetailsDataModel(
+        id = id,
+        name = name,
+        biography = biography,
+        birthday = birthday,
+        placeOfBirth = placeOfBirth,
+        profilePath = profilePath,
+        knownForDepartment = knownForDepartment
+    )
 }
