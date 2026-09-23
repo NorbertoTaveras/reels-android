@@ -9,7 +9,6 @@ package com.norbertotaveras.reels.presentation.features.cast.details
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
@@ -19,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarHost
 
 @Composable
 fun CastDetailsRoute(
@@ -51,7 +51,7 @@ fun CastDetailsRoute(
             modifier = Modifier.fillMaxSize()
         )
 
-        SnackbarHost(
+        ReelsSnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
         )

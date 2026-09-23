@@ -9,7 +9,6 @@ package com.norbertotaveras.reels.presentation.features.movies.favorites
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
@@ -19,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Modifier
+import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarHost
 
 @Composable
 fun FavoritesRoute(
@@ -53,7 +53,7 @@ fun FavoritesRoute(
             modifier = Modifier.fillMaxSize()
         )
 
-        SnackbarHost(
+        ReelsSnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
         )

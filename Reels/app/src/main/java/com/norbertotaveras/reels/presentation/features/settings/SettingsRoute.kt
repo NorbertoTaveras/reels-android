@@ -9,9 +9,6 @@ package com.norbertotaveras.reels.presentation.features.settings
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,8 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.SingletonImageLoader
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsAccent
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsSurfaceHigh
+import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarHost
 
 @Composable
 fun SettingsRoute(
@@ -65,16 +61,9 @@ fun SettingsRoute(
             modifier = Modifier.fillMaxSize()
         )
 
-        SnackbarHost(
+        ReelsSnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
-        ) { snackbarData ->
-            Snackbar(
-                snackbarData = snackbarData,
-                containerColor = ReelsSurfaceHigh,
-                contentColor = MaterialTheme.colorScheme.onSurface,
-                actionColor = ReelsAccent
-            )
-        }
+        )
     }
 }
