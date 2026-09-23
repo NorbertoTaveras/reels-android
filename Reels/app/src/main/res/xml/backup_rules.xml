@@ -6,7 +6,7 @@
   modification, distribution, or use is prohibited.
 -->
 <full-backup-content>
-    <!-- Reels stores favorites and preferences locally; do not include them in cloud backups. -->
+    <!-- Reels stores the saved library and preferences locally; do not include them in cloud backups. -->
     <exclude domain="database" path="." />
     <exclude domain="file" path="." />
     <exclude domain="sharedpref" path="." />

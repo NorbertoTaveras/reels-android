@@ -8,11 +8,11 @@
 package com.norbertotaveras.reels.presentation.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Bookmarks
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Bookmarks
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
@@ -41,8 +41,8 @@ val reelsBottomNavItems = listOf(
     ReelsBottomNavItem(
         route = ReelsDestinations.FAVORITES,
         label = "Library",
-        selectedIcon = Icons.Filled.Favorite,
-        unselectedIcon = Icons.Outlined.FavoriteBorder
+        selectedIcon = Icons.Filled.Bookmarks,
+        unselectedIcon = Icons.Outlined.Bookmarks
     ),
     ReelsBottomNavItem(
         route = ReelsDestinations.SETTINGS,

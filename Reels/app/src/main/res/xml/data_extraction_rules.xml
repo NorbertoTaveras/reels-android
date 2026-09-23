@@ -7,7 +7,7 @@
 -->
 <data-extraction-rules>
     <cloud-backup>
-        <!-- Favorites and settings are local-only app data. -->
+        <!-- Saved library and settings are local-only app data. -->
         <exclude domain="database" path="." />
         <exclude domain="file" path="." />
         <exclude domain="sharedpref" path="." />
