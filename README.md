@@ -171,3 +171,15 @@ The app includes:
 - Light and dark Material 3 themes.
 
 See [release-checklist.md](Reels/docs/release-checklist.md) before creating a signed release artifact.
+
+## License
+
+Designed and developed by [Norberto Taveras](https://github.com/NorbertoTaveras).
+
+Copyright (c) 2026 Norberto Taveras. All rights reserved.
+
+This project is proprietary. The source code, documentation, design assets, and project structure may not be copied, modified, distributed, sublicensed, published, or incorporated into another project without prior written permission.
+
+This product uses the TMDB API but is not endorsed or certified by TMDB. Movie data, images, logos, trademarks, and other third-party materials remain subject to their respective owners' terms, licenses, and attribution requirements.
+
+See [LICENSE](LICENSE) for details.
