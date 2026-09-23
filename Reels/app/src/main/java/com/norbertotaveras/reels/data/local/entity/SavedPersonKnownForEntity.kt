@@ -1,0 +1,26 @@
+/*
+ * Copyright (c) 2026 Norberto Taveras. All rights reserved.
+ *
+ * This source code is proprietary and confidential. Unauthorized copying,
+ * modification, distribution, or use is prohibited.
+ */
+
+package com.norbertotaveras.reels.data.local.entity
+
+import androidx.room.Entity
+
+@Entity(
+    tableName = "saved_person_known_for",
+    primaryKeys = ["personId", "movieId"]
+)
+data class SavedPersonKnownForEntity(
+    val personId: Int,
+    val movieId: Int,
+    val title: String,
+    val posterPath: String?,
+    val releaseDate: String?,
+    val character: String?,
+    val voteAverage: Double,
+    val popularity: Double,
+    val position: Int
+)

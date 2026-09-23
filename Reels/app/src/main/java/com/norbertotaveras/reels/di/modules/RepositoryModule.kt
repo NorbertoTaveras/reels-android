@@ -9,8 +9,10 @@ package com.norbertotaveras.reels.di.modules
 
 import com.norbertotaveras.reels.data.repository.TmdbRepositoryImpl
 import com.norbertotaveras.reels.data.repository.favorites.FavoriteMoviesRepositoryImpl
+import com.norbertotaveras.reels.data.repository.favorites.SavedPeopleRepositoryImpl
 import com.norbertotaveras.reels.data.repository.settings.SettingsRepositoryImpl
 import com.norbertotaveras.reels.domain.repository.favorites.FavoriteMoviesRepository
+import com.norbertotaveras.reels.domain.repository.favorites.SavedPeopleRepository
 import com.norbertotaveras.reels.domain.repository.movie.MovieRepository
 import com.norbertotaveras.reels.domain.repository.person.PersonRepository
 import com.norbertotaveras.reels.domain.repository.settings.SettingsRepository
@@ -28,6 +30,12 @@ abstract class RepositoryModule {
     abstract fun provideFavoriteMoviesRepository(
         implementation: FavoriteMoviesRepositoryImpl
     ): FavoriteMoviesRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSavedPeopleRepository(
+        implementation: SavedPeopleRepositoryImpl
+    ): SavedPeopleRepository
 
     @Binds
     @Singleton

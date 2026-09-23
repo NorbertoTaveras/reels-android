@@ -10,6 +10,7 @@ package com.norbertotaveras.reels.di.modules
 import android.content.Context
 import androidx.room.Room
 import com.norbertotaveras.reels.data.local.dao.FavoriteMovieDao
+import com.norbertotaveras.reels.data.local.dao.SavedPersonDao
 import com.norbertotaveras.reels.data.local.db.ReelsDatabase
 import com.norbertotaveras.reels.data.local.db.ReelsDatabaseMigrations
 import dagger.Module
@@ -41,5 +42,12 @@ object DatabaseModule {
         database: ReelsDatabase
     ): FavoriteMovieDao {
         return database.favoriteMovieDao()
+    }
+
+    @Provides
+    fun provideSavedPersonDao(
+        database: ReelsDatabase
+    ): SavedPersonDao {
+        return database.savedPersonDao()
     }
 }
