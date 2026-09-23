@@ -28,7 +28,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsSurfaceHigh
 
 @Composable
 fun SettingsRoute(
-    onNavigateToFavorites: () -> Unit,
+    onNavigateToLibrary: () -> Unit,
     onOpenExternalUrl: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = hiltViewModel(),
@@ -40,8 +40,8 @@ fun SettingsRoute(
     LaunchedEffect(viewModel, context, snackbarHostState) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                SettingsEffect.NavigateToFavorites -> {
-                    onNavigateToFavorites()
+                SettingsEffect.NavigateToLibrary -> {
+                    onNavigateToLibrary()
                 }
 
                 SettingsEffect.ClearImageCache -> {

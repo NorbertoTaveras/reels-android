@@ -142,7 +142,7 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
 
             composable(ReelsDestinations.SETTINGS) {
                 SettingsRoute(
-                    onNavigateToFavorites = {
+                    onNavigateToLibrary = {
                         navController.navigateToBottomNavRoute(ReelsDestinations.FAVORITES)
                     },
                     onOpenExternalUrl = openExternalUrl

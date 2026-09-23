@@ -13,6 +13,8 @@ import com.norbertotaveras.reels.BuildConfig
 import com.norbertotaveras.reels.domain.model.settings.AppTheme
 import com.norbertotaveras.reels.domain.model.settings.ImageQuality
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
+import com.norbertotaveras.reels.domain.usecase.favorites.ObserveFavoriteMoviesUseCase
+import com.norbertotaveras.reels.domain.usecase.favorites.ObserveSavedPeopleUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateImageQualityUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateLanguageRegionUseCase
@@ -25,12 +27,15 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val observeSettingsUseCase: ObserveSettingsUseCase,
+    private val observeFavoriteMoviesUseCase: ObserveFavoriteMoviesUseCase,
+    private val observeSavedPeopleUseCase: ObserveSavedPeopleUseCase,
     private val updateImageQualityUseCase: UpdateImageQualityUseCase,
     private val updateLanguageRegionUseCase: UpdateLanguageRegionUseCase,
     private val updateThemeUseCase: UpdateThemeUseCase,
@@ -48,6 +53,7 @@ class SettingsViewModel @Inject constructor(
 
     init {
         observeSettings()
+        observeSavedLibrary()
     }
 
     fun onEvent(event: SettingsEvent) {
@@ -59,7 +65,7 @@ class SettingsViewModel @Inject constructor(
             SettingsEvent.ThemeClicked -> onThemeClicked()
             is SettingsEvent.ThemeSelected -> onThemeSelected(event.theme)
             SettingsEvent.PreferenceDialogDismissed -> onPreferenceDialogDismissed()
-            SettingsEvent.SavedMoviesClicked -> onSavedMoviesClicked()
+            SettingsEvent.SavedLibraryClicked -> onSavedLibraryClicked()
             SettingsEvent.ClearImageCacheClicked -> onClearImageCacheClicked()
             SettingsEvent.ClearImageCacheConfirmed -> onClearImageCacheConfirmed()
             SettingsEvent.ClearImageCacheDismissed -> onClearImageCacheDismissed()
@@ -81,6 +87,24 @@ class SettingsViewModel @Inject constructor(
                         selectedLanguageRegion = settings.languageRegion,
                         selectedTheme = settings.theme
                     )
+                }
+            }
+        }
+    }
+
+    private fun observeSavedLibrary() {
+        viewModelScope.launch {
+            combine(
+                observeFavoriteMoviesUseCase(),
+                observeSavedPeopleUseCase()
+            ) { movies, people ->
+                buildSavedLibraryLabel(
+                    movieCount = movies.size,
+                    personCount = people.size
+                )
+            }.collect { savedLibraryLabel ->
+                _state.update { currentState ->
+                    currentState.copy(savedLibraryLabel = savedLibraryLabel)
                 }
             }
         }
@@ -135,9 +159,9 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun onSavedMoviesClicked() {
+    private fun onSavedLibraryClicked() {
         viewModelScope.launch {
-            _effect.emit(SettingsEffect.NavigateToFavorites)
+            _effect.emit(SettingsEffect.NavigateToLibrary)
         }
     }
 
@@ -195,6 +219,19 @@ class SettingsViewModel @Inject constructor(
             }
 
             return "$flavorLabel $buildTypeLabel · $tokenStatusLabel"
+        }
+
+        fun buildSavedLibraryLabel(
+            movieCount: Int,
+            personCount: Int
+        ): String {
+            if (movieCount == 0 && personCount == 0) {
+                return "Manage movies and people saved on this device"
+            }
+
+            val movieLabel = "$movieCount ${if (movieCount == 1) "movie" else "movies"}"
+            val personLabel = "$personCount ${if (personCount == 1) "person" else "people"}"
+            return "$movieLabel · $personLabel saved on this device"
         }
 
         fun String.toDisplayLabel(): String {

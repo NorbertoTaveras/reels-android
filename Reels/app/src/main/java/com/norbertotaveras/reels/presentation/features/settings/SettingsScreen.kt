@@ -117,9 +117,9 @@ fun SettingsScreen(
         SettingsSection(title = "DATA & STORAGE") {
             SettingsRow(
                 icon = Icons.Filled.Download,
-                title = "Saved Movies",
-                subtitle = state.savedMoviesLabel,
-                onClick = { onEvent(SettingsEvent.SavedMoviesClicked) }
+                title = "Saved Library",
+                subtitle = state.savedLibraryLabel,
+                onClick = { onEvent(SettingsEvent.SavedLibraryClicked) }
             )
 
             SettingsDivider()
@@ -233,7 +233,7 @@ private fun ClearImageCacheDialog(
         },
         text = {
             Text(
-                text = "Reels will remove locally cached poster and backdrop images. Movie data and favorites will stay saved.",
+                text = "Reels will remove locally cached poster and backdrop images. Movie data and your saved library will stay saved.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -274,7 +274,7 @@ private fun PrivacyNoticeDialog(
                 verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
             ) {
                 PrivacyNoticeText(
-                    text = "Favorites and preferences stay on this device."
+                    text = "Saved movies, saved people, and preferences stay on this device."
                 )
 
                 PrivacyNoticeText(
@@ -282,7 +282,7 @@ private fun PrivacyNoticeDialog(
                 )
 
                 PrivacyNoticeText(
-                    text = "Reels does not use TMDB account login, collect personal account data, or sync your favorites to TMDB."
+                    text = "Reels does not use TMDB account login, collect personal account data, or sync your saved library to TMDB."
                 )
             }
         },
