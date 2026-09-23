@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (c) 2026 Norberto Taveras. All rights reserved.
+
+  This source code is proprietary and confidential. Unauthorized copying,
+  modification, distribution, or use is prohibited.
+-->
 <data-extraction-rules>
     <cloud-backup>
         <!-- Favorites and settings are local-only app data. -->
