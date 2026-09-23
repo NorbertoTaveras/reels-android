@@ -179,10 +179,6 @@ private fun LibraryHeader(
                 LibraryTabChip(
                     tab = tab,
                     selected = state.selectedTab == tab,
-                    count = when (tab) {
-                        LibraryTab.Movies -> state.movies.size
-                        LibraryTab.People -> state.people.size
-                    },
                     onClick = { onTabSelected(tab) },
                     modifier = Modifier.weight(1f)
                 )
@@ -195,7 +191,6 @@ private fun LibraryHeader(
 private fun LibraryTabChip(
     tab: LibraryTab,
     selected: Boolean,
-    count: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -229,7 +224,7 @@ private fun LibraryTabChip(
                 horizontal = ReelsSpacing.medium,
                 vertical = ReelsSpacing.small
             ),
-            text = "${tab.title} $count",
+            text = tab.title,
             style = MaterialTheme.typography.labelLarge,
             textAlign = TextAlign.Center,
             maxLines = 1
