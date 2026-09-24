@@ -9,12 +9,40 @@ package com.norbertotaveras.reels.presentation.ui.extensions
 
 import androidx.compose.runtime.Composable
 import com.norbertotaveras.reels.BuildConfig
+import com.norbertotaveras.reels.domain.model.settings.ImageQuality
 import com.norbertotaveras.reels.presentation.ui.theme.LocalImageQuality
 
+enum class TmdbImageType {
+    Poster,
+    Backdrop,
+    Profile
+}
+
 @Composable
-fun String?.toTmdbImageUrl(): String? {
+fun String?.toTmdbImageUrl(
+    imageType: TmdbImageType = TmdbImageType.Poster
+): String? {
     val imageQuality = LocalImageQuality.current
     return this
         ?.takeIf { path -> path.isNotBlank() }
-        ?.let { path -> "${BuildConfig.BASE_IMAGE_URL}${imageQuality.tmdbSizePath}$path" }
+        ?.let { path -> "${BuildConfig.BASE_IMAGE_URL}${imageType.sizePath(imageQuality)}$path" }
+}
+
+private fun TmdbImageType.sizePath(imageQuality: ImageQuality): String {
+    return when (this) {
+        TmdbImageType.Poster -> when (imageQuality) {
+            ImageQuality.High -> "w342"
+            ImageQuality.Standard -> "w185"
+        }
+
+        TmdbImageType.Backdrop -> when (imageQuality) {
+            ImageQuality.High -> "w780"
+            ImageQuality.Standard -> "w300"
+        }
+
+        TmdbImageType.Profile -> when (imageQuality) {
+            ImageQuality.High -> "w185"
+            ImageQuality.Standard -> "w92"
+        }
+    }
 }

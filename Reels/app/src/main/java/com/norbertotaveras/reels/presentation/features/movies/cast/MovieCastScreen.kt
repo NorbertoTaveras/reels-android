@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.cast.CastMemberDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
+import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
 import com.norbertotaveras.reels.presentation.ui.extensions.toErrorTitle
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
@@ -329,7 +330,9 @@ private fun MovieCastRow(
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
-                val profileUrl = castMember.profilePath.toTmdbImageUrl()
+                val profileUrl = castMember.profilePath.toTmdbImageUrl(
+                    imageType = TmdbImageType.Profile
+                )
 
                 if (profileUrl.isNullOrBlank()) {
                     Icon(

@@ -62,8 +62,10 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContainer
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.extensions.toErrorTitle
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
+import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 @Composable
 fun MoviesListScreen(
@@ -199,14 +201,15 @@ private fun FeaturedMovieCarousel(
     onMovieClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var activeMovieIndex by remember(movies) { mutableIntStateOf(0) }
+    val movieIds = remember(movies) { movies.map { movie -> movie.id } }
+    var activeMovieIndex by remember(movieIds) { mutableIntStateOf(0) }
 
-    LaunchedEffect(movies.size) {
-        if (movies.size <= 1) return@LaunchedEffect
+    LaunchedEffect(movieIds) {
+        if (movieIds.size <= 1) return@LaunchedEffect
 
-        while (true) {
+        while (isActive) {
             delay(HERO_AUTO_SCROLL_DELAY_MS)
-            activeMovieIndex = (activeMovieIndex + 1) % movies.size
+            activeMovieIndex = (activeMovieIndex + 1) % movieIds.size
         }
     }
 
@@ -248,7 +251,9 @@ private fun FeaturedMovieHero(
             .clickable(onClick = onClick)
     ) {
         AsyncImage(
-            model = (movie.backdropPath ?: movie.posterPath).toTmdbImageUrl(),
+            model = (movie.backdropPath ?: movie.posterPath).toTmdbImageUrl(
+                imageType = TmdbImageType.Backdrop
+            ),
             contentDescription = movie.title,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop

@@ -91,13 +91,6 @@ class MovieDetailsViewModel @Inject constructor(
 
             movieResult.fold(
                 onSuccess = { movie ->
-                    _state.update { currentState ->
-                        currentState.copy(
-                            movie = movie,
-                            isOfflineFavorite = false
-                        )
-                    }
-
                     val creditsDeferred = async {
                         getMovieCreditsUseCase(
                             movieId = movieId,
@@ -117,51 +110,31 @@ class MovieDetailsViewModel @Inject constructor(
                         )
                     }
 
-                    creditsDeferred.await().fold(
-                        onSuccess = { credits ->
-                            _state.update { currentState ->
-                                currentState.copy(cast = credits.cast.take(10))
-                            }
-                        },
-                        onFailure = {
-                            _state.update { currentState ->
-                                currentState.copy(cast = emptyList())
-                            }
-                        }
-                    )
-
-                    videosDeferred.await().fold(
-                        onSuccess = { videos ->
-                            _state.update { currentState ->
-                                currentState.copy(
-                                    trailers = videos.videos
-                                        .filter { video -> video.isPlayableTrailer }
-                                        .take(10)
-                                )
-                            }
-                        },
-                        onFailure = {
-                            _state.update { currentState ->
-                                currentState.copy(trailers = emptyList())
-                            }
-                        }
-                    )
-
-                    similarDeferred.await().fold(
-                        onSuccess = { movies ->
-                            _state.update { currentState ->
-                                currentState.copy(similarMovies = movies.take(10))
-                            }
-                        },
-                        onFailure = {
-                            _state.update { currentState ->
-                                currentState.copy(similarMovies = emptyList())
-                            }
-                        }
-                    )
+                    val cast = creditsDeferred.await()
+                        .getOrNull()
+                        ?.cast
+                        ?.take(10)
+                        .orEmpty()
+                    val trailers = videosDeferred.await()
+                        .getOrNull()
+                        ?.videos
+                        ?.filter { video -> video.isPlayableTrailer }
+                        ?.take(10)
+                        .orEmpty()
+                    val similarMovies = similarDeferred.await()
+                        .getOrNull()
+                        ?.take(10)
+                        .orEmpty()
 
                     _state.update { currentState ->
-                        currentState.copy(isLoading = false)
+                        currentState.copy(
+                            movie = movie,
+                            cast = cast,
+                            trailers = trailers,
+                            similarMovies = similarMovies,
+                            isOfflineFavorite = false,
+                            isLoading = false
+                        )
                     }
                 },
                 onFailure = { error ->

@@ -47,6 +47,7 @@ import com.norbertotaveras.reels.presentation.ui.components.movie.PosterCarousel
 import com.norbertotaveras.reels.presentation.ui.components.movie.SimilarMoviesSection
 import com.norbertotaveras.reels.presentation.ui.components.trailer.TrailerCarousel
 import com.norbertotaveras.reels.presentation.ui.components.trailer.TrailerCarouselItem
+import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
@@ -92,7 +93,9 @@ fun MovieDetailsContent(
         item {
             MovieHeroHeader(
                 title = movie.title,
-                backdropUrl = (movie.backdropPath ?: movie.posterPath).toTmdbImageUrl(),
+                backdropUrl = (movie.backdropPath ?: movie.posterPath).toTmdbImageUrl(
+                    imageType = TmdbImageType.Backdrop
+                ),
                 posterUrl = movie.posterPath.toTmdbImageUrl(),
                 metadata = listOfNotNull(
                     movie.releaseDate?.take(4),

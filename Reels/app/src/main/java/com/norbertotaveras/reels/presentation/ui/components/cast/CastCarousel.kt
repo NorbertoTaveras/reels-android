@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.norbertotaveras.reels.domain.model.cast.CastMemberDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.SectionHeader
+import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
@@ -57,7 +58,9 @@ fun CastCarousel(
                 CastCard(
                     name = castMember.name,
                     characterName = castMember.characterName,
-                    profileUrl = castMember.profilePath.toTmdbImageUrl(),
+                    profileUrl = castMember.profilePath.toTmdbImageUrl(
+                        imageType = TmdbImageType.Profile
+                    ),
                     onClick = { onCastClick(castMember.id) }
                 )
             }

@@ -55,6 +55,7 @@ import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.favorite.FavoriteMovieDataModel
 import com.norbertotaveras.reels.domain.model.favorite.SavedPersonDataModel
 import com.norbertotaveras.reels.extensions.toReleaseYear
+import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
@@ -309,7 +310,9 @@ private fun SavedPersonCard(
         verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesTextSpacing)
     ) {
         LibraryPosterCard(
-            imageUrl = person.profilePath.toTmdbImageUrl(),
+            imageUrl = person.profilePath.toTmdbImageUrl(
+                imageType = TmdbImageType.Profile
+            ),
             contentDescription = person.name,
             onClick = onClick,
             placeholder = {

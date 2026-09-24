@@ -102,52 +102,40 @@ class CastDetailsViewModel @Inject constructor(
                 null
             }
 
-            personResult.fold(
-                onSuccess = { person ->
-                    _state.update { currentState ->
+            _state.update { currentState ->
+                personResult.fold(
+                    onSuccess = { person ->
                         currentState.copy(
                             person = person,
-                            isOfflineSavedPerson = false
+                            knownFor = creditsResult
+                                .getOrNull()
+                                ?.cast
+                                ?.take(10)
+                                .orEmpty(),
+                            isOfflineSavedPerson = false,
+                            errorMessage = null,
+                            isLoading = false
                         )
-                    }
-                },
-                onFailure = { error ->
-                    _state.update { currentState ->
+                    },
+                    onFailure = { error ->
                         if (savedPerson != null) {
                             currentState.copy(
                                 person = savedPerson.toPersonDetails(),
                                 knownFor = savedPerson.knownFor,
                                 isOfflineSavedPerson = true,
-                                errorMessage = null
+                                errorMessage = null,
+                                isLoading = false
                             )
                         } else {
                             currentState.copy(
                                 errorMessage = error.toUserMessage(
                                     fallback = "Unable to load cast details."
-                                )
+                                ),
+                                isLoading = false
                             )
                         }
                     }
-                }
-            )
-
-            if (savedPerson == null) {
-                creditsResult.fold(
-                    onSuccess = { credits ->
-                        _state.update { currentState ->
-                            currentState.copy(knownFor = credits.cast.take(10))
-                        }
-                    },
-                    onFailure = {
-                        _state.update { currentState ->
-                            currentState.copy(knownFor = emptyList())
-                        }
-                    }
                 )
-            }
-
-            _state.update { currentState ->
-                currentState.copy(isLoading = false)
             }
         }
     }
