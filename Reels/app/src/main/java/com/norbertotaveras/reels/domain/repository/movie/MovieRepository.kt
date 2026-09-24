@@ -9,6 +9,7 @@ package com.norbertotaveras.reels.domain.repository.movie
 
 import androidx.paging.PagingData
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
+import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
 import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieCreditsDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
@@ -26,6 +27,11 @@ interface MovieRepository {
         query: String,
         language: String = "en-US",
         includeAdult: Boolean = false,
+    ): Flow<PagingData<MovieDataModel>>
+
+    fun discoverMovies(
+        filters: DiscoverFilterDataModel,
+        language: String = "en-US",
     ): Flow<PagingData<MovieDataModel>>
 
     suspend fun getMovieDetails(

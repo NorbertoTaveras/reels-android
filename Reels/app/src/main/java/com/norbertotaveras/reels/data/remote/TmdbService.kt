@@ -71,6 +71,18 @@ interface TmdbService {
         @Query("include_adult") includeAdult: Boolean = false
     ): MoviesResponseDto
 
+    @GET("discover/movie")
+    suspend fun discoverMovies(
+        @Query("language") language: String?,
+        @Query("page") page: Int?,
+        @Query("sort_by") sortBy: String,
+        @Query("with_genres") genreId: Int?,
+        @Query("primary_release_year") year: Int?,
+        @Query("vote_average.gte") minimumRating: Int?,
+        @Query("include_adult") includeAdult: Boolean = false,
+        @Query("include_video") includeVideo: Boolean = false
+    ): MoviesResponseDto
+
     @GET("genre/movie/list")
     suspend fun getMovieGenres(
         @Query("language") language: String?

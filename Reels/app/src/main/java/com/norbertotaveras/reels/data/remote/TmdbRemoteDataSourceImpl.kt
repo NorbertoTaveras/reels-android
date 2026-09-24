@@ -107,6 +107,26 @@ class TmdbRemoteDataSourceImpl @Inject constructor(
         )
     }
 
+    override suspend fun discoverMovies(
+        language: String?,
+        page: Int?,
+        sortBy: String,
+        genreId: Int?,
+        year: Int?,
+        minimumRating: Int?,
+        includeAdult: Boolean
+    ): MoviesResponseDto {
+        return service.discoverMovies(
+            language = language,
+            page = page,
+            sortBy = sortBy,
+            genreId = genreId,
+            year = year,
+            minimumRating = minimumRating,
+            includeAdult = includeAdult
+        )
+    }
+
     override suspend fun getMovieGenres(
         language: String?
     ): GenresResponseDto {

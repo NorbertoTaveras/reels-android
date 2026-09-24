@@ -9,6 +9,7 @@ package com.norbertotaveras.reels.presentation.navigation
 
 object ReelsDestinations {
     const val HOME = "home"
+    const val DISCOVER = "discover"
     const val SEARCH = "search"
     const val FAVORITES = "favorites"
     const val SETTINGS = "settings"

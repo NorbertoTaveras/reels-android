@@ -9,10 +9,12 @@ package com.norbertotaveras.reels.presentation.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmarks
+import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Bookmarks
+import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
@@ -31,6 +33,12 @@ val reelsBottomNavItems = listOf(
         label = "Home",
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home
+    ),
+    ReelsBottomNavItem(
+        route = ReelsDestinations.DISCOVER,
+        label = "Discover",
+        selectedIcon = Icons.Filled.Explore,
+        unselectedIcon = Icons.Outlined.Explore
     ),
     ReelsBottomNavItem(
         route = ReelsDestinations.SEARCH,

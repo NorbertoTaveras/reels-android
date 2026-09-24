@@ -60,6 +60,16 @@ interface TmdbRemoteDataSource {
         includeAdult: Boolean = false
     ): MoviesResponseDto
 
+    suspend fun discoverMovies(
+        language: String? = null,
+        page: Int? = null,
+        sortBy: String,
+        genreId: Int? = null,
+        year: Int? = null,
+        minimumRating: Int? = null,
+        includeAdult: Boolean = false
+    ): MoviesResponseDto
+
     suspend fun getMovieGenres(
         language: String? = null
     ): GenresResponseDto

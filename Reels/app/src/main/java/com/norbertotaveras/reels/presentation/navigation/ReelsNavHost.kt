@@ -33,6 +33,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.norbertotaveras.reels.presentation.features.cast.details.CastDetailsRoute
+import com.norbertotaveras.reels.presentation.features.movies.discover.DiscoverRoute
 import com.norbertotaveras.reels.presentation.features.movies.cast.MovieCastRoute
 import com.norbertotaveras.reels.presentation.features.movies.category.MovieCategoryRoute
 import com.norbertotaveras.reels.presentation.features.movies.details.MovieDetailsRoute
@@ -101,6 +102,14 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
                     },
                     onSeeAllClick = { category ->
                         navController.navigateToMovieCategory(category)
+                    }
+                )
+            }
+
+            composable(ReelsDestinations.DISCOVER) {
+                DiscoverRoute(
+                    onMovieClick = { movieId ->
+                        navController.navigateToMovieDetails(movieId)
                     }
                 )
             }

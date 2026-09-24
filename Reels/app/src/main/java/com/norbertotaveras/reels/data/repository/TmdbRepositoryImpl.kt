@@ -13,10 +13,12 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
+import com.norbertotaveras.reels.data.remote.paging.DiscoverMoviesPagingSource
 import com.norbertotaveras.reels.data.remote.paging.MoviesPagingSource
 import com.norbertotaveras.reels.data.remote.paging.SearchMoviesPagingSource
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
+import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
 import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieCreditsDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
@@ -69,6 +71,24 @@ class TmdbRepositoryImpl @Inject constructor(
                     query = query,
                     language = language,
                     includeAdult = includeAdult
+                )
+            }
+        ).flow.map { pagingData ->
+            pagingData.map { movieDto -> movieDto.toMovieDataModel() }
+        }
+    }
+
+    override fun discoverMovies(
+        filters: DiscoverFilterDataModel,
+        language: String,
+    ): Flow<PagingData<MovieDataModel>> {
+        return Pager(
+            config = defaultPagingConfig(),
+            pagingSourceFactory = {
+                DiscoverMoviesPagingSource(
+                    remoteDataSource = remoteDataSource,
+                    filters = filters,
+                    language = language
                 )
             }
         ).flow.map { pagingData ->
