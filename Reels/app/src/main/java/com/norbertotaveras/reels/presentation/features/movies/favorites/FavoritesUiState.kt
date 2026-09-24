@@ -38,16 +38,4 @@ val FavoritesUiState.hasSelectedTabItems: Boolean
     get() = selectedItemCount > 0
 
 val FavoritesUiState.offlineLabel: String
-    get() = buildList {
-        if (movies.isNotEmpty()) add(movies.size.toLibraryCountLabel(singular = "movie", plural = "movies"))
-        if (people.isNotEmpty()) add(people.size.toLibraryCountLabel(singular = "person", plural = "people"))
-    }.joinToString(" · ").ifBlank {
-        "Available offline"
-    }
-
-private fun Int.toLibraryCountLabel(
-    singular: String,
-    plural: String,
-): String {
-    return "$this ${if (this == 1) singular else plural}"
-}
+    get() = "Available offline"

@@ -93,7 +93,10 @@ fun FavoritesScreen(
 
         if (!state.hasSelectedTabItems) {
             item(span = { GridItemSpan(maxLineSpan) }) {
-                EmptyLibraryState(selectedTab = state.selectedTab)
+                EmptyLibraryState(
+                    selectedTab = state.selectedTab,
+                    modifier = Modifier.padding(top = ReelsDimensions.favoritesEmptyTopPadding)
+                )
             }
         } else {
             when (state.selectedTab) {
@@ -325,6 +328,9 @@ private fun SavedPersonCard(
             },
             topStartBadge = {
                 OfflineBadge()
+            },
+            topEndBadge = {
+                SavedBadge()
             }
         )
 
@@ -477,6 +483,26 @@ private fun RatingBadge(
                     lineHeight = 16.sp
                 ),
                 fontWeight = FontWeight.SemiBold
+            )
+        }
+    }
+}
+
+@Composable
+private fun SavedBadge(
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.size(ReelsDimensions.favoritesOfflineBadgeSize),
+        shape = CircleShape,
+        color = ReelsSurfaceHigh.copy(alpha = 0.82f),
+        contentColor = MaterialTheme.colorScheme.primary
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Icon(
+                imageVector = Icons.Filled.Favorite,
+                contentDescription = "Saved",
+                modifier = Modifier.size(ReelsDimensions.favoritesOfflineBadgeIconSize)
             )
         }
     }

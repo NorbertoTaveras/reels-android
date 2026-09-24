@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -55,17 +56,17 @@ class FavoritesViewModel @Inject constructor(
 
     private fun observeFavorites() {
         viewModelScope.launch {
-            observeFavoriteMoviesUseCase().collectLatest { movies ->
+            combine(
+                observeFavoriteMoviesUseCase(),
+                observeSavedPeopleUseCase()
+            ) { movies, people ->
+                movies to people
+            }.collectLatest { (movies, people) ->
                 _state.update { currentState ->
-                    currentState.copy(movies = movies)
-                }
-            }
-        }
-
-        viewModelScope.launch {
-            observeSavedPeopleUseCase().collectLatest { people ->
-                _state.update { currentState ->
-                    currentState.copy(people = people)
+                    currentState.copy(
+                        movies = movies,
+                        people = people
+                    )
                 }
             }
         }
