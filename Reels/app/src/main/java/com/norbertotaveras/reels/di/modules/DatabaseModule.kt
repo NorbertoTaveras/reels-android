@@ -9,6 +9,7 @@ package com.norbertotaveras.reels.di.modules
 
 import android.content.Context
 import androidx.room.Room
+import com.norbertotaveras.reels.data.local.dao.CachedMovieDao
 import com.norbertotaveras.reels.data.local.dao.FavoriteMovieDao
 import com.norbertotaveras.reels.data.local.dao.SavedPersonDao
 import com.norbertotaveras.reels.data.local.db.ReelsDatabase
@@ -47,5 +48,12 @@ object DatabaseModule {
         database: ReelsDatabase
     ): SavedPersonDao {
         return database.savedPersonDao()
+    }
+
+    @Provides
+    fun provideCachedMovieDao(
+        database: ReelsDatabase
+    ): CachedMovieDao {
+        return database.cachedMovieDao()
     }
 }

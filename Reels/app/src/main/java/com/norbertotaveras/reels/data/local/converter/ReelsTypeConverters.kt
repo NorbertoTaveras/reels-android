@@ -14,6 +14,7 @@ import com.google.gson.reflect.TypeToken
 class ReelsTypeConverters {
     private val gson = Gson()
     private val stringListType = object : TypeToken<List<String>>() {}.type
+    private val intListType = object : TypeToken<List<Int>>() {}.type
 
     @TypeConverter
     fun fromStringList(value: List<String>): String {
@@ -26,5 +27,17 @@ class ReelsTypeConverters {
         if (!value.trimStart().startsWith("[")) return value.split("|")
 
         return gson.fromJson(value, stringListType)
+    }
+
+    @TypeConverter
+    fun fromIntList(value: List<Int>): String {
+        return gson.toJson(value, intListType)
+    }
+
+    @TypeConverter
+    fun toIntList(value: String): List<Int> {
+        if (value.isBlank()) return emptyList()
+
+        return gson.fromJson(value, intListType)
     }
 }

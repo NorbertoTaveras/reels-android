@@ -10,12 +10,17 @@ package com.norbertotaveras.reels.data.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.map
+import com.norbertotaveras.reels.data.local.dao.CachedMovieDao
+import com.norbertotaveras.reels.data.local.db.ReelsDatabase
+import com.norbertotaveras.reels.data.local.mapper.toMovieDataModel
 import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
+import com.norbertotaveras.reels.data.remote.paging.CachedMoviesRemoteMediator
 import com.norbertotaveras.reels.data.remote.paging.DiscoverMoviesPagingSource
-import com.norbertotaveras.reels.data.remote.paging.MoviesPagingSource
 import com.norbertotaveras.reels.data.remote.paging.SearchMoviesPagingSource
+import com.norbertotaveras.reels.data.remote.paging.cacheKey
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
@@ -36,8 +41,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 @Singleton
+@OptIn(ExperimentalPagingApi::class)
 class TmdbRepositoryImpl @Inject constructor(
     private val remoteDataSource: TmdbRemoteDataSource,
+    private val database: ReelsDatabase,
+    private val cachedMovieDao: CachedMovieDao,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : MovieRepository, PersonRepository {
     override fun getMovies(
@@ -46,15 +54,18 @@ class TmdbRepositoryImpl @Inject constructor(
     ): Flow<PagingData<MovieDataModel>> {
         return Pager(
             config = defaultPagingConfig(),
+            remoteMediator = CachedMoviesRemoteMediator(
+                database = database,
+                cachedMovieDao = cachedMovieDao,
+                remoteDataSource = remoteDataSource,
+                category = category,
+                language = language
+            ),
             pagingSourceFactory = {
-                MoviesPagingSource(
-                    remoteDataSource = remoteDataSource,
-                    category = category,
-                    language = language
-                )
+                cachedMovieDao.pagingSource(listKey = category.cacheKey(language = language))
             }
         ).flow.map { pagingData ->
-            pagingData.map { movieDto -> movieDto.toMovieDataModel() }
+            pagingData.map { cachedMovie -> cachedMovie.toMovieDataModel() }
         }
     }
 
