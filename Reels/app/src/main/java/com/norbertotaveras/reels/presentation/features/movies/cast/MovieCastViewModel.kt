@@ -10,7 +10,11 @@ package com.norbertotaveras.reels.presentation.features.movies.cast
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.norbertotaveras.reels.domain.usecase.favorites.ObserveSavedPeopleUseCase
+import com.norbertotaveras.reels.domain.usecase.favorites.ToggleSavedPersonUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.GetMovieCreditsUseCase
+import com.norbertotaveras.reels.domain.usecase.person.GetPersonDetailsUseCase
+import com.norbertotaveras.reels.domain.usecase.person.GetPersonMovieCreditsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.presentation.navigation.ReelsDestinations
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
@@ -32,6 +36,10 @@ import javax.inject.Inject
 class MovieCastViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getMovieCreditsUseCase: GetMovieCreditsUseCase,
+    private val getPersonDetailsUseCase: GetPersonDetailsUseCase,
+    private val getPersonMovieCreditsUseCase: GetPersonMovieCreditsUseCase,
+    private val observeSavedPeopleUseCase: ObserveSavedPeopleUseCase,
+    private val toggleSavedPersonUseCase: ToggleSavedPersonUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
 ) : ViewModel() {
     private val movieId: Int = checkNotNull(
@@ -49,6 +57,7 @@ class MovieCastViewModel @Inject constructor(
 
     init {
         observeSettings()
+        observeSavedPeople()
     }
 
     fun onEvent(event: MovieCastEvent) {
@@ -56,6 +65,19 @@ class MovieCastViewModel @Inject constructor(
             MovieCastEvent.BackClicked -> onBackClicked()
             MovieCastEvent.RetryClicked -> loadCast(language = currentLanguage)
             is MovieCastEvent.CastClicked -> onCastClicked(personId = event.personId)
+            is MovieCastEvent.SaveClicked -> onSaveClicked(personId = event.personId)
+        }
+    }
+
+    private fun observeSavedPeople() {
+        viewModelScope.launch {
+            observeSavedPeopleUseCase().collect { savedPeople ->
+                _state.update { currentState ->
+                    currentState.copy(
+                        savedPersonIds = savedPeople.map { person -> person.id }.toSet()
+                    )
+                }
+            }
         }
     }
 
@@ -117,6 +139,70 @@ class MovieCastViewModel @Inject constructor(
     private fun onCastClicked(personId: Int) {
         viewModelScope.launch {
             _effect.emit(MovieCastEffect.NavigateToCastDetails(personId = personId))
+        }
+    }
+
+    private fun onSaveClicked(personId: Int) {
+        viewModelScope.launch {
+            val currentState = _state.value
+            if (personId in currentState.savingPersonIds) return@launch
+
+            val isSaved = personId in currentState.savedPersonIds
+            _state.update { state ->
+                state.copy(savingPersonIds = state.savingPersonIds + personId)
+            }
+
+            try {
+                val personResult = getPersonDetailsUseCase(
+                    personId = personId,
+                    language = currentLanguage
+                )
+                val creditsResult = getPersonMovieCreditsUseCase(
+                    personId = personId,
+                    language = currentLanguage
+                )
+
+                personResult.fold(
+                    onSuccess = { person ->
+                        toggleSavedPersonUseCase(
+                            isSaved = isSaved,
+                            person = person,
+                            knownFor = creditsResult.getOrNull()?.cast.orEmpty()
+                        ).onSuccess { saved ->
+                            _effect.emit(
+                                MovieCastEffect.ShowMessage(
+                                    message = if (saved) {
+                                        "Saved to library."
+                                    } else {
+                                        "Removed from library."
+                                    }
+                                )
+                            )
+                        }.onFailure { error ->
+                            _effect.emit(
+                                MovieCastEffect.ShowMessage(
+                                    message = error.toUserMessage(
+                                        fallback = "Unable to update library."
+                                    )
+                                )
+                            )
+                        }
+                    },
+                    onFailure = { error ->
+                        _effect.emit(
+                            MovieCastEffect.ShowMessage(
+                                message = error.toUserMessage(
+                                    fallback = "Unable to load person details."
+                                )
+                            )
+                        )
+                    }
+                )
+            } finally {
+                _state.update { state ->
+                    state.copy(savingPersonIds = state.savingPersonIds - personId)
+                }
+            }
         }
     }
 

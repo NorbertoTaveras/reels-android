@@ -12,5 +12,7 @@ import com.norbertotaveras.reels.domain.model.cast.CastMemberDataModel
 data class MovieCastUiState(
     val isLoading: Boolean = true,
     val cast: List<CastMemberDataModel> = emptyList(),
+    val savedPersonIds: Set<Int> = emptySet(),
+    val savingPersonIds: Set<Int> = emptySet(),
     val errorMessage: String? = null,
 )

@@ -26,11 +26,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.CloudOff
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -90,11 +94,16 @@ fun MovieCastScreen(
             MovieCastContent(
                 modifier = modifier,
                 cast = state.cast,
+                savedPersonIds = state.savedPersonIds,
+                savingPersonIds = state.savingPersonIds,
                 onBackClick = {
                     onEvent(MovieCastEvent.BackClicked)
                 },
                 onCastClick = { personId ->
                     onEvent(MovieCastEvent.CastClicked(personId = personId))
+                },
+                onSaveClick = { personId ->
+                    onEvent(MovieCastEvent.SaveClicked(personId = personId))
                 }
             )
         }
@@ -211,8 +220,11 @@ private fun MovieCastErrorState(
 @Composable
 private fun MovieCastContent(
     cast: List<CastMemberDataModel>,
+    savedPersonIds: Set<Int>,
+    savingPersonIds: Set<Int>,
     onBackClick: () -> Unit,
     onCastClick: (Int) -> Unit,
+    onSaveClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -248,8 +260,13 @@ private fun MovieCastContent(
             ) { castMember ->
                 MovieCastRow(
                     castMember = castMember,
+                    isSaved = castMember.id in savedPersonIds,
+                    isSaving = castMember.id in savingPersonIds,
                     onClick = {
                         onCastClick(castMember.id)
+                    },
+                    onSaveClick = {
+                        onSaveClick(castMember.id)
                     }
                 )
             }
@@ -300,7 +317,10 @@ private fun MovieCastHeader(
 @Composable
 private fun MovieCastRow(
     castMember: CastMemberDataModel,
+    isSaved: Boolean,
+    isSaving: Boolean,
     onClick: () -> Unit,
+    onSaveClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -376,6 +396,39 @@ private fun MovieCastRow(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+            }
+
+            IconButton(
+                enabled = !isSaving,
+                onClick = onSaveClick,
+                colors = IconButtonDefaults.iconButtonColors(
+                    contentColor = if (isSaved) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    }
+                )
+            ) {
+                if (isSaving) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                } else {
+                    Icon(
+                        imageVector = if (isSaved) {
+                            Icons.Filled.Favorite
+                        } else {
+                            Icons.Outlined.FavoriteBorder
+                        },
+                        contentDescription = if (isSaved) {
+                            "Remove from library"
+                        } else {
+                            "Save to library"
+                        }
+                    )
+                }
             }
         }
     }

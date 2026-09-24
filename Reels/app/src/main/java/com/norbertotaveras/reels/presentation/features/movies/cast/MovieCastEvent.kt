@@ -11,4 +11,5 @@ sealed interface MovieCastEvent {
     data object BackClicked : MovieCastEvent
     data object RetryClicked : MovieCastEvent
     data class CastClicked(val personId: Int) : MovieCastEvent
+    data class SaveClicked(val personId: Int) : MovieCastEvent
 }
