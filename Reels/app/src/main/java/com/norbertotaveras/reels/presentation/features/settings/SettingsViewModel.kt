@@ -13,12 +13,17 @@ import com.norbertotaveras.reels.BuildConfig
 import com.norbertotaveras.reels.domain.model.settings.AppTheme
 import com.norbertotaveras.reels.domain.model.settings.ImageQuality
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
+import com.norbertotaveras.reels.domain.usecase.account.DisconnectTmdbAccountUseCase
+import com.norbertotaveras.reels.domain.usecase.account.FinishTmdbAuthenticationUseCase
+import com.norbertotaveras.reels.domain.usecase.account.ObserveTmdbAccountUseCase
+import com.norbertotaveras.reels.domain.usecase.account.StartTmdbAuthenticationUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveFavoriteMoviesUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveSavedPeopleUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateImageQualityUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateLanguageRegionUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateThemeUseCase
+import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -36,6 +41,10 @@ class SettingsViewModel @Inject constructor(
     private val observeSettingsUseCase: ObserveSettingsUseCase,
     private val observeFavoriteMoviesUseCase: ObserveFavoriteMoviesUseCase,
     private val observeSavedPeopleUseCase: ObserveSavedPeopleUseCase,
+    private val observeTmdbAccountUseCase: ObserveTmdbAccountUseCase,
+    private val startTmdbAuthenticationUseCase: StartTmdbAuthenticationUseCase,
+    private val finishTmdbAuthenticationUseCase: FinishTmdbAuthenticationUseCase,
+    private val disconnectTmdbAccountUseCase: DisconnectTmdbAccountUseCase,
     private val updateImageQualityUseCase: UpdateImageQualityUseCase,
     private val updateLanguageRegionUseCase: UpdateLanguageRegionUseCase,
     private val updateThemeUseCase: UpdateThemeUseCase,
@@ -54,6 +63,7 @@ class SettingsViewModel @Inject constructor(
     init {
         observeSettings()
         observeSavedLibrary()
+        observeTmdbAccount()
     }
 
     fun onEvent(event: SettingsEvent) {
@@ -69,6 +79,9 @@ class SettingsViewModel @Inject constructor(
             SettingsEvent.ClearImageCacheClicked -> onClearImageCacheClicked()
             SettingsEvent.ClearImageCacheConfirmed -> onClearImageCacheConfirmed()
             SettingsEvent.ClearImageCacheDismissed -> onClearImageCacheDismissed()
+            SettingsEvent.TmdbAccountClicked -> onTmdbAccountClicked()
+            SettingsEvent.TmdbAccountFinishClicked -> onTmdbAccountFinishClicked()
+            SettingsEvent.TmdbAccountDisconnectClicked -> onTmdbAccountDisconnectClicked()
             SettingsEvent.PrivacyClicked -> onPrivacyClicked()
             SettingsEvent.PrivacyNoticeDismissed -> onPrivacyNoticeDismissed()
             SettingsEvent.TmdbAttributionClicked -> onTmdbAttributionClicked()
@@ -105,6 +118,38 @@ class SettingsViewModel @Inject constructor(
             }.collect { savedLibraryLabel ->
                 _state.update { currentState ->
                     currentState.copy(savedLibraryLabel = savedLibraryLabel)
+                }
+            }
+        }
+    }
+
+    private fun observeTmdbAccount() {
+        viewModelScope.launch {
+            observeTmdbAccountUseCase().collect { accountState ->
+                _state.update { currentState ->
+                    val account = accountState.account
+                    currentState.copy(
+                        isTmdbAccountConnected = accountState.isConnected,
+                        isTmdbAccountApprovalPending = accountState.isApprovalPending,
+                        tmdbAccountTitle = when {
+                            accountState.isConnected -> "TMDB Account"
+                            accountState.isApprovalPending -> "Finish TMDB Connection"
+                            else -> "Connect TMDB Account"
+                        },
+                        tmdbAccountLabel = when {
+                            accountState.isConnected -> {
+                                val accountName = account?.displayName
+                                    ?.takeIf { displayName -> displayName.isNotBlank() }
+                                    ?: account?.username
+                                    ?: "Connected"
+                                "Connected as $accountName"
+                            }
+                            accountState.isApprovalPending -> {
+                                "Return after approving access in your browser"
+                            }
+                            else -> "Sync watchlist and ratings with TMDB"
+                        }
+                    )
                 }
             }
         }
@@ -183,6 +228,95 @@ class SettingsViewModel @Inject constructor(
     private fun onClearImageCacheDismissed() {
         _state.update { currentState ->
             currentState.copy(isClearImageCacheDialogVisible = false)
+        }
+    }
+
+    private fun onTmdbAccountClicked() {
+        viewModelScope.launch {
+            if (_state.value.isTmdbAccountLoading) return@launch
+
+            _state.update { currentState ->
+                currentState.copy(isTmdbAccountLoading = true)
+            }
+
+            startTmdbAuthenticationUseCase()
+                .onSuccess { approvalUrl ->
+                    _effect.emit(SettingsEffect.OpenExternalUrl(url = approvalUrl))
+                    _effect.emit(
+                        SettingsEffect.ShowMessage(
+                            message = "Approve Reels in TMDB, then return to finish."
+                        )
+                    )
+                }
+                .onFailure { error ->
+                    _effect.emit(
+                        SettingsEffect.ShowMessage(
+                            message = error.toUserMessage(
+                                fallback = "Unable to start TMDB connection."
+                            )
+                        )
+                    )
+                }
+
+            _state.update { currentState ->
+                currentState.copy(isTmdbAccountLoading = false)
+            }
+        }
+    }
+
+    private fun onTmdbAccountFinishClicked() {
+        viewModelScope.launch {
+            if (_state.value.isTmdbAccountLoading) return@launch
+
+            _state.update { currentState ->
+                currentState.copy(isTmdbAccountLoading = true)
+            }
+
+            finishTmdbAuthenticationUseCase()
+                .onSuccess {
+                    _effect.emit(SettingsEffect.ShowMessage(message = "TMDB account connected."))
+                }
+                .onFailure { error ->
+                    _effect.emit(
+                        SettingsEffect.ShowMessage(
+                            message = error.toUserMessage(
+                                fallback = "Approve access in TMDB before finishing."
+                            )
+                        )
+                    )
+                }
+
+            _state.update { currentState ->
+                currentState.copy(isTmdbAccountLoading = false)
+            }
+        }
+    }
+
+    private fun onTmdbAccountDisconnectClicked() {
+        viewModelScope.launch {
+            if (_state.value.isTmdbAccountLoading) return@launch
+
+            _state.update { currentState ->
+                currentState.copy(isTmdbAccountLoading = true)
+            }
+
+            disconnectTmdbAccountUseCase()
+                .onSuccess {
+                    _effect.emit(SettingsEffect.ShowMessage(message = "TMDB account disconnected."))
+                }
+                .onFailure { error ->
+                    _effect.emit(
+                        SettingsEffect.ShowMessage(
+                            message = error.toUserMessage(
+                                fallback = "Unable to disconnect TMDB account."
+                            )
+                        )
+                    )
+                }
+
+            _state.update { currentState ->
+                currentState.copy(isTmdbAccountLoading = false)
+            }
         }
     }
 

@@ -28,6 +28,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.Login
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Download
@@ -36,6 +38,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -133,6 +136,50 @@ fun SettingsScreen(
                 subtitle = state.clearImageCacheLabel,
                 onClick = { onEvent(SettingsEvent.ClearImageCacheClicked) }
             )
+        }
+
+        SettingsSection(title = "TMDB ACCOUNT") {
+            val tmdbAccountClick: (() -> Unit)? = if (state.isTmdbAccountConnected) {
+                null
+            } else {
+                { onEvent(SettingsEvent.TmdbAccountClicked) }
+            }
+
+            SettingsRow(
+                icon = Icons.Filled.VerifiedUser,
+                title = state.tmdbAccountTitle,
+                subtitle = state.tmdbAccountLabel,
+                showsChevron = !state.isTmdbAccountLoading && !state.isTmdbAccountConnected,
+                onClick = tmdbAccountClick
+            )
+
+            if (state.isTmdbAccountApprovalPending) {
+                SettingsDivider()
+
+                SettingsRow(
+                    icon = Icons.AutoMirrored.Filled.Login,
+                    title = "Finish Connection",
+                    subtitle = "Tap after approving access on themoviedb.org",
+                    showsChevron = !state.isTmdbAccountLoading,
+                    onClick = {
+                        onEvent(SettingsEvent.TmdbAccountFinishClicked)
+                    }
+                )
+            }
+
+            if (state.isTmdbAccountConnected) {
+                SettingsDivider()
+
+                SettingsRow(
+                    icon = Icons.AutoMirrored.Filled.Logout,
+                    title = "Disconnect",
+                    subtitle = "Remove TMDB session from this device",
+                    showsChevron = !state.isTmdbAccountLoading,
+                    onClick = {
+                        onEvent(SettingsEvent.TmdbAccountDisconnectClicked)
+                    }
+                )
+            }
         }
 
         SettingsSection(title = "ABOUT REELS") {
@@ -285,7 +332,7 @@ private fun PrivacyNoticeDialog(
                 )
 
                 PrivacyNoticeText(
-                    text = "Reels does not use TMDB account login, collect personal account data, or sync your saved library to TMDB."
+                    text = "If you connect TMDB, Reels stores the TMDB session only on this device so watchlist and rating sync can work."
                 )
             }
         },

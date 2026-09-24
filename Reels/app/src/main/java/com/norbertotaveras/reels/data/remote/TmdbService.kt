@@ -8,6 +8,10 @@
 package com.norbertotaveras.reels.data.remote
 
 import com.norbertotaveras.reels.data.remote.dto.genre.GenresResponseDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbAccountDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbCreateSessionRequestDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbRequestTokenDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbSessionDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieCreditsDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieDetailsDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieVideosDto
@@ -15,10 +19,25 @@ import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
 import com.norbertotaveras.reels.data.remote.dto.person.PersonDetailsDto
 import com.norbertotaveras.reels.data.remote.dto.person.PersonMovieCreditsDto
 import retrofit2.http.GET
+import retrofit2.http.Body
 import retrofit2.http.Path
+import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface TmdbService {
+    @GET("authentication/token/new")
+    suspend fun createRequestToken(): TmdbRequestTokenDto
+
+    @POST("authentication/session/new")
+    suspend fun createSession(
+        @Body request: TmdbCreateSessionRequestDto
+    ): TmdbSessionDto
+
+    @GET("account")
+    suspend fun getAccountDetails(
+        @Query("session_id") sessionId: String
+    ): TmdbAccountDto
+
     @GET("movie/{category}")
     suspend fun getMovies(
         @Path("category") category: String,

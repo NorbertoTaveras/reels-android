@@ -8,6 +8,10 @@
 package com.norbertotaveras.reels.data.remote
 
 import com.norbertotaveras.reels.data.remote.dto.genre.GenresResponseDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbAccountDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbCreateSessionRequestDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbRequestTokenDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbSessionDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieCreditsDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieDetailsDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieVideosDto
@@ -19,6 +23,20 @@ import javax.inject.Inject
 class TmdbRemoteDataSourceImpl @Inject constructor(
     private val service: TmdbService
 ) : TmdbRemoteDataSource {
+    override suspend fun createRequestToken(): TmdbRequestTokenDto {
+        return service.createRequestToken()
+    }
+
+    override suspend fun createSession(requestToken: String): TmdbSessionDto {
+        return service.createSession(
+            request = TmdbCreateSessionRequestDto(requestToken = requestToken)
+        )
+    }
+
+    override suspend fun getAccountDetails(sessionId: String): TmdbAccountDto {
+        return service.getAccountDetails(sessionId = sessionId)
+    }
+
     override suspend fun getMovies(
         category: String,
         language: String?,

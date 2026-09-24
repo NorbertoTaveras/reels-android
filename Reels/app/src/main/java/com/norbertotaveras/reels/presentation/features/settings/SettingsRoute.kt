@@ -54,6 +54,10 @@ fun SettingsRoute(
                 is SettingsEffect.OpenExternalUrl -> {
                     onOpenExternalUrl(effect.url)
                 }
+
+                is SettingsEffect.ShowMessage -> {
+                    snackbarHostState.showSnackbar(message = effect.message)
+                }
             }
         }
     }

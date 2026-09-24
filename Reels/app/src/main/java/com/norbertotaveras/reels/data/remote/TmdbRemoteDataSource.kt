@@ -8,6 +8,9 @@
 package com.norbertotaveras.reels.data.remote
 
 import com.norbertotaveras.reels.data.remote.dto.genre.GenresResponseDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbAccountDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbRequestTokenDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbSessionDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieCreditsDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieDetailsDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieVideosDto
@@ -16,6 +19,12 @@ import com.norbertotaveras.reels.data.remote.dto.person.PersonDetailsDto
 import com.norbertotaveras.reels.data.remote.dto.person.PersonMovieCreditsDto
 
 interface TmdbRemoteDataSource {
+    suspend fun createRequestToken(): TmdbRequestTokenDto
+
+    suspend fun createSession(requestToken: String): TmdbSessionDto
+
+    suspend fun getAccountDetails(sessionId: String): TmdbAccountDto
+
     suspend fun getMovies(
         category: String,
         language: String? = null,
