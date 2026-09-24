@@ -18,9 +18,10 @@ import com.norbertotaveras.reels.data.local.mapper.toMovieDataModel
 import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
 import com.norbertotaveras.reels.data.remote.paging.CachedMoviesRemoteMediator
+import com.norbertotaveras.reels.data.remote.paging.CachedSearchMoviesRemoteMediator
 import com.norbertotaveras.reels.data.remote.paging.DiscoverMoviesPagingSource
-import com.norbertotaveras.reels.data.remote.paging.SearchMoviesPagingSource
 import com.norbertotaveras.reels.data.remote.paging.cacheKey
+import com.norbertotaveras.reels.data.remote.paging.searchCacheKey
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
@@ -76,16 +77,25 @@ class TmdbRepositoryImpl @Inject constructor(
     ): Flow<PagingData<MovieDataModel>> {
         return Pager(
             config = defaultPagingConfig(),
+            remoteMediator = CachedSearchMoviesRemoteMediator(
+                database = database,
+                cachedMovieDao = cachedMovieDao,
+                remoteDataSource = remoteDataSource,
+                query = query,
+                language = language,
+                includeAdult = includeAdult
+            ),
             pagingSourceFactory = {
-                SearchMoviesPagingSource(
-                    remoteDataSource = remoteDataSource,
-                    query = query,
-                    language = language,
-                    includeAdult = includeAdult
+                cachedMovieDao.pagingSource(
+                    listKey = searchCacheKey(
+                        query = query,
+                        language = language,
+                        includeAdult = includeAdult
+                    )
                 )
             }
         ).flow.map { pagingData ->
-            pagingData.map { movieDto -> movieDto.toMovieDataModel() }
+            pagingData.map { cachedMovie -> cachedMovie.toMovieDataModel() }
         }
     }
 
