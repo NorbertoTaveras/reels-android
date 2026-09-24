@@ -7,13 +7,8 @@
 
 package com.norbertotaveras.reels.extensions
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.Period
-import java.time.format.DateTimeParseException
 import java.util.Calendar
 import java.util.Locale
 
@@ -55,43 +50,90 @@ fun String?.toDisplayAge(): String? {
     return "$age years old"
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 fun String?.toRelativeReleaseAge(
-    now: LocalDate = LocalDate.now()
+    now: Calendar = Calendar.getInstance()
 ): String? {
+    val value = this?.takeIf { it.isNotBlank() } ?: return null
+    val parser = SimpleDateFormat(TMDB_DATE_PATTERN, Locale.US)
     val releaseDate = try {
-        LocalDate.parse(this ?: return null)
-    } catch (_: DateTimeParseException) {
+        parser.parse(value) ?: return null
+    } catch (_: ParseException) {
         return null
     }
 
-    val period = Period.between(releaseDate, now)
+    val release = Calendar.getInstance().apply { time = releaseDate }
+    val daysBetween = daysBetween(start = now, end = release)
+    val monthsBetween = monthsBetween(start = now, end = release)
+    val yearsBetween = yearsBetween(start = now, end = release)
 
-    if (releaseDate.isAfter(now)) {
-        val futurePeriod = Period.between(now, releaseDate)
-
+    if (daysBetween > 0) {
         return when {
-            futurePeriod.years > 1 -> "in ${futurePeriod.years} years"
-            futurePeriod.years == 1 -> "in 1 year"
-            futurePeriod.months > 1 -> "in ${futurePeriod.months} months"
-            futurePeriod.months == 1 -> "in 1 month"
-            futurePeriod.days > 1 -> "in ${futurePeriod.days} days"
-            futurePeriod.days == 1 -> "tomorrow"
+            yearsBetween > 1 -> "in $yearsBetween years"
+            yearsBetween == 1 -> "in 1 year"
+            monthsBetween > 1 -> "in $monthsBetween months"
+            monthsBetween == 1 -> "in 1 month"
+            daysBetween > 1 -> "in $daysBetween days"
+            daysBetween == 1 -> "tomorrow"
             else -> null
         }
     }
 
+    val elapsedDays = -daysBetween
+    val elapsedMonths = -monthsBetween
+    val elapsedYears = -yearsBetween
+
     return when {
-        period.years > 1 -> "${period.years} years ago"
-        period.years == 1 -> "1 year ago"
-        period.months > 1 -> "${period.months} months ago"
-        period.months == 1 -> "1 month ago"
-        period.days > 1 -> "${period.days} days ago"
-        period.days == 1 -> "1 day ago"
-        period.days == 0 -> "Released today"
+        elapsedYears > 1 -> "$elapsedYears years ago"
+        elapsedYears == 1 -> "1 year ago"
+        elapsedMonths > 1 -> "$elapsedMonths months ago"
+        elapsedMonths == 1 -> "1 month ago"
+        elapsedDays > 1 -> "$elapsedDays days ago"
+        elapsedDays == 1 -> "1 day ago"
+        elapsedDays == 0 -> "Released today"
         else -> null
+    }
+}
+
+private fun daysBetween(
+    start: Calendar,
+    end: Calendar
+): Int {
+    val startDay = start.normalizedDay()
+    val endDay = end.normalizedDay()
+    val millisBetween = endDay.timeInMillis - startDay.timeInMillis
+    return (millisBetween / MILLIS_PER_DAY).toInt()
+}
+
+private fun monthsBetween(
+    start: Calendar,
+    end: Calendar
+): Int {
+    val months = (end.get(Calendar.YEAR) - start.get(Calendar.YEAR)) * MONTHS_PER_YEAR +
+        (end.get(Calendar.MONTH) - start.get(Calendar.MONTH))
+    return when {
+        months > 0 && end.get(Calendar.DAY_OF_MONTH) < start.get(Calendar.DAY_OF_MONTH) -> months - 1
+        months < 0 && end.get(Calendar.DAY_OF_MONTH) > start.get(Calendar.DAY_OF_MONTH) -> months + 1
+        else -> months
+    }
+}
+
+private fun yearsBetween(
+    start: Calendar,
+    end: Calendar
+): Int {
+    return monthsBetween(start = start, end = end) / MONTHS_PER_YEAR
+}
+
+private fun Calendar.normalizedDay(): Calendar {
+    return (clone() as Calendar).apply {
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
     }
 }
 
 private const val TMDB_DATE_PATTERN = "yyyy-MM-dd"
 private const val DISPLAY_DATE_PATTERN = "MMMM d, yyyy"
+private const val MILLIS_PER_DAY = 24 * 60 * 60 * 1000L
+private const val MONTHS_PER_YEAR = 12

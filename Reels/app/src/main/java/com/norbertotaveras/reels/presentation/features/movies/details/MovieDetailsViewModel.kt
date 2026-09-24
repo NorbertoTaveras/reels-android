@@ -21,6 +21,7 @@ import com.norbertotaveras.reels.domain.usecase.movie.GetSimilarMoviesUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,6 +58,7 @@ class MovieDetailsViewModel @Inject constructor(
         savedStateHandle.get<Int>(ReelsDestinations.MOVIE_ID_ARG)
     )
     private var currentLanguage: String = DEFAULT_LANGUAGE
+    private var loadMovieJob: Job? = null
 
     init {
         observeFavoriteState()
@@ -76,7 +78,8 @@ class MovieDetailsViewModel @Inject constructor(
     }
 
     fun loadMovie(language: String = currentLanguage) {
-        viewModelScope.launch {
+        loadMovieJob?.cancel()
+        loadMovieJob = viewModelScope.launch {
             _state.update { currentState ->
                 currentState.copy(
                     isLoading = true,

@@ -21,6 +21,7 @@ import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.presentation.navigation.ReelsDestinations
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,6 +55,7 @@ class CastDetailsViewModel @Inject constructor(
         savedStateHandle.get<Int>(ReelsDestinations.PERSON_ID_ARG)
     )
     private var currentLanguage: String = DEFAULT_LANGUAGE
+    private var loadPersonJob: Job? = null
 
     init {
         observeSettings()
@@ -70,7 +72,8 @@ class CastDetailsViewModel @Inject constructor(
     }
 
     fun loadPerson(language: String = currentLanguage) {
-        viewModelScope.launch {
+        loadPersonJob?.cancel()
+        loadPersonJob = viewModelScope.launch {
             _state.update { currentState ->
                 currentState.copy(
                     isLoading = true,

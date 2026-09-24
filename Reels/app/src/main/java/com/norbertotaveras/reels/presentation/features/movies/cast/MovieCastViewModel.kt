@@ -15,6 +15,7 @@ import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.presentation.navigation.ReelsDestinations
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -44,6 +45,7 @@ class MovieCastViewModel @Inject constructor(
     val effect: SharedFlow<MovieCastEffect> = _effect.asSharedFlow()
 
     private var currentLanguage: String = DEFAULT_LANGUAGE
+    private var loadCastJob: Job? = null
 
     init {
         observeSettings()
@@ -70,7 +72,8 @@ class MovieCastViewModel @Inject constructor(
     }
 
     private fun loadCast(language: String) {
-        viewModelScope.launch {
+        loadCastJob?.cancel()
+        loadCastJob = viewModelScope.launch {
             _state.update { currentState ->
                 currentState.copy(
                     isLoading = true,
