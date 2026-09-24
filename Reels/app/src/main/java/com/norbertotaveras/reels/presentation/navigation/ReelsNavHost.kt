@@ -33,6 +33,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.norbertotaveras.reels.presentation.features.cast.details.CastDetailsRoute
+import com.norbertotaveras.reels.presentation.features.cast.filmography.FilmographyRoute
 import com.norbertotaveras.reels.presentation.features.movies.discover.DiscoverRoute
 import com.norbertotaveras.reels.presentation.features.movies.cast.MovieCastRoute
 import com.norbertotaveras.reels.presentation.features.movies.category.MovieCategoryRoute
@@ -206,6 +207,25 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
                 )
             ) {
                 CastDetailsRoute(
+                    onBackClick = navController::navigateUp,
+                    onFilmographyClick = { personId ->
+                        navController.navigate(ReelsDestinations.filmographyRoute(personId))
+                    },
+                    onMovieClick = { movieId ->
+                        navController.navigateToMovieDetails(movieId)
+                    }
+                )
+            }
+
+            composable(
+                route = ReelsDestinations.FILMOGRAPHY_ROUTE,
+                arguments = listOf(
+                    navArgument(ReelsDestinations.PERSON_ID_ARG) {
+                        type = NavType.IntType
+                    }
+                )
+            ) {
+                FilmographyRoute(
                     onBackClick = navController::navigateUp,
                     onMovieClick = { movieId ->
                         navController.navigateToMovieDetails(movieId)

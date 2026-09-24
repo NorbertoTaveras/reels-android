@@ -99,6 +99,9 @@ fun CastDetailsScreen(
                 onMovieClick = { movieId ->
                     onEvent(CastDetailsEvent.MovieClicked(movieId = movieId))
                 },
+                onFilmographyClick = {
+                    onEvent(CastDetailsEvent.FilmographyClicked)
+                },
                 onFavoriteClick = {
                     onEvent(CastDetailsEvent.FavoriteClicked)
                 }

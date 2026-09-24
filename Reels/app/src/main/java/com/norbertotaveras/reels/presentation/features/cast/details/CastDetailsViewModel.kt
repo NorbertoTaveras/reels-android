@@ -67,6 +67,7 @@ class CastDetailsViewModel @Inject constructor(
             CastDetailsEvent.BackClicked -> onBackClicked()
             CastDetailsEvent.RetryClicked -> loadPerson(language = currentLanguage)
             CastDetailsEvent.FavoriteClicked -> onFavoriteClicked()
+            CastDetailsEvent.FilmographyClicked -> onFilmographyClicked()
             is CastDetailsEvent.MovieClicked -> onMovieClicked(movieId = event.movieId)
         }
     }
@@ -174,6 +175,12 @@ class CastDetailsViewModel @Inject constructor(
     private fun onMovieClicked(movieId: Int) {
         viewModelScope.launch {
             _effect.emit(CastDetailsEffect.NavigateToMovieDetails(movieId = movieId))
+        }
+    }
+
+    private fun onFilmographyClicked() {
+        viewModelScope.launch {
+            _effect.emit(CastDetailsEffect.NavigateToFilmography(personId = personId))
         }
     }
 

@@ -75,6 +75,7 @@ fun CastDetailsContent(
     placeOfBirth: String?,
     onBackClick: () -> Unit,
     onMovieClick: (Int) -> Unit,
+    onFilmographyClick: () -> Unit,
     modifier: Modifier = Modifier,
     isFavorite: Boolean = false,
     isFavoriteLoading: Boolean = false,
@@ -115,7 +116,8 @@ fun CastDetailsContent(
         item {
             KnownForPreviewSection(
                 knownFor = knownFor,
-                onMovieClick = onMovieClick
+                onMovieClick = onMovieClick,
+                onSeeAllClick = onFilmographyClick
             )
         }
 
@@ -455,6 +457,7 @@ private fun BiographySection(
 private fun KnownForPreviewSection(
     knownFor: List<PersonMovieCreditDataModel>,
     onMovieClick: (Int) -> Unit,
+    onSeeAllClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (knownFor.isEmpty()) return
@@ -465,7 +468,9 @@ private fun KnownForPreviewSection(
     ) {
         SectionHeader(
             modifier = Modifier.padding(horizontal = ReelsSpacing.screenHorizontal),
-            title = "Known For"
+            title = "Known For",
+            actionLabel = "See all",
+            onActionClick = onSeeAllClick
         )
 
         PosterCarousel(
@@ -587,7 +592,8 @@ private fun CastDetailsContentPreview() {
             birthday = "December 27, 1995",
             placeOfBirth = "New York City, New York, USA",
             onBackClick = {},
-            onMovieClick = {}
+            onMovieClick = {},
+            onFilmographyClick = {}
         )
     }
 }

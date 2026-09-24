@@ -24,6 +24,7 @@ import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbar
 fun CastDetailsRoute(
     onBackClick: () -> Unit,
     onMovieClick: (Int) -> Unit,
+    onFilmographyClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CastDetailsViewModel = hiltViewModel(),
 ) {
@@ -34,6 +35,9 @@ fun CastDetailsRoute(
         viewModel.effect.collect { effect ->
             when (effect) {
                 CastDetailsEffect.NavigateBack -> onBackClick()
+                is CastDetailsEffect.NavigateToFilmography -> {
+                    onFilmographyClick(effect.personId)
+                }
                 is CastDetailsEffect.NavigateToMovieDetails -> {
                     onMovieClick(effect.movieId)
                 }

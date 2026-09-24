@@ -151,6 +151,23 @@ object ReelsDimensions {
     val castDetailsBiographyFadeHeight = 42.dp
     val castDetailsBiographyToggleIconSize = 18.dp
 
+    val filmographyScreenTopPadding = 24.dp
+    val filmographyScreenBottomPadding = 32.dp
+    val filmographyHeaderSpacing = 14.dp
+    val filmographyHeaderBottomPadding = 20.dp
+    val filmographyBackButtonSize = 44.dp
+    val filmographyBackIconSize = 26.dp
+    val filmographyFilterSpacing = 10.dp
+    val filmographyFilterHorizontalPadding = 14.dp
+    val filmographyFilterVerticalPadding = 9.dp
+    val filmographyGridHorizontalSpacing = 20.dp
+    val filmographyGridVerticalSpacing = 28.dp
+    val filmographyPosterTextSpacing = 10.dp
+    val filmographyRatingEdgePadding = 10.dp
+    val filmographyRatingHorizontalPadding = 10.dp
+    val filmographyRatingVerticalPadding = 6.dp
+    val filmographyRatingIconSize = 15.dp
+
     val settingsScreenTopPadding = 24.dp
     val settingsScreenBottomPadding = 32.dp
     val settingsSectionSpacing = 24.dp

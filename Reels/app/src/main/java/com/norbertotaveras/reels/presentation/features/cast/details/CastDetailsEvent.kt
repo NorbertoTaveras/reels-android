@@ -11,5 +11,6 @@ sealed interface CastDetailsEvent {
     data object BackClicked : CastDetailsEvent
     data object RetryClicked : CastDetailsEvent
     data object FavoriteClicked : CastDetailsEvent
+    data object FilmographyClicked : CastDetailsEvent
     data class MovieClicked(val movieId: Int) : CastDetailsEvent
 }
