@@ -21,6 +21,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.SingletonImageLoader
 import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarHost
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun SettingsRoute(
@@ -43,7 +45,9 @@ fun SettingsRoute(
                 SettingsEffect.ClearImageCache -> {
                     val imageLoader = SingletonImageLoader.get(context)
                     imageLoader.memoryCache?.clear()
-                    imageLoader.diskCache?.clear()
+                    withContext(Dispatchers.IO) {
+                        imageLoader.diskCache?.clear()
+                    }
                     snackbarHostState.showSnackbar(message = "Image cache cleared")
                 }
 

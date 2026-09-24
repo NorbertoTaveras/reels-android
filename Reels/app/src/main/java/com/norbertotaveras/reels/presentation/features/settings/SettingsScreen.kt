@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
@@ -47,13 +48,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.norbertotaveras.reels.R
 import com.norbertotaveras.reels.domain.model.settings.AppTheme
 import com.norbertotaveras.reels.domain.model.settings.ImageQuality
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
@@ -172,8 +175,8 @@ fun SettingsScreen(
         SettingsPreferenceDialog.ImageQuality -> {
             SettingsOptionDialog(
                 title = "Image Quality",
-                description = "Choose how large TMDB poster and backdrop images should be when Reels loads movie artwork.",
-                options = ImageQuality.values().toList(),
+                description = "Choose how large TMDB poster, backdrop, and profile images should be when Reels loads artwork.",
+                options = ImageQuality.entries,
                 selectedOption = state.selectedImageQuality,
                 optionLabel = ImageQuality::label,
                 onOptionSelected = { imageQuality ->
@@ -187,7 +190,7 @@ fun SettingsScreen(
             SettingsOptionDialog(
                 title = "Language & Region",
                 description = "Choose the language and region Reels sends to TMDB for browse, search, and detail requests.",
-                options = LanguageRegion.values().toList(),
+                options = LanguageRegion.entries,
                 selectedOption = state.selectedLanguageRegion,
                 optionLabel = LanguageRegion::label,
                 onOptionSelected = { languageRegion ->
@@ -201,7 +204,7 @@ fun SettingsScreen(
             SettingsOptionDialog(
                 title = "Theme",
                 description = "Choose whether Reels follows the device theme or uses a fixed light or dark appearance.",
-                options = AppTheme.values().toList(),
+                options = AppTheme.entries,
                 selectedOption = state.selectedTheme,
                 optionLabel = AppTheme::label,
                 onOptionSelected = { theme ->
@@ -233,7 +236,7 @@ private fun ClearImageCacheDialog(
         },
         text = {
             Text(
-                text = "Reels will remove locally cached poster and backdrop images. Movie data and your saved library will stay saved.",
+                text = "Reels will remove locally cached poster, backdrop, and profile images. Movie data and your saved library will stay saved.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -629,44 +632,21 @@ private fun TmdbAttributionCard(
 private fun TmdbLogoMark(
     modifier: Modifier = Modifier,
 ) {
-    Box(
+    Surface(
         modifier = modifier
             .size(ReelsDimensions.settingsTmdbLogoSize)
-            .clip(MaterialTheme.shapes.large)
-            .background(Color(0xFF01B4E4)),
-        contentAlignment = Alignment.Center
+            .clip(MaterialTheme.shapes.large),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surfaceVariant
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "TM",
-                style = MaterialTheme.typography.labelSmall,
-                color = Color.White,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.width(2.dp))
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(3.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .width(ReelsDimensions.settingsTmdbLogoPillWidth)
-                        .height(ReelsDimensions.settingsTmdbLogoPillHeight)
-                        .clip(MaterialTheme.shapes.small)
-                        .background(Color.White)
-                )
-                Text(
-                    text = "D",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
+        Image(
+            painter = painterResource(id = R.drawable.tmdb_logo),
+            contentDescription = "TMDB logo",
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(ReelsSpacing.small),
+            contentScale = ContentScale.Fit
+        )
     }
 }
 

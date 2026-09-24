@@ -19,7 +19,7 @@ data class SettingsUiState(
     val selectedLanguageRegion: LanguageRegion = LanguageRegion.EnglishUnitedStates,
     val selectedTheme: AppTheme = AppTheme.System,
     val savedLibraryLabel: String = "Manage movies and people saved on this device",
-    val clearImageCacheLabel: String = "Free up locally cached poster images",
+    val clearImageCacheLabel: String = "Free up locally cached artwork",
     val appVersionLabel: String = "1.0.0",
     val appConfigurationLabel: String = "Production Debug · Token configured",
     val privacyLabel: String = "Local library stays on this device",
