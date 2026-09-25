@@ -36,9 +36,6 @@ val FavoritesUiState.selectedItemCount: Int
         LibraryTab.Rated -> 0
     }
 
-val FavoritesUiState.hasSavedItems: Boolean
-    get() = movies.isNotEmpty() || people.isNotEmpty()
-
 val FavoritesUiState.hasSelectedTabItems: Boolean
     get() = selectedTab == LibraryTab.Tmdb || selectedTab == LibraryTab.Rated || selectedItemCount > 0
 
