@@ -54,6 +54,7 @@ import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
+import com.norbertotaveras.reels.presentation.ui.components.common.CachedContentBanner
 import com.norbertotaveras.reels.presentation.ui.components.common.CenteredErrorState
 import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
 import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
@@ -441,12 +442,14 @@ private fun HomeMovieSection(
             }
         )
 
-        when (val refreshState = movies.loadState.refresh) {
-            is LoadState.Loading -> {
-                SectionLoadingState()
-            }
+        val refreshState = movies.loadState.refresh
+        val cachedRefreshError = movies.loadState.mediator?.refresh as? LoadState.Error
+        val hasCachedMovies = movies.itemCount > 0
 
-            is LoadState.Error -> {
+        when {
+            refreshState is LoadState.Loading && !hasCachedMovies -> SectionLoadingState()
+
+            refreshState is LoadState.Error && !hasCachedMovies -> {
                 InlineRetryState(
                     modifier = Modifier.padding(horizontal = ReelsSpacing.screenHorizontal),
                     message = refreshState.error.toUserMessage(
@@ -457,19 +460,26 @@ private fun HomeMovieSection(
                 )
             }
 
-            is LoadState.NotLoading -> {
-                if (movies.itemCount == 0) {
-                    EmptyState(
+            !hasCachedMovies -> {
+                EmptyState(
+                    modifier = Modifier.padding(horizontal = ReelsSpacing.screenHorizontal),
+                    title = "No movies found",
+                    message = "Try refreshing this section again in a moment."
+                )
+            }
+
+            else -> {
+                if (cachedRefreshError != null || refreshState is LoadState.Error) {
+                    CachedContentBanner(
                         modifier = Modifier.padding(horizontal = ReelsSpacing.screenHorizontal),
-                        title = "No movies found",
-                        message = "Try refreshing this section again in a moment."
-                    )
-                } else {
-                    MoviePosterRow(
-                        movies = movies,
-                        onEvent = onEvent
+                        message = "Showing saved movies. New results will load when the connection improves."
                     )
                 }
+
+                MoviePosterRow(
+                    movies = movies,
+                    onEvent = onEvent
+                )
             }
         }
     }

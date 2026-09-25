@@ -53,6 +53,7 @@ import androidx.paging.compose.LazyPagingItems
 import com.norbertotaveras.reels.extensions.toRelativeReleaseAge
 import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
+import com.norbertotaveras.reels.presentation.ui.components.common.CachedContentBanner
 import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
 import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
 import com.norbertotaveras.reels.presentation.ui.components.movie.MovieResultRow
@@ -166,14 +167,16 @@ fun SearchScreen(
                     SearchResultsHeader()
                 }
 
-                when (val refreshState = movies.loadState.refresh) {
-                    is LoadState.Loading -> {
-                        item {
-                            SearchResultLoadingState()
-                        }
+                val refreshState = movies.loadState.refresh
+                val cachedRefreshError = movies.loadState.mediator?.refresh as? LoadState.Error
+                val hasCachedMovies = movies.itemCount > 0
+
+                when {
+                    refreshState is LoadState.Loading && !hasCachedMovies -> {
+                        item { SearchResultLoadingState() }
                     }
 
-                    is LoadState.Error -> {
+                    refreshState is LoadState.Error && !hasCachedMovies -> {
                         item {
                             InlineRetryState(
                                 modifier = Modifier.padding(top = ReelsSpacing.medium),
@@ -186,63 +189,71 @@ fun SearchScreen(
                         }
                     }
 
-                    is LoadState.NotLoading -> {
-                        if (movies.itemCount == 0) {
+                    !hasCachedMovies -> {
+                        item {
+                            EmptyState(
+                                title = "No movies found",
+                                message = "No results for \"$trimmedQuery\". Try a different title or check the spelling."
+                            )
+                        }
+                    }
+
+                    else -> {
+                        if (cachedRefreshError != null || refreshState is LoadState.Error) {
                             item {
-                                EmptyState(
-                                    title = "No movies found",
-                                    message = "No results for \"$trimmedQuery\". Try a different title or check the spelling."
+                                CachedContentBanner(
+                                    message = "Showing saved results. Search will refresh when the connection improves."
                                 )
                             }
-                        } else {
-                            items(
-                                count = movies.itemCount,
-                                key = { index ->
-                                    val movie = movies.peek(index)
-                                    "${movie?.id ?: "placeholder"}-$index"
-                                }
-                            ) { index ->
-                                val movie = movies[index]
+                        }
 
-                                if (movie != null) {
-                                    MovieResultRow(
-                                        title = movie.title,
-                                        posterUrl = movie.posterPath.toTmdbImageUrl(),
-                                        releaseYear = movie.releaseDate.toReleaseYear(),
-                                        secondaryMetadata = movie.releaseDate.toRelativeReleaseAge(),
-                                        genres = movie.genreIds
-                                            .mapNotNull { genreId -> state.genreNamesById[genreId] }
-                                            .take(3),
-                                        rating = String.format("%.1f", movie.voteAverage),
-                                        onClick = {
-                                            onEvent(SearchEvent.MovieClicked(movieId = movie.id))
-                                        }
+                        items(
+                            count = movies.itemCount,
+                            key = { index ->
+                                val movie = movies.peek(index)
+                                "${movie?.id ?: "placeholder"}-$index"
+                            }
+                        ) { index ->
+                            val movie = movies[index]
+
+                            if (movie != null) {
+                                MovieResultRow(
+                                    title = movie.title,
+                                    posterUrl = movie.posterPath.toTmdbImageUrl(),
+                                    releaseYear = movie.releaseDate.toReleaseYear(),
+                                    secondaryMetadata = movie.releaseDate.toRelativeReleaseAge(),
+                                    genres = movie.genreIds
+                                        .mapNotNull { genreId -> state.genreNamesById[genreId] }
+                                        .take(3),
+                                    rating = String.format("%.1f", movie.voteAverage),
+                                    onClick = {
+                                        onEvent(SearchEvent.MovieClicked(movieId = movie.id))
+                                    }
+                                )
+                            }
+                        }
+
+                        when (val appendState = movies.loadState.append) {
+                            is LoadState.Loading -> {
+                                item {
+                                    SearchAppendLoadingState()
+                                }
+                            }
+
+                            is LoadState.Error -> {
+                                item {
+                                    InlineRetryState(
+                                        modifier = Modifier.padding(vertical = ReelsSpacing.medium),
+                                        message = appendState.error.toUserMessage(
+                                            fallback = "Unable to load more results."
+                                        ),
+                                        retryLabel = "Retry",
+                                        onRetry = movies::retry
                                     )
                                 }
                             }
 
-                            when (val appendState = movies.loadState.append) {
-                                is LoadState.Loading -> {
-                                    item {
-                                        SearchAppendLoadingState()
-                                    }
-                                }
-
-                                is LoadState.Error -> {
-                                    item {
-                                        InlineRetryState(
-                                            modifier = Modifier.padding(vertical = ReelsSpacing.medium),
-                                            message = appendState.error.toUserMessage(
-                                                fallback = "Unable to load more results."
-                                            ),
-                                            retryLabel = "Retry",
-                                            onRetry = movies::retry
-                                        )
-                                    }
-                                }
-
-                                is LoadState.NotLoading -> Unit
-                            }
+                            is LoadState.NotLoading -> Unit
                         }
                     }
                 }
