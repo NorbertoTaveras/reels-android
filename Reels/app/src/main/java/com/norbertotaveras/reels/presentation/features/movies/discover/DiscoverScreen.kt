@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import coil3.compose.AsyncImage
+import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.domain.model.discover.DiscoverSort
 import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
@@ -407,7 +408,7 @@ private fun DiscoverPosterCard(
             overflow = TextOverflow.Ellipsis
         )
 
-        movie.releaseDate?.take(4)?.takeIf { year -> year.isNotBlank() }?.let { year ->
+        movie.releaseDate.toReleaseYear()?.let { year ->
             Text(
                 text = year,
                 style = MaterialTheme.typography.bodyMedium.copy(

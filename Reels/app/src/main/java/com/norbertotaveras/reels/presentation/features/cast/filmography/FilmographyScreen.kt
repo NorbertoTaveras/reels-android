@@ -48,6 +48,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.domain.model.person.PersonMovieCreditDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
 import com.norbertotaveras.reels.presentation.ui.extensions.toErrorTitle
@@ -322,7 +323,7 @@ private fun FilmographyPosterCard(
             overflow = TextOverflow.Ellipsis
         )
 
-        movie.releaseDate?.take(4)?.takeIf { year -> year.isNotBlank() }?.let { year ->
+        movie.releaseDate.toReleaseYear()?.let { year ->
             Text(
                 text = year,
                 style = MaterialTheme.typography.bodyMedium.copy(

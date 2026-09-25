@@ -10,6 +10,7 @@ package com.norbertotaveras.reels.presentation.features.cast.filmography
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.domain.model.person.PersonMovieCreditDataModel
 import com.norbertotaveras.reels.domain.usecase.person.GetPersonDetailsUseCase
 import com.norbertotaveras.reels.domain.usecase.person.GetPersonMovieCreditsUseCase
@@ -159,7 +160,7 @@ private fun List<PersonMovieCreditDataModel>.sortedBy(
         FilmographySort.Popular -> sortedByDescending { movie -> movie.popularity }
         FilmographySort.Newest -> sortedWith(
             compareByDescending<PersonMovieCreditDataModel> { movie ->
-                movie.releaseDate?.take(4)?.toIntOrNull() ?: 0
+                movie.releaseDate.toReleaseYear()?.toIntOrNull() ?: 0
             }.thenByDescending { movie -> movie.popularity }
         )
         FilmographySort.HighestRated -> sortedWith(

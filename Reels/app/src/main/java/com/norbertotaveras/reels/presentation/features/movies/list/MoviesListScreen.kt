@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import coil3.compose.AsyncImage
+import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.CenteredErrorState
@@ -288,7 +289,7 @@ private fun FeaturedMovieHero(
             ) {
                 RatingBadge(rating = movie.voteAverage)
 
-                movie.releaseDate?.take(4)?.takeIf { it.isNotBlank() }?.let { year ->
+                movie.releaseDate.toReleaseYear()?.let { year ->
                     Text(
                         text = year,
                         style = MaterialTheme.typography.bodyLarge,
@@ -749,7 +750,7 @@ private fun HomePosterCard(
             overflow = TextOverflow.Ellipsis
         )
 
-        movie.releaseDate?.take(4)?.takeIf { it.isNotBlank() }?.let { year ->
+        movie.releaseDate.toReleaseYear()?.let { year ->
             Text(
                 text = year,
                 style = MaterialTheme.typography.bodyMedium.copy(

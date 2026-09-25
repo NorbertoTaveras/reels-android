@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import coil3.compose.AsyncImage
+import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
 import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
@@ -424,7 +425,7 @@ private fun MovieCategoryPosterCard(
             overflow = TextOverflow.Ellipsis
         )
 
-        movie.releaseDate?.take(4)?.takeIf { year -> year.isNotBlank() }?.let { year ->
+        movie.releaseDate.toReleaseYear()?.let { year ->
             Text(
                 text = year,
                 style = MaterialTheme.typography.bodyMedium.copy(

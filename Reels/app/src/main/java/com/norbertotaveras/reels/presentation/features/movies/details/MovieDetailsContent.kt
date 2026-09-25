@@ -48,6 +48,7 @@ import com.norbertotaveras.reels.domain.model.cast.CastMemberDataModel
 import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDetailsDataModel
 import com.norbertotaveras.reels.extensions.toDisplayTmdbDate
+import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.presentation.ui.components.cast.CastCarousel
 import com.norbertotaveras.reels.presentation.ui.components.movie.MovieHeroHeader
 import com.norbertotaveras.reels.presentation.ui.components.movie.PosterCarouselItem
@@ -112,7 +113,7 @@ fun MovieDetailsContent(
                 ),
                 posterUrl = movie.posterPath.toTmdbImageUrl(),
                 metadata = listOfNotNull(
-                    movie.releaseDate?.take(4),
+                    movie.releaseDate.toReleaseYear(),
                     movie.runtime?.let { "$it min" }
                 ),
                 rating = String.format("%.1f", movie.voteAverage),

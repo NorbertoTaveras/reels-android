@@ -56,6 +56,7 @@ import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.person.PersonMovieCreditDataModel
 import com.norbertotaveras.reels.extensions.toDisplayAge
 import com.norbertotaveras.reels.extensions.toDisplayTmdbDate
+import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.presentation.ui.components.movie.PosterCarousel
 import com.norbertotaveras.reels.presentation.ui.components.movie.PosterCarouselItem
 import com.norbertotaveras.reels.presentation.ui.components.common.SectionHeader
@@ -479,7 +480,7 @@ private fun KnownForPreviewSection(
                     id = movie.id,
                     title = movie.title,
                     posterUrl = movie.posterPath.toTmdbImageUrl(),
-                    releaseYear = movie.releaseDate?.take(4)
+                    releaseYear = movie.releaseDate.toReleaseYear()
                 )
             },
             onMovieClick = onMovieClick
