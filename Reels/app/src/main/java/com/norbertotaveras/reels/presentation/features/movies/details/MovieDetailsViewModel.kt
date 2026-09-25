@@ -11,6 +11,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.norbertotaveras.reels.presentation.navigation.ReelsDestinations
+import com.norbertotaveras.reels.domain.usecase.account.DeleteTmdbMovieRatingUseCase
+import com.norbertotaveras.reels.domain.usecase.account.GetTmdbMovieAccountStateUseCase
+import com.norbertotaveras.reels.domain.usecase.account.ObserveTmdbAccountUseCase
+import com.norbertotaveras.reels.domain.usecase.account.RateTmdbMovieUseCase
+import com.norbertotaveras.reels.domain.usecase.account.UpdateTmdbWatchlistUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.GetFavoriteMovieDetailsUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveIsFavoriteUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ToggleFavoriteMovieUseCase
@@ -46,6 +51,11 @@ class MovieDetailsViewModel @Inject constructor(
     private val observeIsFavoriteUseCase: ObserveIsFavoriteUseCase,
     private val toggleFavoriteMovieUseCase: ToggleFavoriteMovieUseCase,
     private val getFavoriteMovieDetailsUseCase: GetFavoriteMovieDetailsUseCase,
+    private val observeTmdbAccountUseCase: ObserveTmdbAccountUseCase,
+    private val getTmdbMovieAccountStateUseCase: GetTmdbMovieAccountStateUseCase,
+    private val updateTmdbWatchlistUseCase: UpdateTmdbWatchlistUseCase,
+    private val rateTmdbMovieUseCase: RateTmdbMovieUseCase,
+    private val deleteTmdbMovieRatingUseCase: DeleteTmdbMovieRatingUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(MovieDetailsUiState())
@@ -62,6 +72,7 @@ class MovieDetailsViewModel @Inject constructor(
 
     init {
         observeFavoriteState()
+        observeTmdbAccountState()
         observeSettings()
     }
 
@@ -70,6 +81,9 @@ class MovieDetailsViewModel @Inject constructor(
             MovieDetailsEvent.BackClicked -> onBackClicked()
             MovieDetailsEvent.RetryClicked -> loadMovie(language = currentLanguage)
             MovieDetailsEvent.FavoriteClicked -> onFavoriteClick()
+            MovieDetailsEvent.WatchlistClicked -> onWatchlistClicked()
+            MovieDetailsEvent.RatingClicked -> onRatingClicked()
+            MovieDetailsEvent.DeleteRatingClicked -> onDeleteRatingClicked()
             is MovieDetailsEvent.CastClicked -> onCastClicked(personId = event.personId)
             MovieDetailsEvent.CastSeeAllClicked -> onCastSeeAllClicked()
             is MovieDetailsEvent.TrailerClicked -> onTrailerClicked(trailerId = event.trailerId)
@@ -139,6 +153,7 @@ class MovieDetailsViewModel @Inject constructor(
                             isLoading = false
                         )
                     }
+                    refreshMovieAccountState()
                 },
                 onFailure = { error ->
                     val offlineFavorite = getFavoriteMovieDetailsUseCase(movieId = movieId)
@@ -172,6 +187,32 @@ class MovieDetailsViewModel @Inject constructor(
             observeIsFavoriteUseCase(movieId = movieId).collectLatest { isFavorite ->
                 _state.update { currentState ->
                     currentState.copy(isFavorite = isFavorite)
+                }
+            }
+        }
+    }
+
+    private fun observeTmdbAccountState() {
+        viewModelScope.launch {
+            observeTmdbAccountUseCase().collectLatest { accountState ->
+                _state.update { currentState ->
+                    currentState.copy(
+                        isTmdbAccountConnected = accountState.isConnected,
+                        isWatchlisted = if (accountState.isConnected) {
+                            currentState.isWatchlisted
+                        } else {
+                            false
+                        },
+                        tmdbRating = if (accountState.isConnected) {
+                            currentState.tmdbRating
+                        } else {
+                            null
+                        }
+                    )
+                }
+
+                if (accountState.isConnected) {
+                    refreshMovieAccountState()
                 }
             }
         }
@@ -234,6 +275,145 @@ class MovieDetailsViewModel @Inject constructor(
         }
     }
 
+    private fun refreshMovieAccountState() {
+        viewModelScope.launch {
+            getTmdbMovieAccountStateUseCase(movieId = movieId)
+                .onSuccess { accountState ->
+                    _state.update { currentState ->
+                        currentState.copy(
+                            isWatchlisted = accountState?.isWatchlisted ?: false,
+                            tmdbRating = accountState?.rating
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun onWatchlistClicked() {
+        val shouldWatchlist = !state.value.isWatchlisted
+        viewModelScope.launch {
+            if (state.value.isAccountActionLoading) return@launch
+
+            _state.update { currentState ->
+                currentState.copy(isAccountActionLoading = true)
+            }
+
+            updateTmdbWatchlistUseCase(
+                movieId = movieId,
+                watchlist = shouldWatchlist
+            ).fold(
+                onSuccess = {
+                    _state.update { currentState ->
+                        currentState.copy(
+                            isWatchlisted = shouldWatchlist,
+                            isAccountActionLoading = false
+                        )
+                    }
+                    _effect.emit(
+                        MovieDetailsEffect.ShowMessage(
+                            message = if (shouldWatchlist) {
+                                "Added to TMDB watchlist"
+                            } else {
+                                "Removed from TMDB watchlist"
+                            }
+                        )
+                    )
+                },
+                onFailure = { error ->
+                    _state.update { currentState ->
+                        currentState.copy(isAccountActionLoading = false)
+                    }
+                    _effect.emit(
+                        MovieDetailsEffect.ShowMessage(
+                            message = error.toUserMessage(
+                                fallback = "Unable to update TMDB watchlist."
+                            )
+                        )
+                    )
+                }
+            )
+        }
+    }
+
+    private fun onRatingClicked() {
+        viewModelScope.launch {
+            if (state.value.isAccountActionLoading) return@launch
+
+            _state.update { currentState ->
+                currentState.copy(isAccountActionLoading = true)
+            }
+
+            rateTmdbMovieUseCase(
+                movieId = movieId,
+                rating = DEFAULT_TMDB_RATING
+            ).fold(
+                onSuccess = {
+                    _state.update { currentState ->
+                        currentState.copy(
+                            tmdbRating = DEFAULT_TMDB_RATING,
+                            isAccountActionLoading = false
+                        )
+                    }
+                    _effect.emit(
+                        MovieDetailsEffect.ShowMessage(
+                            message = "Rated on TMDB"
+                        )
+                    )
+                },
+                onFailure = { error ->
+                    _state.update { currentState ->
+                        currentState.copy(isAccountActionLoading = false)
+                    }
+                    _effect.emit(
+                        MovieDetailsEffect.ShowMessage(
+                            message = error.toUserMessage(
+                                fallback = "Unable to rate this movie."
+                            )
+                        )
+                    )
+                }
+            )
+        }
+    }
+
+    private fun onDeleteRatingClicked() {
+        viewModelScope.launch {
+            if (state.value.isAccountActionLoading) return@launch
+
+            _state.update { currentState ->
+                currentState.copy(isAccountActionLoading = true)
+            }
+
+            deleteTmdbMovieRatingUseCase(movieId = movieId).fold(
+                onSuccess = {
+                    _state.update { currentState ->
+                        currentState.copy(
+                            tmdbRating = null,
+                            isAccountActionLoading = false
+                        )
+                    }
+                    _effect.emit(
+                        MovieDetailsEffect.ShowMessage(
+                            message = "TMDB rating removed"
+                        )
+                    )
+                },
+                onFailure = { error ->
+                    _state.update { currentState ->
+                        currentState.copy(isAccountActionLoading = false)
+                    }
+                    _effect.emit(
+                        MovieDetailsEffect.ShowMessage(
+                            message = error.toUserMessage(
+                                fallback = "Unable to remove this rating."
+                            )
+                        )
+                    )
+                }
+            )
+        }
+    }
+
     private fun onCastClicked(personId: Int) {
         viewModelScope.launch {
             _effect.emit(MovieDetailsEffect.NavigateToCastDetails(personId = personId))
@@ -265,5 +445,6 @@ class MovieDetailsViewModel @Inject constructor(
 
     private companion object {
         const val DEFAULT_LANGUAGE = "en-US"
+        const val DEFAULT_TMDB_RATING = 8.0
     }
 }

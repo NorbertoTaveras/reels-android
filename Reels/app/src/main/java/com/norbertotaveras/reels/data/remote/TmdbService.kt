@@ -10,8 +10,12 @@ package com.norbertotaveras.reels.data.remote
 import com.norbertotaveras.reels.data.remote.dto.genre.GenresResponseDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbAccountDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbCreateSessionRequestDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbMovieAccountStateDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbMutationResponseDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbRatingRequestDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbRequestTokenDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbSessionDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbWatchlistRequestDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieCreditsDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieDetailsDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieVideosDto
@@ -20,6 +24,7 @@ import com.norbertotaveras.reels.data.remote.dto.person.PersonDetailsDto
 import com.norbertotaveras.reels.data.remote.dto.person.PersonMovieCreditsDto
 import retrofit2.http.GET
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.Path
 import retrofit2.http.POST
 import retrofit2.http.Query
@@ -37,6 +42,32 @@ interface TmdbService {
     suspend fun getAccountDetails(
         @Query("session_id") sessionId: String
     ): TmdbAccountDto
+
+    @GET("movie/{movieId}/account_states")
+    suspend fun getMovieAccountState(
+        @Path("movieId") movieId: Int,
+        @Query("session_id") sessionId: String
+    ): TmdbMovieAccountStateDto
+
+    @POST("account/{accountId}/watchlist")
+    suspend fun updateWatchlist(
+        @Path("accountId") accountId: Int,
+        @Query("session_id") sessionId: String,
+        @Body request: TmdbWatchlistRequestDto
+    ): TmdbMutationResponseDto
+
+    @POST("movie/{movieId}/rating")
+    suspend fun rateMovie(
+        @Path("movieId") movieId: Int,
+        @Query("session_id") sessionId: String,
+        @Body request: TmdbRatingRequestDto
+    ): TmdbMutationResponseDto
+
+    @DELETE("movie/{movieId}/rating")
+    suspend fun deleteMovieRating(
+        @Path("movieId") movieId: Int,
+        @Query("session_id") sessionId: String
+    ): TmdbMutationResponseDto
 
     @GET("movie/{category}")
     suspend fun getMovies(

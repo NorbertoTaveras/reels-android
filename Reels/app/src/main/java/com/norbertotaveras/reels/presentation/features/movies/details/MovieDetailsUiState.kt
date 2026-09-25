@@ -21,5 +21,9 @@ data class MovieDetailsUiState(
     val isFavorite: Boolean = false,
     val isFavoriteLoading: Boolean = false,
     val isOfflineFavorite: Boolean = false,
+    val isTmdbAccountConnected: Boolean = false,
+    val isWatchlisted: Boolean = false,
+    val tmdbRating: Double? = null,
+    val isAccountActionLoading: Boolean = false,
     val errorMessage: String? = null
 )

@@ -12,6 +12,7 @@ import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.account.TmdbAccountStateDataModel
+import com.norbertotaveras.reels.domain.model.account.TmdbMovieAccountStateDataModel
 import com.norbertotaveras.reels.domain.repository.account.TmdbAccountRepository
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -69,6 +70,71 @@ class TmdbAccountRepositoryImpl @Inject constructor(
         return accountResult {
             accountDataStore.clearAccount()
         }
+    }
+
+    override suspend fun getMovieAccountState(
+        movieId: Int
+    ): Result<TmdbMovieAccountStateDataModel?> {
+        return accountResult {
+            val accountState = accountDataStore.accountState.first()
+            val sessionId = accountState.sessionId ?: return@accountResult null
+
+            remoteDataSource.getMovieAccountState(
+                movieId = movieId,
+                sessionId = sessionId
+            ).toTmdbMovieAccountStateDataModel()
+        }
+    }
+
+    override suspend fun updateMovieWatchlist(
+        movieId: Int,
+        watchlist: Boolean
+    ): Result<Unit> {
+        return accountResult {
+            val accountState = requireConnectedAccountState()
+            remoteDataSource.updateWatchlist(
+                accountId = accountState.account?.accountId
+                    ?: error("TMDB account details are unavailable."),
+                sessionId = accountState.sessionId
+                    ?: error("TMDB session is unavailable."),
+                movieId = movieId,
+                watchlist = watchlist
+            )
+        }
+    }
+
+    override suspend fun rateMovie(
+        movieId: Int,
+        rating: Double
+    ): Result<Unit> {
+        return accountResult {
+            val sessionId = requireConnectedAccountState().sessionId
+                ?: error("TMDB session is unavailable.")
+            remoteDataSource.rateMovie(
+                movieId = movieId,
+                sessionId = sessionId,
+                rating = rating
+            )
+        }
+    }
+
+    override suspend fun deleteMovieRating(movieId: Int): Result<Unit> {
+        return accountResult {
+            val sessionId = requireConnectedAccountState().sessionId
+                ?: error("TMDB session is unavailable.")
+            remoteDataSource.deleteMovieRating(
+                movieId = movieId,
+                sessionId = sessionId
+            )
+        }
+    }
+
+    private suspend fun requireConnectedAccountState(): TmdbAccountStateDataModel {
+        val accountState = accountDataStore.accountState.first()
+        if (!accountState.isConnected) {
+            error("Connect a TMDB account before syncing this movie.")
+        }
+        return accountState
     }
 
     private suspend fun <T> accountResult(block: suspend () -> T): Result<T> {

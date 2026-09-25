@@ -9,6 +9,7 @@ package com.norbertotaveras.reels.data.remote
 
 import com.norbertotaveras.reels.data.remote.dto.genre.GenresResponseDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbAccountDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbMovieAccountStateDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbRequestTokenDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbSessionDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieCreditsDto
@@ -24,6 +25,29 @@ interface TmdbRemoteDataSource {
     suspend fun createSession(requestToken: String): TmdbSessionDto
 
     suspend fun getAccountDetails(sessionId: String): TmdbAccountDto
+
+    suspend fun getMovieAccountState(
+        movieId: Int,
+        sessionId: String
+    ): TmdbMovieAccountStateDto
+
+    suspend fun updateWatchlist(
+        accountId: Int,
+        sessionId: String,
+        movieId: Int,
+        watchlist: Boolean
+    )
+
+    suspend fun rateMovie(
+        movieId: Int,
+        sessionId: String,
+        rating: Double
+    )
+
+    suspend fun deleteMovieRating(
+        movieId: Int,
+        sessionId: String
+    )
 
     suspend fun getMovies(
         category: String,

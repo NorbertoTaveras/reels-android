@@ -10,8 +10,11 @@ package com.norbertotaveras.reels.data.remote
 import com.norbertotaveras.reels.data.remote.dto.genre.GenresResponseDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbAccountDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbCreateSessionRequestDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbMovieAccountStateDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbRatingRequestDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbRequestTokenDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbSessionDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbWatchlistRequestDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieCreditsDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieDetailsDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieVideosDto
@@ -35,6 +38,54 @@ class TmdbRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun getAccountDetails(sessionId: String): TmdbAccountDto {
         return service.getAccountDetails(sessionId = sessionId)
+    }
+
+    override suspend fun getMovieAccountState(
+        movieId: Int,
+        sessionId: String
+    ): TmdbMovieAccountStateDto {
+        return service.getMovieAccountState(
+            movieId = movieId,
+            sessionId = sessionId
+        )
+    }
+
+    override suspend fun updateWatchlist(
+        accountId: Int,
+        sessionId: String,
+        movieId: Int,
+        watchlist: Boolean
+    ) {
+        service.updateWatchlist(
+            accountId = accountId,
+            sessionId = sessionId,
+            request = TmdbWatchlistRequestDto(
+                mediaId = movieId,
+                watchlist = watchlist
+            )
+        )
+    }
+
+    override suspend fun rateMovie(
+        movieId: Int,
+        sessionId: String,
+        rating: Double
+    ) {
+        service.rateMovie(
+            movieId = movieId,
+            sessionId = sessionId,
+            request = TmdbRatingRequestDto(value = rating)
+        )
+    }
+
+    override suspend fun deleteMovieRating(
+        movieId: Int,
+        sessionId: String
+    ) {
+        service.deleteMovieRating(
+            movieId = movieId,
+            sessionId = sessionId
+        )
     }
 
     override suspend fun getMovies(
