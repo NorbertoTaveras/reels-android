@@ -14,6 +14,7 @@ import androidx.paging.map
 import com.norbertotaveras.reels.data.local.preferences.TmdbAccountDataStore
 import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
+import com.norbertotaveras.reels.data.remote.paging.TmdbAccountMovieListType
 import com.norbertotaveras.reels.data.remote.paging.TmdbWatchlistMoviesPagingSource
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.account.TmdbAccountStateDataModel
@@ -100,28 +101,19 @@ class TmdbAccountRepositoryImpl @Inject constructor(
     override fun getWatchlistMovies(
         language: String,
     ): Flow<PagingData<MovieDataModel>> {
-        return accountDataStore.accountState.flatMapLatest { accountState ->
-            val accountId = accountState.account?.accountId
-            val sessionId = accountState.sessionId
+        return getAccountMovies(
+            language = language,
+            listType = TmdbAccountMovieListType.Watchlist
+        )
+    }
 
-            if (!accountState.isConnected || accountId == null || sessionId == null) {
-                flowOf(PagingData.empty())
-            } else {
-                Pager(
-                    config = defaultPagingConfig(),
-                    pagingSourceFactory = {
-                        TmdbWatchlistMoviesPagingSource(
-                            remoteDataSource = remoteDataSource,
-                            accountId = accountId,
-                            sessionId = sessionId,
-                            language = language
-                        )
-                    }
-                ).flow.map { pagingData ->
-                    pagingData.map { movieDto -> movieDto.toMovieDataModel() }
-                }
-            }
-        }
+    override fun getRatedMovies(
+        language: String,
+    ): Flow<PagingData<MovieDataModel>> {
+        return getAccountMovies(
+            language = language,
+            listType = TmdbAccountMovieListType.Rated
+        )
     }
 
     override suspend fun updateMovieWatchlist(
@@ -182,6 +174,35 @@ class TmdbAccountRepositoryImpl @Inject constructor(
             prefetchDistance = 5,
             enablePlaceholders = false
         )
+    }
+
+    private fun getAccountMovies(
+        language: String,
+        listType: TmdbAccountMovieListType,
+    ): Flow<PagingData<MovieDataModel>> {
+        return accountDataStore.accountState.flatMapLatest { accountState ->
+            val accountId = accountState.account?.accountId
+            val sessionId = accountState.sessionId
+
+            if (!accountState.isConnected || accountId == null || sessionId == null) {
+                flowOf(PagingData.empty())
+            } else {
+                Pager(
+                    config = defaultPagingConfig(),
+                    pagingSourceFactory = {
+                        TmdbWatchlistMoviesPagingSource(
+                            remoteDataSource = remoteDataSource,
+                            accountId = accountId,
+                            sessionId = sessionId,
+                            language = language,
+                            listType = listType
+                        )
+                    }
+                ).flow.map { pagingData ->
+                    pagingData.map { movieDto -> movieDto.toMovieDataModel() }
+                }
+            }
+        }
     }
 
     private suspend fun <T> accountResult(block: suspend () -> T): Result<T> {

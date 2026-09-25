@@ -70,6 +70,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 fun FavoritesScreen(
     state: FavoritesUiState,
     tmdbWatchlistMovies: LazyPagingItems<MovieDataModel>,
+    tmdbRatedMovies: LazyPagingItems<MovieDataModel>,
     onEvent: (FavoritesEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -142,9 +143,21 @@ fun FavoritesScreen(
                 }
 
                 LibraryTab.Tmdb -> {
-                    tmdbWatchlistContent(
+                    tmdbAccountMovieContent(
                         state = state,
                         movies = tmdbWatchlistMovies,
+                        listType = TmdbLibraryListType.Watchlist,
+                        onMovieClick = { movieId ->
+                            onEvent(FavoritesEvent.MovieClicked(movieId = movieId))
+                        }
+                    )
+                }
+
+                LibraryTab.Rated -> {
+                    tmdbAccountMovieContent(
+                        state = state,
+                        movies = tmdbRatedMovies,
+                        listType = TmdbLibraryListType.Rated,
                         onMovieClick = { movieId ->
                             onEvent(FavoritesEvent.MovieClicked(movieId = movieId))
                         }
@@ -207,9 +220,15 @@ private fun LibraryHeader(
     }
 }
 
-private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbWatchlistContent(
+private enum class TmdbLibraryListType {
+    Watchlist,
+    Rated
+}
+
+private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovieContent(
     state: FavoritesUiState,
     movies: LazyPagingItems<MovieDataModel>,
+    listType: TmdbLibraryListType,
     onMovieClick: (Int) -> Unit,
 ) {
     when {
@@ -225,6 +244,7 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbWatchlistCon
         movies.loadState.refresh is LoadState.Loading -> {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 LibraryLoadingState(
+                    listType = listType,
                     modifier = Modifier.padding(top = ReelsDimensions.favoritesEmptyTopPadding)
                 )
             }
@@ -233,6 +253,7 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbWatchlistCon
         movies.loadState.refresh is LoadState.Error -> {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 LibraryErrorState(
+                    listType = listType,
                     modifier = Modifier.padding(top = ReelsDimensions.favoritesEmptyTopPadding)
                 )
             }
@@ -251,13 +272,14 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbWatchlistCon
             items(
                 count = movies.itemCount,
                 key = { index ->
-                    movies.peek(index)?.id?.let { movieId -> "tmdb-$movieId-$index" }
-                        ?: "tmdb-placeholder-$index"
+                    movies.peek(index)?.id?.let { movieId -> "${listType.name}-$movieId-$index" }
+                        ?: "${listType.name}-placeholder-$index"
                 }
             ) { index ->
                 movies[index]?.let { movie ->
                     TmdbWatchlistMovieCard(
                         movie = movie,
+                        listType = listType,
                         onClick = {
                             onMovieClick(movie.id)
                         }
@@ -316,6 +338,7 @@ private fun LibraryTabChip(
 @Composable
 private fun TmdbWatchlistMovieCard(
     movie: MovieDataModel,
+    listType: TmdbLibraryListType,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -331,7 +354,16 @@ private fun TmdbWatchlistMovieCard(
                 TmdbBadge()
             },
             topEndBadge = {
-                RatingBadge(rating = String.format("%.1f", movie.voteAverage))
+                RatingBadge(
+                    rating = when (listType) {
+                        TmdbLibraryListType.Watchlist -> String.format("%.1f", movie.voteAverage)
+                        TmdbLibraryListType.Rated -> {
+                            movie.accountRating?.let { rating ->
+                                "Your ${String.format("%.1f", rating)}"
+                            } ?: String.format("%.1f", movie.voteAverage)
+                        }
+                    }
+                )
             }
         )
 
@@ -697,6 +729,7 @@ private fun LibraryRemoveButton(
 
 @Composable
 private fun LibraryLoadingState(
+    listType: TmdbLibraryListType,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -716,7 +749,10 @@ private fun LibraryLoadingState(
             CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
 
             Text(
-                text = "Loading TMDB watchlist",
+                text = when (listType) {
+                    TmdbLibraryListType.Watchlist -> "Loading TMDB watchlist"
+                    TmdbLibraryListType.Rated -> "Loading TMDB ratings"
+                },
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold
@@ -727,6 +763,7 @@ private fun LibraryLoadingState(
 
 @Composable
 private fun LibraryErrorState(
+    listType: TmdbLibraryListType,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -759,7 +796,10 @@ private fun LibraryErrorState(
             }
 
             Text(
-                text = "Unable to load TMDB watchlist",
+                text = when (listType) {
+                    TmdbLibraryListType.Watchlist -> "Unable to load TMDB watchlist"
+                    TmdbLibraryListType.Rated -> "Unable to load TMDB ratings"
+                },
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold
@@ -806,6 +846,7 @@ private fun EmptyLibraryState(
                             LibraryTab.Movies -> Icons.Outlined.FavoriteBorder
                             LibraryTab.People -> Icons.Filled.Person
                             LibraryTab.Tmdb -> Icons.Filled.Sync
+                            LibraryTab.Rated -> Icons.Filled.Star
                         },
                         contentDescription = null,
                         modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconSize)
@@ -818,6 +859,7 @@ private fun EmptyLibraryState(
                     LibraryTab.Movies -> "No saved movies yet"
                     LibraryTab.People -> "No saved people yet"
                     LibraryTab.Tmdb -> "No TMDB watchlist yet"
+                    LibraryTab.Rated -> "No TMDB ratings yet"
                 },
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -829,6 +871,7 @@ private fun EmptyLibraryState(
                     LibraryTab.Movies -> "Save movies from details to keep their posters, ratings, and key info available offline."
                     LibraryTab.People -> "Save people from cast details to keep their profiles and known-for movies available offline."
                     LibraryTab.Tmdb -> "Connect TMDB in Settings, then add movies to your TMDB watchlist from Movie Details."
+                    LibraryTab.Rated -> "Rate movies from Movie Details to sync them with your TMDB account."
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,

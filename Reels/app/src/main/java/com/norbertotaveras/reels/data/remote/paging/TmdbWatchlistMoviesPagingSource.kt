@@ -18,16 +18,25 @@ class TmdbWatchlistMoviesPagingSource(
     private val accountId: Int,
     private val sessionId: String,
     private val language: String,
+    private val listType: TmdbAccountMovieListType = TmdbAccountMovieListType.Watchlist,
 ) : PagingSource<Int, MovieDto>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MovieDto> {
         return try {
             val page = params.key ?: FIRST_PAGE
-            val response = remoteDataSource.getWatchlistMovies(
-                accountId = accountId,
-                sessionId = sessionId,
-                language = language,
-                page = page
-            )
+            val response = when (listType) {
+                TmdbAccountMovieListType.Watchlist -> remoteDataSource.getWatchlistMovies(
+                    accountId = accountId,
+                    sessionId = sessionId,
+                    language = language,
+                    page = page
+                )
+                TmdbAccountMovieListType.Rated -> remoteDataSource.getRatedMovies(
+                    accountId = accountId,
+                    sessionId = sessionId,
+                    language = language,
+                    page = page
+                )
+            }
 
             LoadResult.Page(
                 data = response.results,

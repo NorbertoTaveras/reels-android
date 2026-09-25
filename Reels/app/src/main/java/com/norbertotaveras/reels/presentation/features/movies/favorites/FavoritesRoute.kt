@@ -30,6 +30,7 @@ fun FavoritesRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val tmdbWatchlistMovies = viewModel.tmdbWatchlistMovies.collectAsLazyPagingItems()
+    val tmdbRatedMovies = viewModel.tmdbRatedMovies.collectAsLazyPagingItems()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(viewModel, snackbarHostState) {
@@ -52,6 +53,7 @@ fun FavoritesRoute(
         FavoritesScreen(
             state = state,
             tmdbWatchlistMovies = tmdbWatchlistMovies,
+            tmdbRatedMovies = tmdbRatedMovies,
             onEvent = viewModel::onEvent,
             modifier = Modifier.fillMaxSize()
         )

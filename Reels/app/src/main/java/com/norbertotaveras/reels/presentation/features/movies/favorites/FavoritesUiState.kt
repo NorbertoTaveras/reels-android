@@ -24,7 +24,8 @@ enum class LibraryTab(
 ) {
     Movies(title = "Movies"),
     People(title = "People"),
-    Tmdb(title = "TMDB")
+    Tmdb(title = "TMDB"),
+    Rated(title = "Rated")
 }
 
 val FavoritesUiState.selectedItemCount: Int
@@ -32,13 +33,14 @@ val FavoritesUiState.selectedItemCount: Int
         LibraryTab.Movies -> movies.size
         LibraryTab.People -> people.size
         LibraryTab.Tmdb -> 0
+        LibraryTab.Rated -> 0
     }
 
 val FavoritesUiState.hasSavedItems: Boolean
     get() = movies.isNotEmpty() || people.isNotEmpty()
 
 val FavoritesUiState.hasSelectedTabItems: Boolean
-    get() = selectedTab == LibraryTab.Tmdb || selectedItemCount > 0
+    get() = selectedTab == LibraryTab.Tmdb || selectedTab == LibraryTab.Rated || selectedItemCount > 0
 
 val FavoritesUiState.offlineLabel: String
     get() = "Available offline"

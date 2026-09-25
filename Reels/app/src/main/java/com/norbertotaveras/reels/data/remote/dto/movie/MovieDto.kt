@@ -29,7 +29,9 @@ data class MovieDto(
     @SerializedName("vote_average")
     val voteAverage: Double,
 	@SerializedName("genre_ids")
-	val genreIds: List<Int>
+	val genreIds: List<Int>,
+    @SerializedName("rating")
+    val accountRating: Double? = null,
 ) : Parcelable {
 	fun toMovieDataModel(): MovieDataModel {
 		return MovieDataModel(
@@ -40,7 +42,8 @@ data class MovieDto(
 			backdropPath = backdropPath,
             releaseDate = releaseDate,
             voteAverage = voteAverage,
-			genreIds = genreIds
+			genreIds = genreIds,
+            accountRating = accountRating
 		)
 	}
 }

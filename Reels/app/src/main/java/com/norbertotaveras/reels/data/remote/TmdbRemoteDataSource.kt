@@ -45,6 +45,13 @@ interface TmdbRemoteDataSource {
         page: Int? = null
     ): MoviesResponseDto
 
+    suspend fun getRatedMovies(
+        accountId: Int,
+        sessionId: String,
+        language: String? = null,
+        page: Int? = null
+    ): MoviesResponseDto
+
     suspend fun rateMovie(
         movieId: Int,
         sessionId: String,

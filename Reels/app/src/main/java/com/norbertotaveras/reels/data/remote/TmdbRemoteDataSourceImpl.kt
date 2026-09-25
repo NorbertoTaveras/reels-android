@@ -80,6 +80,20 @@ class TmdbRemoteDataSourceImpl @Inject constructor(
         )
     }
 
+    override suspend fun getRatedMovies(
+        accountId: Int,
+        sessionId: String,
+        language: String?,
+        page: Int?
+    ): MoviesResponseDto {
+        return service.getRatedMovies(
+            accountId = accountId,
+            sessionId = sessionId,
+            language = language,
+            page = page
+        )
+    }
+
     override suspend fun rateMovie(
         movieId: Int,
         sessionId: String,

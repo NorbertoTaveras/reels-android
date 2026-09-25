@@ -19,5 +19,6 @@ data class MovieDataModel(
     val backdropPath: String?,
     val releaseDate: String?,
     val voteAverage: Double,
-    val genreIds: List<Int>
+    val genreIds: List<Int>,
+    val accountRating: Double? = null,
 ) : Parcelable

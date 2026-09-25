@@ -64,6 +64,14 @@ interface TmdbService {
         @Query("page") page: Int?
     ): MoviesResponseDto
 
+    @GET("account/{accountId}/rated/movies")
+    suspend fun getRatedMovies(
+        @Path("accountId") accountId: Int,
+        @Query("session_id") sessionId: String,
+        @Query("language") language: String?,
+        @Query("page") page: Int?
+    ): MoviesResponseDto
+
     @POST("movie/{movieId}/rating")
     suspend fun rateMovie(
         @Path("movieId") movieId: Int,

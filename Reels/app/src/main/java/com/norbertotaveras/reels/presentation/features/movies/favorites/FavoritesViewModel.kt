@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
+import com.norbertotaveras.reels.domain.usecase.account.GetTmdbRatedMoviesUseCase
 import com.norbertotaveras.reels.domain.usecase.account.GetTmdbWatchlistMoviesUseCase
 import com.norbertotaveras.reels.domain.usecase.account.ObserveTmdbAccountUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveFavoriteMoviesUseCase
@@ -47,6 +48,7 @@ class FavoritesViewModel @Inject constructor(
     private val removeSavedPersonUseCase: RemoveSavedPersonUseCase,
     private val observeTmdbAccountUseCase: ObserveTmdbAccountUseCase,
     private val getTmdbWatchlistMoviesUseCase: GetTmdbWatchlistMoviesUseCase,
+    private val getTmdbRatedMoviesUseCase: GetTmdbRatedMoviesUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(FavoritesUiState())
@@ -60,6 +62,14 @@ class FavoritesViewModel @Inject constructor(
         .distinctUntilChanged()
         .flatMapLatest { language ->
             getTmdbWatchlistMoviesUseCase(language = language)
+        }
+        .cachedIn(viewModelScope)
+
+    val tmdbRatedMovies: Flow<PagingData<MovieDataModel>> = observeSettingsUseCase()
+        .map { settings -> settings.languageRegion.languageCode }
+        .distinctUntilChanged()
+        .flatMapLatest { language ->
+            getTmdbRatedMoviesUseCase(language = language)
         }
         .cachedIn(viewModelScope)
 
