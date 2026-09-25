@@ -7,6 +7,7 @@
 
 package com.norbertotaveras.reels.domain.repository.settings
 
+import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
 import com.norbertotaveras.reels.domain.model.settings.AppSettings
 import com.norbertotaveras.reels.domain.model.settings.AppTheme
 import com.norbertotaveras.reels.domain.model.settings.ImageQuality
@@ -19,4 +20,5 @@ interface SettingsRepository {
     suspend fun updateLanguageRegion(languageRegion: LanguageRegion)
     suspend fun updateTheme(theme: AppTheme)
     suspend fun updateRecentSearches(recentSearches: List<String>)
+    suspend fun updateDiscoverFilters(filters: DiscoverFilterDataModel)
 }

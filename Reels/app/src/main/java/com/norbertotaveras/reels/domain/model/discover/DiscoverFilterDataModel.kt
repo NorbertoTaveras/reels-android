@@ -15,6 +15,9 @@ data class DiscoverFilterDataModel(
     val minimumRating: Int? = null,
 )
 
+val DiscoverFilterDataModel.hasActiveFilters: Boolean
+    get() = this != DiscoverFilterDataModel()
+
 enum class DiscoverSort(
     val label: String,
     val apiValue: String,

@@ -15,6 +15,7 @@ import com.norbertotaveras.reels.domain.model.discover.DiscoverSort
 import com.norbertotaveras.reels.domain.usecase.movie.DiscoverMoviesUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.GetMovieGenresUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
+import com.norbertotaveras.reels.domain.usecase.settings.UpdateDiscoverFiltersUseCase
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -37,6 +38,7 @@ class DiscoverViewModel @Inject constructor(
     private val discoverMoviesUseCase: DiscoverMoviesUseCase,
     private val getMovieGenresUseCase: GetMovieGenresUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
+    private val updateDiscoverFiltersUseCase: UpdateDiscoverFiltersUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(DiscoverUiState())
     val state: StateFlow<DiscoverUiState> = _state.asStateFlow()
@@ -69,6 +71,7 @@ class DiscoverViewModel @Inject constructor(
             )
             is DiscoverEvent.YearSelected -> updateYear(year = event.year)
             is DiscoverEvent.RatingSelected -> updateRating(minimumRating = event.minimumRating)
+            DiscoverEvent.ClearFiltersClicked -> updateFilters(filters = DiscoverFilterDataModel())
             DiscoverEvent.RetryFiltersClicked -> loadGenres()
             is DiscoverEvent.MovieClicked -> onMovieClicked(movieId = event.movieId)
         }
@@ -77,11 +80,14 @@ class DiscoverViewModel @Inject constructor(
     private fun observeSettings() {
         viewModelScope.launch {
             observeSettingsUseCase()
-                .map { settings -> settings.languageRegion.languageCode }
+                .map { settings -> settings.languageRegion.languageCode to settings.discoverFilters }
                 .distinctUntilChanged()
-                .collect { language ->
+                .collect { (language, filters) ->
                     _state.update { currentState ->
-                        currentState.copy(language = language)
+                        currentState.copy(
+                            language = language,
+                            filters = filters
+                        )
                     }
                 }
         }
@@ -120,33 +126,33 @@ class DiscoverViewModel @Inject constructor(
     }
 
     private fun updateSort(sort: DiscoverSort) {
-        _state.update { currentState ->
-            currentState.copy(filters = currentState.filters.copy(sort = sort))
-        }
+        updateFilters(filters = state.value.filters.copy(sort = sort))
     }
 
     private fun updateGenre(genreId: Int?, genreName: String?) {
-        _state.update { currentState ->
-            currentState.copy(
-                filters = currentState.filters.copy(
-                    genreId = genreId,
-                    genreName = genreName
-                )
+        updateFilters(
+            filters = state.value.filters.copy(
+                genreId = genreId,
+                genreName = genreName
             )
-        }
+        )
     }
 
     private fun updateYear(year: Int?) {
-        _state.update { currentState ->
-            currentState.copy(filters = currentState.filters.copy(year = year))
-        }
+        updateFilters(filters = state.value.filters.copy(year = year))
     }
 
     private fun updateRating(minimumRating: Int?) {
+        updateFilters(filters = state.value.filters.copy(minimumRating = minimumRating))
+    }
+
+    private fun updateFilters(filters: DiscoverFilterDataModel) {
         _state.update { currentState ->
-            currentState.copy(
-                filters = currentState.filters.copy(minimumRating = minimumRating)
-            )
+            currentState.copy(filters = filters)
+        }
+
+        viewModelScope.launch {
+            updateDiscoverFiltersUseCase(filters = filters)
         }
     }
 

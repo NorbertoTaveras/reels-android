@@ -116,8 +116,16 @@ fun DiscoverScreen(
                 if (movies.itemCount == 0) {
                     item(span = { GridItemSpan(maxLineSpan) }) {
                         EmptyState(
-                            title = "No matches found",
-                            message = "Adjust your filters to discover more movies."
+                            title = if (state.hasActiveFilters) {
+                                "No matches found"
+                            } else {
+                                "No movies found"
+                            },
+                            message = if (state.hasActiveFilters) {
+                                "This combination is a little too specific. Clear filters or widen your rating, year, or genre."
+                            } else {
+                                "Try refreshing Discover again in a moment."
+                            }
                         )
                     }
                 } else {
@@ -210,6 +218,14 @@ private fun DiscoverFilters(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(ReelsDimensions.discoverSectionSpacing)
     ) {
+        if (state.hasActiveFilters) {
+            ActiveFiltersRow(
+                onClearClick = {
+                    onEvent(DiscoverEvent.ClearFiltersClicked)
+                }
+            )
+        }
+
         DiscoverChipSection(title = "Sort") {
             DiscoverSort.entries.forEach { sort ->
                 DiscoverFilterChip(
@@ -284,6 +300,29 @@ private fun DiscoverFilters(
                     onEvent(DiscoverEvent.RetryFiltersClicked)
                 }
             )
+        }
+    }
+}
+
+@Composable
+private fun ActiveFiltersRow(
+    onClearClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Filters active",
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.SemiBold
+        )
+
+        FilledTonalButton(onClick = onClearClick) {
+            Text(text = "Clear filters")
         }
     }
 }

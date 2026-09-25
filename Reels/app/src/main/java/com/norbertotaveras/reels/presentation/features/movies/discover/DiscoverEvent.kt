@@ -14,6 +14,7 @@ sealed interface DiscoverEvent {
     data class GenreSelected(val genreId: Int?, val genreName: String?) : DiscoverEvent
     data class YearSelected(val year: Int?) : DiscoverEvent
     data class RatingSelected(val minimumRating: Int?) : DiscoverEvent
+    data object ClearFiltersClicked : DiscoverEvent
     data object RetryFiltersClicked : DiscoverEvent
     data class MovieClicked(val movieId: Int) : DiscoverEvent
 }

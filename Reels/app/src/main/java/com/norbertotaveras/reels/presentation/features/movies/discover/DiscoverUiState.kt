@@ -8,6 +8,7 @@
 package com.norbertotaveras.reels.presentation.features.movies.discover
 
 import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
+import com.norbertotaveras.reels.domain.model.discover.hasActiveFilters
 import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
 
 data class DiscoverUiState(
@@ -17,3 +18,6 @@ data class DiscoverUiState(
     val isLoadingFilters: Boolean = true,
     val filterErrorMessage: String? = null,
 )
+
+val DiscoverUiState.hasActiveFilters: Boolean
+    get() = filters.hasActiveFilters

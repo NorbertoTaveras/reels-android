@@ -8,6 +8,7 @@
 package com.norbertotaveras.reels.data.repository.settings
 
 import com.norbertotaveras.reels.data.local.preferences.SettingsDataStore
+import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
 import com.norbertotaveras.reels.domain.model.settings.AppSettings
 import com.norbertotaveras.reels.domain.model.settings.AppTheme
 import com.norbertotaveras.reels.domain.model.settings.ImageQuality
@@ -51,6 +52,12 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun updateRecentSearches(recentSearches: List<String>) {
         withContext(ioDispatcher) {
             settingsDataStore.updateRecentSearches(recentSearches = recentSearches)
+        }
+    }
+
+    override suspend fun updateDiscoverFilters(filters: DiscoverFilterDataModel) {
+        withContext(ioDispatcher) {
+            settingsDataStore.updateDiscoverFilters(filters = filters)
         }
     }
 }

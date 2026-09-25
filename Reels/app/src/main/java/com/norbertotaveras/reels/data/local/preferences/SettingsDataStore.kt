@@ -11,6 +11,8 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
+import com.norbertotaveras.reels.domain.model.discover.DiscoverSort
 import com.norbertotaveras.reels.domain.model.settings.AppSettings
 import com.norbertotaveras.reels.domain.model.settings.AppTheme
 import com.norbertotaveras.reels.domain.model.settings.ImageQuality
@@ -22,6 +24,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.json.JSONArray
 import org.json.JSONException
+import org.json.JSONObject
 
 private val Context.settingsDataStore by preferencesDataStore(name = "settings")
 
@@ -36,7 +39,8 @@ class SettingsDataStore @Inject constructor(
                 LanguageRegion.EnglishUnitedStates
             ),
             theme = preferences[THEME_KEY].toEnumOrDefault(AppTheme.System),
-            recentSearches = preferences[RECENT_SEARCHES_KEY].toRecentSearches()
+            recentSearches = preferences[RECENT_SEARCHES_KEY].toRecentSearches(),
+            discoverFilters = preferences[DISCOVER_FILTERS_KEY].toDiscoverFilters()
         )
     }
 
@@ -61,6 +65,12 @@ class SettingsDataStore @Inject constructor(
     suspend fun updateRecentSearches(recentSearches: List<String>) {
         context.settingsDataStore.edit { preferences ->
             preferences[RECENT_SEARCHES_KEY] = recentSearches.toJsonArrayString()
+        }
+    }
+
+    suspend fun updateDiscoverFilters(filters: DiscoverFilterDataModel) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[DISCOVER_FILTERS_KEY] = filters.toJsonObjectString()
         }
     }
 
@@ -94,10 +104,53 @@ class SettingsDataStore @Inject constructor(
         return jsonArray.toString()
     }
 
+    private fun String?.toDiscoverFilters(): DiscoverFilterDataModel {
+        if (this.isNullOrBlank()) return DiscoverFilterDataModel()
+
+        return try {
+            val jsonObject = JSONObject(this)
+            DiscoverFilterDataModel(
+                sort = jsonObject.optString(DISCOVER_SORT)
+                    .toEnumOrDefault(DiscoverSort.Popularity),
+                genreId = jsonObject.optionalInt(DISCOVER_GENRE_ID),
+                genreName = jsonObject.optionalString(DISCOVER_GENRE_NAME),
+                year = jsonObject.optionalInt(DISCOVER_YEAR),
+                minimumRating = jsonObject.optionalInt(DISCOVER_MINIMUM_RATING)
+            )
+        } catch (_: JSONException) {
+            DiscoverFilterDataModel()
+        }
+    }
+
+    private fun DiscoverFilterDataModel.toJsonObjectString(): String {
+        return JSONObject()
+            .put(DISCOVER_SORT, sort.name)
+            .put(DISCOVER_GENRE_ID, genreId)
+            .put(DISCOVER_GENRE_NAME, genreName)
+            .put(DISCOVER_YEAR, year)
+            .put(DISCOVER_MINIMUM_RATING, minimumRating)
+            .toString()
+    }
+
+    private fun JSONObject.optionalInt(name: String): Int? {
+        return if (isNull(name)) null else optInt(name)
+    }
+
+    private fun JSONObject.optionalString(name: String): String? {
+        return if (isNull(name)) null else optString(name).takeIf { value -> value.isNotBlank() }
+    }
+
     private companion object {
         val IMAGE_QUALITY_KEY = stringPreferencesKey("image_quality")
         val LANGUAGE_REGION_KEY = stringPreferencesKey("language_region")
         val THEME_KEY = stringPreferencesKey("theme")
         val RECENT_SEARCHES_KEY = stringPreferencesKey("recent_searches")
+        val DISCOVER_FILTERS_KEY = stringPreferencesKey("discover_filters")
+
+        const val DISCOVER_SORT = "sort"
+        const val DISCOVER_GENRE_ID = "genreId"
+        const val DISCOVER_GENRE_NAME = "genreName"
+        const val DISCOVER_YEAR = "year"
+        const val DISCOVER_MINIMUM_RATING = "minimumRating"
     }
 }

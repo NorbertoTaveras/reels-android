@@ -7,9 +7,12 @@
 
 package com.norbertotaveras.reels.domain.model.settings
 
+import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
+
 data class AppSettings(
     val imageQuality: ImageQuality = ImageQuality.High,
     val languageRegion: LanguageRegion = LanguageRegion.EnglishUnitedStates,
     val theme: AppTheme = AppTheme.System,
     val recentSearches: List<String> = emptyList(),
+    val discoverFilters: DiscoverFilterDataModel = DiscoverFilterDataModel(),
 )
