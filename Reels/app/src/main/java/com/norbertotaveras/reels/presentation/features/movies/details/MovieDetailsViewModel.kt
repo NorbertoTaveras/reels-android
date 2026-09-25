@@ -275,24 +275,30 @@ class MovieDetailsViewModel @Inject constructor(
         }
     }
 
-    private fun refreshMovieAccountState() {
-        viewModelScope.launch {
-            getTmdbMovieAccountStateUseCase(movieId = movieId)
-                .onSuccess { accountState ->
-                    _state.update { currentState ->
-                        currentState.copy(
-                            isWatchlisted = accountState?.isWatchlisted ?: false,
-                            tmdbRating = accountState?.rating
-                        )
-                    }
+    private suspend fun refreshMovieAccountState() {
+        getTmdbMovieAccountStateUseCase(movieId = movieId)
+            .onSuccess { accountState ->
+                _state.update { currentState ->
+                    currentState.copy(
+                        isWatchlisted = accountState?.isWatchlisted ?: false,
+                        tmdbRating = accountState?.rating
+                    )
                 }
-        }
+            }
     }
 
     private fun onWatchlistClicked() {
         val shouldWatchlist = !state.value.isWatchlisted
         viewModelScope.launch {
             if (state.value.isAccountActionLoading) return@launch
+            if (!state.value.isTmdbAccountConnected) {
+                _effect.emit(
+                    MovieDetailsEffect.ShowMessage(
+                        message = "Connect your TMDB account in Settings first."
+                    )
+                )
+                return@launch
+            }
 
             _state.update { currentState ->
                 currentState.copy(isAccountActionLoading = true)
@@ -303,11 +309,9 @@ class MovieDetailsViewModel @Inject constructor(
                 watchlist = shouldWatchlist
             ).fold(
                 onSuccess = {
+                    refreshMovieAccountState()
                     _state.update { currentState ->
-                        currentState.copy(
-                            isWatchlisted = shouldWatchlist,
-                            isAccountActionLoading = false
-                        )
+                        currentState.copy(isAccountActionLoading = false)
                     }
                     _effect.emit(
                         MovieDetailsEffect.ShowMessage(
@@ -338,6 +342,14 @@ class MovieDetailsViewModel @Inject constructor(
     private fun onRatingClicked() {
         viewModelScope.launch {
             if (state.value.isAccountActionLoading) return@launch
+            if (!state.value.isTmdbAccountConnected) {
+                _effect.emit(
+                    MovieDetailsEffect.ShowMessage(
+                        message = "Connect your TMDB account in Settings first."
+                    )
+                )
+                return@launch
+            }
 
             _state.update { currentState ->
                 currentState.copy(isAccountActionLoading = true)
@@ -348,11 +360,9 @@ class MovieDetailsViewModel @Inject constructor(
                 rating = DEFAULT_TMDB_RATING
             ).fold(
                 onSuccess = {
+                    refreshMovieAccountState()
                     _state.update { currentState ->
-                        currentState.copy(
-                            tmdbRating = DEFAULT_TMDB_RATING,
-                            isAccountActionLoading = false
-                        )
+                        currentState.copy(isAccountActionLoading = false)
                     }
                     _effect.emit(
                         MovieDetailsEffect.ShowMessage(
@@ -379,6 +389,14 @@ class MovieDetailsViewModel @Inject constructor(
     private fun onDeleteRatingClicked() {
         viewModelScope.launch {
             if (state.value.isAccountActionLoading) return@launch
+            if (!state.value.isTmdbAccountConnected) {
+                _effect.emit(
+                    MovieDetailsEffect.ShowMessage(
+                        message = "Connect your TMDB account in Settings first."
+                    )
+                )
+                return@launch
+            }
 
             _state.update { currentState ->
                 currentState.copy(isAccountActionLoading = true)
@@ -386,11 +404,9 @@ class MovieDetailsViewModel @Inject constructor(
 
             deleteTmdbMovieRatingUseCase(movieId = movieId).fold(
                 onSuccess = {
+                    refreshMovieAccountState()
                     _state.update { currentState ->
-                        currentState.copy(
-                            tmdbRating = null,
-                            isAccountActionLoading = false
-                        )
+                        currentState.copy(isAccountActionLoading = false)
                     }
                     _effect.emit(
                         MovieDetailsEffect.ShowMessage(

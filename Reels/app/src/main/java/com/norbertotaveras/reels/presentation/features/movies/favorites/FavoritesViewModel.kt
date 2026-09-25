@@ -25,8 +25,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -57,17 +57,24 @@ class FavoritesViewModel @Inject constructor(
     private val _effect = MutableSharedFlow<FavoritesEffect>()
     val effect: SharedFlow<FavoritesEffect> = _effect.asSharedFlow()
 
-    val tmdbWatchlistMovies: Flow<PagingData<MovieDataModel>> = observeSettingsUseCase()
+    private val tmdbRefreshRequests = MutableStateFlow(0)
+    private val language = observeSettingsUseCase()
         .map { settings -> settings.languageRegion.languageCode }
         .distinctUntilChanged()
+
+    val tmdbWatchlistMovies: Flow<PagingData<MovieDataModel>> = combine(
+        language,
+        tmdbRefreshRequests
+    ) { language, _ -> language }
         .flatMapLatest { language ->
             getTmdbWatchlistMoviesUseCase(language = language)
         }
         .cachedIn(viewModelScope)
 
-    val tmdbRatedMovies: Flow<PagingData<MovieDataModel>> = observeSettingsUseCase()
-        .map { settings -> settings.languageRegion.languageCode }
-        .distinctUntilChanged()
+    val tmdbRatedMovies: Flow<PagingData<MovieDataModel>> = combine(
+        language,
+        tmdbRefreshRequests
+    ) { language, _ -> language }
         .flatMapLatest { language ->
             getTmdbRatedMoviesUseCase(language = language)
         }
@@ -80,6 +87,7 @@ class FavoritesViewModel @Inject constructor(
 
     fun onEvent(event: FavoritesEvent) {
         when (event) {
+            FavoritesEvent.ScreenResumed -> onScreenResumed()
             is FavoritesEvent.TabSelected -> onTabSelected(tab = event.tab)
             is FavoritesEvent.MovieClicked -> onMovieClicked(movieId = event.movieId)
             is FavoritesEvent.PersonClicked -> onPersonClicked(personId = event.personId)
@@ -122,6 +130,18 @@ class FavoritesViewModel @Inject constructor(
         _state.update { currentState ->
             currentState.copy(selectedTab = tab)
         }
+        if (tab == LibraryTab.Tmdb || tab == LibraryTab.Rated) {
+            refreshTmdbLists()
+        }
+    }
+
+    private fun onScreenResumed() {
+        refreshTmdbLists()
+    }
+
+    private fun refreshTmdbLists() {
+        if (!_state.value.isTmdbAccountConnected) return
+        tmdbRefreshRequests.update { refreshCount -> refreshCount + 1 }
     }
 
     private fun onMovieClicked(movieId: Int) {
