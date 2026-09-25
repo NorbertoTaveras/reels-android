@@ -133,7 +133,7 @@ class SettingsViewModel @Inject constructor(
                         isTmdbAccountApprovalPending = accountState.isApprovalPending,
                         tmdbAccountTitle = when {
                             accountState.isConnected -> "TMDB Account"
-                            accountState.isApprovalPending -> "Finish TMDB Connection"
+                            accountState.isApprovalPending -> "TMDB Approval Pending"
                             else -> "Connect TMDB Account"
                         },
                         tmdbAccountLabel = when {
@@ -145,7 +145,7 @@ class SettingsViewModel @Inject constructor(
                                 "Connected as $accountName"
                             }
                             accountState.isApprovalPending -> {
-                                "Return after approving access in your browser"
+                                "Approve access in your browser, then finish connection"
                             }
                             else -> "Sync watchlist and ratings with TMDB"
                         }

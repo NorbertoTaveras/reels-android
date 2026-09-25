@@ -139,7 +139,9 @@ fun SettingsScreen(
         }
 
         SettingsSection(title = "TMDB ACCOUNT") {
-            val tmdbAccountClick: (() -> Unit)? = if (state.isTmdbAccountConnected) {
+            val tmdbAccountClick: (() -> Unit)? = if (
+                state.isTmdbAccountConnected || state.isTmdbAccountApprovalPending
+            ) {
                 null
             } else {
                 { onEvent(SettingsEvent.TmdbAccountClicked) }
@@ -149,7 +151,9 @@ fun SettingsScreen(
                 icon = Icons.Filled.VerifiedUser,
                 title = state.tmdbAccountTitle,
                 subtitle = state.tmdbAccountLabel,
-                showsChevron = !state.isTmdbAccountLoading && !state.isTmdbAccountConnected,
+                showsChevron = !state.isTmdbAccountLoading &&
+                        !state.isTmdbAccountConnected &&
+                        !state.isTmdbAccountApprovalPending,
                 onClick = tmdbAccountClick
             )
 
