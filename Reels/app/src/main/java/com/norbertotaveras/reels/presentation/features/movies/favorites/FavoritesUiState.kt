@@ -14,6 +14,7 @@ data class FavoritesUiState(
     val movies: List<FavoriteMovieDataModel> = emptyList(),
     val people: List<SavedPersonDataModel> = emptyList(),
     val selectedTab: LibraryTab = LibraryTab.Movies,
+    val isTmdbAccountConnected: Boolean = false,
     val removingMovieIds: Set<Int> = emptySet(),
     val removingPersonIds: Set<Int> = emptySet(),
 )
@@ -22,20 +23,22 @@ enum class LibraryTab(
     val title: String,
 ) {
     Movies(title = "Movies"),
-    People(title = "People")
+    People(title = "People"),
+    Tmdb(title = "TMDB")
 }
 
 val FavoritesUiState.selectedItemCount: Int
     get() = when (selectedTab) {
         LibraryTab.Movies -> movies.size
         LibraryTab.People -> people.size
+        LibraryTab.Tmdb -> 0
     }
 
 val FavoritesUiState.hasSavedItems: Boolean
     get() = movies.isNotEmpty() || people.isNotEmpty()
 
 val FavoritesUiState.hasSelectedTabItems: Boolean
-    get() = selectedItemCount > 0
+    get() = selectedTab == LibraryTab.Tmdb || selectedItemCount > 0
 
 val FavoritesUiState.offlineLabel: String
     get() = "Available offline"

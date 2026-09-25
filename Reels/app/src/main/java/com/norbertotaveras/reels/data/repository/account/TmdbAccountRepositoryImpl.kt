@@ -7,21 +7,32 @@
 
 package com.norbertotaveras.reels.data.repository.account
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 import com.norbertotaveras.reels.data.local.preferences.TmdbAccountDataStore
 import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
+import com.norbertotaveras.reels.data.remote.paging.TmdbWatchlistMoviesPagingSource
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.account.TmdbAccountStateDataModel
 import com.norbertotaveras.reels.domain.model.account.TmdbMovieAccountStateDataModel
+import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.domain.repository.account.TmdbAccountRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
 @Singleton
+@OptIn(ExperimentalCoroutinesApi::class)
 class TmdbAccountRepositoryImpl @Inject constructor(
     private val remoteDataSource: TmdbRemoteDataSource,
     private val accountDataStore: TmdbAccountDataStore,
@@ -86,6 +97,33 @@ class TmdbAccountRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun getWatchlistMovies(
+        language: String,
+    ): Flow<PagingData<MovieDataModel>> {
+        return accountDataStore.accountState.flatMapLatest { accountState ->
+            val accountId = accountState.account?.accountId
+            val sessionId = accountState.sessionId
+
+            if (!accountState.isConnected || accountId == null || sessionId == null) {
+                flowOf(PagingData.empty())
+            } else {
+                Pager(
+                    config = defaultPagingConfig(),
+                    pagingSourceFactory = {
+                        TmdbWatchlistMoviesPagingSource(
+                            remoteDataSource = remoteDataSource,
+                            accountId = accountId,
+                            sessionId = sessionId,
+                            language = language
+                        )
+                    }
+                ).flow.map { pagingData ->
+                    pagingData.map { movieDto -> movieDto.toMovieDataModel() }
+                }
+            }
+        }
+    }
+
     override suspend fun updateMovieWatchlist(
         movieId: Int,
         watchlist: Boolean
@@ -135,6 +173,15 @@ class TmdbAccountRepositoryImpl @Inject constructor(
             error("Connect a TMDB account before syncing this movie.")
         }
         return accountState
+    }
+
+    private fun defaultPagingConfig(): PagingConfig {
+        return PagingConfig(
+            pageSize = 20,
+            initialLoadSize = 20,
+            prefetchDistance = 5,
+            enablePlaceholders = false
+        )
     }
 
     private suspend fun <T> accountResult(block: suspend () -> T): Result<T> {

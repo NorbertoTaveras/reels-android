@@ -7,8 +7,10 @@
 
 package com.norbertotaveras.reels.domain.repository.account
 
+import androidx.paging.PagingData
 import com.norbertotaveras.reels.domain.model.account.TmdbAccountStateDataModel
 import com.norbertotaveras.reels.domain.model.account.TmdbMovieAccountStateDataModel
+import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import kotlinx.coroutines.flow.Flow
 
 interface TmdbAccountRepository {
@@ -21,6 +23,10 @@ interface TmdbAccountRepository {
     suspend fun disconnect(): Result<Unit>
 
     suspend fun getMovieAccountState(movieId: Int): Result<TmdbMovieAccountStateDataModel?>
+
+    fun getWatchlistMovies(
+        language: String = "en-US",
+    ): Flow<PagingData<MovieDataModel>>
 
     suspend fun updateMovieWatchlist(
         movieId: Int,

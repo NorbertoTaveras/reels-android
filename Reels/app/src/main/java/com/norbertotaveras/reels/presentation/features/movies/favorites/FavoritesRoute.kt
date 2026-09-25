@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Modifier
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarHost
 
 @Composable
@@ -28,6 +29,7 @@ fun FavoritesRoute(
     viewModel: FavoritesViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val tmdbWatchlistMovies = viewModel.tmdbWatchlistMovies.collectAsLazyPagingItems()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(viewModel, snackbarHostState) {
@@ -49,6 +51,7 @@ fun FavoritesRoute(
     Box(modifier = modifier.fillMaxSize()) {
         FavoritesScreen(
             state = state,
+            tmdbWatchlistMovies = tmdbWatchlistMovies,
             onEvent = viewModel::onEvent,
             modifier = Modifier.fillMaxSize()
         )

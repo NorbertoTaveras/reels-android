@@ -56,6 +56,14 @@ interface TmdbService {
         @Body request: TmdbWatchlistRequestDto
     ): TmdbMutationResponseDto
 
+    @GET("account/{accountId}/watchlist/movies")
+    suspend fun getWatchlistMovies(
+        @Path("accountId") accountId: Int,
+        @Query("session_id") sessionId: String,
+        @Query("language") language: String?,
+        @Query("page") page: Int?
+    ): MoviesResponseDto
+
     @POST("movie/{movieId}/rating")
     suspend fun rateMovie(
         @Path("movieId") movieId: Int,

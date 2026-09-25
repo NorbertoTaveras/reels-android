@@ -31,6 +31,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
@@ -51,9 +52,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.favorite.FavoriteMovieDataModel
 import com.norbertotaveras.reels.domain.model.favorite.SavedPersonDataModel
+import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
@@ -65,6 +69,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 @Composable
 fun FavoritesScreen(
     state: FavoritesUiState,
+    tmdbWatchlistMovies: LazyPagingItems<MovieDataModel>,
     onEvent: (FavoritesEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -135,6 +140,16 @@ fun FavoritesScreen(
                         )
                     }
                 }
+
+                LibraryTab.Tmdb -> {
+                    tmdbWatchlistContent(
+                        state = state,
+                        movies = tmdbWatchlistMovies,
+                        onMovieClick = { movieId ->
+                            onEvent(FavoritesEvent.MovieClicked(movieId = movieId))
+                        }
+                    )
+                }
             }
         }
     }
@@ -192,6 +207,67 @@ private fun LibraryHeader(
     }
 }
 
+private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbWatchlistContent(
+    state: FavoritesUiState,
+    movies: LazyPagingItems<MovieDataModel>,
+    onMovieClick: (Int) -> Unit,
+) {
+    when {
+        !state.isTmdbAccountConnected -> {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                EmptyLibraryState(
+                    selectedTab = LibraryTab.Tmdb,
+                    modifier = Modifier.padding(top = ReelsDimensions.favoritesEmptyTopPadding)
+                )
+            }
+        }
+
+        movies.loadState.refresh is LoadState.Loading -> {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                LibraryLoadingState(
+                    modifier = Modifier.padding(top = ReelsDimensions.favoritesEmptyTopPadding)
+                )
+            }
+        }
+
+        movies.loadState.refresh is LoadState.Error -> {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                LibraryErrorState(
+                    modifier = Modifier.padding(top = ReelsDimensions.favoritesEmptyTopPadding)
+                )
+            }
+        }
+
+        movies.itemCount == 0 -> {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                EmptyLibraryState(
+                    selectedTab = LibraryTab.Tmdb,
+                    modifier = Modifier.padding(top = ReelsDimensions.favoritesEmptyTopPadding)
+                )
+            }
+        }
+
+        else -> {
+            items(
+                count = movies.itemCount,
+                key = { index ->
+                    movies.peek(index)?.id?.let { movieId -> "tmdb-$movieId-$index" }
+                        ?: "tmdb-placeholder-$index"
+                }
+            ) { index ->
+                movies[index]?.let { movie ->
+                    TmdbWatchlistMovieCard(
+                        movie = movie,
+                        onClick = {
+                            onMovieClick(movie.id)
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Composable
 private fun LibraryTabChip(
     tab: LibraryTab,
@@ -234,6 +310,55 @@ private fun LibraryTabChip(
             textAlign = TextAlign.Center,
             maxLines = 1
         )
+    }
+}
+
+@Composable
+private fun TmdbWatchlistMovieCard(
+    movie: MovieDataModel,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.width(ReelsDimensions.favoritesPosterCardWidth),
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesTextSpacing)
+    ) {
+        LibraryPosterCard(
+            imageUrl = movie.posterPath.toTmdbImageUrl(),
+            contentDescription = movie.title,
+            onClick = onClick,
+            topStartBadge = {
+                TmdbBadge()
+            },
+            topEndBadge = {
+                RatingBadge(rating = String.format("%.1f", movie.voteAverage))
+            }
+        )
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
+        ) {
+            Text(
+                text = movie.title,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = 15.sp,
+                    lineHeight = 20.sp
+                ),
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Text(
+                text = movie.releaseDate.toReleaseYear().orEmpty(),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }
 
@@ -432,6 +557,26 @@ private fun LibraryPosterCard(
 }
 
 @Composable
+private fun TmdbBadge(
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.size(ReelsDimensions.favoritesOfflineBadgeSize),
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.88f),
+        contentColor = MaterialTheme.colorScheme.background
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Icon(
+                imageVector = Icons.Filled.Sync,
+                contentDescription = "Synced with TMDB",
+                modifier = Modifier.size(ReelsDimensions.favoritesOfflineBadgeIconSize)
+            )
+        }
+    }
+}
+
+@Composable
 private fun OfflineBadge(
     modifier: Modifier = Modifier,
 ) {
@@ -551,6 +696,86 @@ private fun LibraryRemoveButton(
 }
 
 @Composable
+private fun LibraryLoadingState(
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(ReelsDimensions.favoritesEmptyCardPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesEmptyContentSpacing)
+        ) {
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+
+            Text(
+                text = "Loading TMDB watchlist",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
+private fun LibraryErrorState(
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(ReelsDimensions.favoritesEmptyCardPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesEmptyContentSpacing)
+        ) {
+            Surface(
+                modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconContainerSize),
+                shape = MaterialTheme.shapes.large,
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = MaterialTheme.colorScheme.primary
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Filled.Sync,
+                        contentDescription = null,
+                        modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconSize)
+                    )
+                }
+            }
+
+            Text(
+                text = "Unable to load TMDB watchlist",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold
+            )
+
+            Text(
+                text = "Check your connection or reconnect TMDB from Settings.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
 private fun EmptyLibraryState(
     selectedTab: LibraryTab,
     modifier: Modifier = Modifier,
@@ -580,6 +805,7 @@ private fun EmptyLibraryState(
                         imageVector = when (selectedTab) {
                             LibraryTab.Movies -> Icons.Outlined.FavoriteBorder
                             LibraryTab.People -> Icons.Filled.Person
+                            LibraryTab.Tmdb -> Icons.Filled.Sync
                         },
                         contentDescription = null,
                         modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconSize)
@@ -591,6 +817,7 @@ private fun EmptyLibraryState(
                 text = when (selectedTab) {
                     LibraryTab.Movies -> "No saved movies yet"
                     LibraryTab.People -> "No saved people yet"
+                    LibraryTab.Tmdb -> "No TMDB watchlist yet"
                 },
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -601,6 +828,7 @@ private fun EmptyLibraryState(
                 text = when (selectedTab) {
                     LibraryTab.Movies -> "Save movies from details to keep their posters, ratings, and key info available offline."
                     LibraryTab.People -> "Save people from cast details to keep their profiles and known-for movies available offline."
+                    LibraryTab.Tmdb -> "Connect TMDB in Settings, then add movies to your TMDB watchlist from Movie Details."
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,

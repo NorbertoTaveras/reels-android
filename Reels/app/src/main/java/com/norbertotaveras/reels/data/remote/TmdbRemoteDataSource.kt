@@ -38,6 +38,13 @@ interface TmdbRemoteDataSource {
         watchlist: Boolean
     )
 
+    suspend fun getWatchlistMovies(
+        accountId: Int,
+        sessionId: String,
+        language: String? = null,
+        page: Int? = null
+    ): MoviesResponseDto
+
     suspend fun rateMovie(
         movieId: Int,
         sessionId: String,
