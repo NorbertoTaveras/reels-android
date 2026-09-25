@@ -11,6 +11,8 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieDto
+import com.norbertotaveras.reels.data.remote.error.TmdbSessionExpiredException
+import com.norbertotaveras.reels.data.remote.error.isTmdbSessionExpiredError
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
 
 class TmdbAccountMoviesPagingSource(
@@ -19,6 +21,7 @@ class TmdbAccountMoviesPagingSource(
     private val sessionId: String,
     private val language: String,
     private val listType: TmdbAccountMovieListType = TmdbAccountMovieListType.Watchlist,
+    private val onSessionExpired: suspend () -> Unit,
 ) : PagingSource<Int, MovieDto>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MovieDto> {
         return try {
@@ -44,7 +47,12 @@ class TmdbAccountMoviesPagingSource(
                 nextKey = if (page >= response.totalPages) null else page + 1
             )
         } catch (error: Exception) {
-            LoadResult.Error(error.toTmdbNetworkException())
+            if (error.isTmdbSessionExpiredError()) {
+                onSessionExpired()
+                LoadResult.Error(TmdbSessionExpiredException().toTmdbNetworkException())
+            } else {
+                LoadResult.Error(error.toTmdbNetworkException())
+            }
         }
     }
 

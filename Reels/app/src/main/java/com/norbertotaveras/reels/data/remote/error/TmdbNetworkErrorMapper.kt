@@ -15,6 +15,10 @@ class TmdbConfigurationException(
     message: String,
 ) : IOException(message)
 
+class TmdbSessionExpiredException : IOException(
+    "Your TMDB session expired. Connect again in Settings."
+)
+
 class TmdbNetworkException(
     override val message: String,
     cause: Throwable? = null,
@@ -24,6 +28,7 @@ fun Throwable.toTmdbNetworkException(): TmdbNetworkException {
     val userMessage = when (this) {
         is TmdbNetworkException -> message
         is TmdbConfigurationException -> message ?: "TMDB API token is missing. Check the app configuration."
+        is TmdbSessionExpiredException -> message ?: "Your TMDB session expired. Connect again in Settings."
         is SocketTimeoutException -> "TMDB took too long to respond. Please try again."
         is IOException -> "Check your internet connection and try again."
         is HttpException -> toUserMessage()
@@ -36,6 +41,11 @@ fun Throwable.toTmdbNetworkException(): TmdbNetworkException {
     )
 }
 
+fun Throwable.isTmdbSessionExpiredError(): Boolean {
+    return this is TmdbSessionExpiredException ||
+        this is HttpException && code() in TMDB_SESSION_ERROR_CODES
+}
+
 private fun HttpException.toUserMessage(): String {
     return when (code()) {
         401, 403 -> "TMDB authorization failed. Check the app configuration."
@@ -46,3 +56,5 @@ private fun HttpException.toUserMessage(): String {
         else -> "Unable to load TMDB data. Please try again."
     }
 }
+
+private val TMDB_SESSION_ERROR_CODES = setOf(401, 403)

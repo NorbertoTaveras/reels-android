@@ -13,6 +13,8 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.norbertotaveras.reels.data.local.preferences.TmdbAccountDataStore
 import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
+import com.norbertotaveras.reels.data.remote.error.TmdbSessionExpiredException
+import com.norbertotaveras.reels.data.remote.error.isTmdbSessionExpiredError
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
 import com.norbertotaveras.reels.data.remote.paging.TmdbAccountMoviesPagingSource
 import com.norbertotaveras.reels.data.remote.paging.TmdbAccountMovieListType
@@ -87,7 +89,7 @@ class TmdbAccountRepositoryImpl @Inject constructor(
     override suspend fun getMovieAccountState(
         movieId: Int
     ): Result<TmdbMovieAccountStateDataModel?> {
-        return accountResult {
+        return accountResult(clearAccountOnExpiredSession = true) {
             val accountState = accountDataStore.accountState.first()
             val sessionId = accountState.sessionId ?: return@accountResult null
 
@@ -120,7 +122,7 @@ class TmdbAccountRepositoryImpl @Inject constructor(
         movieId: Int,
         watchlist: Boolean
     ): Result<Unit> {
-        return accountResult {
+        return accountResult(clearAccountOnExpiredSession = true) {
             val accountState = requireConnectedAccountState()
             remoteDataSource.updateWatchlist(
                 accountId = accountState.account?.accountId
@@ -137,7 +139,7 @@ class TmdbAccountRepositoryImpl @Inject constructor(
         movieId: Int,
         rating: Double
     ): Result<Unit> {
-        return accountResult {
+        return accountResult(clearAccountOnExpiredSession = true) {
             val sessionId = requireConnectedAccountState().sessionId
                 ?: error("TMDB session is unavailable.")
             remoteDataSource.rateMovie(
@@ -149,7 +151,7 @@ class TmdbAccountRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteMovieRating(movieId: Int): Result<Unit> {
-        return accountResult {
+        return accountResult(clearAccountOnExpiredSession = true) {
             val sessionId = requireConnectedAccountState().sessionId
                 ?: error("TMDB session is unavailable.")
             remoteDataSource.deleteMovieRating(
@@ -195,7 +197,10 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                             accountId = accountId,
                             sessionId = sessionId,
                             language = language,
-                            listType = listType
+                            listType = listType,
+                            onSessionExpired = {
+                                accountDataStore.clearAccount()
+                            }
                         )
                     }
                 ).flow.map { pagingData ->
@@ -205,14 +210,24 @@ class TmdbAccountRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun <T> accountResult(block: suspend () -> T): Result<T> {
+    private suspend fun <T> accountResult(
+        clearAccountOnExpiredSession: Boolean = false,
+        block: suspend () -> T,
+    ): Result<T> {
         return runCatching {
             withContext(ioDispatcher) {
                 block()
             }
         }.fold(
             onSuccess = { value -> Result.success(value) },
-            onFailure = { error -> Result.failure(error.toTmdbNetworkException()) }
+            onFailure = { error ->
+                if (clearAccountOnExpiredSession && error.isTmdbSessionExpiredError()) {
+                    accountDataStore.clearAccount()
+                    Result.failure(TmdbSessionExpiredException().toTmdbNetworkException())
+                } else {
+                    Result.failure(error.toTmdbNetworkException())
+                }
+            }
         )
     }
 
