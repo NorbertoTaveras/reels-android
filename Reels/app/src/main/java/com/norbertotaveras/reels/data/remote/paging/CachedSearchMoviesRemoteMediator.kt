@@ -36,6 +36,22 @@ class CachedSearchMoviesRemoteMediator(
         includeAdult = includeAdult
     )
 
+    override suspend fun initialize(): InitializeAction {
+        val lastUpdatedAt = cachedMovieDao.getRemoteKey(listKey = listKey)?.lastUpdatedAt
+            ?: return InitializeAction.LAUNCH_INITIAL_REFRESH
+        val isCacheFresh = MovieCachePolicy.isFresh(
+            lastUpdatedAt = lastUpdatedAt,
+            now = System.currentTimeMillis(),
+            timeoutMillis = MovieCachePolicy.SEARCH_CACHE_TIMEOUT_MILLIS
+        )
+
+        return if (isCacheFresh) {
+            InitializeAction.SKIP_INITIAL_REFRESH
+        } else {
+            InitializeAction.LAUNCH_INITIAL_REFRESH
+        }
+    }
+
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, CachedMovieEntity>,
@@ -61,6 +77,8 @@ class CachedSearchMoviesRemoteMediator(
             val listStartPosition = (page - 1) * state.config.pageSize
 
             database.withTransaction {
+                cleanupExpiredCache(now = now)
+
                 if (loadType == LoadType.REFRESH) {
                     cachedMovieDao.clearListEntries(listKey = listKey)
                     cachedMovieDao.clearRemoteKey(listKey = listKey)
@@ -93,6 +111,13 @@ class CachedSearchMoviesRemoteMediator(
         } catch (error: Exception) {
             MediatorResult.Error(error.toTmdbNetworkException())
         }
+    }
+
+    private suspend fun cleanupExpiredCache(now: Long) {
+        val cutoffMillis = MovieCachePolicy.retentionCutoff(now = now)
+        cachedMovieDao.clearExpiredListEntries(cutoffMillis = cutoffMillis)
+        cachedMovieDao.clearExpiredRemoteKeys(cutoffMillis = cutoffMillis)
+        cachedMovieDao.clearOrphanMovies()
     }
 
     private companion object {

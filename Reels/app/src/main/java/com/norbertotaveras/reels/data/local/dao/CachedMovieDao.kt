@@ -46,4 +46,28 @@ interface CachedMovieDao {
 
     @Query("DELETE FROM movie_remote_keys WHERE listKey = :listKey")
     suspend fun clearRemoteKey(listKey: String)
+
+    @Query(
+        """
+        DELETE FROM cached_movie_list_entries
+        WHERE listKey IN (
+            SELECT listKey FROM movie_remote_keys
+            WHERE lastUpdatedAt < :cutoffMillis
+        )
+        """
+    )
+    suspend fun clearExpiredListEntries(cutoffMillis: Long)
+
+    @Query("DELETE FROM movie_remote_keys WHERE lastUpdatedAt < :cutoffMillis")
+    suspend fun clearExpiredRemoteKeys(cutoffMillis: Long)
+
+    @Query(
+        """
+        DELETE FROM cached_movies
+        WHERE id NOT IN (
+            SELECT movieId FROM cached_movie_list_entries
+        )
+        """
+    )
+    suspend fun clearOrphanMovies()
 }
