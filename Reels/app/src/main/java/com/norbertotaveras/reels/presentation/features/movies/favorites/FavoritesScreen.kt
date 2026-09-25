@@ -143,7 +143,7 @@ fun FavoritesScreen(
                 }
 
                 LibraryTab.Tmdb -> {
-                    tmdbAccountMovieContent(
+                    tmdbAccountMovieItems(
                         state = state,
                         movies = tmdbWatchlistMovies,
                         listType = TmdbLibraryListType.Watchlist,
@@ -154,7 +154,7 @@ fun FavoritesScreen(
                 }
 
                 LibraryTab.Rated -> {
-                    tmdbAccountMovieContent(
+                    tmdbAccountMovieItems(
                         state = state,
                         movies = tmdbRatedMovies,
                         listType = TmdbLibraryListType.Rated,
@@ -225,7 +225,7 @@ private enum class TmdbLibraryListType {
     Rated
 }
 
-private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovieContent(
+private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovieItems(
     state: FavoritesUiState,
     movies: LazyPagingItems<MovieDataModel>,
     listType: TmdbLibraryListType,

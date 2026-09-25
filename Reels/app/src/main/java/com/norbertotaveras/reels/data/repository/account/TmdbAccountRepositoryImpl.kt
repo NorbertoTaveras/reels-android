@@ -14,8 +14,8 @@ import androidx.paging.map
 import com.norbertotaveras.reels.data.local.preferences.TmdbAccountDataStore
 import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
+import com.norbertotaveras.reels.data.remote.paging.TmdbAccountMoviesPagingSource
 import com.norbertotaveras.reels.data.remote.paging.TmdbAccountMovieListType
-import com.norbertotaveras.reels.data.remote.paging.TmdbWatchlistMoviesPagingSource
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.account.TmdbAccountStateDataModel
 import com.norbertotaveras.reels.domain.model.account.TmdbMovieAccountStateDataModel
@@ -190,7 +190,7 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                 Pager(
                     config = defaultPagingConfig(),
                     pagingSourceFactory = {
-                        TmdbWatchlistMoviesPagingSource(
+                        TmdbAccountMoviesPagingSource(
                             remoteDataSource = remoteDataSource,
                             accountId = accountId,
                             sessionId = sessionId,

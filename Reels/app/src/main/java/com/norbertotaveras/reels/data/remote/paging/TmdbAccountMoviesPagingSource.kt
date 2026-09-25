@@ -13,7 +13,7 @@ import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieDto
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
 
-class TmdbWatchlistMoviesPagingSource(
+class TmdbAccountMoviesPagingSource(
     private val remoteDataSource: TmdbRemoteDataSource,
     private val accountId: Int,
     private val sessionId: String,
