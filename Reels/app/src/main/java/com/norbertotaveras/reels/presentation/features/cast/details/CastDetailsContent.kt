@@ -90,7 +90,7 @@ fun CastDetailsContent(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
         contentPadding = PaddingValues(bottom = ReelsSpacing.xxLarge),
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.section)
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.castDetailsSectionSpacing)
     ) {
         item {
             CastHeroHeader(
@@ -250,7 +250,7 @@ private fun CastHeroHeader(
         ) {
             Text(
                 text = name,
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onBackground
             )
 
@@ -393,7 +393,7 @@ private fun BiographySection(
     ) {
         Text(
             text = "Biography",
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
 
@@ -436,7 +436,7 @@ private fun BiographySection(
                 Row(
                     modifier = Modifier.padding(
                         horizontal = ReelsSpacing.medium,
-                        vertical = ReelsSpacing.small
+                        vertical = ReelsSpacing.xSmall
                     ),
                     horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
                     verticalAlignment = Alignment.CenterVertically
@@ -475,13 +475,14 @@ private fun KnownForPreviewSection(
 
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.detailsCarouselHeaderSpacing)
     ) {
         SectionHeader(
             modifier = Modifier.padding(horizontal = ReelsSpacing.screenHorizontal),
             title = "Known For",
             actionLabel = "See all",
-            onActionClick = onSeeAllClick
+            onActionClick = onSeeAllClick,
+            titleStyle = MaterialTheme.typography.titleMedium
         )
 
         PosterCarousel(
@@ -493,7 +494,11 @@ private fun KnownForPreviewSection(
                     releaseYear = movie.releaseDate.toReleaseYear()
                 )
             },
-            onMovieClick = onMovieClick
+            onMovieClick = onMovieClick,
+            contentPadding = PaddingValues(horizontal = ReelsSpacing.screenHorizontal),
+            cardWidth = ReelsDimensions.castDetailsKnownForPosterWidth,
+            titleStyle = MaterialTheme.typography.titleSmall,
+            releaseYearStyle = MaterialTheme.typography.labelMedium
         )
     }
 }
@@ -593,7 +598,7 @@ private fun PersonalInfoSection(
     ) {
         Text(
             text = "Personal Info",
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
 
@@ -678,7 +683,7 @@ private fun CastDetailsContentPreview() {
             biography = "Timothée Chalamet is an American and French actor known for emotionally precise performances across independent dramas and large-scale films.",
             knownForDepartment = "Acting",
             knownFor = emptyList(),
-            birthday = "December 27, 1995",
+            birthday = "1995-12-27",
             placeOfBirth = "New York City, New York, USA",
             onBackClick = {},
             onMovieClick = {},

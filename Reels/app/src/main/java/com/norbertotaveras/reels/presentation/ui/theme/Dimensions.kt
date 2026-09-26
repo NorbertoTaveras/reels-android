@@ -153,8 +153,10 @@ object ReelsDimensions {
     val castDetailsQuickInfoSpacing = 18.dp
     val castDetailsInfoIconContainerSize = 40.dp
     val castDetailsInfoIconSize = 16.dp
-    val castDetailsBiographyFadeHeight = 42.dp
+    val castDetailsSectionSpacing = 26.dp
+    val castDetailsBiographyFadeHeight = 34.dp
     val castDetailsBiographyToggleIconSize = 18.dp
+    val castDetailsKnownForPosterWidth = 112.dp
 
     val filmographyScreenTopPadding = 24.dp
     val filmographyScreenBottomPadding = 32.dp
