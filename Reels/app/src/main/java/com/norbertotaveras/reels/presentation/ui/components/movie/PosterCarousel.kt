@@ -17,7 +17,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 
@@ -35,6 +38,9 @@ fun PosterCarousel(
     onMovieClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(horizontal = ReelsSpacing.large),
+    cardWidth: Dp = 120.dp,
+    titleStyle: TextStyle = MaterialTheme.typography.titleMedium,
+    releaseYearStyle: TextStyle = MaterialTheme.typography.labelMedium,
 ) {
     LazyRow(
         modifier = modifier,
@@ -50,6 +56,9 @@ fun PosterCarousel(
                 posterUrl = item.posterUrl,
                 releaseYear = item.releaseYear,
                 rating = item.rating,
+                width = cardWidth,
+                titleStyle = titleStyle,
+                releaseYearStyle = releaseYearStyle,
                 onClick = { onMovieClick(item.id) }
             )
         }

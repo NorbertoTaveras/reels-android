@@ -45,7 +45,10 @@ fun SimilarMoviesSection(
             onMovieClick = onMovieClick,
             contentPadding = PaddingValues(
                 horizontal = ReelsSpacing.screenHorizontal
-            )
+            ),
+            cardWidth = ReelsDimensions.detailsSimilarMoviePosterWidth,
+            titleStyle = MaterialTheme.typography.titleSmall,
+            releaseYearStyle = MaterialTheme.typography.labelMedium
         )
     }
 }

@@ -26,8 +26,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContainer
@@ -42,11 +44,14 @@ fun MoviePosterCard(
     modifier: Modifier = Modifier,
     releaseYear: String? = null,
     rating: String? = null,
+    width: Dp = 120.dp,
+    titleStyle: TextStyle = MaterialTheme.typography.titleMedium,
+    releaseYearStyle: TextStyle = MaterialTheme.typography.labelMedium,
     onClick: () -> Unit,
 ) {
     Column(
         modifier = modifier
-            .width(120.dp)
+            .width(width)
             .clickable(onClick = onClick),
         verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
     ) {
@@ -94,7 +99,7 @@ fun MoviePosterCard(
 
         Text(
             text = title,
-            style = MaterialTheme.typography.titleMedium,
+            style = titleStyle,
             color = MaterialTheme.colorScheme.onBackground,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
@@ -103,7 +108,7 @@ fun MoviePosterCard(
         if (!releaseYear.isNullOrBlank()) {
             Text(
                 text = releaseYear,
-                style = MaterialTheme.typography.labelMedium,
+                style = releaseYearStyle,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
