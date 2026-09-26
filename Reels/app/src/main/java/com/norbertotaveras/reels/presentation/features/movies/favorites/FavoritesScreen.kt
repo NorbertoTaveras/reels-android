@@ -184,23 +184,11 @@ private fun LibraryHeader(
             color = MaterialTheme.colorScheme.onBackground
         )
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Filled.DownloadDone,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.size(ReelsDimensions.favoritesOfflineBadgeIconSize)
-            )
-
-            Text(
-                text = state.offlineLabel,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.secondary
-            )
-        }
+        Text(
+            text = state.librarySubtitle,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
 
         Row(
             modifier = Modifier
@@ -225,6 +213,12 @@ private enum class TmdbLibraryListType {
     Rated
 }
 
+private val TmdbLibraryListType.emptyTab: LibraryTab
+    get() = when (this) {
+        TmdbLibraryListType.Watchlist -> LibraryTab.Tmdb
+        TmdbLibraryListType.Rated -> LibraryTab.Rated
+    }
+
 private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovieItems(
     state: FavoritesUiState,
     movies: LazyPagingItems<MovieDataModel>,
@@ -235,7 +229,7 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
         !state.isTmdbAccountConnected -> {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 EmptyLibraryState(
-                    selectedTab = LibraryTab.Tmdb,
+                    selectedTab = listType.emptyTab,
                     modifier = Modifier.padding(top = ReelsDimensions.favoritesEmptyTopPadding)
                 )
             }
@@ -262,7 +256,7 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
         movies.itemCount == 0 -> {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 EmptyLibraryState(
-                    selectedTab = LibraryTab.Tmdb,
+                    selectedTab = listType.emptyTab,
                     modifier = Modifier.padding(top = ReelsDimensions.favoritesEmptyTopPadding)
                 )
             }

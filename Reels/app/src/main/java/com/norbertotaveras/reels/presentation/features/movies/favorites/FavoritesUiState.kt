@@ -39,5 +39,5 @@ val FavoritesUiState.selectedItemCount: Int
 val FavoritesUiState.hasSelectedTabItems: Boolean
     get() = selectedTab == LibraryTab.Tmdb || selectedTab == LibraryTab.Rated || selectedItemCount > 0
 
-val FavoritesUiState.offlineLabel: String
-    get() = "Available offline"
+val FavoritesUiState.librarySubtitle: String
+    get() = "Your saved movies, people & TMDB activity"
