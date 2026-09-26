@@ -409,9 +409,11 @@ private fun DiscoverFilterSheet(
                         state.filterErrorMessage != null -> Unit
 
                         else -> {
-                            state.genres.forEach { genre ->
+                            state.genres
+                                .toDiscoverFilterGenres()
+                                .forEach { genre ->
                                 DiscoverFilterChip(
-                                    label = genre.name,
+                                    label = genre.displayName,
                                     selected = state.filters.genreId == genre.id,
                                     onClick = {
                                         onEvent(
@@ -423,7 +425,7 @@ private fun DiscoverFilterSheet(
                                             } else {
                                                 DiscoverEvent.GenreSelected(
                                                     genreId = genre.id,
-                                                    genreName = genre.name
+                                                    genreName = genre.displayName
                                                 )
                                             }
                                         )
@@ -445,14 +447,16 @@ private fun DiscoverFilterSheet(
                 }
 
                 DiscoverChipSection(title = "Release Year") {
-                    DISCOVER_YEARS.forEach { year ->
+                    DISCOVER_YEARS.forEach { filter ->
                         DiscoverFilterChip(
-                            label = year.toString(),
-                            selected = state.filters.year == year,
+                            label = filter.label,
+                            selected = state.filters.year == filter.year,
                             onClick = {
                                 onEvent(
                                     DiscoverEvent.YearSelected(
-                                        year = year.takeUnless { state.filters.year == year }
+                                        year = filter.year.takeUnless {
+                                            state.filters.year == filter.year
+                                        }
                                     )
                                 )
                             }
@@ -967,6 +971,7 @@ private fun DiscoverFilterSheetFooter(
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = onApplyClick,
+                shape = MaterialTheme.shapes.large,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
@@ -1181,8 +1186,27 @@ private fun discoverPlaceholderColor(): Color {
     return MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.52f)
 }
 
-private val DISCOVER_YEARS = listOf(2024, 2023, 2022, 2021)
+private val DISCOVER_YEARS = listOf(
+    DiscoverYearFilter(label = "2024", year = 2024),
+    DiscoverYearFilter(label = "2023", year = 2023),
+    DiscoverYearFilter(label = "2022", year = 2022),
+    DiscoverYearFilter(label = "2021", year = 2021),
+    DiscoverYearFilter(label = "2010s", year = 2010),
+    DiscoverYearFilter(label = "2000s", year = 2000)
+)
 private val DISCOVER_RATINGS = listOf(null, 5, 6, 7, 8)
+private val DISCOVER_GENRE_ORDER = listOf(
+    "Action",
+    "Adventure",
+    "Animation",
+    "Comedy",
+    "Drama",
+    "History",
+    "Horror",
+    "Romance",
+    "Science Fiction",
+    "Thriller"
+)
 private val DISCOVER_SORTS = listOf(
     DiscoverSort.Popularity,
     DiscoverSort.HighestRated,
@@ -1190,6 +1214,16 @@ private val DISCOVER_SORTS = listOf(
     DiscoverSort.Alphabetical
 )
 private const val DISCOVER_PLACEHOLDER_COUNT = 12
+
+private data class DiscoverYearFilter(
+    val label: String,
+    val year: Int,
+)
+
+private data class DiscoverGenreFilter(
+    val id: Int,
+    val displayName: String,
+)
 
 private val DiscoverSort.displayLabel: String
     get() = when (this) {
@@ -1224,6 +1258,24 @@ private fun String.toDiscoverLanguageLabel(): String {
         "en-GB" -> "English · United Kingdom"
         "es-ES" -> "Spanish · Spain"
         "fr-FR" -> "French · France"
+        else -> this
+    }
+}
+
+private fun List<GenreDataModel>.toDiscoverFilterGenres(): List<DiscoverGenreFilter> {
+    return DISCOVER_GENRE_ORDER.mapNotNull { expectedName ->
+        firstOrNull { genre -> genre.name == expectedName }?.let { genre ->
+            DiscoverGenreFilter(
+                id = genre.id,
+                displayName = expectedName.toDiscoverGenreDisplayName()
+            )
+        }
+    }
+}
+
+private fun String.toDiscoverGenreDisplayName(): String {
+    return when (this) {
+        "Science Fiction" -> "Sci-Fi"
         else -> this
     }
 }
