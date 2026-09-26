@@ -29,6 +29,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.CloudOff
+import androidx.compose.material.icons.outlined.MovieFilter
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
@@ -96,6 +97,8 @@ fun DiscoverScreen(
         item(span = { GridItemSpan(maxLineSpan) }) {
             DiscoverHeader(
                 hasActiveFilters = state.hasActiveFilters,
+                movieCount = movies.itemCount,
+                sortLabel = state.filters.sort.displayLabel,
                 onFilterClick = {
                     onEvent(DiscoverEvent.FiltersClicked)
                 }
@@ -209,67 +212,130 @@ fun DiscoverScreen(
 @Composable
 private fun DiscoverHeader(
     hasActiveFilters: Boolean,
+    movieCount: Int,
+    sortLabel: String,
     onFilterClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    Column(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
-        verticalAlignment = Alignment.Top
+        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)
     ) {
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.discoverHeaderSpacing)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
+            verticalAlignment = Alignment.Top
         ) {
-            Text(
-                text = "Discover",
-                style = MaterialTheme.typography.headlineLarge.copy(
-                    fontSize = 34.sp,
-                    lineHeight = 40.sp
-                ),
-                color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.Bold
-            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(ReelsDimensions.discoverHeaderSpacing)
+            ) {
+                Text(
+                    text = "Discover",
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        fontSize = 34.sp,
+                        lineHeight = 40.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontWeight = FontWeight.Bold
+                )
 
-            Text(
-                text = "Find movies by mood, genre, year, and rating",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+                Text(
+                    text = movieCount.toMovieCountLabel(),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = 14.sp,
+                        lineHeight = 18.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            DiscoverFilterButton(
+                hasActiveFilters = hasActiveFilters,
+                onClick = onFilterClick
             )
         }
 
         Surface(
-            modifier = Modifier
-                .size(48.dp)
-                .clickable(onClick = onFilterClick),
-            shape = CircleShape,
-            color = if (hasActiveFilters) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.surface
-            },
-            contentColor = if (hasActiveFilters) {
-                MaterialTheme.colorScheme.onPrimary
-            } else {
-                MaterialTheme.colorScheme.onSurface
-            },
+            modifier = Modifier.clickable(onClick = onFilterClick),
+            shape = MaterialTheme.shapes.extraLarge,
+            color = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
             border = BorderStroke(
                 width = 1.dp,
-                color = if (hasActiveFilters) {
-                    Color.Transparent
-                } else {
-                    MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
-                }
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.22f)
             )
         ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = Icons.Filled.FilterList,
-                    contentDescription = "Open discover filters"
+            Row(
+                modifier = Modifier.padding(
+                    horizontal = ReelsSpacing.medium,
+                    vertical = ReelsSpacing.small
+                ),
+                horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Sort:",
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontSize = 13.sp,
+                        lineHeight = 16.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                Text(
+                    text = sortLabel,
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontSize = 13.sp,
+                        lineHeight = 16.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun DiscoverFilterButton(
+    hasActiveFilters: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier
+            .size(44.dp)
+            .clickable(onClick = onClick),
+        shape = CircleShape,
+        color = if (hasActiveFilters) {
+            MaterialTheme.colorScheme.primary
+        } else {
+            MaterialTheme.colorScheme.surface
+        },
+        contentColor = if (hasActiveFilters) {
+            MaterialTheme.colorScheme.onPrimary
+        } else {
+            MaterialTheme.colorScheme.onSurface
+        },
+        border = BorderStroke(
+            width = 1.dp,
+            color = if (hasActiveFilters) {
+                Color.Transparent
+            } else {
+                MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
+            }
+        )
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Icon(
+                imageVector = Icons.Filled.FilterList,
+                contentDescription = "Open discover filters",
+                modifier = Modifier.size(22.dp)
+            )
         }
     }
 }
@@ -524,9 +590,22 @@ private fun DiscoverPosterCard(
             AsyncImage(
                 model = movie.posterPath.toTmdbImageUrl(),
                 contentDescription = movie.title,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentScale = ContentScale.Crop
             )
+
+            if (movie.posterPath.isNullOrBlank()) {
+                Icon(
+                    imageVector = Icons.Outlined.MovieFilter,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(28.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
 
             DiscoverRatingBadge(
                 modifier = Modifier
@@ -538,9 +617,9 @@ private fun DiscoverPosterCard(
 
         Text(
             text = movie.title,
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontSize = 17.sp,
-                lineHeight = 22.sp
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontSize = 13.sp,
+                lineHeight = 16.sp
             ),
             color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.SemiBold,
@@ -551,9 +630,9 @@ private fun DiscoverPosterCard(
         movie.releaseDate.toReleaseYear()?.let { year ->
             Text(
                 text = year,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 16.sp,
-                    lineHeight = 22.sp
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontSize = 12.sp,
+                    lineHeight = 15.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
@@ -590,9 +669,9 @@ private fun DiscoverRatingBadge(
 
             Text(
                 text = String.format("%.1f", rating),
-                style = MaterialTheme.typography.labelLarge.copy(
-                    fontSize = 16.sp,
-                    lineHeight = 20.sp
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = 13.sp,
+                    lineHeight = 16.sp
                 ),
                 fontWeight = FontWeight.SemiBold
             )
@@ -694,3 +773,16 @@ private fun discoverPlaceholderColor(): Color {
 private val DISCOVER_YEARS = listOf(null, 2026, 2025, 2024, 2023, 2022, 2021)
 private val DISCOVER_RATINGS = listOf(null, 9, 8, 7, 6)
 private const val DISCOVER_PLACEHOLDER_COUNT = 12
+
+private val DiscoverSort.displayLabel: String
+    get() = when (this) {
+        DiscoverSort.Popularity -> "Popularity"
+        else -> label
+    }
+
+private fun Int.toMovieCountLabel(): String {
+    return when (this) {
+        1 -> "1 movie"
+        else -> "$this movies"
+    }
+}
