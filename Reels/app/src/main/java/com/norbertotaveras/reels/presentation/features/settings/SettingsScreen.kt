@@ -155,7 +155,7 @@ fun SettingsScreen(
             )
         }
 
-        SettingsSection(title = "ABOUT REELS") {
+        SettingsSection(title = "ABOUT") {
             SettingsRow(
                 icon = Icons.Filled.Info,
                 title = "App Version",
@@ -166,8 +166,17 @@ fun SettingsScreen(
             SettingsDivider()
 
             SettingsRow(
+                icon = Icons.Filled.VerifiedUser,
+                title = "UI States Reference",
+                subtitle = "Production state catalogue",
+                onClick = { onEvent(SettingsEvent.UiStatesReferenceClicked) }
+            )
+
+            SettingsDivider()
+
+            SettingsRow(
                 icon = Icons.Filled.Shield,
-                title = "Privacy",
+                title = "Privacy Notice",
                 subtitle = state.privacyLabel,
                 onClick = { onEvent(SettingsEvent.PrivacyClicked) }
             )

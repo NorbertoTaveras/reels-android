@@ -51,7 +51,7 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
     private val _state = MutableStateFlow(
         SettingsUiState(
-            appVersionLabel = BuildConfig.VERSION_NAME,
+            appVersionLabel = buildAppVersionLabel(),
             appConfigurationLabel = buildAppConfigurationLabel()
         )
     )
@@ -82,6 +82,7 @@ class SettingsViewModel @Inject constructor(
             SettingsEvent.TmdbAccountClicked -> onTmdbAccountClicked()
             SettingsEvent.TmdbAccountFinishClicked -> onTmdbAccountFinishClicked()
             SettingsEvent.TmdbAccountDisconnectClicked -> onTmdbAccountDisconnectClicked()
+            SettingsEvent.UiStatesReferenceClicked -> onUiStatesReferenceClicked()
             SettingsEvent.PrivacyClicked -> onPrivacyClicked()
             SettingsEvent.PrivacyNoticeDismissed -> onPrivacyNoticeDismissed()
             SettingsEvent.TmdbAttributionClicked -> onTmdbAttributionClicked()
@@ -327,6 +328,16 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    private fun onUiStatesReferenceClicked() {
+        viewModelScope.launch {
+            _effect.emit(
+                SettingsEffect.ShowMessage(
+                    message = "UI states reference is planned for a native screen."
+                )
+            )
+        }
+    }
+
     private fun onPrivacyNoticeDismissed() {
         _state.update { currentState ->
             currentState.copy(isPrivacyNoticeVisible = false)
@@ -343,6 +354,10 @@ class SettingsViewModel @Inject constructor(
 
     private companion object {
         const val TMDB_WEBSITE_URL = "https://www.themoviedb.org/"
+
+        fun buildAppVersionLabel(): String {
+            return "${BuildConfig.VERSION_NAME} (build ${BuildConfig.VERSION_CODE})"
+        }
 
         fun buildAppConfigurationLabel(): String {
             val flavorLabel = BuildConfig.FLAVOR.toDisplayLabel()
@@ -361,12 +376,12 @@ class SettingsViewModel @Inject constructor(
             personCount: Int
         ): String {
             if (movieCount == 0 && personCount == 0) {
-                return "Manage movies and people saved on this device"
+                return "Manage movies and people"
             }
 
             val movieLabel = "$movieCount ${if (movieCount == 1) "movie" else "movies"}"
             val personLabel = "$personCount ${if (personCount == 1) "person" else "people"}"
-            return "$movieLabel · $personLabel saved on this device"
+            return "$movieLabel · $personLabel"
         }
 
         fun String.toDisplayLabel(): String {
