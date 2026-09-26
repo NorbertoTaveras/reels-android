@@ -128,9 +128,14 @@ class SettingsViewModel @Inject constructor(
             observeTmdbAccountUseCase().collect { accountState ->
                 _state.update { currentState ->
                     val account = accountState.account
+                    val accountName = account?.displayName
+                        ?.takeIf { displayName -> displayName.isNotBlank() }
+                        ?: account?.username
+                        ?: ""
                     currentState.copy(
                         isTmdbAccountConnected = accountState.isConnected,
                         isTmdbAccountApprovalPending = accountState.isApprovalPending,
+                        tmdbAccountName = accountName,
                         tmdbAccountTitle = when {
                             accountState.isConnected -> "TMDB Account"
                             accountState.isApprovalPending -> "TMDB Approval Pending"
@@ -138,11 +143,7 @@ class SettingsViewModel @Inject constructor(
                         },
                         tmdbAccountLabel = when {
                             accountState.isConnected -> {
-                                val accountName = account?.displayName
-                                    ?.takeIf { displayName -> displayName.isNotBlank() }
-                                    ?: account?.username
-                                    ?: "Connected"
-                                "Connected as $accountName"
+                                "Connected as ${accountName.ifBlank { "TMDB user" }}"
                             }
                             accountState.isApprovalPending -> {
                                 "Approve access in your browser, then finish connection"

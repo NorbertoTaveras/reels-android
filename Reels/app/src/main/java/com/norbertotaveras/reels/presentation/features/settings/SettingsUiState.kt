@@ -22,6 +22,7 @@ data class SettingsUiState(
     val clearImageCacheLabel: String = "Free up locally cached artwork",
     val tmdbAccountTitle: String = "Connect TMDB Account",
     val tmdbAccountLabel: String = "Sync watchlist and ratings with TMDB",
+    val tmdbAccountName: String = "",
     val isTmdbAccountLoading: Boolean = false,
     val isTmdbAccountConnected: Boolean = false,
     val isTmdbAccountApprovalPending: Boolean = false,
