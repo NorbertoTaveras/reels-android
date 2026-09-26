@@ -91,8 +91,8 @@ object ReelsDimensions {
     val favoritesRatingHorizontalPadding = 8.dp
     val favoritesRatingVerticalPadding = 5.dp
     val favoritesRatingEdgePadding = 8.dp
-    val favoritesCardActionSpacing = 8.dp
     val favoritesTextSpacing = 6.dp
+    val favoritesMetadataIconSize = 13.dp
     val favoritesEmptyTopPadding = 48.dp
     val favoritesEmptyCardPadding = 24.dp
     val favoritesEmptyIconContainerSize = 72.dp

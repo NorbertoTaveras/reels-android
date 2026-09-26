@@ -28,11 +28,14 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Work
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -49,6 +52,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -67,8 +73,10 @@ import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSurfaceHigh
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
 
 @Composable
 fun FavoritesScreen(
@@ -345,20 +353,41 @@ private fun TmdbWatchlistMovieCard(
             contentDescription = movie.title,
             onClick = onClick,
             topStartBadge = {
-                TmdbBadge()
+                when (listType) {
+                    TmdbLibraryListType.Watchlist -> TmdbBadge()
+                    TmdbLibraryListType.Rated -> UserRatingBadge(
+                        rating = movie.accountRating?.let { rating ->
+                            String.format("%.1f", rating)
+                        }.orEmpty()
+                    )
+                }
             },
             topEndBadge = {
                 RatingBadge(
                     rating = when (listType) {
                         TmdbLibraryListType.Watchlist -> String.format("%.1f", movie.voteAverage)
-                        TmdbLibraryListType.Rated -> {
-                            movie.accountRating?.let { rating ->
-                                "Your ${String.format("%.1f", rating)}"
-                            } ?: String.format("%.1f", movie.voteAverage)
-                        }
+                        TmdbLibraryListType.Rated -> String.format("%.1f", movie.voteAverage)
                     }
                 )
-            }
+            },
+            bottomEndBadge = {
+                when (listType) {
+                    TmdbLibraryListType.Watchlist -> LibraryOverlayIconBadge(
+                        imageVector = Icons.Filled.Bookmark,
+                        contentDescription = "Saved to TMDB watchlist",
+                        containerColor = ReelsTeal.copy(alpha = 0.92f),
+                        contentColor = MaterialTheme.colorScheme.background
+                    )
+
+                    TmdbLibraryListType.Rated -> LibraryOverlayIconBadge(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = "Rated on TMDB",
+                        containerColor = ReelsRatingContainer.copy(alpha = 0.92f),
+                        contentColor = MaterialTheme.colorScheme.primary
+                    )
+                }
+            },
+            showBottomScrim = true
         )
 
         Column(
@@ -409,43 +438,39 @@ private fun FavoriteMovieCard(
             },
             topEndBadge = {
                 RatingBadge(rating = String.format("%.1f", movie.voteAverage))
-            }
+            },
+            bottomEndBadge = {
+                LibraryRemoveButton(
+                    isRemoving = isRemoving,
+                    contentDescription = "Remove ${movie.title} from library",
+                    onClick = onFavoriteClick
+                )
+            },
+            showBottomScrim = true
         )
 
-        Row(
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesCardActionSpacing),
-            verticalAlignment = Alignment.Top
+            verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
         ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
-            ) {
-                Text(
-                    text = movie.title,
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontSize = 15.sp,
-                        lineHeight = 20.sp
-                    ),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+            Text(
+                text = movie.title,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = 15.sp,
+                    lineHeight = 20.sp
+                ),
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
 
-                Text(
-                    text = movie.releaseDate.toReleaseYear().orEmpty(),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-
-            LibraryRemoveButton(
-                isRemoving = isRemoving,
-                contentDescription = "Remove ${movie.title} from library",
-                onClick = onFavoriteClick
+            Text(
+                text = movie.releaseDate.toReleaseYear().orEmpty(),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }
@@ -481,29 +506,39 @@ private fun SavedPersonCard(
                 OfflineBadge()
             },
             topEndBadge = {
-                SavedBadge()
+                LibraryRemoveButton(
+                    isRemoving = isRemoving,
+                    contentDescription = "Remove ${person.name} from library",
+                    onClick = onFavoriteClick
+                )
             }
         )
 
-        Row(
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesCardActionSpacing),
-            verticalAlignment = Alignment.Top
+            verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
         ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
+            Text(
+                text = person.name,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = 15.sp,
+                    lineHeight = 20.sp
+                ),
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = person.name,
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontSize = 15.sp,
-                        lineHeight = 20.sp
-                    ),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                Icon(
+                    imageVector = Icons.Filled.Work,
+                    contentDescription = null,
+                    modifier = Modifier.size(ReelsDimensions.favoritesMetadataIconSize),
+                    tint = MaterialTheme.colorScheme.primary
                 )
 
                 Text(
@@ -514,11 +549,56 @@ private fun SavedPersonCard(
                     overflow = TextOverflow.Ellipsis
                 )
             }
+        }
+    }
+}
 
-            LibraryRemoveButton(
-                isRemoving = isRemoving,
-                contentDescription = "Remove ${person.name} from library",
-                onClick = onFavoriteClick
+@Composable
+private fun UserRatingBadge(
+    rating: String,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.extraLarge,
+        color = ReelsRatingContainer.copy(alpha = 0.92f),
+        contentColor = MaterialTheme.colorScheme.primary
+    ) {
+        Text(
+            modifier = Modifier.padding(
+                horizontal = ReelsDimensions.favoritesRatingHorizontalPadding,
+                vertical = ReelsDimensions.favoritesRatingVerticalPadding
+            ),
+            text = if (rating.isBlank()) "Your" else "Your $rating",
+            style = MaterialTheme.typography.labelMedium.copy(
+                fontSize = 12.sp,
+                lineHeight = 16.sp
+            ),
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1
+        )
+    }
+}
+
+@Composable
+private fun LibraryOverlayIconBadge(
+    imageVector: ImageVector,
+    contentDescription: String,
+    containerColor: Color,
+    contentColor: Color,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.size(ReelsDimensions.favoritesHeartButtonSize),
+        shape = MaterialTheme.shapes.medium,
+        color = containerColor,
+        contentColor = contentColor
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Icon(
+                imageVector = imageVector,
+                contentDescription = contentDescription,
+                modifier = Modifier.size(ReelsDimensions.favoritesHeartIconSize)
             )
         }
     }
@@ -533,6 +613,8 @@ private fun LibraryPosterCard(
     placeholder: @Composable () -> Unit = {},
     topStartBadge: @Composable () -> Unit = {},
     topEndBadge: @Composable () -> Unit = {},
+    bottomEndBadge: @Composable () -> Unit = {},
+    showBottomScrim: Boolean = false,
 ) {
     Card(
         modifier = modifier
@@ -577,6 +659,26 @@ private fun LibraryPosterCard(
                     .padding(ReelsDimensions.favoritesRatingEdgePadding)
             ) {
                 topEndBadge()
+            }
+
+            if (showBottomScrim) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    MaterialTheme.colorScheme.background.copy(alpha = 0.76f)
+                                )
+                            )
+                        )
+                        .padding(ReelsDimensions.favoritesRatingEdgePadding),
+                    contentAlignment = Alignment.BottomEnd
+                ) {
+                    bottomEndBadge()
+                }
             }
         }
     }
@@ -654,26 +756,6 @@ private fun RatingBadge(
                     lineHeight = 16.sp
                 ),
                 fontWeight = FontWeight.SemiBold
-            )
-        }
-    }
-}
-
-@Composable
-private fun SavedBadge(
-    modifier: Modifier = Modifier,
-) {
-    Surface(
-        modifier = modifier.size(ReelsDimensions.favoritesOfflineBadgeSize),
-        shape = CircleShape,
-        color = ReelsSurfaceHigh.copy(alpha = 0.82f),
-        contentColor = MaterialTheme.colorScheme.primary
-    ) {
-        Box(contentAlignment = Alignment.Center) {
-            Icon(
-                imageVector = Icons.Filled.Favorite,
-                contentDescription = "Saved",
-                modifier = Modifier.size(ReelsDimensions.favoritesOfflineBadgeIconSize)
             )
         }
     }
