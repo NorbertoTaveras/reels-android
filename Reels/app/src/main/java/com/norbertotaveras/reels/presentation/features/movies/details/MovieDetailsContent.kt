@@ -41,6 +41,7 @@ import com.norbertotaveras.reels.domain.model.cast.CastMemberDataModel
 import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDetailsDataModel
 import com.norbertotaveras.reels.extensions.toDisplayTmdbDate
+import com.norbertotaveras.reels.extensions.toDisplayLanguageName
 import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.presentation.ui.components.cast.CastCarousel
 import com.norbertotaveras.reels.presentation.ui.components.movie.MovieHeroHeader
@@ -53,7 +54,6 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
-import java.util.Locale
 
 private data class MovieInfoRowData(
     val label: String,
@@ -427,20 +427,6 @@ private fun MovieInfoIcon(
         contentDescription = null,
         modifier = modifier.size(ReelsDimensions.detailsInfoIconSize)
     )
-}
-
-private fun String.toDisplayLanguageName(): String {
-    return Locale.forLanguageTag(this)
-        .getDisplayLanguage(Locale.US)
-        .replaceFirstChar { firstChar ->
-            if (firstChar.isLowerCase()) {
-                firstChar.titlecase(Locale.US)
-            } else {
-                firstChar.toString()
-            }
-        }
-        .takeIf { language -> language.isNotBlank() }
-        ?: this
 }
 
 @Composable
