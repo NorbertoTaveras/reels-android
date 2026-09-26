@@ -107,6 +107,8 @@ fun MovieDetailsScreen(
                 isFavorite = state.isFavorite,
                 isFavoriteLoading = state.isFavoriteLoading,
                 isOfflineFavorite = state.isOfflineFavorite,
+                savedPersonIds = state.savedPersonIds,
+                savingPersonIds = state.savingPersonIds,
                 isTmdbAccountConnected = state.isTmdbAccountConnected,
                 isWatchlisted = state.isWatchlisted,
                 tmdbRating = state.tmdbRating,
@@ -128,6 +130,9 @@ fun MovieDetailsScreen(
                 },
                 onCastClick = { personId ->
                     onEvent(MovieDetailsEvent.CastClicked(personId = personId))
+                },
+                onCastSaveClick = { personId ->
+                    onEvent(MovieDetailsEvent.CastSaveClicked(personId = personId))
                 },
                 onCastSeeAllClick = {
                     onEvent(MovieDetailsEvent.CastSeeAllClicked)

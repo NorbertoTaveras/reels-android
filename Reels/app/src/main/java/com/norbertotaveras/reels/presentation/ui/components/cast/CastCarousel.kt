@@ -31,6 +31,9 @@ fun CastCarousel(
     cast: List<CastMemberDataModel>,
     onCastClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    savedPersonIds: Set<Int> = emptySet(),
+    savingPersonIds: Set<Int> = emptySet(),
+    onSaveClick: ((Int) -> Unit)? = null,
     onSeeAllClick: (() -> Unit)? = null,
 ) {
     if (cast.isEmpty()) return
@@ -61,6 +64,11 @@ fun CastCarousel(
                     profileUrl = castMember.profilePath.toTmdbImageUrl(
                         imageType = TmdbImageType.Profile
                     ),
+                    isSaved = castMember.id in savedPersonIds,
+                    isSaving = castMember.id in savingPersonIds,
+                    onSaveClick = onSaveClick?.let {
+                        { it(castMember.id) }
+                    },
                     onClick = { onCastClick(castMember.id) }
                 )
             }
@@ -105,6 +113,8 @@ private fun CastCarouselPreview() {
                     )
                 ),
                 onCastClick = {},
+                savedPersonIds = setOf(1),
+                onSaveClick = {},
                 onSeeAllClick = {}
             )
         }

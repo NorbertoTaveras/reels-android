@@ -74,6 +74,8 @@ fun MovieDetailsContent(
     isFavorite: Boolean = false,
     isFavoriteLoading: Boolean = false,
     isOfflineFavorite: Boolean = false,
+    savedPersonIds: Set<Int> = emptySet(),
+    savingPersonIds: Set<Int> = emptySet(),
     isTmdbAccountConnected: Boolean = false,
     isWatchlisted: Boolean = false,
     tmdbRating: Double? = null,
@@ -87,6 +89,7 @@ fun MovieDetailsContent(
     onRatingClick: () -> Unit,
     onDeleteRatingClick: () -> Unit,
     onCastClick: (Int) -> Unit,
+    onCastSaveClick: (Int) -> Unit,
     onCastSeeAllClick: () -> Unit,
     onTrailerClick: (String) -> Unit,
     onSimilarMovieClick: (Int) -> Unit,
@@ -183,7 +186,10 @@ fun MovieDetailsContent(
                 CastCarousel(
                     modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
                     cast = cast,
+                    savedPersonIds = savedPersonIds,
+                    savingPersonIds = savingPersonIds,
                     onCastClick = onCastClick,
+                    onSaveClick = onCastSaveClick,
                     onSeeAllClick = onCastSeeAllClick
                 )
             }
@@ -633,6 +639,7 @@ private fun MovieDetailsContentPreview() {
             isTmdbAccountConnected = true,
             isWatchlisted = true,
             tmdbRating = 8.0,
+            savedPersonIds = setOf(1),
             cast = previewCast,
             trailers = previewTrailers,
             similarMovies = previewSimilarMovies,
@@ -642,6 +649,7 @@ private fun MovieDetailsContentPreview() {
             onRatingClick = {},
             onDeleteRatingClick = {},
             onCastClick = {},
+            onCastSaveClick = {},
             onCastSeeAllClick = {},
             onTrailerClick = {},
             onSimilarMovieClick = {}

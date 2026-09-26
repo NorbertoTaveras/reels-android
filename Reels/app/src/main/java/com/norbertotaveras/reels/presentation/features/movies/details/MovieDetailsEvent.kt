@@ -18,6 +18,7 @@ sealed interface MovieDetailsEvent {
     data object RatingSubmitted : MovieDetailsEvent
     data object DeleteRatingClicked : MovieDetailsEvent
     data class CastClicked(val personId: Int) : MovieDetailsEvent
+    data class CastSaveClicked(val personId: Int) : MovieDetailsEvent
     data object CastSeeAllClicked : MovieDetailsEvent
     data class TrailerClicked(val trailerId: String) : MovieDetailsEvent
     data class SimilarMovieClicked(val movieId: Int) : MovieDetailsEvent

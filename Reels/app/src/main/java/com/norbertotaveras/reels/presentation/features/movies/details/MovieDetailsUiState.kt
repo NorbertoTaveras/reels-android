@@ -21,6 +21,8 @@ data class MovieDetailsUiState(
     val isFavorite: Boolean = false,
     val isFavoriteLoading: Boolean = false,
     val isOfflineFavorite: Boolean = false,
+    val savedPersonIds: Set<Int> = emptySet(),
+    val savingPersonIds: Set<Int> = emptySet(),
     val isTmdbAccountConnected: Boolean = false,
     val isWatchlisted: Boolean = false,
     val tmdbRating: Double? = null,

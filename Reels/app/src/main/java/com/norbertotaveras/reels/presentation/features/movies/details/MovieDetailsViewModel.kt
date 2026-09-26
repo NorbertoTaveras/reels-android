@@ -17,12 +17,16 @@ import com.norbertotaveras.reels.domain.usecase.account.ObserveTmdbAccountUseCas
 import com.norbertotaveras.reels.domain.usecase.account.RateTmdbMovieUseCase
 import com.norbertotaveras.reels.domain.usecase.account.UpdateTmdbWatchlistUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.GetFavoriteMovieDetailsUseCase
+import com.norbertotaveras.reels.domain.usecase.favorites.ObserveSavedPeopleUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveIsFavoriteUseCase
+import com.norbertotaveras.reels.domain.usecase.favorites.ToggleSavedPersonUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ToggleFavoriteMovieUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.GetMovieCreditsUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.GetMovieDetailsUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.GetMovieVideosUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.GetSimilarMoviesUseCase
+import com.norbertotaveras.reels.domain.usecase.person.GetPersonDetailsUseCase
+import com.norbertotaveras.reels.domain.usecase.person.GetPersonMovieCreditsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -51,11 +55,15 @@ class MovieDetailsViewModel @Inject constructor(
     private val observeIsFavoriteUseCase: ObserveIsFavoriteUseCase,
     private val toggleFavoriteMovieUseCase: ToggleFavoriteMovieUseCase,
     private val getFavoriteMovieDetailsUseCase: GetFavoriteMovieDetailsUseCase,
+    private val observeSavedPeopleUseCase: ObserveSavedPeopleUseCase,
+    private val toggleSavedPersonUseCase: ToggleSavedPersonUseCase,
     private val observeTmdbAccountUseCase: ObserveTmdbAccountUseCase,
     private val getTmdbMovieAccountStateUseCase: GetTmdbMovieAccountStateUseCase,
     private val updateTmdbWatchlistUseCase: UpdateTmdbWatchlistUseCase,
     private val rateTmdbMovieUseCase: RateTmdbMovieUseCase,
     private val deleteTmdbMovieRatingUseCase: DeleteTmdbMovieRatingUseCase,
+    private val getPersonDetailsUseCase: GetPersonDetailsUseCase,
+    private val getPersonMovieCreditsUseCase: GetPersonMovieCreditsUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(MovieDetailsUiState())
@@ -72,6 +80,7 @@ class MovieDetailsViewModel @Inject constructor(
 
     init {
         observeFavoriteState()
+        observeSavedPeople()
         observeTmdbAccountState()
         observeSettings()
     }
@@ -88,6 +97,7 @@ class MovieDetailsViewModel @Inject constructor(
             MovieDetailsEvent.RatingSubmitted -> onRatingSubmitted()
             MovieDetailsEvent.DeleteRatingClicked -> onDeleteRatingClicked()
             is MovieDetailsEvent.CastClicked -> onCastClicked(personId = event.personId)
+            is MovieDetailsEvent.CastSaveClicked -> onCastSaveClicked(personId = event.personId)
             MovieDetailsEvent.CastSeeAllClicked -> onCastSeeAllClicked()
             is MovieDetailsEvent.TrailerClicked -> onTrailerClicked(trailerId = event.trailerId)
             is MovieDetailsEvent.SimilarMovieClicked -> onSimilarMovieClicked(movieId = event.movieId)
@@ -190,6 +200,16 @@ class MovieDetailsViewModel @Inject constructor(
             observeIsFavoriteUseCase(movieId = movieId).collectLatest { isFavorite ->
                 _state.update { currentState ->
                     currentState.copy(isFavorite = isFavorite)
+                }
+            }
+        }
+    }
+
+    private fun observeSavedPeople() {
+        viewModelScope.launch {
+            observeSavedPeopleUseCase().collectLatest { people ->
+                _state.update { currentState ->
+                    currentState.copy(savedPersonIds = people.map { person -> person.id }.toSet())
                 }
             }
         }
@@ -479,6 +499,71 @@ class MovieDetailsViewModel @Inject constructor(
     private fun onCastClicked(personId: Int) {
         viewModelScope.launch {
             _effect.emit(MovieDetailsEffect.NavigateToCastDetails(personId = personId))
+        }
+    }
+
+    private fun onCastSaveClicked(personId: Int) {
+        viewModelScope.launch {
+            val currentState = _state.value
+            if (personId in currentState.savingPersonIds) return@launch
+
+            val isSaved = personId in currentState.savedPersonIds
+            _state.update { state ->
+                state.copy(savingPersonIds = state.savingPersonIds + personId)
+            }
+
+            val personResult = getPersonDetailsUseCase(
+                personId = personId,
+                language = currentLanguage
+            )
+            val creditsResult = getPersonMovieCreditsUseCase(
+                personId = personId,
+                language = currentLanguage
+            )
+
+            personResult.fold(
+                onSuccess = { person ->
+                    toggleSavedPersonUseCase(
+                        isSaved = isSaved,
+                        person = person,
+                        knownFor = creditsResult.getOrNull()?.cast.orEmpty()
+                    ).fold(
+                        onSuccess = { saved ->
+                            _effect.emit(
+                                MovieDetailsEffect.ShowMessage(
+                                    message = if (saved) {
+                                        "Saved to library."
+                                    } else {
+                                        "Removed from library."
+                                    }
+                                )
+                            )
+                        },
+                        onFailure = { error ->
+                            _effect.emit(
+                                MovieDetailsEffect.ShowMessage(
+                                    message = error.toUserMessage(
+                                        fallback = "Unable to update library."
+                                    )
+                                )
+                            )
+                        }
+                    )
+                },
+                onFailure = { error ->
+                    _effect.emit(
+                        MovieDetailsEffect.ShowMessage(
+                            message = error.toUserMessage(
+                                fallback = "Unable to load person details."
+                            )
+                        )
+                    )
+                }
+            )
+
+            _state.update { state ->
+                state.copy(savingPersonIds = state.savingPersonIds - personId)
+            }
         }
     }
 

@@ -24,7 +24,7 @@ enum class LibraryTab(
 ) {
     Movies(title = "Movies"),
     People(title = "People"),
-    Tmdb(title = "TMDB"),
+    Tmdb(title = "Watchlist"),
     Rated(title = "Rated")
 }
 
