@@ -10,30 +10,41 @@ package com.norbertotaveras.reels.presentation.features.movies.discover
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.outlined.MovieFilter
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
@@ -203,6 +214,7 @@ fun DiscoverScreen(
         if (state.isFilterSheetVisible) {
             DiscoverFilterSheet(
                 state = state,
+                movieCount = movies.itemCount,
                 onEvent = onEvent
             )
         }
@@ -344,6 +356,7 @@ private fun DiscoverFilterButton(
 @Composable
 private fun DiscoverFilterSheet(
     state: DiscoverUiState,
+    movieCount: Int,
     onEvent: (DiscoverEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -352,22 +365,159 @@ private fun DiscoverFilterSheet(
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface,
+        dragHandle = {
+            Spacer(
+                modifier = Modifier
+                    .padding(top = ReelsSpacing.medium, bottom = ReelsSpacing.small)
+                    .width(44.dp)
+                    .height(4.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.35f))
+            )
+        },
         onDismissRequest = {
             onEvent(DiscoverEvent.FiltersDismissed)
         }
     ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = ReelsSpacing.screenHorizontal)
-            .padding(bottom = 28.dp),
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.discoverSectionSpacing)
-    ) {
-        Row(
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.discoverSectionSpacing)
         ) {
+            DiscoverFilterSheetHeader(
+                activeFilterCount = state.activeFilterCount,
+                onDismissClick = {
+                    onEvent(DiscoverEvent.FiltersDismissed)
+                }
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f, fill = false)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = ReelsSpacing.screenHorizontal),
+                verticalArrangement = Arrangement.spacedBy(ReelsDimensions.discoverSectionSpacing)
+            ) {
+                if (state.hasActiveFilters) {
+                    DiscoverActiveFiltersRow(
+                        state = state,
+                        onEvent = onEvent
+                    )
+                }
+
+                DiscoverChipSection(title = "Genre") {
+                    DiscoverFilterChip(
+                        label = "All",
+                        selected = state.filters.genreId == null,
+                        onClick = {
+                            onEvent(
+                                DiscoverEvent.GenreSelected(
+                                    genreId = null,
+                                    genreName = null
+                                )
+                            )
+                        }
+                    )
+
+                    when {
+                        state.isLoadingFilters -> {
+                            repeat(6) {
+                                DiscoverFilterSkeletonChip()
+                            }
+                        }
+
+                        state.filterErrorMessage != null -> Unit
+
+                        else -> {
+                            state.genres.forEach { genre ->
+                                DiscoverFilterChip(
+                                    label = genre.name,
+                                    selected = state.filters.genreId == genre.id,
+                                    onClick = {
+                                        onEvent(
+                                            DiscoverEvent.GenreSelected(
+                                                genreId = genre.id,
+                                                genreName = genre.name
+                                            )
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                if (state.filterErrorMessage != null) {
+                    InlineRetryState(
+                        message = state.filterErrorMessage,
+                        retryLabel = "Reload genres",
+                        onRetry = {
+                            onEvent(DiscoverEvent.RetryFiltersClicked)
+                        }
+                    )
+                }
+
+                DiscoverChipSection(title = "Release Year") {
+                    DISCOVER_YEARS.forEach { year ->
+                        DiscoverFilterChip(
+                            label = year?.toString() ?: "Any",
+                            selected = state.filters.year == year,
+                            onClick = {
+                                onEvent(DiscoverEvent.YearSelected(year = year))
+                            }
+                        )
+                    }
+                }
+
+                DiscoverChipSection(title = "Min Rating") {
+                    DISCOVER_RATINGS.forEach { rating ->
+                        DiscoverFilterChip(
+                            label = rating?.let { "$it+" } ?: "Any",
+                            selected = state.filters.minimumRating == rating,
+                            onClick = {
+                                onEvent(DiscoverEvent.RatingSelected(minimumRating = rating))
+                            }
+                        )
+                    }
+                }
+
+                DiscoverSortSection(
+                    selectedSort = state.filters.sort,
+                    onSortSelected = { sort ->
+                        onEvent(DiscoverEvent.SortSelected(sort = sort))
+                    }
+                )
+
+                DiscoverLanguageRow(language = state.language)
+            }
+
+            DiscoverFilterSheetFooter(
+                movieCount = movieCount,
+                onClearClick = {
+                    onEvent(DiscoverEvent.ClearFiltersClicked)
+                },
+                onApplyClick = {
+                    onEvent(DiscoverEvent.FiltersDismissed)
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun DiscoverFilterSheetHeader(
+    activeFilterCount: Int,
+    onDismissClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = ReelsSpacing.screenHorizontal),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)) {
             Text(
                 text = "Filters",
                 style = MaterialTheme.typography.headlineSmall,
@@ -375,99 +525,23 @@ private fun DiscoverFilterSheet(
                 fontWeight = FontWeight.Bold
             )
 
-            TextButton(
-                onClick = {
-                    onEvent(DiscoverEvent.FiltersDismissed)
-                }
-            ) {
-                Text(text = "Done")
-            }
-        }
-
-        if (state.hasActiveFilters) {
-            ActiveFiltersRow(
-                onClearClick = {
-                    onEvent(DiscoverEvent.ClearFiltersClicked)
-                }
+            Text(
+                text = if (activeFilterCount == 0) {
+                    "Refine movies by genre, year, rating, and sort"
+                } else {
+                    "$activeFilterCount active ${if (activeFilterCount == 1) "filter" else "filters"}"
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 
-        DiscoverChipSection(title = "Sort") {
-            DiscoverSort.entries.forEach { sort ->
-                DiscoverFilterChip(
-                    label = sort.label,
-                    selected = state.filters.sort == sort,
-                    onClick = {
-                        onEvent(DiscoverEvent.SortSelected(sort = sort))
-                    }
-                )
-            }
-        }
-
-        DiscoverChipSection(title = "Genre") {
-            DiscoverFilterChip(
-                label = "All",
-                selected = state.filters.genreId == null,
-                onClick = {
-                    onEvent(
-                        DiscoverEvent.GenreSelected(
-                            genreId = null,
-                            genreName = null
-                        )
-                    )
-                }
-            )
-
-            state.genres.forEach { genre ->
-                DiscoverFilterChip(
-                    label = genre.name,
-                    selected = state.filters.genreId == genre.id,
-                    onClick = {
-                        onEvent(
-                            DiscoverEvent.GenreSelected(
-                                genreId = genre.id,
-                                genreName = genre.name
-                            )
-                        )
-                    }
-                )
-            }
-        }
-
-        DiscoverChipSection(title = "Year") {
-            DISCOVER_YEARS.forEach { year ->
-                DiscoverFilterChip(
-                    label = year?.toString() ?: "Any",
-                    selected = state.filters.year == year,
-                    onClick = {
-                        onEvent(DiscoverEvent.YearSelected(year = year))
-                    }
-                )
-            }
-        }
-
-        DiscoverChipSection(title = "Rating") {
-            DISCOVER_RATINGS.forEach { rating ->
-                DiscoverFilterChip(
-                    label = rating?.let { "$it+" } ?: "Any",
-                    selected = state.filters.minimumRating == rating,
-                    onClick = {
-                        onEvent(DiscoverEvent.RatingSelected(minimumRating = rating))
-                    }
-                )
-            }
-        }
-
-        if (state.filterErrorMessage != null) {
-            InlineRetryState(
-                message = state.filterErrorMessage,
-                retryLabel = "Reload filters",
-                onRetry = {
-                    onEvent(DiscoverEvent.RetryFiltersClicked)
-                }
+        IconButton(onClick = onDismissClick) {
+            Icon(
+                imageVector = Icons.Filled.Close,
+                contentDescription = "Close filters"
             )
         }
-    }
     }
 }
 
@@ -495,6 +569,119 @@ private fun ActiveFiltersRow(
 }
 
 @Composable
+private fun DiscoverActiveFiltersRow(
+    state: DiscoverUiState,
+    onEvent: (DiscoverEvent) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            DiscoverSectionTitle(title = "Active Filters")
+
+            TextButton(
+                onClick = {
+                    onEvent(DiscoverEvent.ClearFiltersClicked)
+                }
+            ) {
+                Text(text = "Clear all")
+            }
+        }
+
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
+            verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
+        ) {
+            state.filters.genreName?.let { genreName ->
+                DiscoverRemovableFilterChip(
+                    label = genreName,
+                    onRemoveClick = {
+                        onEvent(
+                            DiscoverEvent.GenreSelected(
+                                genreId = null,
+                                genreName = null
+                            )
+                        )
+                    }
+                )
+            }
+
+            state.filters.year?.let { year ->
+                DiscoverRemovableFilterChip(
+                    label = year.toString(),
+                    onRemoveClick = {
+                        onEvent(DiscoverEvent.YearSelected(year = null))
+                    }
+                )
+            }
+
+            state.filters.minimumRating?.let { rating ->
+                DiscoverRemovableFilterChip(
+                    label = "$rating+ rating",
+                    onRemoveClick = {
+                        onEvent(DiscoverEvent.RatingSelected(minimumRating = null))
+                    }
+                )
+            }
+
+            if (state.filters.sort != DiscoverSort.Popularity) {
+                DiscoverRemovableFilterChip(
+                    label = state.filters.sort.displayLabel,
+                    onRemoveClick = {
+                        onEvent(DiscoverEvent.SortSelected(sort = DiscoverSort.Popularity))
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DiscoverRemovableFilterChip(
+    label: String,
+    onRemoveClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.clickable(onClick = onRemoveClick),
+        shape = MaterialTheme.shapes.extraLarge,
+        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.14f),
+        contentColor = MaterialTheme.colorScheme.primary,
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.24f)
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(
+                horizontal = ReelsSpacing.medium,
+                vertical = ReelsSpacing.small
+            ),
+            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            Icon(
+                imageVector = Icons.Filled.Close,
+                contentDescription = null,
+                modifier = Modifier.size(14.dp)
+            )
+        }
+    }
+}
+
+@Composable
 private fun DiscoverChipSection(
     title: String,
     modifier: Modifier = Modifier,
@@ -504,28 +691,32 @@ private fun DiscoverChipSection(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
     ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.Bold
-        )
+        DiscoverSectionTitle(title = title)
 
-        LazyRow(
+        FlowRow(
             horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.discoverFilterRowSpacing),
-            contentPadding = PaddingValues(end = ReelsSpacing.screenHorizontal)
+            verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
         ) {
-            item {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(
-                        ReelsDimensions.discoverFilterRowSpacing
-                    )
-                ) {
-                    content()
-                }
-            }
+            content()
         }
     }
+}
+
+@Composable
+private fun DiscoverSectionTitle(
+    title: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        modifier = modifier,
+        text = title,
+        style = MaterialTheme.typography.titleMedium.copy(
+            fontSize = 16.sp,
+            lineHeight = 22.sp
+        ),
+        color = MaterialTheme.colorScheme.onBackground,
+        fontWeight = FontWeight.Bold
+    )
 }
 
 @Composable
@@ -568,6 +759,228 @@ private fun DiscoverFilterChip(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
+    }
+}
+
+@Composable
+private fun DiscoverFilterSkeletonChip(
+    modifier: Modifier = Modifier,
+) {
+    Spacer(
+        modifier = modifier
+            .width(86.dp)
+            .height(36.dp)
+            .clip(MaterialTheme.shapes.extraLarge)
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+    )
+}
+
+@Composable
+private fun DiscoverSortSection(
+    selectedSort: DiscoverSort,
+    onSortSelected: (DiscoverSort) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
+    ) {
+        DiscoverSectionTitle(title = "Sort By")
+
+        Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)) {
+            DiscoverSort.entries.forEach { sort ->
+                DiscoverSortRow(
+                    label = sort.displayLabel,
+                    selected = selectedSort == sort,
+                    onClick = {
+                        onSortSelected(sort)
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DiscoverSortRow(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = MaterialTheme.shapes.large,
+        color = if (selected) {
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+        } else {
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.42f)
+        },
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        border = BorderStroke(
+            width = 1.dp,
+            color = if (selected) {
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
+            } else {
+                MaterialTheme.colorScheme.outline.copy(alpha = 0.18f)
+            }
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(
+                horizontal = ReelsSpacing.large,
+                vertical = ReelsSpacing.medium
+            ),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = 15.sp,
+                    lineHeight = 20.sp
+                ),
+                fontWeight = FontWeight.SemiBold
+            )
+
+            Surface(
+                modifier = Modifier.size(22.dp),
+                shape = CircleShape,
+                color = if (selected) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    Color.Transparent
+                },
+                border = BorderStroke(
+                    width = 1.dp,
+                    color = if (selected) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
+                    }
+                ),
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ) {
+                if (selected) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = null,
+                            modifier = Modifier.size(15.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DiscoverLanguageRow(
+    language: String,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
+    ) {
+        DiscoverSectionTitle(title = "Language / Region")
+
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.large,
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.42f),
+            border = BorderStroke(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f)
+            )
+        ) {
+            Row(
+                modifier = Modifier.padding(ReelsSpacing.large),
+                horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Surface(
+                    modifier = Modifier.size(38.dp),
+                    shape = MaterialTheme.shapes.medium,
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                    contentColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Filled.Language,
+                            contentDescription = null,
+                            modifier = Modifier.size(19.dp)
+                        )
+                    }
+                }
+
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        text = language.toDiscoverLanguageLabel(),
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontSize = 15.sp,
+                            lineHeight = 20.sp
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.SemiBold
+                    )
+
+                    Text(
+                        text = "Uses your Settings language and region",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DiscoverFilterSheetFooter(
+    movieCount: Int,
+    onClearClick: () -> Unit,
+    onApplyClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 3.dp,
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = ReelsSpacing.screenHorizontal)
+                .padding(top = ReelsSpacing.medium, bottom = 28.dp),
+            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextButton(
+                modifier = Modifier.weight(1f),
+                onClick = onClearClick
+            ) {
+                Text(text = "Reset")
+            }
+
+            Button(
+                modifier = Modifier.weight(2f),
+                onClick = onApplyClick,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Text(text = "Show ${movieCount.toMovieCountLabel()}")
+            }
+        }
     }
 }
 
@@ -784,5 +1197,25 @@ private fun Int.toMovieCountLabel(): String {
     return when (this) {
         1 -> "1 movie"
         else -> "$this movies"
+    }
+}
+
+private val DiscoverUiState.activeFilterCount: Int
+    get() {
+        var count = 0
+        if (filters.genreId != null) count += 1
+        if (filters.year != null) count += 1
+        if (filters.minimumRating != null) count += 1
+        if (filters.sort != DiscoverSort.Popularity) count += 1
+        return count
+    }
+
+private fun String.toDiscoverLanguageLabel(): String {
+    return when (this) {
+        "en-US" -> "English · United States"
+        "en-GB" -> "English · United Kingdom"
+        "es-ES" -> "Spanish · Spain"
+        "fr-FR" -> "French · France"
+        else -> this
     }
 }
