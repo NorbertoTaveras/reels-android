@@ -21,20 +21,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -120,8 +113,13 @@ fun MovieDetailsContent(
                 genres = movie.genres.map { it.name },
                 isFavorite = isFavorite,
                 isFavoriteLoading = isFavoriteLoading,
+                isWatchlisted = isWatchlisted,
+                tmdbRating = tmdbRating,
+                isAccountActionLoading = isAccountActionLoading,
                 onBackClick = onBackClick,
-                onFavoriteClick = onFavoriteClick
+                onFavoriteClick = onFavoriteClick,
+                onWatchlistClick = onWatchlistClick,
+                onRatingClick = onRatingClick
             )
         }
 
@@ -154,19 +152,6 @@ fun MovieDetailsContent(
                 originalLanguage = movie.originalLanguage,
                 popularityLabel = "%,d votes".format(movie.voteCount),
                 modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing)
-            )
-        }
-
-        item {
-            TmdbSyncSection(
-                modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
-                isConnected = isTmdbAccountConnected,
-                isWatchlisted = isWatchlisted,
-                rating = tmdbRating,
-                isLoading = isAccountActionLoading,
-                onWatchlistClick = onWatchlistClick,
-                onRatingClick = onRatingClick,
-                onDeleteRatingClick = onDeleteRatingClick
             )
         }
 
@@ -240,167 +225,6 @@ fun MovieDetailsContent(
             }
         }
     }
-}
-
-@Composable
-private fun TmdbSyncSection(
-    isConnected: Boolean,
-    isWatchlisted: Boolean,
-    rating: Double?,
-    isLoading: Boolean,
-    onWatchlistClick: () -> Unit,
-    onRatingClick: () -> Unit,
-    onDeleteRatingClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = ReelsSpacing.screenHorizontal),
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface,
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outline
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(ReelsDimensions.inlineStateCardPadding),
-            verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Surface(
-                    modifier = Modifier.size(ReelsDimensions.inlineStateIconContainerSize),
-                    shape = MaterialTheme.shapes.medium,
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = MaterialTheme.colorScheme.primary
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = if (isWatchlisted) {
-                                Icons.Filled.Bookmark
-                            } else {
-                                Icons.Filled.BookmarkBorder
-                            },
-                            contentDescription = null,
-                            modifier = Modifier.size(ReelsDimensions.inlineStateIconSize)
-                        )
-                    }
-                }
-
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
-                ) {
-                    Text(
-                        text = "TMDB Sync",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Text(
-                        text = if (isConnected) {
-                            buildTmdbSyncSubtitle(
-                                isWatchlisted = isWatchlisted,
-                                rating = rating
-                            )
-                        } else {
-                            "Connect TMDB in Settings to sync watchlist and ratings."
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(ReelsDimensions.inlineStateIconSize),
-                        strokeWidth = 2.dp
-                    )
-                }
-            }
-
-            if (isConnected) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    FilledTonalButton(
-                        enabled = !isLoading,
-                        onClick = onWatchlistClick
-                    ) {
-                        Icon(
-                            imageVector = if (isWatchlisted) {
-                                Icons.Filled.Bookmark
-                            } else {
-                                Icons.Filled.BookmarkBorder
-                            },
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Text(
-                            modifier = Modifier.padding(start = ReelsSpacing.xSmall),
-                            text = if (isWatchlisted) "Watchlisted" else "Watchlist"
-                        )
-                    }
-
-                    if (rating == null) {
-                        OutlinedButton(
-                            enabled = !isLoading,
-                            onClick = onRatingClick
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.StarBorder,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Text(
-                                modifier = Modifier.padding(start = ReelsSpacing.xSmall),
-                                text = "Rate"
-                            )
-                        }
-                    } else {
-                        OutlinedButton(
-                            enabled = !isLoading,
-                            onClick = onDeleteRatingClick
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Star,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Text(
-                                modifier = Modifier.padding(start = ReelsSpacing.xSmall),
-                                text = "Rated ${rating.toRatingLabel()}"
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-private fun buildTmdbSyncSubtitle(
-    isWatchlisted: Boolean,
-    rating: Double?,
-): String {
-    val watchlistLabel = if (isWatchlisted) {
-        "In your watchlist"
-    } else {
-        "Not in watchlist"
-    }
-    val ratingLabel = rating?.let { "rated ${it.toRatingLabel()}" } ?: "not rated"
-    return "$watchlistLabel • $ratingLabel"
-}
-
-private fun Double.toRatingLabel(): String {
-    return String.format(Locale.US, "%.1f", this)
 }
 
 @Composable

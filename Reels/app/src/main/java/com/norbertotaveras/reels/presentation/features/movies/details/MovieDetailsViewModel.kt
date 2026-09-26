@@ -83,6 +83,9 @@ class MovieDetailsViewModel @Inject constructor(
             MovieDetailsEvent.FavoriteClicked -> onFavoriteClick()
             MovieDetailsEvent.WatchlistClicked -> onWatchlistClicked()
             MovieDetailsEvent.RatingClicked -> onRatingClicked()
+            is MovieDetailsEvent.RatingSelected -> onRatingSelected(rating = event.rating)
+            MovieDetailsEvent.RatingSheetDismissed -> onRatingSheetDismissed()
+            MovieDetailsEvent.RatingSubmitted -> onRatingSubmitted()
             MovieDetailsEvent.DeleteRatingClicked -> onDeleteRatingClicked()
             is MovieDetailsEvent.CastClicked -> onCastClicked(personId = event.personId)
             MovieDetailsEvent.CastSeeAllClicked -> onCastSeeAllClicked()
@@ -311,7 +314,10 @@ class MovieDetailsViewModel @Inject constructor(
                 onSuccess = {
                     refreshMovieAccountState()
                     _state.update { currentState ->
-                        currentState.copy(isAccountActionLoading = false)
+                        currentState.copy(
+                            isAccountActionLoading = false,
+                            isRatingSheetVisible = false
+                        )
                     }
                     _effect.emit(
                         MovieDetailsEffect.ShowMessage(
@@ -352,21 +358,61 @@ class MovieDetailsViewModel @Inject constructor(
             }
 
             _state.update { currentState ->
+                currentState.copy(
+                    selectedTmdbRating = currentState.tmdbRating ?: DEFAULT_TMDB_RATING,
+                    isRatingSheetVisible = true
+                )
+            }
+        }
+    }
+
+    private fun onRatingSelected(rating: Double) {
+        _state.update { currentState ->
+            currentState.copy(selectedTmdbRating = rating)
+        }
+    }
+
+    private fun onRatingSheetDismissed() {
+        _state.update { currentState ->
+            currentState.copy(isRatingSheetVisible = false)
+        }
+    }
+
+    private fun onRatingSubmitted() {
+        viewModelScope.launch {
+            if (state.value.isAccountActionLoading) return@launch
+            if (!state.value.isTmdbAccountConnected) {
+                _state.update { currentState ->
+                    currentState.copy(isRatingSheetVisible = false)
+                }
+                _effect.emit(
+                    MovieDetailsEffect.ShowMessage(
+                        message = "Connect your TMDB account in Settings first."
+                    )
+                )
+                return@launch
+            }
+
+            val rating = state.value.selectedTmdbRating
+            _state.update { currentState ->
                 currentState.copy(isAccountActionLoading = true)
             }
 
             rateTmdbMovieUseCase(
                 movieId = movieId,
-                rating = DEFAULT_TMDB_RATING
+                rating = rating
             ).fold(
                 onSuccess = {
                     refreshMovieAccountState()
                     _state.update { currentState ->
-                        currentState.copy(isAccountActionLoading = false)
+                        currentState.copy(
+                            isAccountActionLoading = false,
+                            isRatingSheetVisible = false
+                        )
                     }
                     _effect.emit(
                         MovieDetailsEffect.ShowMessage(
-                            message = "Rated on TMDB"
+                            message = "Rated ${rating.toRatingLabel()} on TMDB"
                         )
                     )
                 },
@@ -462,5 +508,13 @@ class MovieDetailsViewModel @Inject constructor(
     private companion object {
         const val DEFAULT_LANGUAGE = "en-US"
         const val DEFAULT_TMDB_RATING = 8.0
+    }
+}
+
+private fun Double.toRatingLabel(): String {
+    return if (this % 1.0 == 0.0) {
+        toInt().toString()
+    } else {
+        toString()
     }
 }

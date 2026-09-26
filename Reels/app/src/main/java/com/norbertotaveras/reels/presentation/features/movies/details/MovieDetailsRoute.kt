@@ -63,6 +63,27 @@ fun MovieDetailsRoute(
             onEvent = viewModel::onEvent
         )
 
+        if (state.isRatingSheetVisible) {
+            MovieRatingSheet(
+                selectedRating = state.selectedTmdbRating,
+                isLoading = state.isAccountActionLoading,
+                onRatingSelected = { rating ->
+                    viewModel.onEvent(MovieDetailsEvent.RatingSelected(rating = rating))
+                },
+                onSubmitClick = {
+                    viewModel.onEvent(MovieDetailsEvent.RatingSubmitted)
+                },
+                onDeleteClick = state.tmdbRating?.let {
+                    {
+                        viewModel.onEvent(MovieDetailsEvent.DeleteRatingClicked)
+                    }
+                },
+                onDismiss = {
+                    viewModel.onEvent(MovieDetailsEvent.RatingSheetDismissed)
+                }
+            )
+        }
+
         ReelsSnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)

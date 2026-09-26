@@ -22,9 +22,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -53,6 +56,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightRatingContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 import com.norbertotaveras.reels.presentation.ui.theme.isReelsLightTheme
 
@@ -67,8 +71,13 @@ fun MovieHeroHeader(
     isFavorite: Boolean,
     onBackClick: () -> Unit,
     onFavoriteClick: () -> Unit,
+    onWatchlistClick: () -> Unit,
+    onRatingClick: () -> Unit,
     modifier: Modifier = Modifier,
     isFavoriteLoading: Boolean = false,
+    isWatchlisted: Boolean = false,
+    tmdbRating: Double? = null,
+    isAccountActionLoading: Boolean = false,
 ) {
     Box(
         modifier = modifier
@@ -174,7 +183,12 @@ fun MovieHeroHeader(
                         rating = rating,
                         isFavorite = isFavorite,
                         isFavoriteLoading = isFavoriteLoading,
-                        onFavoriteClick = onFavoriteClick
+                        isWatchlisted = isWatchlisted,
+                        tmdbRating = tmdbRating,
+                        isAccountActionLoading = isAccountActionLoading,
+                        onFavoriteClick = onFavoriteClick,
+                        onWatchlistClick = onWatchlistClick,
+                        onRatingClick = onRatingClick
                     )
                 }
             }
@@ -222,12 +236,17 @@ private fun HeroActionRow(
     rating: String?,
     isFavorite: Boolean,
     isFavoriteLoading: Boolean,
+    isWatchlisted: Boolean,
+    tmdbRating: Double?,
+    isAccountActionLoading: Boolean,
     onFavoriteClick: () -> Unit,
+    onWatchlistClick: () -> Unit,
+    onRatingClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
+        horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (!rating.isNullOrBlank()) {
@@ -238,6 +257,23 @@ private fun HeroActionRow(
             isFavorite = isFavorite,
             isLoading = isFavoriteLoading,
             onClick = onFavoriteClick
+        )
+
+        HeroToggleActionButton(
+            selected = isWatchlisted,
+            selectedIcon = Icons.Filled.Bookmark,
+            unselectedIcon = Icons.Outlined.BookmarkBorder,
+            selectedContentDescription = "Remove from TMDB watchlist",
+            unselectedContentDescription = "Add to TMDB watchlist",
+            selectedColor = ReelsTeal,
+            isLoading = isAccountActionLoading,
+            onClick = onWatchlistClick
+        )
+
+        HeroRateButton(
+            rating = tmdbRating,
+            isLoading = isAccountActionLoading,
+            onClick = onRatingClick
         )
     }
 }
@@ -285,10 +321,7 @@ private fun HeroFavoriteButton(
 ) {
     Surface(
         modifier = modifier
-            .size(
-                width = ReelsDimensions.detailsFavoriteButtonWidth,
-                height = ReelsDimensions.detailsActionButtonHeight
-            )
+            .size(ReelsDimensions.detailsActionButtonHeight)
             .clickable(
                 enabled = !isLoading,
                 role = Role.Button,
@@ -333,6 +366,133 @@ private fun HeroFavoriteButton(
     }
 }
 
+@Composable
+private fun HeroToggleActionButton(
+    selected: Boolean,
+    selectedIcon: androidx.compose.ui.graphics.vector.ImageVector,
+    unselectedIcon: androidx.compose.ui.graphics.vector.ImageVector,
+    selectedContentDescription: String,
+    unselectedContentDescription: String,
+    selectedColor: Color,
+    isLoading: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier
+            .size(ReelsDimensions.detailsActionButtonHeight)
+            .clickable(
+                enabled = !isLoading,
+                role = Role.Button,
+                onClickLabel = if (selected) {
+                    selectedContentDescription
+                } else {
+                    unselectedContentDescription
+                },
+                onClick = onClick
+            ),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surface,
+        contentColor = if (selected) {
+            selectedColor
+        } else {
+            MaterialTheme.colorScheme.onSurface
+        },
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
+        )
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            } else {
+                Icon(
+                    imageVector = if (selected) selectedIcon else unselectedIcon,
+                    contentDescription = null,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun HeroRateButton(
+    rating: Double?,
+    isLoading: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier
+            .height(ReelsDimensions.detailsActionButtonHeight)
+            .clickable(
+                enabled = !isLoading,
+                role = Role.Button,
+                onClickLabel = if (rating == null) "Rate on TMDB" else "Update TMDB rating",
+                onClick = onClick
+            ),
+        shape = MaterialTheme.shapes.large,
+        color = if (rating == null) {
+            MaterialTheme.colorScheme.surface
+        } else {
+            ReelsRatingContainer
+        },
+        contentColor = if (rating == null) {
+            MaterialTheme.colorScheme.onSurface
+        } else {
+            MaterialTheme.colorScheme.primary
+        },
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = ReelsSpacing.small),
+            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            } else {
+                Icon(
+                    imageVector = if (rating == null) {
+                        Icons.Outlined.StarBorder
+                    } else {
+                        Icons.Filled.Star
+                    },
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+
+                Text(
+                    text = rating?.toHeroRatingLabel() ?: "Rate",
+                    style = MaterialTheme.typography.labelMedium,
+                    maxLines = 1
+                )
+            }
+        }
+    }
+}
+
+private fun Double.toHeroRatingLabel(): String {
+    return if (this % 1.0 == 0.0) {
+        toInt().toString()
+    } else {
+        String.format("%.1f", this)
+    }
+}
+
 
 
 
@@ -352,7 +512,9 @@ private fun MovieHeroHeaderPreview() {
                 genres = listOf("Sci-Fi", "Adventure", "Drama"),
                 isFavorite = false,
                 onBackClick = {},
-                onFavoriteClick = {}
+                onFavoriteClick = {},
+                onWatchlistClick = {},
+                onRatingClick = {}
             )
         }
     }

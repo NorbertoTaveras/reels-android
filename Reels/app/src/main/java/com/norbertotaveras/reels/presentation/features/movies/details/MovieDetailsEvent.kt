@@ -13,6 +13,9 @@ sealed interface MovieDetailsEvent {
     data object FavoriteClicked : MovieDetailsEvent
     data object WatchlistClicked : MovieDetailsEvent
     data object RatingClicked : MovieDetailsEvent
+    data class RatingSelected(val rating: Double) : MovieDetailsEvent
+    data object RatingSheetDismissed : MovieDetailsEvent
+    data object RatingSubmitted : MovieDetailsEvent
     data object DeleteRatingClicked : MovieDetailsEvent
     data class CastClicked(val personId: Int) : MovieDetailsEvent
     data object CastSeeAllClicked : MovieDetailsEvent
