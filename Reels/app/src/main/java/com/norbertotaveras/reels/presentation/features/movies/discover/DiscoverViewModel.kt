@@ -64,6 +64,8 @@ class DiscoverViewModel @Inject constructor(
 
     fun onEvent(event: DiscoverEvent) {
         when (event) {
+            DiscoverEvent.FiltersClicked -> showFilters()
+            DiscoverEvent.FiltersDismissed -> hideFilters()
             is DiscoverEvent.SortSelected -> updateSort(sort = event.sort)
             is DiscoverEvent.GenreSelected -> updateGenre(
                 genreId = event.genreId,
@@ -74,6 +76,18 @@ class DiscoverViewModel @Inject constructor(
             DiscoverEvent.ClearFiltersClicked -> updateFilters(filters = DiscoverFilterDataModel())
             DiscoverEvent.RetryFiltersClicked -> loadGenres()
             is DiscoverEvent.MovieClicked -> onMovieClicked(movieId = event.movieId)
+        }
+    }
+
+    private fun showFilters() {
+        _state.update { currentState ->
+            currentState.copy(isFilterSheetVisible = true)
+        }
+    }
+
+    private fun hideFilters() {
+        _state.update { currentState ->
+            currentState.copy(isFilterSheetVisible = false)
         }
     }
 

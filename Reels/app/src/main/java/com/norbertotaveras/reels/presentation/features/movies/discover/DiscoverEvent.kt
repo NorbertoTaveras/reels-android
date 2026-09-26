@@ -10,6 +10,8 @@ package com.norbertotaveras.reels.presentation.features.movies.discover
 import com.norbertotaveras.reels.domain.model.discover.DiscoverSort
 
 sealed interface DiscoverEvent {
+    data object FiltersClicked : DiscoverEvent
+    data object FiltersDismissed : DiscoverEvent
     data class SortSelected(val sort: DiscoverSort) : DiscoverEvent
     data class GenreSelected(val genreId: Int?, val genreName: String?) : DiscoverEvent
     data class YearSelected(val year: Int?) : DiscoverEvent
