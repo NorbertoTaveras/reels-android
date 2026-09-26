@@ -100,10 +100,11 @@ fun MovieHeroHeader(
                     .height(ReelsDimensions.detailsHeroHeight)
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(
-                                MaterialTheme.colorScheme.background.copy(alpha = 0.05f),
-                                MaterialTheme.colorScheme.background.copy(alpha = 0.55f),
-                                MaterialTheme.colorScheme.background
+                            colorStops = arrayOf(
+                                0.0f to Color.Black.copy(alpha = 0.16f),
+                                0.42f to Color.Black.copy(alpha = 0.10f),
+                                0.72f to MaterialTheme.colorScheme.background.copy(alpha = 0.28f),
+                                1.0f to MaterialTheme.colorScheme.background
                             )
                         )
                     )
