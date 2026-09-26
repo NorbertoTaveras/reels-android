@@ -43,6 +43,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -955,21 +956,24 @@ private fun DiscoverFilterSheetFooter(
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 3.dp,
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
-        )
+        tonalElevation = 3.dp
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = ReelsSpacing.screenHorizontal)
-                .padding(top = ReelsSpacing.medium, bottom = 28.dp),
+                .padding(bottom = 28.dp),
             verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
         ) {
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f),
+                thickness = 1.dp
+            )
+
             Button(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = ReelsSpacing.screenHorizontal)
+                    .padding(top = ReelsSpacing.medium),
                 onClick = onApplyClick,
                 shape = MaterialTheme.shapes.large,
                 colors = ButtonDefaults.buttonColors(
