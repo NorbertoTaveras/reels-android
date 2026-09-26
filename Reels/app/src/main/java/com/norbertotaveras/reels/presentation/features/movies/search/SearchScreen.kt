@@ -149,7 +149,7 @@ fun SearchScreen(
             contentPadding = PaddingValues(bottom = ReelsDimensions.searchContentBottomPadding),
             verticalArrangement = Arrangement.spacedBy(ReelsDimensions.searchResultSpacing)
         ) {
-            if (state.recentSearches.isNotEmpty()) {
+            if (state.recentSearches.isNotEmpty() && trimmedQuery.isNotBlank()) {
                 item {
                     RecentSearchesSection(
                         recentSearches = state.recentSearches,
@@ -160,7 +160,14 @@ fun SearchScreen(
 
             if (!hasSearchableQuery) {
                 item {
-                    SearchPromptState(query = trimmedQuery)
+                    if (trimmedQuery.isBlank()) {
+                        SearchIdleContent(
+                            recentSearches = state.recentSearches,
+                            onEvent = onEvent
+                        )
+                    } else {
+                        SearchPromptState(query = trimmedQuery)
+                    }
                 }
             } else {
                 item {
@@ -276,6 +283,27 @@ private fun SearchResultsHeader(
         color = MaterialTheme.colorScheme.onBackground,
         fontWeight = FontWeight.Bold
     )
+}
+
+@Composable
+private fun SearchIdleContent(
+    recentSearches: List<String>,
+    onEvent: (SearchEvent) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.searchFieldToContentSpacing)
+    ) {
+        if (recentSearches.isNotEmpty()) {
+            RecentSearchesSection(
+                recentSearches = recentSearches,
+                onEvent = onEvent
+            )
+        }
+
+        TrendingSearchesSection(onEvent = onEvent)
+    }
 }
 
 @Composable
@@ -438,12 +466,13 @@ private fun RecentSearchesSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Recent Searches",
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontSize = 16.sp,
-                    lineHeight = 22.sp
+                text = "RECENT",
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontSize = 13.sp,
+                    lineHeight = 16.sp,
+                    letterSpacing = 0.sp
                 ),
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Bold
             )
 
@@ -465,34 +494,102 @@ private fun RecentSearchesSection(
             verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
         ) {
             recentSearches.forEach { query ->
-                Surface(
+                SearchSuggestionChip(
+                    label = query,
                     onClick = {
                         onEvent(SearchEvent.RecentSearchClicked(query = query))
-                    },
-                    shape = MaterialTheme.shapes.extraLarge,
-                    color = if (isReelsLightTheme()) {
-                        ReelsLightGenreChipContainer
-                    } else {
-                        ReelsGenreChipContainer
-                    },
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                ) {
-                    Text(
-                        modifier = Modifier.padding(
-                            horizontal = ReelsDimensions.searchChipHorizontalPadding,
-                            vertical = ReelsDimensions.searchChipVerticalPadding
-                        ),
-                        text = query,
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            fontSize = 14.sp,
-                            lineHeight = 18.sp
-                        )
-                    )
-                }
-
+                    }
+                )
             }
         }
     }
 }
+
+@Composable
+private fun TrendingSearchesSection(
+    onEvent: (SearchEvent) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.searchSectionSpacing)
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Search,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Text(
+                text = "TRENDING",
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontSize = 13.sp,
+                    lineHeight = 16.sp,
+                    letterSpacing = 0.sp
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
+            verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
+        ) {
+            TRENDING_SEARCHES.forEach { query ->
+                SearchSuggestionChip(
+                    label = query,
+                    onClick = {
+                        onEvent(SearchEvent.RecentSearchClicked(query = query))
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SearchSuggestionChip(
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier,
+        onClick = onClick,
+        shape = MaterialTheme.shapes.extraLarge,
+        color = if (isReelsLightTheme()) {
+            ReelsLightGenreChipContainer
+        } else {
+            ReelsGenreChipContainer
+        },
+        contentColor = MaterialTheme.colorScheme.onSurface
+    ) {
+        Text(
+            modifier = Modifier.padding(
+                horizontal = ReelsDimensions.searchChipHorizontalPadding,
+                vertical = ReelsDimensions.searchChipVerticalPadding
+            ),
+            text = label,
+            style = MaterialTheme.typography.labelLarge.copy(
+                fontSize = 14.sp,
+                lineHeight = 18.sp
+            )
+        )
+    }
+}
+
+private val TRENDING_SEARCHES = listOf(
+    "Oppenheimer",
+    "Saltburn",
+    "Dune",
+    "Poor Things",
+    "Maestro"
+)
 
 private const val MIN_SEARCH_QUERY_LENGTH = 2
