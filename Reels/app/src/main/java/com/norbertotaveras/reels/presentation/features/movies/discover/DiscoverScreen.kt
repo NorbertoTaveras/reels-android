@@ -75,9 +75,12 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toErrorTitle
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsGenreChipContainer
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightGenreChipContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import com.norbertotaveras.reels.presentation.ui.theme.isReelsLightTheme
 
 @Composable
 fun DiscoverScreen(
@@ -365,28 +368,18 @@ private fun DiscoverFilterSheet(
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface,
-        dragHandle = {
-            Spacer(
-                modifier = Modifier
-                    .padding(top = ReelsSpacing.medium, bottom = ReelsSpacing.small)
-                    .width(44.dp)
-                    .height(4.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.35f))
-            )
-        },
+        dragHandle = null,
         onDismissRequest = {
             onEvent(DiscoverEvent.FiltersDismissed)
         }
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.discoverSectionSpacing)
+            verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)
         ) {
             DiscoverFilterSheetHeader(
-                activeFilterCount = state.activeFilterCount,
-                onDismissClick = {
-                    onEvent(DiscoverEvent.FiltersDismissed)
+                onResetClick = {
+                    onEvent(DiscoverEvent.ClearFiltersClicked)
                 }
             )
 
@@ -396,7 +389,7 @@ private fun DiscoverFilterSheet(
                     .weight(1f, fill = false)
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = ReelsSpacing.screenHorizontal),
-                verticalArrangement = Arrangement.spacedBy(ReelsDimensions.discoverSectionSpacing)
+                verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)
             ) {
                 if (state.hasActiveFilters) {
                     DiscoverActiveFiltersRow(
@@ -406,22 +399,9 @@ private fun DiscoverFilterSheet(
                 }
 
                 DiscoverChipSection(title = "Genre") {
-                    DiscoverFilterChip(
-                        label = "All",
-                        selected = state.filters.genreId == null,
-                        onClick = {
-                            onEvent(
-                                DiscoverEvent.GenreSelected(
-                                    genreId = null,
-                                    genreName = null
-                                )
-                            )
-                        }
-                    )
-
                     when {
                         state.isLoadingFilters -> {
-                            repeat(6) {
+                            repeat(10) {
                                 DiscoverFilterSkeletonChip()
                             }
                         }
@@ -435,10 +415,17 @@ private fun DiscoverFilterSheet(
                                     selected = state.filters.genreId == genre.id,
                                     onClick = {
                                         onEvent(
-                                            DiscoverEvent.GenreSelected(
-                                                genreId = genre.id,
-                                                genreName = genre.name
-                                            )
+                                            if (state.filters.genreId == genre.id) {
+                                                DiscoverEvent.GenreSelected(
+                                                    genreId = null,
+                                                    genreName = null
+                                                )
+                                            } else {
+                                                DiscoverEvent.GenreSelected(
+                                                    genreId = genre.id,
+                                                    genreName = genre.name
+                                                )
+                                            }
                                         )
                                     }
                                 )
@@ -460,10 +447,14 @@ private fun DiscoverFilterSheet(
                 DiscoverChipSection(title = "Release Year") {
                     DISCOVER_YEARS.forEach { year ->
                         DiscoverFilterChip(
-                            label = year?.toString() ?: "Any",
+                            label = year.toString(),
                             selected = state.filters.year == year,
                             onClick = {
-                                onEvent(DiscoverEvent.YearSelected(year = year))
+                                onEvent(
+                                    DiscoverEvent.YearSelected(
+                                        year = year.takeUnless { state.filters.year == year }
+                                    )
+                                )
                             }
                         )
                     }
@@ -493,9 +484,6 @@ private fun DiscoverFilterSheet(
 
             DiscoverFilterSheetFooter(
                 movieCount = movieCount,
-                onClearClick = {
-                    onEvent(DiscoverEvent.ClearFiltersClicked)
-                },
                 onApplyClick = {
                     onEvent(DiscoverEvent.FiltersDismissed)
                 }
@@ -506,40 +494,41 @@ private fun DiscoverFilterSheet(
 
 @Composable
 private fun DiscoverFilterSheetHeader(
-    activeFilterCount: Int,
-    onDismissClick: () -> Unit,
+    onResetClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = ReelsSpacing.screenHorizontal),
+            .padding(
+                start = ReelsSpacing.screenHorizontal,
+                top = ReelsSpacing.large,
+                end = ReelsSpacing.screenHorizontal
+            ),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)) {
             Text(
                 text = "Filters",
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontSize = 15.sp,
+                    lineHeight = 20.sp
+                ),
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold
             )
-
-            Text(
-                text = if (activeFilterCount == 0) {
-                    "Refine movies by genre, year, rating, and sort"
-                } else {
-                    "$activeFilterCount active ${if (activeFilterCount == 1) "filter" else "filters"}"
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
 
-        IconButton(onClick = onDismissClick) {
-            Icon(
-                imageVector = Icons.Filled.Close,
-                contentDescription = "Close filters"
+        TextButton(onClick = onResetClick) {
+            Text(
+                text = "Reset all",
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontSize = 10.sp,
+                    lineHeight = 13.sp
+                ),
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.SemiBold
             )
         }
     }
@@ -689,13 +678,13 @@ private fun DiscoverChipSection(
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
+        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
     ) {
         DiscoverSectionTitle(title = title)
 
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.discoverFilterRowSpacing),
-            verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
+            verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
         ) {
             content()
         }
@@ -709,13 +698,13 @@ private fun DiscoverSectionTitle(
 ) {
     Text(
         modifier = modifier,
-        text = title,
-        style = MaterialTheme.typography.titleMedium.copy(
-            fontSize = 16.sp,
-            lineHeight = 22.sp
+        text = title.uppercase(),
+        style = MaterialTheme.typography.labelSmall.copy(
+            fontSize = 9.sp,
+            lineHeight = 12.sp
         ),
-        color = MaterialTheme.colorScheme.onBackground,
-        fontWeight = FontWeight.Bold
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        fontWeight = FontWeight.ExtraBold
     )
 }
 
@@ -730,19 +719,19 @@ private fun DiscoverFilterChip(
         modifier = modifier.clickable(onClick = onClick),
         shape = MaterialTheme.shapes.extraLarge,
         color = if (selected) {
-            MaterialTheme.colorScheme.primary
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.16f)
         } else {
-            MaterialTheme.colorScheme.surface
+            discoverFilterControlColor()
         },
         contentColor = if (selected) {
-            MaterialTheme.colorScheme.onPrimary
+            MaterialTheme.colorScheme.primary
         } else {
-            MaterialTheme.colorScheme.onSurface
+            MaterialTheme.colorScheme.onSurfaceVariant
         },
         border = BorderStroke(
             width = 1.dp,
             color = if (selected) {
-                Color.Transparent
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
             } else {
                 MaterialTheme.colorScheme.outline.copy(alpha = 0.22f)
             }
@@ -751,10 +740,13 @@ private fun DiscoverFilterChip(
         Text(
             modifier = Modifier.padding(
                 horizontal = ReelsDimensions.discoverFilterChipHorizontalPadding,
-                vertical = ReelsDimensions.discoverFilterChipVerticalPadding
+                vertical = 7.dp
             ),
             text = label,
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontSize = 10.sp,
+                lineHeight = 13.sp
+            ),
             fontWeight = FontWeight.SemiBold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
@@ -787,10 +779,11 @@ private fun DiscoverSortSection(
     ) {
         DiscoverSectionTitle(title = "Sort By")
 
-        Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)) {
-            DiscoverSort.entries.forEach { sort ->
+        Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)) {
+            DISCOVER_SORTS.forEach { sort ->
                 DiscoverSortRow(
                     label = sort.displayLabel,
+                    description = sort.descriptionLabel,
                     selected = selectedSort == sort,
                     onClick = {
                         onSortSelected(sort)
@@ -804,6 +797,7 @@ private fun DiscoverSortSection(
 @Composable
 private fun DiscoverSortRow(
     label: String,
+    description: String,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -816,7 +810,7 @@ private fun DiscoverSortRow(
         color = if (selected) {
             MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
         } else {
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.42f)
+            discoverFilterControlColor()
         },
         contentColor = MaterialTheme.colorScheme.onSurface,
         border = BorderStroke(
@@ -830,23 +824,36 @@ private fun DiscoverSortRow(
     ) {
         Row(
             modifier = Modifier.padding(
-                horizontal = ReelsSpacing.large,
-                vertical = ReelsSpacing.medium
+                horizontal = ReelsSpacing.medium,
+                vertical = ReelsSpacing.small
             ),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = 15.sp,
-                    lineHeight = 20.sp
-                ),
-                fontWeight = FontWeight.SemiBold
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontSize = 11.sp,
+                        lineHeight = 14.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontSize = 9.sp,
+                        lineHeight = 12.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Medium
+                )
+            }
 
             Surface(
-                modifier = Modifier.size(22.dp),
+                modifier = Modifier.size(18.dp),
                 shape = CircleShape,
                 color = if (selected) {
                     MaterialTheme.colorScheme.primary
@@ -868,7 +875,7 @@ private fun DiscoverSortRow(
                         Icon(
                             imageVector = Icons.Filled.Check,
                             contentDescription = null,
-                            modifier = Modifier.size(15.dp)
+                            modifier = Modifier.size(12.dp)
                         )
                     }
                 }
@@ -886,25 +893,28 @@ private fun DiscoverLanguageRow(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
     ) {
-        DiscoverSectionTitle(title = "Language / Region")
+        DiscoverSectionTitle(title = "Language & Region")
 
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.large,
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.42f),
+            color = discoverFilterControlColor(),
             border = BorderStroke(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f)
             )
         ) {
             Row(
-                modifier = Modifier.padding(ReelsSpacing.large),
-                horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
+                modifier = Modifier.padding(
+                    horizontal = ReelsSpacing.medium,
+                    vertical = ReelsSpacing.small
+                ),
+                horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Surface(
-                    modifier = Modifier.size(38.dp),
-                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier.size(24.dp),
+                    shape = CircleShape,
                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
                     contentColor = MaterialTheme.colorScheme.primary
                 ) {
@@ -912,28 +922,21 @@ private fun DiscoverLanguageRow(
                         Icon(
                             imageVector = Icons.Filled.Language,
                             contentDescription = null,
-                            modifier = Modifier.size(19.dp)
+                            modifier = Modifier.size(14.dp)
                         )
                     }
                 }
 
-                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text(
-                        text = language.toDiscoverLanguageLabel(),
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontSize = 15.sp,
-                            lineHeight = 20.sp
-                        ),
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.SemiBold
-                    )
-
-                    Text(
-                        text = "Uses your Settings language and region",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = language.toDiscoverLanguageLabel(),
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontSize = 11.sp,
+                        lineHeight = 14.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.SemiBold
+                )
             }
         }
     }
@@ -942,7 +945,6 @@ private fun DiscoverLanguageRow(
 @Composable
 private fun DiscoverFilterSheetFooter(
     movieCount: Int,
-    onClearClick: () -> Unit,
     onApplyClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -955,30 +957,26 @@ private fun DiscoverFilterSheetFooter(
             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
         )
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = ReelsSpacing.screenHorizontal)
                 .padding(top = ReelsSpacing.medium, bottom = 28.dp),
-            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
-            verticalAlignment = Alignment.CenterVertically
+            verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
         ) {
-            TextButton(
-                modifier = Modifier.weight(1f),
-                onClick = onClearClick
-            ) {
-                Text(text = "Reset")
-            }
-
             Button(
-                modifier = Modifier.weight(2f),
+                modifier = Modifier.fillMaxWidth(),
                 onClick = onApplyClick,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text(text = "Show ${movieCount.toMovieCountLabel()}")
+                Text(
+                    text = "Show ${movieCount.toMovieCountLabel(capitalize = true)}",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
@@ -1183,20 +1181,59 @@ private fun discoverPlaceholderColor(): Color {
     return MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.52f)
 }
 
-private val DISCOVER_YEARS = listOf(null, 2026, 2025, 2024, 2023, 2022, 2021)
-private val DISCOVER_RATINGS = listOf(null, 9, 8, 7, 6)
+private val DISCOVER_YEARS = listOf(2024, 2023, 2022, 2021)
+private val DISCOVER_RATINGS = listOf(null, 5, 6, 7, 8)
+private val DISCOVER_SORTS = listOf(
+    DiscoverSort.Popularity,
+    DiscoverSort.HighestRated,
+    DiscoverSort.Newest,
+    DiscoverSort.Alphabetical
+)
 private const val DISCOVER_PLACEHOLDER_COUNT = 12
 
 private val DiscoverSort.displayLabel: String
     get() = when (this) {
         DiscoverSort.Popularity -> "Popularity"
+        DiscoverSort.HighestRated -> "Rating"
+        DiscoverSort.Newest -> "Release Date"
+        DiscoverSort.Alphabetical -> "A - Z"
         else -> label
     }
 
-private fun Int.toMovieCountLabel(): String {
-    return when (this) {
-        1 -> "1 movie"
+private val DiscoverSort.descriptionLabel: String
+    get() = when (this) {
+        DiscoverSort.Popularity -> "Most watched first"
+        DiscoverSort.HighestRated -> "Highest rated first"
+        DiscoverSort.Newest -> "Newest releases first"
+        DiscoverSort.Alphabetical -> "Alphabetical order"
+        DiscoverSort.Revenue -> "Highest box office first"
+    }
+
+private fun Int.toMovieCountLabel(capitalize: Boolean = false): String {
+    return when {
+        this == 1 && capitalize -> "1 Movie"
+        this == 1 -> "1 movie"
+        capitalize -> "$this Movies"
         else -> "$this movies"
+    }
+}
+
+private fun String.toDiscoverLanguageLabel(): String {
+    return when (this) {
+        "en-US" -> "English · All regions"
+        "en-GB" -> "English · United Kingdom"
+        "es-ES" -> "Spanish · Spain"
+        "fr-FR" -> "French · France"
+        else -> this
+    }
+}
+
+@Composable
+private fun discoverFilterControlColor(): Color {
+    return if (isReelsLightTheme()) {
+        ReelsLightGenreChipContainer
+    } else {
+        ReelsGenreChipContainer.copy(alpha = 0.58f)
     }
 }
 
@@ -1209,13 +1246,3 @@ private val DiscoverUiState.activeFilterCount: Int
         if (filters.sort != DiscoverSort.Popularity) count += 1
         return count
     }
-
-private fun String.toDiscoverLanguageLabel(): String {
-    return when (this) {
-        "en-US" -> "English · United States"
-        "en-GB" -> "English · United Kingdom"
-        "es-ES" -> "Spanish · Spain"
-        "fr-FR" -> "French · France"
-        else -> this
-    }
-}

@@ -34,6 +34,10 @@ enum class DiscoverSort(
         label = "Newest",
         apiValue = "primary_release_date.desc"
     ),
+    Alphabetical(
+        label = "A - Z",
+        apiValue = "original_title.asc"
+    ),
     Revenue(
         label = "Box Office",
         apiValue = "revenue.desc"
