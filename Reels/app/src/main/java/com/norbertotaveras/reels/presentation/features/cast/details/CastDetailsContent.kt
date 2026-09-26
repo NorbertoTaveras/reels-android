@@ -23,12 +23,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.CircularProgressIndicator
@@ -119,6 +121,13 @@ fun CastDetailsContent(
                 knownFor = knownFor,
                 onMovieClick = onMovieClick,
                 onSeeAllClick = onFilmographyClick
+            )
+        }
+
+        item {
+            FullFilmographySection(
+                creditCount = knownFor.size,
+                onClick = onFilmographyClick
             )
         }
 
@@ -488,6 +497,82 @@ private fun KnownForPreviewSection(
     }
 }
 
+
+@Composable
+private fun FullFilmographySection(
+    creditCount: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.padding(horizontal = ReelsSpacing.screenHorizontal),
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.detailsCarouselHeaderSpacing)
+    ) {
+        Text(
+            text = "Full Filmography",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick),
+            shape = MaterialTheme.shapes.large,
+            color = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            border = BorderStroke(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
+            )
+        ) {
+            Row(
+                modifier = Modifier.padding(ReelsDimensions.inlineStateCardPadding),
+                horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Surface(
+                    modifier = Modifier.size(ReelsDimensions.inlineStateIconContainerSize),
+                    shape = MaterialTheme.shapes.medium,
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Filled.Movie,
+                            contentDescription = null,
+                            modifier = Modifier.size(ReelsDimensions.inlineStateIconSize)
+                        )
+                    }
+                }
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
+                ) {
+                    Text(
+                        text = "View all credits",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+
+                    Text(
+                        text = "$creditCount credits",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    modifier = Modifier.size(ReelsDimensions.settingsChevronSize),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
 
 @Composable
 private fun PersonalInfoSection(
