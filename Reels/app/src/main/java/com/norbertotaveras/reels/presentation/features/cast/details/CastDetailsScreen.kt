@@ -372,4 +372,4 @@ private fun castDetailsPlaceholderColor(): Color {
     return MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.52f)
 }
 
-private const val CAST_DETAILS_KNOWN_FOR_PLACEHOLDER_COUNT = 4
+private const val CAST_DETAILS_KNOWN_FOR_PLACEHOLDER_COUNT = 3

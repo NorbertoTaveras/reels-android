@@ -471,6 +471,7 @@ private fun KnownForPreviewSection(
     modifier: Modifier = Modifier,
 ) {
     if (knownFor.isEmpty()) return
+    val previewMovies = knownFor.take(KNOWN_FOR_PREVIEW_COUNT)
 
     Column(
         modifier = modifier,
@@ -484,7 +485,7 @@ private fun KnownForPreviewSection(
         )
 
         PosterCarousel(
-            items = knownFor.map { movie ->
+            items = previewMovies.map { movie ->
                 PosterCarouselItem(
                     id = movie.id,
                     title = movie.title,
@@ -496,6 +497,8 @@ private fun KnownForPreviewSection(
         )
     }
 }
+
+private const val KNOWN_FOR_PREVIEW_COUNT = 3
 
 
 @Composable

@@ -114,7 +114,6 @@ class CastDetailsViewModel @Inject constructor(
                             knownFor = creditsResult
                                 .getOrNull()
                                 ?.cast
-                                ?.take(10)
                                 .orEmpty(),
                             isOfflineSavedPerson = false,
                             errorMessage = null,
