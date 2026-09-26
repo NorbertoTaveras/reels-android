@@ -69,14 +69,14 @@ fun MovieResultRow(
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.16f)
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f)
         )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(ReelsDimensions.searchResultCardPadding),
-            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
+            horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.searchResultCardPadding),
             verticalAlignment = Alignment.Top
         ) {
             AsyncImage(
@@ -92,8 +92,7 @@ fun MovieResultRow(
 
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = ReelsSpacing.xSmall),
+                    .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(ReelsDimensions.searchResultContentSpacing),
                 horizontalAlignment = Alignment.Start
             ) {
@@ -193,14 +192,18 @@ private fun RatingPill(
         } else {
             ReelsRatingContainer
         },
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
+        ),
         contentColor = MaterialTheme.colorScheme.primary
     ) {
         Row(
             modifier = Modifier.padding(
-                horizontal = ReelsSpacing.small,
-                vertical = ReelsSpacing.xSmall
+                horizontal = 9.dp,
+                vertical = 5.dp
             ),
-            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -213,7 +216,7 @@ private fun RatingPill(
                 text = rating,
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontSize = 14.sp,
-                    lineHeight = 18.sp
+                    lineHeight = 16.sp
                 ),
                 fontWeight = FontWeight.SemiBold
             )
@@ -233,23 +236,27 @@ private fun GenrePillRow(
     ) {
         genres.take(3).forEach { genre ->
             Surface(
-                shape = MaterialTheme.shapes.medium,
+                shape = MaterialTheme.shapes.extraLarge,
                 color = if (isReelsLightTheme()) {
                     ReelsLightGenreChipContainer
                 } else {
                     ReelsGenreChipContainer
                 },
+                border = BorderStroke(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
+                ),
                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant
             ) {
                 Text(
                     modifier = Modifier.padding(
-                        horizontal = ReelsSpacing.small,
-                        vertical = ReelsSpacing.xSmall
+                        horizontal = 10.dp,
+                        vertical = 5.dp
                     ),
                     text = genre,
                     style = MaterialTheme.typography.labelSmall.copy(
-                        fontSize = 13.sp,
-                        lineHeight = 18.sp
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp
                     )
                 )
             }

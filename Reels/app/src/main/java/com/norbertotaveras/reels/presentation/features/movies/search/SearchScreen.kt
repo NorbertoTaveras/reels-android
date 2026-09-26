@@ -396,7 +396,7 @@ private fun SearchResultPlaceholderRow(
             Spacer(
                 modifier = Modifier
                     .width(ReelsDimensions.searchResultPosterWidth)
-                    .height(116.dp)
+                    .height(ReelsDimensions.searchResultPosterHeight)
                     .clip(MaterialTheme.shapes.medium)
                     .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f))
             )
