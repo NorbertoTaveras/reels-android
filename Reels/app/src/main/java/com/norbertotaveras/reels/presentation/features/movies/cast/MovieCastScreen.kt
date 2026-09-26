@@ -34,7 +34,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -44,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -332,7 +332,7 @@ private fun MovieCastRow(
         border = BorderStroke(
             width = ReelsDimensions.fullCastBorderWidth,
             color = MaterialTheme.colorScheme.outline
-                .copy(alpha = 0.46f)
+                .copy(alpha = 0.28f)
         )
     ) {
         Row(
@@ -398,36 +398,45 @@ private fun MovieCastRow(
                 )
             }
 
-            IconButton(
-                enabled = !isSaving,
-                onClick = onSaveClick,
-                colors = IconButtonDefaults.iconButtonColors(
-                    contentColor = if (isSaved) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    }
-                )
-            ) {
-                if (isSaving) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                } else {
-                    Icon(
-                        imageVector = if (isSaved) {
-                            Icons.Filled.Favorite
-                        } else {
-                            Icons.Outlined.FavoriteBorder
-                        },
-                        contentDescription = if (isSaved) {
+            Surface(
+                modifier = Modifier
+                    .size(ReelsDimensions.fullCastSaveButtonSize)
+                    .clickable(
+                        enabled = !isSaving,
+                        role = Role.Button,
+                        onClickLabel = if (isSaved) {
                             "Remove from library"
                         } else {
                             "Save to library"
-                        }
-                    )
+                        },
+                        onClick = onSaveClick
+                    ),
+                shape = CircleShape,
+                color = Color.Transparent,
+                contentColor = if (isSaved) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                }
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    if (isSaving) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    } else {
+                        Icon(
+                            imageVector = if (isSaved) {
+                                Icons.Filled.Favorite
+                            } else {
+                                Icons.Outlined.FavoriteBorder
+                            },
+                            contentDescription = null,
+                            modifier = Modifier.size(ReelsDimensions.fullCastSaveIconSize)
+                        )
+                    }
                 }
             }
         }
@@ -445,7 +454,7 @@ private fun MovieCastPlaceholderRow(
         border = BorderStroke(
             width = ReelsDimensions.fullCastBorderWidth,
             color = MaterialTheme.colorScheme.outline
-                .copy(alpha = 0.46f)
+                .copy(alpha = 0.28f)
         )
     ) {
         Row(
