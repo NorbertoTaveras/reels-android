@@ -146,6 +146,9 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
                     },
                     onPersonClick = { personId ->
                         navController.navigateToCastDetails(personId)
+                    },
+                    onNavigateToSettings = {
+                        navController.navigateToBottomNavRoute(ReelsDestinations.SETTINGS)
                     }
                 )
             }

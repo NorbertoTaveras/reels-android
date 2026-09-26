@@ -33,10 +33,13 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -77,6 +80,8 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSurfaceHigh
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsTmdbBlue
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsTmdbOnBlue
 
 @Composable
 fun FavoritesScreen(
@@ -159,6 +164,9 @@ fun FavoritesScreen(
                         state = state,
                         movies = tmdbWatchlistMovies,
                         listType = TmdbLibraryListType.Watchlist,
+                        onConnectSettingsClick = {
+                            onEvent(FavoritesEvent.ConnectSettingsClicked)
+                        },
                         onMovieClick = { movieId ->
                             onEvent(FavoritesEvent.MovieClicked(movieId = movieId))
                         }
@@ -170,6 +178,9 @@ fun FavoritesScreen(
                         state = state,
                         movies = tmdbRatedMovies,
                         listType = TmdbLibraryListType.Rated,
+                        onConnectSettingsClick = {
+                            onEvent(FavoritesEvent.ConnectSettingsClicked)
+                        },
                         onMovieClick = { movieId ->
                             onEvent(FavoritesEvent.MovieClicked(movieId = movieId))
                         }
@@ -227,13 +238,15 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
     state: FavoritesUiState,
     movies: LazyPagingItems<MovieDataModel>,
     listType: TmdbLibraryListType,
+    onConnectSettingsClick: () -> Unit,
     onMovieClick: (Int) -> Unit,
 ) {
     when {
         !state.isTmdbAccountConnected -> {
             item(span = { GridItemSpan(maxLineSpan) }) {
-                EmptyLibraryState(
-                    selectedTab = listType.emptyTab,
+                DisconnectedTmdbLibraryState(
+                    listType = listType,
+                    onConnectSettingsClick = onConnectSettingsClick,
                     modifier = Modifier.padding(top = ReelsDimensions.favoritesEmptyTopPadding)
                 )
             }
@@ -888,6 +901,144 @@ private fun LibraryErrorState(
                 textAlign = TextAlign.Center
             )
         }
+    }
+}
+
+@Composable
+private fun DisconnectedTmdbLibraryState(
+    listType: TmdbLibraryListType,
+    onConnectSettingsClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(ReelsDimensions.favoritesEmptyCardPadding),
+            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesEmptyContentSpacing)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.large),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                LibraryTmdbLogoMark()
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
+                ) {
+                    Text(
+                        text = "Connect TMDB to sync your library",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Text(
+                        text = when (listType) {
+                            TmdbLibraryListType.Watchlist -> {
+                                "Bring your TMDB watchlist into Reels."
+                            }
+                            TmdbLibraryListType.Rated -> {
+                                "Bring your TMDB ratings into Reels."
+                            }
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
+            ) {
+                TmdbFeatureRow(text = "Sync your TMDB watchlist")
+                TmdbFeatureRow(text = "View your movie ratings")
+                TmdbFeatureRow(text = "Local favorites stay available offline")
+            }
+
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onConnectSettingsClick,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = ReelsTmdbBlue,
+                    contentColor = ReelsTmdbOnBlue
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Settings,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+
+                Text(
+                    modifier = Modifier.padding(start = ReelsSpacing.small),
+                    text = "Connect in Settings",
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun LibraryTmdbLogoMark(
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.size(ReelsDimensions.favoritesTmdbLogoSize),
+        shape = MaterialTheme.shapes.large,
+        color = ReelsTmdbBlue,
+        contentColor = ReelsTmdbOnBlue
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                text = "TMDB",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Black,
+                maxLines = 1
+            )
+        }
+    }
+}
+
+@Composable
+private fun TmdbFeatureRow(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Surface(
+            modifier = Modifier.size(ReelsDimensions.favoritesFeatureIconContainerSize),
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.primary
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    contentDescription = null,
+                    modifier = Modifier.size(ReelsDimensions.favoritesFeatureIconSize)
+                )
+            }
+        }
+
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.SemiBold
+        )
     }
 }
 

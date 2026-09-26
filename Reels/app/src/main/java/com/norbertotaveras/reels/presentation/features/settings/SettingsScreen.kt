@@ -56,7 +56,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -74,9 +73,8 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
-
-private val ReelsTmdbBlue = Color(0xFF01B4E4)
-private val ReelsTmdbOnBlue = Color.White
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsTmdbBlue
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsTmdbOnBlue
 
 @Composable
 fun SettingsScreen(

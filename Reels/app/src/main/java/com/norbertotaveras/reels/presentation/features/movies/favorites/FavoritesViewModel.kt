@@ -93,6 +93,7 @@ class FavoritesViewModel @Inject constructor(
             is FavoritesEvent.PersonClicked -> onPersonClicked(personId = event.personId)
             is FavoritesEvent.FavoriteClicked -> onFavoriteClicked(movieId = event.movieId)
             is FavoritesEvent.SavedPersonClicked -> onSavedPersonClicked(personId = event.personId)
+            FavoritesEvent.ConnectSettingsClicked -> onConnectSettingsClicked()
         }
     }
 
@@ -153,6 +154,12 @@ class FavoritesViewModel @Inject constructor(
     private fun onPersonClicked(personId: Int) {
         viewModelScope.launch {
             _effect.emit(FavoritesEffect.NavigateToCastDetails(personId = personId))
+        }
+    }
+
+    private fun onConnectSettingsClicked() {
+        viewModelScope.launch {
+            _effect.emit(FavoritesEffect.NavigateToSettings)
         }
     }
 

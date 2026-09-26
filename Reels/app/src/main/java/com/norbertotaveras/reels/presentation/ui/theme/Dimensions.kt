@@ -98,6 +98,9 @@ object ReelsDimensions {
     val favoritesEmptyIconContainerSize = 72.dp
     val favoritesEmptyIconSize = 34.dp
     val favoritesEmptyContentSpacing = 14.dp
+    val favoritesTmdbLogoSize = 58.dp
+    val favoritesFeatureIconContainerSize = 26.dp
+    val favoritesFeatureIconSize = 14.dp
 
     val detailsHeroHeight = 282.dp
     val detailsHeaderHeight = 438.dp

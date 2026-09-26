@@ -29,6 +29,7 @@ import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbar
 fun FavoritesRoute(
     onMovieClick: (Int) -> Unit,
     onPersonClick: (Int) -> Unit,
+    onNavigateToSettings: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FavoritesViewModel = hiltViewModel(),
 ) {
@@ -61,6 +62,9 @@ fun FavoritesRoute(
                 }
                 is FavoritesEffect.NavigateToCastDetails -> {
                     onPersonClick(effect.personId)
+                }
+                FavoritesEffect.NavigateToSettings -> {
+                    onNavigateToSettings()
                 }
                 is FavoritesEffect.ShowMessage -> {
                     snackbarHostState.showSnackbar(message = effect.message)

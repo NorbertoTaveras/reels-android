@@ -14,4 +14,5 @@ sealed interface FavoritesEvent {
     data class PersonClicked(val personId: Int) : FavoritesEvent
     data class FavoriteClicked(val movieId: Int) : FavoritesEvent
     data class SavedPersonClicked(val personId: Int) : FavoritesEvent
+    data object ConnectSettingsClicked : FavoritesEvent
 }

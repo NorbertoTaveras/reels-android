@@ -18,6 +18,8 @@ val ReelsCopper = Color(0xFFD6944A)
 val ReelsCopperDark = Color(0xFF8B5524)
 val ReelsTeal = Color(0xFF58C4B8)
 val ReelsError = Color(0xFFFFB4AB)
+val ReelsTmdbBlue = Color(0xFF01B4E4)
+val ReelsTmdbOnBlue = Color.White
 
 val ReelsLightBackground = Color(0xFFF5F0E8)
 val ReelsLightSurface = Color(0xFFEDE8DC)
