@@ -35,16 +35,16 @@ val reelsBottomNavItems = listOf(
         unselectedIcon = Icons.Outlined.Home
     ),
     ReelsBottomNavItem(
-        route = ReelsDestinations.DISCOVER,
-        label = "Discover",
-        selectedIcon = Icons.Filled.Explore,
-        unselectedIcon = Icons.Outlined.Explore
-    ),
-    ReelsBottomNavItem(
         route = ReelsDestinations.SEARCH,
         label = "Search",
         selectedIcon = Icons.Filled.Search,
         unselectedIcon = Icons.Outlined.Search
+    ),
+    ReelsBottomNavItem(
+        route = ReelsDestinations.DISCOVER,
+        label = "Discover",
+        selectedIcon = Icons.Filled.Explore,
+        unselectedIcon = Icons.Outlined.Explore
     ),
     ReelsBottomNavItem(
         route = ReelsDestinations.FAVORITES,
