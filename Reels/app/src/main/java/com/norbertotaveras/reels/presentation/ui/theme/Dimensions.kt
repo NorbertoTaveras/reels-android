@@ -72,9 +72,9 @@ object ReelsDimensions {
     val discoverGridVerticalSpacing = 24.dp
     val discoverPosterTextSpacing = 8.dp
     val discoverRatingEdgePadding = 8.dp
-    val discoverRatingHorizontalPadding = 8.dp
-    val discoverRatingVerticalPadding = 5.dp
-    val discoverRatingIconSize = 12.dp
+    val discoverRatingHorizontalPadding = 7.dp
+    val discoverRatingVerticalPadding = 4.dp
+    val discoverRatingIconSize = 10.dp
 
     val favoritesScreenTopPadding = 24.dp
     val favoritesScreenBottomPadding = 32.dp

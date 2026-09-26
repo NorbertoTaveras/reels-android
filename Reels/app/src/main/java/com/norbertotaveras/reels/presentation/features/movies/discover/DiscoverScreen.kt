@@ -1034,8 +1034,8 @@ private fun DiscoverPosterCard(
         Text(
             text = movie.title,
             style = MaterialTheme.typography.bodyMedium.copy(
-                fontSize = 13.sp,
-                lineHeight = 16.sp
+                fontSize = 12.sp,
+                lineHeight = 15.sp
             ),
             color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.SemiBold,
@@ -1047,8 +1047,8 @@ private fun DiscoverPosterCard(
             Text(
                 text = year,
                 style = MaterialTheme.typography.bodySmall.copy(
-                    fontSize = 12.sp,
-                    lineHeight = 15.sp
+                    fontSize = 10.sp,
+                    lineHeight = 13.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
@@ -1086,8 +1086,8 @@ private fun DiscoverRatingBadge(
             Text(
                 text = String.format("%.1f", rating),
                 style = MaterialTheme.typography.labelMedium.copy(
-                    fontSize = 13.sp,
-                    lineHeight = 16.sp
+                    fontSize = 11.sp,
+                    lineHeight = 14.sp
                 ),
                 fontWeight = FontWeight.SemiBold
             )
