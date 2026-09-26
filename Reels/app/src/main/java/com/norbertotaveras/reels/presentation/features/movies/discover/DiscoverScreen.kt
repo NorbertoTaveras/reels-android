@@ -955,7 +955,7 @@ private fun DiscoverFilterSheetFooter(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surface,
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.42f),
         tonalElevation = 3.dp
     ) {
         Column(
@@ -965,7 +965,7 @@ private fun DiscoverFilterSheetFooter(
             verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
         ) {
             HorizontalDivider(
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f),
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.28f),
                 thickness = 1.dp
             )
 
