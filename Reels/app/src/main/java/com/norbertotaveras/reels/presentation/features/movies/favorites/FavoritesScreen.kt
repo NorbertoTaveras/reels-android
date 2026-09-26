@@ -39,7 +39,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -190,21 +194,13 @@ private fun LibraryHeader(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        Row(
+        LibraryTabs(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = ReelsSpacing.small),
-            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
-        ) {
-            LibraryTab.entries.forEach { tab ->
-                LibraryTabChip(
-                    tab = tab,
-                    selected = state.selectedTab == tab,
-                    onClick = { onTabSelected(tab) },
-                    modifier = Modifier.weight(1f)
-                )
-            }
-        }
+            selectedTab = state.selectedTab,
+            onTabSelected = onTabSelected
+        )
     }
 }
 
@@ -285,47 +281,51 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
 }
 
 @Composable
-private fun LibraryTabChip(
-    tab: LibraryTab,
-    selected: Boolean,
-    onClick: () -> Unit,
+private fun LibraryTabs(
+    selectedTab: LibraryTab,
+    onTabSelected: (LibraryTab) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = modifier.clickable(
-            role = Role.Tab,
-            onClick = onClick
-        ),
-        shape = MaterialTheme.shapes.extraLarge,
-        color = if (selected) {
-            MaterialTheme.colorScheme.primary
-        } else {
-            MaterialTheme.colorScheme.surface
-        },
-        contentColor = if (selected) {
-            MaterialTheme.colorScheme.onPrimary
-        } else {
-            MaterialTheme.colorScheme.onSurface
-        },
-        border = BorderStroke(
-            width = 1.dp,
-            color = if (selected) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.outline
-            }
-        )
+    val selectedTabIndex = LibraryTab.entries.indexOf(selectedTab)
+
+    SecondaryTabRow(
+        modifier = modifier,
+        selectedTabIndex = selectedTabIndex,
+        containerColor = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground,
+        divider = {},
+        indicator = {
+            TabRowDefaults.SecondaryIndicator(
+                modifier = Modifier.tabIndicatorOffset(
+                    selectedTabIndex = selectedTabIndex,
+                    matchContentSize = false
+                ),
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
     ) {
-        Text(
-            modifier = Modifier.padding(
-                horizontal = ReelsSpacing.medium,
-                vertical = ReelsSpacing.small
-            ),
-            text = tab.title,
-            style = MaterialTheme.typography.labelLarge,
-            textAlign = TextAlign.Center,
-            maxLines = 1
-        )
+        LibraryTab.entries.forEach { tab ->
+            val selected = selectedTab == tab
+
+            Tab(
+                selected = selected,
+                onClick = { onTabSelected(tab) },
+                selectedContentColor = MaterialTheme.colorScheme.primary,
+                unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                text = {
+                    Text(
+                        text = tab.title,
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = if (selected) {
+                            FontWeight.Bold
+                        } else {
+                            FontWeight.SemiBold
+                        },
+                        maxLines = 1
+                    )
+                }
+            )
+        }
     }
 }
 
