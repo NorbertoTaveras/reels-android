@@ -267,9 +267,9 @@ private fun FeaturedMovieHero(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            MaterialTheme.colorScheme.background.copy(alpha = 0.02f),
-                            MaterialTheme.colorScheme.background.copy(alpha = 0.10f),
-                            MaterialTheme.colorScheme.background.copy(alpha = 0.78f)
+                            Color.Transparent,
+                            Color.Black.copy(alpha = 0.18f),
+                            Color.Black.copy(alpha = 0.82f)
                         )
                     )
                 )
@@ -294,7 +294,7 @@ private fun FeaturedMovieHero(
                     Text(
                         text = year,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = Color.White.copy(alpha = 0.76f),
                         fontWeight = FontWeight.SemiBold
                     )
                 }
@@ -306,7 +306,7 @@ private fun FeaturedMovieHero(
                     fontSize = 18.sp,
                     lineHeight = 22.sp
                 ),
-                color = MaterialTheme.colorScheme.onBackground,
+                color = Color.White,
                 fontWeight = FontWeight.Bold,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
@@ -318,7 +318,7 @@ private fun FeaturedMovieHero(
                     fontSize = 14.sp,
                     lineHeight = 20.sp
                 ),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = Color.White.copy(alpha = 0.72f),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
