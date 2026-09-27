@@ -78,6 +78,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsGenreChipContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightGenreChipContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContainer
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.isReelsLightTheme
 
@@ -1067,7 +1068,7 @@ private fun DiscoverRatingBadge(
         modifier = modifier,
         shape = MaterialTheme.shapes.extraLarge,
         color = ReelsRatingContainer,
-        contentColor = MaterialTheme.colorScheme.primary
+        contentColor = ReelsRatingContent
     ) {
         Row(
             modifier = Modifier.padding(

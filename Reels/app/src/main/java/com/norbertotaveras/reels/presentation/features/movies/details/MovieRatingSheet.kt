@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContainer
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -180,7 +181,7 @@ private fun RatingChoice(
             MaterialTheme.colorScheme.surfaceVariant
         },
         contentColor = if (selected) {
-            MaterialTheme.colorScheme.primary
+            ReelsRatingContent
         } else {
             MaterialTheme.colorScheme.onSurfaceVariant
         },

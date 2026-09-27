@@ -56,6 +56,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightRatingContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContainer
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
@@ -209,7 +210,7 @@ private fun RatingBadge(
         modifier = modifier,
         shape = MaterialTheme.shapes.medium,
         color = ReelsRatingContainer,
-        contentColor = MaterialTheme.colorScheme.primary
+        contentColor = ReelsRatingContent
     ) {
         Row(
             modifier = Modifier.padding(
@@ -293,7 +294,7 @@ private fun HeroRatingButton(
         } else {
             ReelsRatingContainer
         },
-        contentColor = MaterialTheme.colorScheme.primary
+        contentColor = ReelsRatingContent
     ) {
         Row(
             modifier = Modifier.padding(horizontal = ReelsSpacing.medium),
@@ -448,7 +449,7 @@ private fun HeroRateButton(
         contentColor = if (rating == null) {
             MaterialTheme.colorScheme.onSurface
         } else {
-            MaterialTheme.colorScheme.primary
+            ReelsRatingContent
         },
         border = BorderStroke(
             width = 1.dp,

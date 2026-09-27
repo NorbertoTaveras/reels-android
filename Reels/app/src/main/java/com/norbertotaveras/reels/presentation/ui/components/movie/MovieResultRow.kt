@@ -44,6 +44,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightGenreChipContai
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightRatingContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContainer
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 import com.norbertotaveras.reels.presentation.ui.theme.isReelsLightTheme
@@ -194,9 +195,9 @@ private fun RatingPill(
         },
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
+            color = ReelsRatingContent.copy(alpha = 0.18f)
         ),
-        contentColor = MaterialTheme.colorScheme.primary
+        contentColor = ReelsRatingContent
     ) {
         Row(
             modifier = Modifier.padding(

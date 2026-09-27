@@ -77,6 +77,7 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContainer
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSurfaceHigh
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
@@ -398,7 +399,7 @@ private fun TmdbWatchlistMovieCard(
                         imageVector = Icons.Filled.Close,
                         contentDescription = "Rated on TMDB",
                         containerColor = ReelsRatingContainer.copy(alpha = 0.92f),
-                        contentColor = MaterialTheme.colorScheme.primary
+                        contentColor = ReelsRatingContent
                     )
                 }
             },
@@ -628,7 +629,7 @@ private fun UserRatingBadge(
         modifier = modifier,
         shape = MaterialTheme.shapes.extraLarge,
         color = ReelsRatingContainer.copy(alpha = 0.92f),
-        contentColor = MaterialTheme.colorScheme.primary
+        contentColor = ReelsRatingContent
     ) {
         Text(
             modifier = Modifier.padding(
@@ -799,7 +800,7 @@ private fun RatingBadge(
         modifier = modifier,
         shape = MaterialTheme.shapes.extraLarge,
         color = ReelsSurfaceHigh.copy(alpha = 0.82f),
-        contentColor = MaterialTheme.colorScheme.primary
+        contentColor = ReelsRatingContent
     ) {
         Row(
             modifier = Modifier.padding(
