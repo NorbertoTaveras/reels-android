@@ -11,13 +11,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 object ReelsDimensions {
-    val topPadding = 20.dp
+    val topPadding = 16.dp
     val homeScreenBottomPadding = 72.dp
-    val sectionSpacing = 38.dp
+    val sectionSpacing = 34.dp
     val headerTextSpacing = 6.dp
-    val sectionHeaderToRowSpacing = 24.dp
+    val sectionHeaderToRowSpacing = 20.dp
 
-    val heroCardAspectRatio = 1.06f
+    val heroCardAspectRatio = 1.16f
     val heroContentHorizontalPadding = 18.dp
     val heroContentVerticalPadding = 18.dp
     val heroContentSpacing = 7.dp
