@@ -101,6 +101,11 @@ object ReelsDimensions {
     val favoritesTmdbLogoSize = 58.dp
     val favoritesFeatureIconContainerSize = 26.dp
     val favoritesFeatureIconSize = 14.dp
+    val favoritesPersonRowHorizontalPadding = 12.dp
+    val favoritesPersonRowVerticalPadding = 10.dp
+    val favoritesPersonProfileSize = 58.dp
+    val favoritesPersonProfileCornerSize = 12.dp
+    val favoritesPersonRowContentSpacing = 12.dp
 
     val detailsHeroHeight = 282.dp
     val detailsHeaderHeight = 438.dp

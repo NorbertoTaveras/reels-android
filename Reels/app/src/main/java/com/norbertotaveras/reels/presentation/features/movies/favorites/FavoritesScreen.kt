@@ -142,20 +142,22 @@ fun FavoritesScreen(
                 }
 
                 LibraryTab.People -> {
-                    items(
-                        items = state.people,
-                        key = { person -> person.id }
-                    ) { person ->
-                        SavedPersonCard(
-                            person = person,
-                            isRemoving = state.removingPersonIds.contains(person.id),
-                            onClick = {
-                                onEvent(FavoritesEvent.PersonClicked(personId = person.id))
-                            },
-                            onFavoriteClick = {
-                                onEvent(FavoritesEvent.SavedPersonClicked(personId = person.id))
-                            }
-                        )
+                    state.people.forEach { person ->
+                        item(
+                            key = person.id,
+                            span = { GridItemSpan(maxLineSpan) }
+                        ) {
+                            SavedPersonCard(
+                                person = person,
+                                isRemoving = state.removingPersonIds.contains(person.id),
+                                onClick = {
+                                    onEvent(FavoritesEvent.PersonClicked(personId = person.id))
+                                },
+                                onFavoriteClick = {
+                                    onEvent(FavoritesEvent.SavedPersonClicked(personId = person.id))
+                                }
+                            )
+                        }
                     }
                 }
 
@@ -497,71 +499,122 @@ private fun SavedPersonCard(
     onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier.width(ReelsDimensions.favoritesPosterCardWidth),
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesTextSpacing)
-    ) {
-        LibraryPosterCard(
-            imageUrl = person.profilePath.toTmdbImageUrl(
-                imageType = TmdbImageType.Profile
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(
+                role = Role.Button,
+                onClick = onClick
             ),
-            contentDescription = person.name,
-            onClick = onClick,
-            placeholder = {
-                Icon(
-                    imageVector = Icons.Filled.Person,
-                    contentDescription = null,
-                    modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconSize),
-                    tint = MaterialTheme.colorScheme.primary
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.24f)
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = ReelsDimensions.favoritesPersonRowHorizontalPadding,
+                    vertical = ReelsDimensions.favoritesPersonRowVerticalPadding
+                ),
+            horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesPersonRowContentSpacing),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box {
+                PersonProfileImage(
+                    imageUrl = person.profilePath.toTmdbImageUrl(
+                        imageType = TmdbImageType.Profile
+                    ),
+                    contentDescription = person.name
                 )
-            },
-            topStartBadge = {
-                OfflineBadge()
-            },
-            topEndBadge = {
+
+                OfflineBadge(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(ReelsSpacing.xSmall)
+                )
+            }
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
+            ) {
+                Text(
+                    text = person.name,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Work,
+                        contentDescription = null,
+                        modifier = Modifier.size(ReelsDimensions.favoritesMetadataIconSize),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+
+                    Text(
+                        text = person.knownForDepartment ?: "Known for ${person.knownFor.size} movies",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+
+            Box(
+                modifier = Modifier.padding(start = ReelsSpacing.xSmall),
+                contentAlignment = Alignment.Center
+            ) {
                 LibraryRemoveButton(
                     isRemoving = isRemoving,
                     contentDescription = "Remove ${person.name} from library",
                     onClick = onFavoriteClick
                 )
             }
-        )
+        }
+    }
+}
 
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
-        ) {
-            Text(
-                text = person.name,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = 15.sp,
-                    lineHeight = 20.sp
-                ),
-                color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+@Composable
+private fun PersonProfileImage(
+    imageUrl: String?,
+    contentDescription: String,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.size(ReelsDimensions.favoritesPersonProfileSize),
+        shape = RoundedCornerShape(ReelsDimensions.favoritesPersonProfileCornerSize),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        contentColor = MaterialTheme.colorScheme.primary
+    ) {
+        if (imageUrl == null) {
+            Box(contentAlignment = Alignment.Center) {
                 Icon(
-                    imageVector = Icons.Filled.Work,
+                    imageVector = Icons.Filled.Person,
                     contentDescription = null,
-                    modifier = Modifier.size(ReelsDimensions.favoritesMetadataIconSize),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-
-                Text(
-                    text = person.knownForDepartment ?: "Known for ${person.knownFor.size} movies",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconSize)
                 )
             }
+        } else {
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = contentDescription,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(ReelsDimensions.favoritesPersonProfileCornerSize)),
+                contentScale = ContentScale.Crop
+            )
         }
     }
 }
@@ -795,7 +848,7 @@ private fun LibraryRemoveButton(
         contentColor = MaterialTheme.colorScheme.primary,
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.outline
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.24f)
         )
     ) {
         Box(contentAlignment = Alignment.Center) {
@@ -827,7 +880,7 @@ private fun LibraryLoadingState(
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.outline
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.24f)
         )
     ) {
         Column(
@@ -861,7 +914,7 @@ private fun LibraryErrorState(
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.outline
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.24f)
         )
     ) {
         Column(
@@ -916,7 +969,7 @@ private fun DisconnectedTmdbLibraryState(
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.outline
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.24f)
         )
     ) {
         Column(
@@ -1053,7 +1106,7 @@ private fun EmptyLibraryState(
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.outline
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.24f)
         )
     ) {
         Column(
