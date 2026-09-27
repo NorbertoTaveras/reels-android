@@ -41,13 +41,12 @@ import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsGenreChipContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightGenreChipContainer
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightRatingContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 import com.norbertotaveras.reels.presentation.ui.theme.isReelsLightTheme
+import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
 
 @Composable
 fun MovieResultRow(
@@ -188,11 +187,7 @@ private fun RatingPill(
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.medium,
-        color = if (isReelsLightTheme()) {
-            ReelsLightRatingContainer
-        } else {
-            ReelsRatingContainer
-        },
+        color = reelsRatingContainerColor(),
         border = BorderStroke(
             width = 1.dp,
             color = ReelsRatingContent.copy(alpha = 0.18f)

@@ -70,3 +70,12 @@ fun ReelsTheme(
 fun isReelsLightTheme(): Boolean {
     return MaterialTheme.colorScheme.background == ReelsLightBackground
 }
+
+@Composable
+fun reelsRatingContainerColor(): androidx.compose.ui.graphics.Color {
+    return if (isReelsLightTheme()) {
+        ReelsLightRatingContainer
+    } else {
+        ReelsRatingContainer
+    }
+}

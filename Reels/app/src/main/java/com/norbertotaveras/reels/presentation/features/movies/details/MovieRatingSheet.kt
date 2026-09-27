@@ -41,9 +41,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -176,7 +176,7 @@ private fun RatingChoice(
             ),
         shape = CircleShape,
         color = if (selected) {
-            ReelsRatingContainer
+            reelsRatingContainerColor()
         } else {
             MaterialTheme.colorScheme.surfaceVariant
         },

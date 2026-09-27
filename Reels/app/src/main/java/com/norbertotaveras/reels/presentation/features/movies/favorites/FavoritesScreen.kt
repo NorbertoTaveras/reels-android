@@ -76,13 +76,13 @@ import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSurfaceHigh
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTmdbBlue
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTmdbOnBlue
+import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
 
 @Composable
 fun FavoritesScreen(
@@ -398,7 +398,7 @@ private fun TmdbWatchlistMovieCard(
                     TmdbLibraryListType.Rated -> LibraryOverlayIconBadge(
                         imageVector = Icons.Filled.Close,
                         contentDescription = "Rated on TMDB",
-                        containerColor = ReelsRatingContainer.copy(alpha = 0.92f),
+                        containerColor = reelsRatingContainerColor().copy(alpha = 0.92f),
                         contentColor = ReelsRatingContent
                     )
                 }
@@ -628,7 +628,7 @@ private fun UserRatingBadge(
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.extraLarge,
-        color = ReelsRatingContainer.copy(alpha = 0.92f),
+        color = reelsRatingContainerColor().copy(alpha = 0.92f),
         contentColor = ReelsRatingContent
     ) {
         Text(

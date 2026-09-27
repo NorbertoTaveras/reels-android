@@ -53,14 +53,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightRatingContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
-import com.norbertotaveras.reels.presentation.ui.theme.isReelsLightTheme
+import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
 
 @Composable
 fun MovieHeroHeader(
@@ -209,7 +207,7 @@ private fun RatingBadge(
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.medium,
-        color = ReelsRatingContainer,
+        color = reelsRatingContainerColor(),
         contentColor = ReelsRatingContent
     ) {
         Row(
@@ -289,11 +287,7 @@ private fun HeroRatingButton(
     Surface(
         modifier = modifier.height(ReelsDimensions.detailsActionButtonHeight),
         shape = MaterialTheme.shapes.large,
-        color = if (isReelsLightTheme()) {
-            ReelsLightRatingContainer
-        } else {
-            ReelsRatingContainer
-        },
+        color = reelsRatingContainerColor(),
         contentColor = ReelsRatingContent
     ) {
         Row(
@@ -444,7 +438,7 @@ private fun HeroRateButton(
         color = if (rating == null) {
             MaterialTheme.colorScheme.surface
         } else {
-            ReelsRatingContainer
+            reelsRatingContainerColor()
         },
         contentColor = if (rating == null) {
             MaterialTheme.colorScheme.onSurface
