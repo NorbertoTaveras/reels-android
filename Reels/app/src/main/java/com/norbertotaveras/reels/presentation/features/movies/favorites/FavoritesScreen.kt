@@ -83,6 +83,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsTmdbBlue
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTmdbOnBlue
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContentColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
 
 @Composable
@@ -630,7 +631,7 @@ private fun UserRatingBadge(
         modifier = modifier,
         shape = MaterialTheme.shapes.extraLarge,
         color = reelsRatingContainerColor().copy(alpha = 0.92f),
-        contentColor = reelsRatingContentColor()
+        contentColor = reelsImageRatingContentColor()
     ) {
         Text(
             modifier = Modifier.padding(

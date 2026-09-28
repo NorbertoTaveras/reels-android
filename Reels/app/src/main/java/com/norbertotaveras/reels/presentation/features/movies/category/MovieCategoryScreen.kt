@@ -61,7 +61,7 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
-import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContentColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
 
 @Composable
@@ -522,7 +522,7 @@ private fun CategoryRatingBadge(
         modifier = modifier,
         shape = MaterialTheme.shapes.small,
         color = reelsPosterRatingContainerColor(),
-        contentColor = reelsRatingContentColor()
+        contentColor = reelsImageRatingContentColor()
     ) {
         Row(
             modifier = Modifier.padding(
