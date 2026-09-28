@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.Image
@@ -53,6 +54,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,6 +65,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -202,10 +208,22 @@ fun SettingsScreen(
         SettingsPreferenceDialog.ImageQuality -> {
             SettingsOptionDialog(
                 title = "Image Quality",
-                description = "Choose how large TMDB poster, backdrop, and profile images should be when Reels loads artwork.",
+                description = "Choose the image quality used for posters and backdrops.",
+                icon = Icons.Filled.Image,
                 options = ImageQuality.entries,
                 selectedOption = state.selectedImageQuality,
-                optionLabel = ImageQuality::label,
+                optionLabel = { option ->
+                    when (option) {
+                        ImageQuality.High -> "High quality"
+                        ImageQuality.Standard -> "Standard quality"
+                    }
+                },
+                optionDescription = { option ->
+                    when (option) {
+                        ImageQuality.High -> "Sharper artwork with higher data use"
+                        ImageQuality.Standard -> "Balanced artwork quality and data use"
+                    }
+                },
                 onOptionSelected = { imageQuality ->
                     onEvent(SettingsEvent.ImageQualitySelected(imageQuality))
                 },
@@ -216,10 +234,22 @@ fun SettingsScreen(
         SettingsPreferenceDialog.LanguageRegion -> {
             SettingsOptionDialog(
                 title = "Language & Region",
-                description = "Choose the language and region Reels sends to TMDB for browse, search, and detail requests.",
+                description = "Choose how movie information is localized.",
+                icon = Icons.Filled.Language,
                 options = LanguageRegion.entries,
                 selectedOption = state.selectedLanguageRegion,
-                optionLabel = LanguageRegion::label,
+                optionLabel = { option ->
+                    when (option) {
+                        LanguageRegion.EnglishUnitedStates -> "English"
+                        LanguageRegion.SpanishUnitedStates -> "Spanish"
+                    }
+                },
+                optionDescription = { option ->
+                    when (option) {
+                        LanguageRegion.EnglishUnitedStates -> "United States"
+                        LanguageRegion.SpanishUnitedStates -> "United States"
+                    }
+                },
                 onOptionSelected = { languageRegion ->
                     onEvent(SettingsEvent.LanguageRegionSelected(languageRegion))
                 },
@@ -229,11 +259,25 @@ fun SettingsScreen(
 
         SettingsPreferenceDialog.Theme -> {
             SettingsOptionDialog(
-                title = "Theme",
-                description = "Choose whether Reels follows the device theme or uses a fixed light or dark appearance.",
+                title = "App Theme",
+                description = "Choose how Reels looks on your device.",
+                icon = Icons.Filled.Palette,
                 options = AppTheme.entries,
                 selectedOption = state.selectedTheme,
-                optionLabel = AppTheme::label,
+                optionLabel = { option ->
+                    when (option) {
+                        AppTheme.System -> "System default"
+                        AppTheme.Dark -> "Dark"
+                        AppTheme.Light -> "Light"
+                    }
+                },
+                optionDescription = { option ->
+                    when (option) {
+                        AppTheme.System -> "Follow your device appearance"
+                        AppTheme.Dark -> "Use the cinematic dark theme"
+                        AppTheme.Light -> "Use the warm light theme"
+                    }
+                },
                 onOptionSelected = { theme ->
                     onEvent(SettingsEvent.ThemeSelected(theme))
                 },
@@ -252,25 +296,64 @@ private fun ClearImageCacheDialog(
     modifier: Modifier = Modifier,
 ) {
     AlertDialog(
-        modifier = modifier,
+        modifier = modifier.widthIn(max = 360.dp),
         onDismissRequest = onDismiss,
+        icon = {
+            DialogIcon(
+                icon = Icons.Filled.DeleteOutline,
+                destructive = true
+            )
+        },
         title = {
             Text(
-                text = "Clear Image Cache?",
+                text = "Clear Image Cache",
+                modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
             )
         },
         text = {
-            Text(
-                text = "Reels will remove locally cached poster, backdrop, and profile images. Movie data and your saved library will stay saved.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)) {
+                Text(
+                    text = "Free up storage by removing locally cached artwork.",
+                    modifier = Modifier.fillMaxWidth(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
+
+                Surface(
+                    shape = MaterialTheme.shapes.large,
+                    color = MaterialTheme.colorScheme.surfaceVariant
+                ) {
+                    Column(
+                        modifier = Modifier.padding(ReelsSpacing.large),
+                        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
+                    ) {
+                        CacheBreakdownRow(label = "Posters", value = "24 MB")
+                        CacheBreakdownRow(label = "Portraits", value = "8 MB")
+                        CacheBreakdownRow(label = "Backdrops", value = "10 MB")
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                        CacheBreakdownRow(label = "Total", value = "42 MB", emphasized = true)
+                    }
+                }
+
+                Text(
+                    text = "Your saved movies and people will not be removed.",
+                    modifier = Modifier.fillMaxWidth(),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
+            }
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text(text = "Clear")
+                Text(
+                    text = "Clear Cache",
+                    color = MaterialTheme.colorScheme.error
+                )
             }
         },
         dismissButton = {
@@ -290,35 +373,46 @@ private fun PrivacyNoticeDialog(
     modifier: Modifier = Modifier,
 ) {
     AlertDialog(
-        modifier = modifier,
+        modifier = modifier.widthIn(max = 360.dp),
         onDismissRequest = onDismiss,
+        icon = {
+            DialogIcon(icon = Icons.Filled.Shield)
+        },
         title = {
             Text(
-                text = "Privacy",
+                text = "Privacy Notice",
+                modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
             )
         },
         text = {
             Column(
+                modifier = Modifier
+                    .heightIn(max = 420.dp)
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
             ) {
-                PrivacyNoticeText(
-                    text = "Saved movies, saved people, and preferences stay on this device."
+                PrivacyNoticeSection(
+                    title = "What we collect",
+                    text = "Your saved movies, saved people, preferences, and optional TMDB session are stored locally on this device."
                 )
 
-                PrivacyNoticeText(
-                    text = "Movie data, artwork, cast details, and trailers are loaded from TMDB as you browse."
+                PrivacyNoticeSection(
+                    title = "What we don't collect",
+                    text = "Reels does not collect personal information, track your activity, or sell your data."
                 )
 
-                PrivacyNoticeText(
-                    text = "If you connect TMDB, Reels stores the TMDB session only on this device so watchlist and rating sync can work."
+                PrivacyNoticeSection(
+                    title = "Third parties",
+                    text = "Movie data, artwork, cast details, and trailers are provided by TMDB. Connecting an account lets Reels sync your TMDB watchlist and ratings."
                 )
             }
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = "Got it")
+                Text(text = "Close")
             }
         },
         containerColor = MaterialTheme.colorScheme.surface,
@@ -328,37 +422,58 @@ private fun PrivacyNoticeDialog(
 }
 
 @Composable
-private fun PrivacyNoticeText(
+private fun PrivacyNoticeSection(
+    title: String,
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    Text(
-        text = text,
+    Column(
         modifier = modifier,
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
-    )
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Bold
+        )
+
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
 }
 
 @Composable
 private fun <T> SettingsOptionDialog(
     title: String,
     description: String,
+    icon: ImageVector,
     options: List<T>,
     selectedOption: T,
     optionLabel: (T) -> String,
+    optionDescription: (T) -> String,
     onOptionSelected: (T) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var pendingOption by remember(selectedOption) { mutableStateOf(selectedOption) }
+
     AlertDialog(
-        modifier = modifier,
+        modifier = modifier.widthIn(max = 360.dp),
         onDismissRequest = onDismiss,
+        icon = {
+            DialogIcon(icon = icon)
+        },
         title = {
             Text(
                 text = title,
+                modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
             )
         },
         text = {
@@ -368,21 +483,28 @@ private fun <T> SettingsOptionDialog(
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
                 )
 
-                Column {
+                Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)) {
                     options.forEach { option ->
                         SettingsOptionRow(
                             label = optionLabel(option),
-                            selected = option == selectedOption,
-                            onClick = { onOptionSelected(option) }
+                            description = optionDescription(option),
+                            selected = option == pendingOption,
+                            onClick = { pendingOption = option }
                         )
                     }
                 }
             }
         },
         confirmButton = {
+            TextButton(onClick = { onOptionSelected(pendingOption) }) {
+                Text(text = "Apply")
+            }
+        },
+        dismissButton = {
             TextButton(onClick = onDismiss) {
                 Text(text = "Cancel")
             }
@@ -396,6 +518,7 @@ private fun <T> SettingsOptionDialog(
 @Composable
 private fun SettingsOptionRow(
     label: String,
+    description: String,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -405,8 +528,18 @@ private fun SettingsOptionRow(
             .fillMaxWidth()
             .heightIn(min = ReelsDimensions.settingsOptionRowMinHeight)
             .clip(MaterialTheme.shapes.medium)
+            .background(
+                if (selected) {
+                    MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
+                } else {
+                    MaterialTheme.colorScheme.surface
+                }
+            )
             .clickable(onClick = onClick)
-            .padding(horizontal = ReelsDimensions.settingsOptionRowHorizontalPadding),
+            .padding(
+                horizontal = ReelsSpacing.medium,
+                vertical = ReelsSpacing.small
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         RadioButton(
@@ -416,11 +549,78 @@ private fun SettingsOptionRow(
 
         Spacer(modifier = Modifier.width(ReelsSpacing.small))
 
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold
+            )
+
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun DialogIcon(
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+    destructive: Boolean = false,
+) {
+    val contentColor = if (destructive) {
+        MaterialTheme.colorScheme.error
+    } else {
+        MaterialTheme.colorScheme.primary
+    }
+
+    Box(
+        modifier = modifier
+            .size(48.dp)
+            .clip(MaterialTheme.shapes.large)
+            .background(contentColor.copy(alpha = 0.12f)),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(24.dp),
+            tint = contentColor
+        )
+    }
+}
+
+@Composable
+private fun CacheBreakdownRow(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    emphasized: Boolean = false,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold
+            fontWeight = if (emphasized) FontWeight.Bold else FontWeight.Medium
+        )
+
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = if (emphasized) FontWeight.Bold else FontWeight.Medium
         )
     }
 }

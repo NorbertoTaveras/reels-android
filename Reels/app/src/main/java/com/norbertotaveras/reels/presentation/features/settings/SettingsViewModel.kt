@@ -165,6 +165,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             dismissPreferenceDialog()
             updateImageQualityUseCase(imageQuality)
+            _effect.emit(SettingsEffect.ShowMessage(message = "Image quality updated"))
         }
     }
 
@@ -176,6 +177,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             dismissPreferenceDialog()
             updateLanguageRegionUseCase(languageRegion)
+            _effect.emit(SettingsEffect.ShowMessage(message = "Language and region updated"))
         }
     }
 
@@ -187,6 +189,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             dismissPreferenceDialog()
             updateThemeUseCase(theme)
+            _effect.emit(SettingsEffect.ShowMessage(message = "Theme updated"))
         }
     }
 
