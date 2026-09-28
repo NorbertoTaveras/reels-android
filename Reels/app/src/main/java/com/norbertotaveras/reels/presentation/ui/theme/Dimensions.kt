@@ -54,17 +54,27 @@ object ReelsDimensions {
     val categoryRatingIconSize = 10.dp
 
     val searchScreenTopPadding = 16.dp
-    val searchFieldToContentSpacing = 28.dp
+    val searchFieldHeight = 48.dp
+    val searchFieldHorizontalPadding = 12.dp
+    val searchFieldIconSize = 18.dp
+    val searchFieldToContentSpacing = 20.dp
     val searchContentBottomPadding = 32.dp
-    val searchResultSpacing = 16.dp
-    val searchSectionSpacing = 18.dp
-    val searchChipHorizontalPadding = 16.dp
-    val searchChipVerticalPadding = 9.dp
-    val searchResultPosterWidth = 92.dp
-    val searchResultPosterHeight = 138.dp
-    val searchResultCardPadding = 14.dp
-    val searchResultContentSpacing = 7.dp
-    val searchResultRatingIconSize = 14.dp
+    val searchResultSpacing = 8.dp
+    val searchSectionSpacing = 12.dp
+    val searchSectionGroupSpacing = 24.dp
+    val searchChipHorizontalPadding = 12.dp
+    val searchChipVerticalPadding = 7.dp
+    val searchRecentRowMinHeight = 40.dp
+    val searchRecentRowHorizontalPadding = 12.dp
+    val searchRecentIconSize = 14.dp
+    val searchStateTopPadding = 28.dp
+    val searchStateIconContainerSize = 52.dp
+    val searchStateIconSize = 24.dp
+    val searchResultPosterWidth = 72.dp
+    val searchResultPosterHeight = 108.dp
+    val searchResultCardPadding = 8.dp
+    val searchResultContentSpacing = 5.dp
+    val searchResultRatingIconSize = 11.dp
 
     val discoverScreenTopPadding = 24.dp
     val discoverScreenBottomPadding = 32.dp

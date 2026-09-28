@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -99,8 +100,8 @@ fun MovieResultRow(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleSmall.copy(
-                        fontSize = 16.sp,
-                        lineHeight = 21.sp
+                        fontSize = 14.sp,
+                        lineHeight = 18.sp
                     ),
                     color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.SemiBold,
@@ -146,8 +147,8 @@ private fun MovieResultMetadataRow(
             Text(
                 text = releaseYear.orEmpty(),
                 style = MaterialTheme.typography.bodySmall.copy(
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp
+                    fontSize = 11.sp,
+                    lineHeight = 14.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1
@@ -158,19 +159,26 @@ private fun MovieResultMetadataRow(
             Text(
                 text = "•",
                 style = MaterialTheme.typography.bodySmall.copy(
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp
+                    fontSize = 11.sp,
+                    lineHeight = 14.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 
         if (hasSecondaryMetadata) {
+            Icon(
+                imageVector = Icons.Outlined.Schedule,
+                contentDescription = null,
+                modifier = Modifier.size(12.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
             Text(
                 text = secondaryMetadata.orEmpty(),
                 style = MaterialTheme.typography.bodySmall.copy(
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp
+                    fontSize = 11.sp,
+                    lineHeight = 14.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1
@@ -196,8 +204,8 @@ private fun RatingPill(
     ) {
         Row(
             modifier = Modifier.padding(
-                horizontal = 9.dp,
-                vertical = 5.dp
+                horizontal = 8.dp,
+                vertical = 4.dp
             ),
             horizontalArrangement = Arrangement.spacedBy(5.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -211,8 +219,8 @@ private fun RatingPill(
             Text(
                 text = rating,
                 style = MaterialTheme.typography.labelMedium.copy(
-                    fontSize = 14.sp,
-                    lineHeight = 16.sp
+                    fontSize = 11.sp,
+                    lineHeight = 13.sp
                 ),
                 fontWeight = FontWeight.SemiBold
             )
@@ -247,12 +255,12 @@ private fun GenrePillRow(
                 Text(
                     modifier = Modifier.padding(
                         horizontal = 10.dp,
-                        vertical = 5.dp
+                        vertical = 4.dp
                     ),
                     text = genre,
                     style = MaterialTheme.typography.labelSmall.copy(
-                        fontSize = 12.sp,
-                        lineHeight = 16.sp
+                        fontSize = 10.sp,
+                        lineHeight = 12.sp
                     )
                 )
             }

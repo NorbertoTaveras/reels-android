@@ -76,6 +76,7 @@ class SearchViewModel @Inject constructor(
             SearchEvent.ClearQueryClicked -> onClearQuery()
             SearchEvent.SearchSubmitted -> onSearchSubmitted()
             is SearchEvent.RecentSearchClicked -> onRecentSearchClicked(event.query)
+            is SearchEvent.RecentSearchRemoved -> onRecentSearchRemoved(event.query)
             SearchEvent.ClearRecentSearchesClicked -> onClearRecentSearches()
             is SearchEvent.MovieClicked -> onMovieClicked(event.movieId)
         }
@@ -110,6 +111,20 @@ class SearchViewModel @Inject constructor(
 
         viewModelScope.launch {
             updateRecentSearchesUseCase(recentSearches = emptyList())
+        }
+    }
+
+    private fun onRecentSearchRemoved(query: String) {
+        val recentSearches = state.value.recentSearches.filterNot { recent ->
+            recent.equals(query, ignoreCase = true)
+        }
+
+        _state.update { currentState ->
+            currentState.copy(recentSearches = recentSearches)
+        }
+
+        viewModelScope.launch {
+            updateRecentSearchesUseCase(recentSearches = recentSearches)
         }
     }
 
