@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
@@ -59,6 +60,7 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
+import com.norbertotaveras.reels.presentation.ui.theme.reelsMutedContainerColor
 
 @Composable
 fun MovieCastScreen(
@@ -168,7 +170,8 @@ private fun MovieCastErrorState(
             color = MaterialTheme.colorScheme.surface,
             border = BorderStroke(
                 width = ReelsDimensions.fullCastBorderWidth,
-                color = MaterialTheme.colorScheme.outline
+                color = MaterialTheme.colorScheme.onSurface
+                    .copy(alpha = 0.12f)
             )
         ) {
             Column(
@@ -305,9 +308,12 @@ private fun MovieCastHeader(
 
         Text(
             text = "Full Cast",
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontSize = 24.sp,
+                lineHeight = 36.sp
+            ),
             color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Medium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
@@ -327,12 +333,11 @@ private fun MovieCastRow(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = MaterialTheme.shapes.large,
+        shape = RoundedCornerShape(ReelsDimensions.fullCastRowCornerRadius),
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(
             width = ReelsDimensions.fullCastBorderWidth,
-            color = MaterialTheme.colorScheme.outline
-                .copy(alpha = 0.28f)
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
         )
     ) {
         Row(
@@ -346,7 +351,7 @@ private fun MovieCastRow(
             Box(
                 modifier = Modifier
                     .size(ReelsDimensions.fullCastProfileSize)
-                    .clip(MaterialTheme.shapes.medium)
+                    .clip(RoundedCornerShape(ReelsDimensions.fullCastProfileCornerRadius))
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
@@ -377,10 +382,7 @@ private fun MovieCastRow(
             ) {
                 Text(
                     text = castMember.name,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontSize = 17.sp,
-                        lineHeight = 22.sp
-                    ),
+                    style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -388,10 +390,7 @@ private fun MovieCastRow(
 
                 Text(
                     text = castMember.characterName.ifBlank { "Character unavailable" },
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = 14.sp,
-                        lineHeight = 19.sp
-                    ),
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -411,13 +410,17 @@ private fun MovieCastRow(
                         },
                         onClick = onSaveClick
                     ),
-                shape = CircleShape,
-                color = Color.Transparent,
+                shape = RoundedCornerShape(ReelsDimensions.fullCastSaveButtonCornerRadius),
+                color = reelsMutedContainerColor(),
                 contentColor = if (isSaved) {
                     MaterialTheme.colorScheme.primary
                 } else {
                     MaterialTheme.colorScheme.onSurfaceVariant
-                }
+                },
+                border = BorderStroke(
+                    width = ReelsDimensions.fullCastBorderWidth,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                )
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     if (isSaving) {
@@ -449,12 +452,11 @@ private fun MovieCastPlaceholderRow(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
+        shape = RoundedCornerShape(ReelsDimensions.fullCastRowCornerRadius),
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(
             width = ReelsDimensions.fullCastBorderWidth,
-            color = MaterialTheme.colorScheme.outline
-                .copy(alpha = 0.28f)
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
         )
     ) {
         Row(
@@ -468,7 +470,7 @@ private fun MovieCastPlaceholderRow(
             Box(
                 modifier = Modifier
                     .size(ReelsDimensions.fullCastProfileSize)
-                    .clip(MaterialTheme.shapes.medium)
+                    .clip(RoundedCornerShape(ReelsDimensions.fullCastProfileCornerRadius))
                     .background(fullCastPlaceholderColor())
             )
 

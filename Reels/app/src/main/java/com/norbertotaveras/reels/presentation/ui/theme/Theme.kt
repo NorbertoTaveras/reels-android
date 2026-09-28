@@ -86,6 +86,11 @@ fun reelsRatingContentColor(): androidx.compose.ui.graphics.Color {
 }
 
 @Composable
+fun reelsMutedContainerColor(): androidx.compose.ui.graphics.Color {
+    return if (isReelsLightTheme()) ReelsLightMuted else ReelsMuted
+}
+
+@Composable
 fun reelsPosterRatingContainerColor(): androidx.compose.ui.graphics.Color {
     return if (isReelsLightTheme()) {
         ReelsLightBackground.copy(alpha = 0.80f)

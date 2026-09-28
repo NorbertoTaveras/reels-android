@@ -142,20 +142,23 @@ object ReelsDimensions {
     val detailsOfflineIconSize = 20.dp
     val detailsLoadingHeroHeight = 360.dp
 
-    val fullCastScreenTopPadding = 24.dp
+    val fullCastScreenTopPadding = 0.dp
     val fullCastScreenBottomPadding = 32.dp
-    val fullCastHeaderSpacing = 14.dp
-    val fullCastHeaderBottomPadding = 18.dp
-    val fullCastBackButtonSize = 44.dp
-    val fullCastBackIconSize = 24.dp
-    val fullCastRowSpacing = 8.dp
+    val fullCastHeaderSpacing = 16.dp
+    val fullCastHeaderBottomPadding = 12.dp
+    val fullCastBackButtonSize = 40.dp
+    val fullCastBackIconSize = 20.dp
+    val fullCastRowSpacing = 12.dp
     val fullCastRowHorizontalPadding = 12.dp
-    val fullCastRowVerticalPadding = 9.dp
-    val fullCastProfileSize = 46.dp
-    val fullCastRowContentSpacing = 12.dp
+    val fullCastRowVerticalPadding = 12.dp
+    val fullCastProfileSize = 64.dp
+    val fullCastRowContentSpacing = 16.dp
     val fullCastRowTextSpacing = 2.dp
-    val fullCastSaveButtonSize = 38.dp
-    val fullCastSaveIconSize = 26.dp
+    val fullCastSaveButtonSize = 36.dp
+    val fullCastSaveIconSize = 15.dp
+    val fullCastRowCornerRadius = 14.dp
+    val fullCastProfileCornerRadius = 10.dp
+    val fullCastSaveButtonCornerRadius = 14.dp
     val fullCastBorderWidth = 1.dp
 
     val castDetailsHeroHeight = 420.dp
