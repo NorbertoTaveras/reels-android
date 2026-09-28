@@ -83,6 +83,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsTmdbBlue
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTmdbOnBlue
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
 
 @Composable
 fun FavoritesScreen(
@@ -799,7 +800,7 @@ private fun RatingBadge(
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.extraLarge,
-        color = ReelsSurfaceHigh.copy(alpha = 0.82f),
+        color = reelsPosterRatingContainerColor(),
         contentColor = reelsRatingContentColor()
     ) {
         Row(

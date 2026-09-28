@@ -16,8 +16,8 @@ val ReelsBone = Color(0xFFF3EEE5)
 val ReelsBoneMuted = Color(0xFFC7BFB4)
 val ReelsCopper = Color(0xFFD6944A)
 val ReelsCopperDark = Color(0xFF8B5524)
-val ReelsTeal = Color(0xFF58C4B8)
-val ReelsError = Color(0xFFFFB4AB)
+val ReelsTeal = Color(0xFF4A9B9B)
+val ReelsError = Color(0xFFC0392B)
 val ReelsTmdbBlue = Color(0xFF01B4E4)
 val ReelsTmdbOnBlue = Color.White
 
@@ -39,10 +39,10 @@ val ReelsTextPrimary = Color(0xFFF4F4F5)
 val ReelsTextSecondary = Color(0xFFA1A1AA)
 val ReelsTextTertiary = Color(0xFF71717A)
 
-val ReelsAccent = Color(0xFFD9A25F)
+val ReelsAccent = Color(0xFFD4A574)
 val ReelsAccentMuted = Color(0xFF8A6335)
-val ReelsRatingContainer = Color(0xFF4B392B)
-val ReelsLightRatingContainer = Color(0xFF3A2D24)
+val ReelsRatingContainer = Color(0x33D4A574)
+val ReelsLightRatingContainer = Color(0x33C49040)
 
 val ReelsBorder = Color(0xFF2A2A2F)
 

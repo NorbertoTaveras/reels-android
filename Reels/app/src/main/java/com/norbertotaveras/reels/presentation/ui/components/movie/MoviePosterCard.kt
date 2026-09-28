@@ -35,8 +35,8 @@ import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
-import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
 
 @Composable
 fun MoviePosterCard(
@@ -82,7 +82,7 @@ fun MoviePosterCard(
                             .align(Alignment.TopEnd)
                             .padding(ReelsSpacing.small),
                         shape = MaterialTheme.shapes.extraLarge,
-                        color = reelsRatingContainerColor(),
+                        color = reelsPosterRatingContainerColor(),
                         contentColor = reelsRatingContentColor()
                     ) {
                         Text(

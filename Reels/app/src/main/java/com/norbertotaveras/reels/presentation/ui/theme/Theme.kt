@@ -45,7 +45,7 @@ private val LightColorScheme = lightColorScheme(
     onSurfaceVariant = ReelsLightTextSecondary,
     outline = ReelsLightBorder,
     outlineVariant = ReelsLightBorder,
-    error = ReelsCopperDark
+    error = ReelsError
 )
 
 @Composable
@@ -83,4 +83,9 @@ fun reelsRatingContainerColor(): androidx.compose.ui.graphics.Color {
 @Composable
 fun reelsRatingContentColor(): androidx.compose.ui.graphics.Color {
     return MaterialTheme.colorScheme.primary
+}
+
+@Composable
+fun reelsPosterRatingContainerColor(): androidx.compose.ui.graphics.Color {
+    return ReelsBackground.copy(alpha = 0.80f)
 }

@@ -61,8 +61,8 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
-import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
 
 @Composable
 fun MovieCategoryScreen(
@@ -521,7 +521,7 @@ private fun CategoryRatingBadge(
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.small,
-        color = reelsRatingContainerColor(),
+        color = reelsPosterRatingContainerColor(),
         contentColor = reelsRatingContentColor()
     ) {
         Row(
