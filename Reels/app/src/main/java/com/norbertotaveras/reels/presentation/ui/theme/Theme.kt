@@ -87,15 +87,19 @@ fun reelsRatingContentColor(): androidx.compose.ui.graphics.Color {
 
 @Composable
 fun reelsPosterRatingContainerColor(): androidx.compose.ui.graphics.Color {
-    return ReelsImageOverlayBackground.copy(alpha = 0.80f)
+    return if (isReelsLightTheme()) {
+        ReelsLightBackground.copy(alpha = 0.80f)
+    } else {
+        ReelsImageOverlayBackground.copy(alpha = 0.80f)
+    }
 }
 
 @Composable
 fun reelsImageRatingContainerColor(): androidx.compose.ui.graphics.Color {
-    return ReelsAccent.copy(alpha = 0.20f)
+    return MaterialTheme.colorScheme.primary.copy(alpha = 0.20f)
 }
 
 @Composable
 fun reelsImageRatingContentColor(): androidx.compose.ui.graphics.Color {
-    return ReelsAccent
+    return MaterialTheme.colorScheme.primary
 }
