@@ -66,6 +66,8 @@ class DiscoverViewModel @Inject constructor(
         when (event) {
             DiscoverEvent.FiltersClicked -> showFilters()
             DiscoverEvent.FiltersDismissed -> hideFilters()
+            DiscoverEvent.ApplyFiltersClicked -> applyFilters()
+            DiscoverEvent.ResetDraftFiltersClicked -> resetDraftFilters()
             is DiscoverEvent.SortSelected -> updateSort(sort = event.sort)
             is DiscoverEvent.GenreSelected -> updateGenre(
                 genreId = event.genreId,
@@ -81,13 +83,37 @@ class DiscoverViewModel @Inject constructor(
 
     private fun showFilters() {
         _state.update { currentState ->
-            currentState.copy(isFilterSheetVisible = true)
+            currentState.copy(
+                draftFilters = currentState.filters,
+                isFilterSheetVisible = true
+            )
         }
     }
 
     private fun hideFilters() {
         _state.update { currentState ->
-            currentState.copy(isFilterSheetVisible = false)
+            currentState.copy(
+                draftFilters = null,
+                isFilterSheetVisible = false
+            )
+        }
+    }
+
+    private fun applyFilters() {
+        val filters = state.value.draftFilters ?: state.value.filters
+        _state.update { currentState ->
+            currentState.copy(
+                filters = filters,
+                draftFilters = null,
+                isFilterSheetVisible = false
+            )
+        }
+        persistFilters(filters = filters)
+    }
+
+    private fun resetDraftFilters() {
+        _state.update { currentState ->
+            currentState.copy(draftFilters = DiscoverFilterDataModel())
         }
     }
 
@@ -140,24 +166,39 @@ class DiscoverViewModel @Inject constructor(
     }
 
     private fun updateSort(sort: DiscoverSort) {
-        updateFilters(filters = state.value.filters.copy(sort = sort))
+        updateDraftFilters { filters -> filters.copy(sort = sort) }
     }
 
     private fun updateGenre(genreId: Int?, genreName: String?) {
-        updateFilters(
-            filters = state.value.filters.copy(
+        updateDraftFilters { filters ->
+            filters.copy(
                 genreId = genreId,
                 genreName = genreName
             )
-        )
+        }
     }
 
     private fun updateYear(year: Int?) {
-        updateFilters(filters = state.value.filters.copy(year = year))
+        updateDraftFilters { filters -> filters.copy(year = year) }
     }
 
     private fun updateRating(minimumRating: Int?) {
-        updateFilters(filters = state.value.filters.copy(minimumRating = minimumRating))
+        updateDraftFilters { filters -> filters.copy(minimumRating = minimumRating) }
+    }
+
+    private fun updateDraftFilters(
+        transform: (DiscoverFilterDataModel) -> DiscoverFilterDataModel,
+    ) {
+        if (!state.value.isFilterSheetVisible) {
+            updateFilters(filters = transform(state.value.filters))
+            return
+        }
+
+        _state.update { currentState ->
+            currentState.copy(
+                draftFilters = transform(currentState.draftFilters ?: currentState.filters)
+            )
+        }
     }
 
     private fun updateFilters(filters: DiscoverFilterDataModel) {
@@ -165,6 +206,10 @@ class DiscoverViewModel @Inject constructor(
             currentState.copy(filters = filters)
         }
 
+        persistFilters(filters = filters)
+    }
+
+    private fun persistFilters(filters: DiscoverFilterDataModel) {
         viewModelScope.launch {
             updateDiscoverFiltersUseCase(filters = filters)
         }

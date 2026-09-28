@@ -13,6 +13,7 @@ import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
 
 data class DiscoverUiState(
     val filters: DiscoverFilterDataModel = DiscoverFilterDataModel(),
+    val draftFilters: DiscoverFilterDataModel? = null,
     val language: String = "en-US",
     val genres: List<GenreDataModel> = emptyList(),
     val isLoadingFilters: Boolean = true,
@@ -22,3 +23,6 @@ data class DiscoverUiState(
 
 val DiscoverUiState.hasActiveFilters: Boolean
     get() = filters.hasActiveFilters
+
+val DiscoverUiState.filterSheetFilters: DiscoverFilterDataModel
+    get() = draftFilters ?: filters
