@@ -15,11 +15,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -27,10 +30,11 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.CloudOff
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.Movie
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,16 +45,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.domain.model.person.PersonMovieCreditDataModel
-import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
-import com.norbertotaveras.reels.presentation.ui.extensions.toErrorTitle
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
@@ -85,39 +89,36 @@ fun FilmographyScreen(
         item(span = { GridItemSpan(maxLineSpan) }) {
             FilmographyHeader(
                 personName = state.personName,
+                creditCount = state.movies.size.takeIf {
+                    !state.isLoading && state.errorMessage == null && it > 0
+                },
                 onBackClick = {
                     onEvent(FilmographyEvent.BackClicked)
                 }
             )
         }
 
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            FilmographySortRow(
-                selectedSort = state.sort,
-                onSortClick = { sort ->
-                    onEvent(FilmographyEvent.SortSelected(sort = sort))
-                }
-            )
+        if (state.errorMessage == null) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                FilmographySortRow(
+                    selectedSort = state.sort,
+                    onSortClick = { sort ->
+                        onEvent(FilmographyEvent.SortSelected(sort = sort))
+                    }
+                )
+            }
         }
 
         when {
             state.isLoading -> {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = ReelsSpacing.xxLarge),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
+                items(FILMOGRAPHY_PLACEHOLDER_COUNT) {
+                    FilmographyPlaceholderCard()
                 }
             }
 
             state.errorMessage != null -> {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     FilmographyErrorState(
-                        message = state.errorMessage,
                         onRetry = {
                             onEvent(FilmographyEvent.RetryClicked)
                         }
@@ -127,9 +128,8 @@ fun FilmographyScreen(
 
             state.movies.isEmpty() -> {
                 item(span = { GridItemSpan(maxLineSpan) }) {
-                    EmptyState(
-                        title = "No movie credits found",
-                        message = "This person does not have available movie credits yet."
+                    FilmographyEmptyState(
+                        personName = state.personName
                     )
                 }
             }
@@ -148,6 +148,10 @@ fun FilmographyScreen(
                         }
                     )
                 }
+
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    FilmographyEndCap(creditCount = state.movies.size)
+                }
             }
         }
     }
@@ -156,15 +160,15 @@ fun FilmographyScreen(
 @Composable
 private fun FilmographyHeader(
     personName: String,
+    creditCount: Int?,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    Column(
         modifier = modifier
             .fillMaxWidth()
             .padding(bottom = ReelsDimensions.filmographyHeaderBottomPadding),
-        horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.filmographyHeaderSpacing),
-        verticalAlignment = Alignment.CenterVertically
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.filmographyHeaderSpacing)
     ) {
         Surface(
             modifier = Modifier.size(ReelsDimensions.filmographyBackButtonSize),
@@ -172,7 +176,7 @@ private fun FilmographyHeader(
             color = MaterialTheme.colorScheme.surface,
             border = BorderStroke(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
             )
         ) {
             IconButton(onClick = onBackClick) {
@@ -185,12 +189,13 @@ private fun FilmographyHeader(
             }
         }
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
-        ) {
+        Column(verticalArrangement = Arrangement.spacedBy(ReelsDimensions.filmographyHeaderTextSpacing)) {
             Text(
                 text = "Filmography",
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontSize = 24.sp,
+                    lineHeight = 30.sp
+                ),
                 color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
@@ -199,10 +204,60 @@ private fun FilmographyHeader(
 
             Text(
                 text = personName,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
+                ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
+            )
+
+            creditCount?.let { count ->
+                FilmographyCountChip(
+                    modifier = Modifier.padding(top = ReelsDimensions.filmographyHeaderCountSpacing),
+                    creditCount = count
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FilmographyCountChip(
+    creditCount: Int,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.extraLarge,
+        color = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(
+                horizontal = ReelsDimensions.filmographyCountHorizontalPadding,
+                vertical = ReelsDimensions.filmographyCountVerticalPadding
+            ),
+            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Movie,
+                contentDescription = null,
+                modifier = Modifier.size(ReelsDimensions.filmographyCountIconSize)
+            )
+
+            Text(
+                text = "$creditCount credits",
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = 10.sp,
+                    lineHeight = 14.sp
+                )
             )
         }
     }
@@ -247,21 +302,21 @@ private fun FilmographyFilterChip(
         modifier = modifier.clickable(onClick = onClick),
         shape = MaterialTheme.shapes.extraLarge,
         color = if (selected) {
-            MaterialTheme.colorScheme.primary
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
         } else {
             MaterialTheme.colorScheme.surface
         },
         contentColor = if (selected) {
-            MaterialTheme.colorScheme.onPrimary
+            MaterialTheme.colorScheme.primary
         } else {
-            MaterialTheme.colorScheme.onSurface
+            MaterialTheme.colorScheme.onSurfaceVariant
         },
         border = BorderStroke(
             width = 1.dp,
             color = if (selected) {
-                Color.Transparent
+                MaterialTheme.colorScheme.primary
             } else {
-                MaterialTheme.colorScheme.outline.copy(alpha = 0.22f)
+                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
             }
         )
     ) {
@@ -271,8 +326,11 @@ private fun FilmographyFilterChip(
                 vertical = ReelsDimensions.filmographyFilterVerticalPadding
             ),
             text = label,
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.SemiBold
+            style = MaterialTheme.typography.labelMedium.copy(
+                fontSize = 12.sp,
+                lineHeight = 16.sp
+            ),
+            fontWeight = FontWeight.Medium
         )
     }
 }
@@ -291,7 +349,8 @@ private fun FilmographyPosterCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.poster)
-                .clip(MaterialTheme.shapes.large)
+                .clip(MaterialTheme.shapes.medium)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
             AsyncImage(
                 model = movie.posterPath.toTmdbImageUrl(),
@@ -300,19 +359,24 @@ private fun FilmographyPosterCard(
                 contentScale = ContentScale.Crop
             )
 
-            FilmographyRatingBadge(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(ReelsDimensions.filmographyRatingEdgePadding),
-                rating = movie.voteAverage
-            )
+            if (movie.voteAverage > 0.0) {
+                FilmographyRatingBadge(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(ReelsDimensions.filmographyRatingEdgePadding),
+                    rating = movie.voteAverage
+                )
+            }
         }
 
         Text(
             text = movie.title,
-            style = MaterialTheme.typography.titleSmall,
+            style = MaterialTheme.typography.labelMedium.copy(
+                fontSize = 12.sp,
+                lineHeight = 16.sp
+            ),
             color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.Medium,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
@@ -320,7 +384,10 @@ private fun FilmographyPosterCard(
         movie.releaseDate.toReleaseYear()?.let { year ->
             Text(
                 text = year,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = 10.sp,
+                    lineHeight = 14.sp
+                ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -336,7 +403,7 @@ private fun FilmographyRatingBadge(
 ) {
     Surface(
         modifier = modifier,
-        shape = MaterialTheme.shapes.extraLarge,
+        shape = MaterialTheme.shapes.small,
         color = reelsPosterRatingContainerColor(),
         contentColor = reelsImageRatingContentColor()
     ) {
@@ -356,7 +423,10 @@ private fun FilmographyRatingBadge(
 
             Text(
                 text = String.format("%.1f", rating),
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
+                ),
                 fontWeight = FontWeight.SemiBold
             )
         }
@@ -364,34 +434,124 @@ private fun FilmographyRatingBadge(
 }
 
 @Composable
+private fun FilmographyPlaceholderCard(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.filmographyPosterTextSpacing)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(ReelsRatios.poster)
+                .clip(MaterialTheme.shapes.medium)
+                .background(filmographyPlaceholderColor())
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.82f)
+                .height(12.dp)
+                .clip(MaterialTheme.shapes.small)
+                .background(filmographyPlaceholderColor())
+        )
+
+        Box(
+            modifier = Modifier
+                .width(36.dp)
+                .height(10.dp)
+                .clip(MaterialTheme.shapes.small)
+                .background(filmographyPlaceholderColor())
+        )
+    }
+}
+
+@Composable
+private fun FilmographyEndCap(
+    creditCount: Int,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = ReelsSpacing.large),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(width = 32.dp, height = 1.dp)
+                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.32f))
+        )
+
+        Text(
+            text = "All $creditCount credits",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun filmographyPlaceholderColor(): Color {
+    return MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.52f)
+}
+
+@Composable
 private fun FilmographyErrorState(
-    message: String,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outline
-        )
+    FilmographyMessageState(
+        modifier = modifier,
+        icon = Icons.Outlined.ErrorOutline,
+        title = "Couldn't load credits",
+        message = "Check your connection and try again.",
+        onRetry = onRetry
+    )
+}
+
+@Composable
+private fun FilmographyEmptyState(
+    personName: String,
+    modifier: Modifier = Modifier,
+) {
+    FilmographyMessageState(
+        modifier = modifier,
+        icon = Icons.Outlined.Movie,
+        title = "No credits found",
+        message = "$personName doesn't have any movie credits yet."
+    )
+}
+
+@Composable
+private fun FilmographyMessageState(
+    icon: ImageVector,
+    title: String,
+    message: String,
+    modifier: Modifier = Modifier,
+    onRetry: (() -> Unit)? = null,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(320.dp),
+        contentAlignment = Alignment.Center
     ) {
         Column(
-            modifier = Modifier.padding(ReelsDimensions.stateCardPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(ReelsDimensions.stateCardContentSpacing)
         ) {
             Surface(
                 modifier = Modifier.size(ReelsDimensions.stateIconContainerSize),
-                shape = CircleShape,
+                shape = MaterialTheme.shapes.large,
                 color = MaterialTheme.colorScheme.surfaceVariant,
-                contentColor = MaterialTheme.colorScheme.primary
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
-                        imageVector = Icons.Outlined.CloudOff,
+                        imageVector = icon,
                         contentDescription = null,
                         modifier = Modifier.size(ReelsDimensions.stateIconSize)
                     )
@@ -399,11 +559,11 @@ private fun FilmographyErrorState(
             }
 
             Text(
-                text = message.toErrorTitle(fallback = "Unable to load filmography"),
+                text = title,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Medium
             )
 
             Text(
@@ -413,12 +573,24 @@ private fun FilmographyErrorState(
                 textAlign = TextAlign.Center
             )
 
-            FilledTonalButton(
-                modifier = Modifier.padding(top = ReelsSpacing.small),
-                onClick = onRetry
-            ) {
-                Text(text = "Try Again")
+            onRetry?.let { retry ->
+                Button(
+                    modifier = Modifier.padding(top = ReelsSpacing.small),
+                    onClick = retry
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Refresh,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(ReelsSpacing.small))
+
+                    Text(text = "Retry")
+                }
             }
         }
     }
 }
+
+private const val FILMOGRAPHY_PLACEHOLDER_COUNT = 12
