@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -51,17 +52,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.person.PersonMovieCreditDataModel
 import com.norbertotaveras.reels.extensions.toDisplayAge
 import com.norbertotaveras.reels.extensions.toDisplayTmdbDate
-import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.presentation.ui.components.movie.PosterCarousel
 import com.norbertotaveras.reels.presentation.ui.components.movie.PosterCarouselItem
-import com.norbertotaveras.reels.presentation.ui.components.common.SectionHeader
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
@@ -119,8 +120,7 @@ fun CastDetailsContent(
         item {
             KnownForPreviewSection(
                 knownFor = knownFor,
-                onMovieClick = onMovieClick,
-                onSeeAllClick = onFilmographyClick
+                onMovieClick = onMovieClick
             )
         }
 
@@ -134,7 +134,6 @@ fun CastDetailsContent(
         item {
             PersonalInfoSection(
                 birthday = birthday,
-                knownForDepartment = knownForDepartment,
                 alsoKnownAs = name,
                 knownCreditsCount = knownFor.size
             )
@@ -172,8 +171,8 @@ private fun CastHeroHeader(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            MaterialTheme.colorScheme.background.copy(alpha = 0.15f),
-                            MaterialTheme.colorScheme.background.copy(alpha = 0.25f),
+                            MaterialTheme.colorScheme.background.copy(alpha = 0f),
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.30f),
                             MaterialTheme.colorScheme.background
                         )
                     )
@@ -196,7 +195,8 @@ private fun CastHeroHeader(
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Navigate back"
+                contentDescription = "Navigate back",
+                modifier = Modifier.size(ReelsDimensions.castDetailsHeroActionIconSize)
             )
         }
 
@@ -236,7 +236,8 @@ private fun CastHeroHeader(
                         "Remove from library"
                     } else {
                         "Save to library"
-                    }
+                    },
+                    modifier = Modifier.size(ReelsDimensions.castDetailsHeroActionIconSize)
                 )
             }
         }
@@ -245,18 +246,22 @@ private fun CastHeroHeader(
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .padding(horizontal = ReelsSpacing.screenHorizontal)
-                .padding(bottom = ReelsSpacing.xLarge),
+                .padding(bottom = 0.dp),
             verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
         ) {
             Text(
                 text = name,
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontSize = 24.sp,
+                    lineHeight = 36.sp,
+                    fontWeight = FontWeight.Medium
+                ),
                 color = MaterialTheme.colorScheme.onBackground
             )
 
             if (!knownForDepartment.isNullOrBlank()) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
@@ -339,12 +344,12 @@ private fun CastInfoRow(
     ) {
         Surface(
             modifier = Modifier.size(ReelsDimensions.castDetailsInfoIconContainerSize),
-            shape = MaterialTheme.shapes.medium,
+            shape = RoundedCornerShape(ReelsDimensions.castDetailsInfoCornerRadius),
             color = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.primary,
             border = BorderStroke(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
             )
         ) {
             Box(contentAlignment = Alignment.Center) {
@@ -393,7 +398,7 @@ private fun BiographySection(
     ) {
         Text(
             text = "Biography",
-            style = MaterialTheme.typography.titleMedium,
+            style = castDetailsSectionTitleStyle(),
             color = MaterialTheme.colorScheme.onBackground
         )
 
@@ -442,7 +447,7 @@ private fun BiographySection(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (isExpanded) "Show less" else "Read more",
+                        text = if (isExpanded) "Read less" else "Read more",
                         style = MaterialTheme.typography.labelLarge
                     )
 
@@ -467,7 +472,6 @@ private fun BiographySection(
 private fun KnownForPreviewSection(
     knownFor: List<PersonMovieCreditDataModel>,
     onMovieClick: (Int) -> Unit,
-    onSeeAllClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (knownFor.isEmpty()) return
@@ -475,14 +479,13 @@ private fun KnownForPreviewSection(
 
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.detailsCarouselHeaderSpacing)
+        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)
     ) {
-        SectionHeader(
+        Text(
             modifier = Modifier.padding(horizontal = ReelsSpacing.screenHorizontal),
-            title = "Known For",
-            actionLabel = "See all",
-            onActionClick = onSeeAllClick,
-            titleStyle = MaterialTheme.typography.titleMedium
+            text = "Known For",
+            style = castDetailsSectionTitleStyle(),
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         PosterCarousel(
@@ -490,15 +493,14 @@ private fun KnownForPreviewSection(
                 PosterCarouselItem(
                     id = movie.id,
                     title = movie.title,
-                    posterUrl = movie.posterPath.toTmdbImageUrl(),
-                    releaseYear = movie.releaseDate.toReleaseYear()
+                    posterUrl = movie.posterPath.toTmdbImageUrl()
                 )
             },
             onMovieClick = onMovieClick,
             contentPadding = PaddingValues(horizontal = ReelsSpacing.screenHorizontal),
             cardWidth = ReelsDimensions.castDetailsKnownForPosterWidth,
-            titleStyle = MaterialTheme.typography.titleSmall,
-            releaseYearStyle = MaterialTheme.typography.labelMedium
+            titleStyle = MaterialTheme.typography.bodyMedium,
+            posterShape = RoundedCornerShape(ReelsDimensions.castDetailsCardCornerRadius)
         )
     }
 }
@@ -512,72 +514,62 @@ private fun FullFilmographySection(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier.padding(horizontal = ReelsSpacing.screenHorizontal),
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.detailsCarouselHeaderSpacing)
-    ) {
-        Text(
-            text = "Full Filmography",
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onBackground
+    Surface(
+        modifier = modifier
+            .padding(horizontal = ReelsSpacing.screenHorizontal)
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(ReelsDimensions.castDetailsCardCornerRadius),
+        color = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
         )
-
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onClick),
-            shape = MaterialTheme.shapes.large,
-            color = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            border = BorderStroke(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
-            )
+    ) {
+        Row(
+            modifier = Modifier.padding(ReelsSpacing.large),
+            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.large),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier.padding(ReelsDimensions.inlineStateCardPadding),
-                horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
-                verticalAlignment = Alignment.CenterVertically
+            Surface(
+                modifier = Modifier.size(ReelsDimensions.castDetailsInfoIconContainerSize),
+                shape = RoundedCornerShape(ReelsDimensions.castDetailsInfoCornerRadius),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                contentColor = MaterialTheme.colorScheme.primary
             ) {
-                Surface(
-                    modifier = Modifier.size(ReelsDimensions.inlineStateIconContainerSize),
-                    shape = MaterialTheme.shapes.medium,
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = MaterialTheme.colorScheme.primary
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = Icons.Filled.Movie,
-                            contentDescription = null,
-                            modifier = Modifier.size(ReelsDimensions.inlineStateIconSize)
-                        )
-                    }
-                }
-
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
-                ) {
-                    Text(
-                        text = "View all credits",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-
-                    Text(
-                        text = "$creditCount credits",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Filled.Movie,
+                        contentDescription = null,
+                        modifier = Modifier.size(ReelsDimensions.castDetailsFilmographyIconSize)
                     )
                 }
+            }
 
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = null,
-                    modifier = Modifier.size(ReelsDimensions.settingsChevronSize),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                Text(
+                    text = "Full Filmography",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                Text(
+                    text = "$creditCount credits",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                modifier = Modifier.size(ReelsDimensions.castDetailsFilmographyChevronSize),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
@@ -585,7 +577,6 @@ private fun FullFilmographySection(
 @Composable
 private fun PersonalInfoSection(
     birthday: String?,
-    knownForDepartment: String?,
     knownCreditsCount: Int,
     alsoKnownAs: String?,
     modifier: Modifier = Modifier,
@@ -598,17 +589,17 @@ private fun PersonalInfoSection(
     ) {
         Text(
             text = "Personal Info",
-            style = MaterialTheme.typography.titleMedium,
+            style = castDetailsSectionTitleStyle(),
             color = MaterialTheme.colorScheme.onBackground
         )
 
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.large,
+            shape = RoundedCornerShape(ReelsDimensions.castDetailsCardCornerRadius),
             color = MaterialTheme.colorScheme.surface,
             border = BorderStroke(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
             )
         ) {
             Column {
@@ -648,7 +639,7 @@ private fun PersonalInfoRow(
             .fillMaxWidth()
             .padding(
                 horizontal = ReelsSpacing.large,
-                vertical = ReelsSpacing.medium
+                vertical = ReelsSpacing.large
             ),
         verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
     ) {
@@ -669,9 +660,16 @@ private fun PersonalInfoRow(
 @Composable
 private fun PersonalInfoDivider() {
     HorizontalDivider(
-        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f)
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
     )
 }
+
+@Composable
+private fun castDetailsSectionTitleStyle() = MaterialTheme.typography.titleMedium.copy(
+    fontSize = 18.sp,
+    lineHeight = 27.sp,
+    fontWeight = FontWeight.Medium
+)
 
 @Preview(showBackground = true)
 @Composable

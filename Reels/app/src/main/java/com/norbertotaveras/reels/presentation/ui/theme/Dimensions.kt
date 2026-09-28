@@ -161,17 +161,22 @@ object ReelsDimensions {
     val fullCastSaveButtonCornerRadius = 14.dp
     val fullCastBorderWidth = 1.dp
 
-    val castDetailsHeroHeight = 420.dp
+    val castDetailsHeroHeight = 380.dp
     val castDetailsHeroActionTopPadding = 48.dp
     val castDetailsHeroActionButtonSize = 40.dp
-    val castDetailsDepartmentIconSize = 16.dp
-    val castDetailsQuickInfoSpacing = 18.dp
+    val castDetailsHeroActionIconSize = 20.dp
+    val castDetailsDepartmentIconSize = 14.dp
+    val castDetailsQuickInfoSpacing = 16.dp
     val castDetailsInfoIconContainerSize = 40.dp
-    val castDetailsInfoIconSize = 16.dp
-    val castDetailsSectionSpacing = 26.dp
+    val castDetailsInfoIconSize = 18.dp
+    val castDetailsSectionSpacing = 24.dp
     val castDetailsBiographyFadeHeight = 34.dp
     val castDetailsBiographyToggleIconSize = 18.dp
-    val castDetailsKnownForPosterWidth = 112.dp
+    val castDetailsKnownForPosterWidth = 120.dp
+    val castDetailsInfoCornerRadius = 10.dp
+    val castDetailsCardCornerRadius = 14.dp
+    val castDetailsFilmographyIconSize = 18.dp
+    val castDetailsFilmographyChevronSize = 20.dp
 
     val filmographyScreenTopPadding = 24.dp
     val filmographyScreenBottomPadding = 32.dp

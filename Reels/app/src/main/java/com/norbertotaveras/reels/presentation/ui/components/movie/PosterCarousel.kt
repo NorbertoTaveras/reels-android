@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -41,6 +42,7 @@ fun PosterCarousel(
     cardWidth: Dp = 120.dp,
     titleStyle: TextStyle = MaterialTheme.typography.titleMedium,
     releaseYearStyle: TextStyle = MaterialTheme.typography.labelMedium,
+    posterShape: Shape = MaterialTheme.shapes.large,
 ) {
     LazyRow(
         modifier = modifier,
@@ -59,6 +61,7 @@ fun PosterCarousel(
                 width = cardWidth,
                 titleStyle = titleStyle,
                 releaseYearStyle = releaseYearStyle,
+                posterShape = posterShape,
                 onClick = { onMovieClick(item.id) }
             )
         }

@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -48,6 +49,7 @@ fun MoviePosterCard(
     width: Dp = 120.dp,
     titleStyle: TextStyle = MaterialTheme.typography.titleMedium,
     releaseYearStyle: TextStyle = MaterialTheme.typography.labelMedium,
+    posterShape: Shape = MaterialTheme.shapes.large,
     onClick: () -> Unit,
 ) {
     Column(
@@ -60,7 +62,7 @@ fun MoviePosterCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.poster),
-            shape = MaterialTheme.shapes.large,
+            shape = posterShape,
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant
             )
@@ -72,7 +74,7 @@ fun MoviePosterCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(ReelsRatios.poster)
-                        .clip(MaterialTheme.shapes.large),
+                        .clip(posterShape),
                     contentScale = ContentScale.Crop
                 )
 

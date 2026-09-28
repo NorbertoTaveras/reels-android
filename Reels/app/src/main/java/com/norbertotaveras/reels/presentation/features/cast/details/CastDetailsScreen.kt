@@ -144,7 +144,8 @@ private fun CastDetailsLoadingState(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = "Back",
+                            modifier = Modifier.size(ReelsDimensions.castDetailsHeroActionIconSize)
                         )
                     }
                 }
@@ -152,7 +153,7 @@ private fun CastDetailsLoadingState(
                 CastDetailsPlaceholderBar(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .padding(start = ReelsSpacing.screenHorizontal, bottom = 76.dp),
+                        .padding(start = ReelsSpacing.screenHorizontal, bottom = 36.dp),
                     width = 220.dp,
                     height = 28.dp
                 )
@@ -160,7 +161,7 @@ private fun CastDetailsLoadingState(
                 CastDetailsPlaceholderBar(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .padding(start = ReelsSpacing.screenHorizontal, bottom = 44.dp),
+                        .padding(start = ReelsSpacing.screenHorizontal, bottom = 4.dp),
                     width = 92.dp,
                     height = 16.dp
                 )
