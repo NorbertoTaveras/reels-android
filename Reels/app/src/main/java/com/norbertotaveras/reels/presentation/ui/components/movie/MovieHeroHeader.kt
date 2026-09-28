@@ -427,7 +427,7 @@ private fun HeroRateButton(
 ) {
     Surface(
         modifier = modifier
-            .height(ReelsDimensions.detailsActionButtonHeight)
+            .size(ReelsDimensions.detailsActionButtonHeight)
             .clickable(
                 enabled = !isLoading,
                 role = Role.Button,
@@ -450,11 +450,7 @@ private fun HeroRateButton(
             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
         )
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = ReelsSpacing.small),
-            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Box(contentAlignment = Alignment.Center) {
             if (isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(16.dp),
@@ -469,24 +465,10 @@ private fun HeroRateButton(
                         Icons.Filled.Star
                     },
                     contentDescription = null,
-                    modifier = Modifier.size(18.dp)
-                )
-
-                Text(
-                    text = rating?.toHeroRatingLabel() ?: "Rate",
-                    style = MaterialTheme.typography.labelMedium,
-                    maxLines = 1
+                    modifier = Modifier.size(22.dp)
                 )
             }
         }
-    }
-}
-
-private fun Double.toHeroRatingLabel(): String {
-    return if (this % 1.0 == 0.0) {
-        toInt().toString()
-    } else {
-        String.format("%.1f", this)
     }
 }
 
