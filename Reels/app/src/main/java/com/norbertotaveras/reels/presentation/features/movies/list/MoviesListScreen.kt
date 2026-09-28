@@ -359,7 +359,7 @@ private fun RatingBadge(
                 vertical = if (compact) {
                     ReelsDimensions.compactRatingBadgeVerticalPadding
                 } else {
-                    ReelsSpacing.small
+                    ReelsSpacing.xSmall
                 }
             ),
             horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
@@ -369,7 +369,7 @@ private fun RatingBadge(
                 imageVector = Icons.Filled.Star,
                 contentDescription = null,
                 modifier = Modifier.size(
-                    if (compact) ReelsDimensions.compactRatingBadgeIconSize else 16.dp
+                    if (compact) ReelsDimensions.compactRatingBadgeIconSize else 14.dp
                 )
             )
 
@@ -381,12 +381,9 @@ private fun RatingBadge(
                         lineHeight = 18.sp
                     )
                 } else {
-                    MaterialTheme.typography.titleMedium.copy(
-                        fontSize = 18.sp,
-                        lineHeight = 22.sp
-                    )
+                    MaterialTheme.typography.bodyLarge
                 },
-                fontWeight = FontWeight.Bold
+                fontWeight = if (compact) FontWeight.Bold else FontWeight.Normal
             )
         }
     }
