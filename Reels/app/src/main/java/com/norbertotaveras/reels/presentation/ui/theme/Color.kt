@@ -43,6 +43,7 @@ val ReelsAccent = Color(0xFFD4A574)
 val ReelsAccentMuted = Color(0xFF8A6335)
 val ReelsRatingContainer = Color(0x33D4A574)
 val ReelsLightRatingContainer = Color(0x33C49040)
+val ReelsLightHeroRatingContainer = Color(0xFF3A2D24)
 val ReelsImageOverlayBackground = Color(0xFF0F0F11)
 
 val ReelsBorder = Color(0xFF2A2A2F)
