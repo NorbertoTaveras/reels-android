@@ -54,9 +54,9 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toErrorTitle
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
 
 @Composable
 fun FilmographyScreen(
@@ -338,7 +338,7 @@ private fun FilmographyRatingBadge(
         modifier = modifier,
         shape = MaterialTheme.shapes.extraLarge,
         color = reelsRatingContainerColor(),
-        contentColor = ReelsRatingContent
+        contentColor = reelsRatingContentColor()
     ) {
         Row(
             modifier = Modifier.padding(

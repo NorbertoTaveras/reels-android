@@ -33,7 +33,7 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = ReelsAccent,
+    primary = ReelsLightAccent,
     onPrimary = ReelsLightText,
     secondary = ReelsTeal,
     onSecondary = ReelsLightText,
@@ -73,5 +73,14 @@ fun isReelsLightTheme(): Boolean {
 
 @Composable
 fun reelsRatingContainerColor(): androidx.compose.ui.graphics.Color {
-    return MaterialTheme.colorScheme.background.copy(alpha = 0.8f)
+    return if (isReelsLightTheme()) {
+        ReelsLightRatingContainer
+    } else {
+        ReelsRatingContainer
+    }
+}
+
+@Composable
+fun reelsRatingContentColor(): androidx.compose.ui.graphics.Color {
+    return MaterialTheme.colorScheme.primary
 }

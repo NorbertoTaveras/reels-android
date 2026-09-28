@@ -8,6 +8,7 @@
 package com.norbertotaveras.reels.presentation.features.movies.category
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,9 +27,9 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material.icons.outlined.CloudOff
+import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -49,8 +50,9 @@ import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import coil3.compose.AsyncImage
-import com.norbertotaveras.reels.extensions.toReleaseYear
+import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
+import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
 import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
 import com.norbertotaveras.reels.presentation.ui.extensions.toErrorTitle
@@ -58,9 +60,9 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
 
 @Composable
 fun MovieCategoryScreen(
@@ -73,7 +75,7 @@ fun MovieCategoryScreen(
         is LoadState.Loading -> {
             MovieCategoryLoadingState(
                 modifier = modifier,
-                title = state.category.label,
+                category = state.category,
                 onBackClick = {
                     onEvent(MovieCategoryEvent.BackClicked)
                 }
@@ -84,7 +86,7 @@ fun MovieCategoryScreen(
         is LoadState.Error -> {
             MovieCategoryErrorState(
                 modifier = modifier,
-                title = state.category.label,
+                category = state.category,
                 message = refreshState.error.toUserMessage(
                     fallback = "Unable to load ${state.category.label} movies."
                 ),
@@ -116,7 +118,11 @@ fun MovieCategoryScreen(
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
             MovieCategoryHeader(
-                title = state.category.label,
+                category = state.category,
+                movieCount = movies.itemCount,
+                hasMoreMovies = movies.loadState.append.let { loadState ->
+                    loadState !is LoadState.NotLoading || !loadState.endOfPaginationReached
+                },
                 onBackClick = {
                     onEvent(MovieCategoryEvent.BackClicked)
                 }
@@ -151,15 +157,8 @@ fun MovieCategoryScreen(
 
         when (val appendState = movies.loadState.append) {
             is LoadState.Loading -> {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(ReelsSpacing.large),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
+                items(CATEGORY_APPEND_PLACEHOLDER_COUNT) {
+                    MovieCategoryPlaceholderCard()
                 }
             }
 
@@ -175,23 +174,30 @@ fun MovieCategoryScreen(
                 }
             }
 
-            is LoadState.NotLoading -> Unit
+            is LoadState.NotLoading -> {
+                if (appendState.endOfPaginationReached && movies.itemCount > 0) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        MovieCategoryEndCap(movieCount = movies.itemCount)
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
 private fun MovieCategoryHeader(
-    title: String,
+    category: MovieCategory,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    movieCount: Int? = null,
+    hasMoreMovies: Boolean = false,
 ) {
-    Row(
+    Column(
         modifier = modifier
             .fillMaxWidth()
             .padding(bottom = ReelsDimensions.categoryHeaderBottomPadding),
-        horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.categoryHeaderTextSpacing),
-        verticalAlignment = Alignment.CenterVertically
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.categoryHeaderContentSpacing)
     ) {
         Surface(
             modifier = Modifier.size(ReelsDimensions.categoryBackButtonSize),
@@ -199,9 +205,9 @@ private fun MovieCategoryHeader(
             color = MaterialTheme.colorScheme.surface,
             tonalElevation = 0.dp,
             shadowElevation = 0.dp,
-            border = androidx.compose.foundation.BorderStroke(
+            border = BorderStroke(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f)
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
             )
         ) {
             IconButton(onClick = onBackClick) {
@@ -214,23 +220,87 @@ private fun MovieCategoryHeader(
             }
         }
 
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontSize = 30.sp,
-                lineHeight = 36.sp
-            ),
-            color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+        Column(
+            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.categoryHeaderTextSpacing)
+        ) {
+            Text(
+                text = category.label,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontSize = 24.sp,
+                    lineHeight = 30.sp
+                ),
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Text(
+                text = category.supportingText,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            movieCount?.takeIf { count -> count > 0 }?.let { count ->
+                MovieCategoryCountChip(
+                    modifier = Modifier.padding(top = ReelsDimensions.categoryHeaderCountSpacing),
+                    movieCount = count,
+                    hasMoreMovies = hasMoreMovies
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun MovieCategoryCountChip(
+    movieCount: Int,
+    hasMoreMovies: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.extraLarge,
+        color = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)
         )
+    ) {
+        Row(
+            modifier = Modifier.padding(
+                horizontal = ReelsDimensions.categoryCountHorizontalPadding,
+                vertical = ReelsDimensions.categoryCountVerticalPadding
+            ),
+            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Movie,
+                contentDescription = null,
+                modifier = Modifier.size(ReelsDimensions.categoryCountIconSize)
+            )
+
+            Text(
+                text = if (hasMoreMovies) "$movieCount+ movies" else "$movieCount movies",
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = 10.sp,
+                    lineHeight = 14.sp
+                )
+            )
+        }
     }
 }
 
 @Composable
 private fun MovieCategoryLoadingState(
-    title: String,
+    category: MovieCategory,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -250,7 +320,7 @@ private fun MovieCategoryLoadingState(
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
             MovieCategoryHeader(
-                title = title,
+                category = category,
                 onBackClick = onBackClick
             )
         }
@@ -263,7 +333,7 @@ private fun MovieCategoryLoadingState(
 
 @Composable
 private fun MovieCategoryErrorState(
-    title: String,
+    category: MovieCategory,
     message: String,
     retryLabel: String,
     onBackClick: () -> Unit,
@@ -283,7 +353,7 @@ private fun MovieCategoryErrorState(
         verticalArrangement = Arrangement.spacedBy(ReelsDimensions.sectionSpacing)
     ) {
         MovieCategoryHeader(
-            title = title,
+            category = category,
             onBackClick = onBackClick
         )
 
@@ -317,7 +387,9 @@ private fun MovieCategoryErrorState(
                 }
 
                 Text(
-                    text = message.toErrorTitle(fallback = "Unable to load ${title.lowercase()}"),
+                    text = message.toErrorTitle(
+                        fallback = "Unable to load ${category.label.lowercase()}"
+                    ),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center,
@@ -354,12 +426,12 @@ private fun MovieCategoryPlaceholderCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.poster)
-                .clip(MaterialTheme.shapes.large)
+                .clip(MaterialTheme.shapes.medium)
                 .background(categoryPlaceholderColor())
         )
 
-        CategoryPlaceholderBar(widthFraction = 0.92f, height = 18.dp)
-        CategoryPlaceholderBar(widthFraction = 0.45f, height = 16.dp)
+        CategoryPlaceholderBar(widthFraction = 0.92f, height = 12.dp)
+        CategoryPlaceholderBar(widthFraction = 0.45f, height = 10.dp)
     }
 }
 
@@ -397,7 +469,7 @@ private fun MovieCategoryPosterCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.poster)
-                .clip(MaterialTheme.shapes.large)
+                .clip(MaterialTheme.shapes.medium)
         ) {
             AsyncImage(
                 model = movie.posterPath.toTmdbImageUrl(),
@@ -416,12 +488,12 @@ private fun MovieCategoryPosterCard(
 
         Text(
             text = movie.title,
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontSize = 17.sp,
-                lineHeight = 22.sp
+            style = MaterialTheme.typography.labelMedium.copy(
+                fontSize = 12.sp,
+                lineHeight = 16.sp
             ),
             color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.Medium,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
@@ -429,9 +501,9 @@ private fun MovieCategoryPosterCard(
         movie.releaseDate.toReleaseYear()?.let { year ->
             Text(
                 text = year,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 16.sp,
-                    lineHeight = 22.sp
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = 10.sp,
+                    lineHeight = 14.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
@@ -448,9 +520,9 @@ private fun CategoryRatingBadge(
 ) {
     Surface(
         modifier = modifier,
-        shape = MaterialTheme.shapes.extraLarge,
+        shape = MaterialTheme.shapes.small,
         color = reelsRatingContainerColor(),
-        contentColor = ReelsRatingContent
+        contentColor = reelsRatingContentColor()
     ) {
         Row(
             modifier = Modifier.padding(
@@ -468,9 +540,9 @@ private fun CategoryRatingBadge(
 
             Text(
                 text = String.format("%.1f", rating),
-                style = MaterialTheme.typography.labelLarge.copy(
-                    fontSize = 16.sp,
-                    lineHeight = 20.sp
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
                 ),
                 fontWeight = FontWeight.SemiBold
             )
@@ -478,4 +550,39 @@ private fun CategoryRatingBadge(
     }
 }
 
+@Composable
+private fun MovieCategoryEndCap(
+    movieCount: Int,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = ReelsSpacing.large),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(width = 32.dp, height = 1.dp)
+                .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.55f))
+        )
+
+        Text(
+            text = "All $movieCount movies loaded",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+private val MovieCategory.supportingText: String
+    get() = when (this) {
+        MovieCategory.POPULAR -> "What everyone is watching right now"
+        MovieCategory.NOW_PLAYING -> "Movies playing in theaters now"
+        MovieCategory.UPCOMING -> "Movies arriving in theaters soon"
+        MovieCategory.TOP_RATED -> "The highest-rated movies on TMDB"
+    }
+
 private const val CATEGORY_PLACEHOLDER_COUNT = 12
+private const val CATEGORY_APPEND_PLACEHOLDER_COUNT = 3

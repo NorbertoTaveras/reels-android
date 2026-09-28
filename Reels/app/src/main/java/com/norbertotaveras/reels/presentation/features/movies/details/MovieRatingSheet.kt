@@ -41,9 +41,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -181,7 +181,7 @@ private fun RatingChoice(
             MaterialTheme.colorScheme.surfaceVariant
         },
         contentColor = if (selected) {
-            ReelsRatingContent
+            reelsRatingContentColor()
         } else {
             MaterialTheme.colorScheme.onSurfaceVariant
         },

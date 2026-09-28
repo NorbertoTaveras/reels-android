@@ -77,10 +77,10 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsGenreChipContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightGenreChipContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.isReelsLightTheme
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
 
 @Composable
 fun DiscoverScreen(
@@ -1068,7 +1068,7 @@ private fun DiscoverRatingBadge(
         modifier = modifier,
         shape = MaterialTheme.shapes.extraLarge,
         color = reelsRatingContainerColor(),
-        contentColor = ReelsRatingContent
+        contentColor = reelsRatingContentColor()
     ) {
         Row(
             modifier = Modifier.padding(

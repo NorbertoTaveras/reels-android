@@ -54,11 +54,11 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
 
 @Composable
 fun MovieHeroHeader(
@@ -208,7 +208,7 @@ private fun RatingBadge(
         modifier = modifier,
         shape = MaterialTheme.shapes.medium,
         color = reelsRatingContainerColor(),
-        contentColor = ReelsRatingContent
+        contentColor = reelsRatingContentColor()
     ) {
         Row(
             modifier = Modifier.padding(
@@ -288,7 +288,7 @@ private fun HeroRatingButton(
         modifier = modifier.height(ReelsDimensions.detailsActionButtonHeight),
         shape = MaterialTheme.shapes.large,
         color = reelsRatingContainerColor(),
-        contentColor = ReelsRatingContent
+        contentColor = reelsRatingContentColor()
     ) {
         Row(
             modifier = Modifier.padding(horizontal = ReelsSpacing.medium),
@@ -443,7 +443,7 @@ private fun HeroRateButton(
         contentColor = if (rating == null) {
             MaterialTheme.colorScheme.onSurface
         } else {
-            ReelsRatingContent
+            reelsRatingContentColor()
         },
         border = BorderStroke(
             width = 1.dp,

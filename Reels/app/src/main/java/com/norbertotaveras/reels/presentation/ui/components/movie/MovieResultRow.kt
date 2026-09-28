@@ -42,11 +42,11 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsGenreChipContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightGenreChipContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 import com.norbertotaveras.reels.presentation.ui.theme.isReelsLightTheme
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
 
 @Composable
 fun MovieResultRow(
@@ -190,9 +190,9 @@ private fun RatingPill(
         color = reelsRatingContainerColor(),
         border = BorderStroke(
             width = 1.dp,
-            color = ReelsRatingContent.copy(alpha = 0.18f)
+            color = reelsRatingContentColor().copy(alpha = 0.18f)
         ),
-        contentColor = ReelsRatingContent
+        contentColor = reelsRatingContentColor()
     ) {
         Row(
             modifier = Modifier.padding(

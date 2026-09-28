@@ -32,11 +32,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
 
 @Composable
 fun MoviePosterCard(
@@ -83,7 +83,7 @@ fun MoviePosterCard(
                             .padding(ReelsSpacing.small),
                         shape = MaterialTheme.shapes.extraLarge,
                         color = reelsRatingContainerColor(),
-                        contentColor = ReelsRatingContent
+                        contentColor = reelsRatingContentColor()
                     ) {
                         Text(
                             modifier = Modifier.padding(

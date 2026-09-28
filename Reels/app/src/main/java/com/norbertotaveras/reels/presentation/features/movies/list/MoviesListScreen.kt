@@ -60,13 +60,13 @@ import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
 import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatingContent
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.extensions.toErrorTitle
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
@@ -342,7 +342,7 @@ private fun RatingBadge(
         modifier = modifier,
         shape = MaterialTheme.shapes.extraLarge,
         color = reelsRatingContainerColor(),
-        contentColor = ReelsRatingContent
+        contentColor = reelsRatingContentColor()
     ) {
         Row(
             modifier = Modifier.padding(
