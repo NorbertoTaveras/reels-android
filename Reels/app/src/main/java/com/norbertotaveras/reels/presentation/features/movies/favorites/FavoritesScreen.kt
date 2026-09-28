@@ -18,9 +18,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -33,13 +33,14 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -76,7 +77,6 @@ import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsSurfaceHigh
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTmdbBlue
@@ -145,22 +145,20 @@ fun FavoritesScreen(
                 }
 
                 LibraryTab.People -> {
-                    state.people.forEach { person ->
-                        item(
-                            key = person.id,
-                            span = { GridItemSpan(maxLineSpan) }
-                        ) {
-                            SavedPersonCard(
-                                person = person,
-                                isRemoving = state.removingPersonIds.contains(person.id),
-                                onClick = {
-                                    onEvent(FavoritesEvent.PersonClicked(personId = person.id))
-                                },
-                                onFavoriteClick = {
-                                    onEvent(FavoritesEvent.SavedPersonClicked(personId = person.id))
-                                }
-                            )
-                        }
+                    items(
+                        items = state.people,
+                        key = { person -> person.id }
+                    ) { person ->
+                        SavedPersonCard(
+                            person = person,
+                            isRemoving = state.removingPersonIds.contains(person.id),
+                            onClick = {
+                                onEvent(FavoritesEvent.PersonClicked(personId = person.id))
+                            },
+                            onFavoriteClick = {
+                                onEvent(FavoritesEvent.SavedPersonClicked(personId = person.id))
+                            }
+                        )
                     }
                 }
 
@@ -174,7 +172,8 @@ fun FavoritesScreen(
                         },
                         onMovieClick = { movieId ->
                             onEvent(FavoritesEvent.MovieClicked(movieId = movieId))
-                        }
+                        },
+                        onRefresh = tmdbWatchlistMovies::refresh
                     )
                 }
 
@@ -188,7 +187,8 @@ fun FavoritesScreen(
                         },
                         onMovieClick = { movieId ->
                             onEvent(FavoritesEvent.MovieClicked(movieId = movieId))
-                        }
+                        },
+                        onRefresh = tmdbRatedMovies::refresh
                     )
                 }
             }
@@ -208,20 +208,27 @@ private fun LibraryHeader(
     ) {
         Text(
             text = "Library",
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onBackground
+            style = MaterialTheme.typography.headlineSmall.copy(
+                fontSize = 24.sp,
+                lineHeight = 30.sp
+            ),
+            color = MaterialTheme.colorScheme.onBackground,
+            fontWeight = FontWeight.Bold
         )
 
         Text(
             text = state.librarySubtitle,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodySmall.copy(
+                fontSize = 12.sp,
+                lineHeight = 16.sp
+            ),
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         LibraryTabs(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = ReelsSpacing.small),
+                .padding(top = ReelsSpacing.medium),
             selectedTab = state.selectedTab,
             onTabSelected = onTabSelected
         )
@@ -245,12 +252,12 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
     listType: TmdbLibraryListType,
     onConnectSettingsClick: () -> Unit,
     onMovieClick: (Int) -> Unit,
+    onRefresh: () -> Unit,
 ) {
     when {
         !state.isTmdbAccountConnected -> {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 DisconnectedTmdbLibraryState(
-                    listType = listType,
                     onConnectSettingsClick = onConnectSettingsClick,
                     modifier = Modifier.padding(top = ReelsDimensions.favoritesEmptyTopPadding)
                 )
@@ -258,11 +265,10 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
         }
 
         movies.loadState.refresh is LoadState.Loading -> {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                LibraryLoadingState(
-                    listType = listType,
-                    modifier = Modifier.padding(top = ReelsDimensions.favoritesEmptyTopPadding)
-                )
+            repeat(LIBRARY_LOADING_PLACEHOLDER_COUNT) { index ->
+                item(key = "${listType.name}-loading-$index") {
+                    LibraryPosterPlaceholder()
+                }
             }
         }
 
@@ -270,6 +276,7 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
             item(span = { GridItemSpan(maxLineSpan) }) {
                 LibraryErrorState(
                     listType = listType,
+                    onRetry = onRefresh,
                     modifier = Modifier.padding(top = ReelsDimensions.favoritesEmptyTopPadding)
                 )
             }
@@ -285,6 +292,13 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
         }
 
         else -> {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                LibrarySyncStatus(
+                    listType = listType,
+                    onRefresh = onRefresh
+                )
+            }
+
             items(
                 count = movies.itemCount,
                 key = { index ->
@@ -301,6 +315,24 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
                         }
                     )
                 }
+            }
+
+            when (movies.loadState.append) {
+                is LoadState.Loading -> {
+                    repeat(LIBRARY_APPEND_PLACEHOLDER_COUNT) { index ->
+                        item(key = "${listType.name}-append-loading-$index") {
+                            LibraryPosterPlaceholder()
+                        }
+                    }
+                }
+
+                is LoadState.Error -> {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        LibraryAppendError(onRetry = onRefresh)
+                    }
+                }
+
+                else -> Unit
             }
         }
     }
@@ -324,7 +356,7 @@ private fun LibraryTabs(
             TabRowDefaults.SecondaryIndicator(
                 modifier = Modifier.tabIndicatorOffset(
                     selectedTabIndex = selectedTabIndex,
-                    matchContentSize = false
+                    matchContentSize = true
                 ),
                 color = MaterialTheme.colorScheme.primary
             )
@@ -341,7 +373,10 @@ private fun LibraryTabs(
                 text = {
                     Text(
                         text = tab.title,
-                        style = MaterialTheme.typography.labelLarge,
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp
+                        ),
                         fontWeight = if (selected) {
                             FontWeight.Bold
                         } else {
@@ -356,6 +391,126 @@ private fun LibraryTabs(
 }
 
 @Composable
+private fun LibrarySyncStatus(
+    listType: TmdbLibraryListType,
+    onRefresh: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(ReelsDimensions.favoritesSyncStatusCornerSize),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.24f))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = ReelsSpacing.medium,
+                    vertical = ReelsSpacing.small
+                ),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(ReelsDimensions.favoritesSyncStatusDotSize)
+                        .clip(CircleShape)
+                        .background(ReelsTeal)
+                )
+
+                Text(
+                    text = when (listType) {
+                        TmdbLibraryListType.Watchlist -> "Synced via TMDB"
+                        TmdbLibraryListType.Rated -> "Your TMDB ratings"
+                    },
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Icon(
+                imageVector = Icons.Filled.Refresh,
+                contentDescription = "Refresh TMDB library",
+                modifier = Modifier
+                    .size(ReelsDimensions.favoritesSyncStatusIconSize)
+                    .clickable(role = Role.Button, onClick = onRefresh),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun LibraryPosterPlaceholder(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesTextSpacing)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(ReelsRatios.poster)
+                .clip(RoundedCornerShape(ReelsDimensions.favoritesPosterCornerSize))
+                .background(libraryPlaceholderColor())
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.82f)
+                .height(14.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .background(libraryPlaceholderColor())
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.36f)
+                .height(11.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .background(libraryPlaceholderColor())
+        )
+    }
+}
+
+@Composable
+private fun LibraryAppendError(
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = ReelsSpacing.medium),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Couldn't load more",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Button(
+            modifier = Modifier.padding(start = ReelsSpacing.small),
+            onClick = onRetry,
+            contentPadding = PaddingValues(
+                horizontal = ReelsSpacing.medium,
+                vertical = ReelsSpacing.xSmall
+            )
+        ) {
+            Text(text = "Retry")
+        }
+    }
+}
+
+@Composable
 private fun TmdbWatchlistMovieCard(
     movie: MovieDataModel,
     listType: TmdbLibraryListType,
@@ -363,7 +518,7 @@ private fun TmdbWatchlistMovieCard(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.width(ReelsDimensions.favoritesPosterCardWidth),
+        modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesTextSpacing)
     ) {
         LibraryPosterCard(
@@ -415,8 +570,8 @@ private fun TmdbWatchlistMovieCard(
             Text(
                 text = movie.title,
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = 15.sp,
-                    lineHeight = 20.sp
+                    fontSize = 14.sp,
+                    lineHeight = 18.sp
                 ),
                 color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.SemiBold,
@@ -444,7 +599,7 @@ private fun FavoriteMovieCard(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.width(ReelsDimensions.favoritesPosterCardWidth),
+        modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesTextSpacing)
     ) {
         LibraryPosterCard(
@@ -474,8 +629,8 @@ private fun FavoriteMovieCard(
             Text(
                 text = movie.title,
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = 15.sp,
-                    lineHeight = 20.sp
+                    fontSize = 14.sp,
+                    lineHeight = 18.sp
                 ),
                 color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.SemiBold,
@@ -502,52 +657,62 @@ private fun SavedPersonCard(
     onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
+    Card(
         modifier = modifier
             .fillMaxWidth()
             .clickable(
                 role = Role.Button,
                 onClick = onClick
             ),
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.24f)
-        )
+        shape = RoundedCornerShape(ReelsDimensions.favoritesPosterCornerSize),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.24f))
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = ReelsDimensions.favoritesPersonRowHorizontalPadding,
-                    vertical = ReelsDimensions.favoritesPersonRowVerticalPadding
-                ),
-            horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesPersonRowContentSpacing),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box {
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(ReelsRatios.castPortrait)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+            ) {
                 PersonProfileImage(
                     imageUrl = person.profilePath.toTmdbImageUrl(
                         imageType = TmdbImageType.Profile
                     ),
-                    contentDescription = person.name
+                    contentDescription = person.name,
+                    modifier = Modifier.fillMaxSize()
                 )
 
                 OfflineBadge(
+                    imageVector = Icons.Filled.WifiOff,
                     modifier = Modifier
                         .align(Alignment.TopStart)
-                        .padding(ReelsSpacing.xSmall)
+                        .padding(ReelsSpacing.small)
+                )
+
+                LibraryRemoveButton(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(ReelsSpacing.small),
+                    isRemoving = isRemoving,
+                    contentDescription = "Remove ${person.name} from library",
+                    onClick = onFavoriteClick
                 )
             }
 
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.padding(
+                    horizontal = ReelsSpacing.medium,
+                    vertical = ReelsSpacing.small
+                ),
                 verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
             ) {
                 Text(
                     text = person.name,
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontSize = 14.sp,
+                        lineHeight = 18.sp
+                    ),
                     color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
@@ -567,23 +732,12 @@ private fun SavedPersonCard(
 
                     Text(
                         text = person.knownForDepartment ?: "Known for ${person.knownFor.size} movies",
-                        style = MaterialTheme.typography.labelMedium,
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-            }
-
-            Box(
-                modifier = Modifier.padding(start = ReelsSpacing.xSmall),
-                contentAlignment = Alignment.Center
-            ) {
-                LibraryRemoveButton(
-                    isRemoving = isRemoving,
-                    contentDescription = "Remove ${person.name} from library",
-                    onClick = onFavoriteClick
-                )
             }
         }
     }
@@ -596,8 +750,8 @@ private fun PersonProfileImage(
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = modifier.size(ReelsDimensions.favoritesPersonProfileSize),
-        shape = RoundedCornerShape(ReelsDimensions.favoritesPersonProfileCornerSize),
+        modifier = modifier,
+        shape = RoundedCornerShape(0.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
         contentColor = MaterialTheme.colorScheme.primary
     ) {
@@ -615,7 +769,7 @@ private fun PersonProfileImage(
                 contentDescription = contentDescription,
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(RoundedCornerShape(ReelsDimensions.favoritesPersonProfileCornerSize)),
+                    .clip(RoundedCornerShape(0.dp)),
                 contentScale = ContentScale.Crop
             )
         }
@@ -633,19 +787,30 @@ private fun UserRatingBadge(
         color = reelsRatingContainerColor().copy(alpha = 0.92f),
         contentColor = reelsImageRatingContentColor()
     ) {
-        Text(
+        Row(
             modifier = Modifier.padding(
                 horizontal = ReelsDimensions.favoritesRatingHorizontalPadding,
                 vertical = ReelsDimensions.favoritesRatingVerticalPadding
             ),
-            text = if (rating.isBlank()) "Your" else "Your $rating",
-            style = MaterialTheme.typography.labelMedium.copy(
-                fontSize = 12.sp,
-                lineHeight = 16.sp
-            ),
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1
-        )
+            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Star,
+                contentDescription = null,
+                modifier = Modifier.size(ReelsDimensions.favoritesRatingIconSize)
+            )
+
+            Text(
+                text = rating.ifBlank { "–" },
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
+                ),
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1
+            )
+        }
     }
 }
 
@@ -759,13 +924,13 @@ private fun TmdbBadge(
 ) {
     Surface(
         modifier = modifier.size(ReelsDimensions.favoritesOfflineBadgeSize),
-        shape = CircleShape,
-        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.88f),
-        contentColor = MaterialTheme.colorScheme.background
+        shape = MaterialTheme.shapes.medium,
+        color = ReelsTeal.copy(alpha = 0.92f),
+        contentColor = Color.White
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(
-                imageVector = Icons.Filled.Sync,
+                imageVector = Icons.Filled.Bookmark,
                 contentDescription = "Synced with TMDB",
                 modifier = Modifier.size(ReelsDimensions.favoritesOfflineBadgeIconSize)
             )
@@ -775,17 +940,18 @@ private fun TmdbBadge(
 
 @Composable
 private fun OfflineBadge(
+    imageVector: ImageVector = Icons.Filled.DownloadDone,
     modifier: Modifier = Modifier,
 ) {
     Surface(
         modifier = modifier.size(ReelsDimensions.favoritesOfflineBadgeSize),
-        shape = CircleShape,
-        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.88f),
-        contentColor = MaterialTheme.colorScheme.background
+        shape = MaterialTheme.shapes.medium,
+        color = ReelsTeal.copy(alpha = 0.88f),
+        contentColor = Color.White
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(
-                imageVector = Icons.Filled.DownloadDone,
+                imageVector = imageVector,
                 contentDescription = "Available offline",
                 modifier = Modifier.size(ReelsDimensions.favoritesOfflineBadgeIconSize)
             )
@@ -873,88 +1039,59 @@ private fun LibraryRemoveButton(
 }
 
 @Composable
-private fun LibraryLoadingState(
-    listType: TmdbLibraryListType,
-    modifier: Modifier = Modifier,
-) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.24f)
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(ReelsDimensions.favoritesEmptyCardPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesEmptyContentSpacing)
-        ) {
-            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-
-            Text(
-                text = when (listType) {
-                    TmdbLibraryListType.Watchlist -> "Loading TMDB watchlist"
-                    TmdbLibraryListType.Rated -> "Loading TMDB ratings"
-                },
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}
-
-@Composable
 private fun LibraryErrorState(
     listType: TmdbLibraryListType,
+    onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.24f)
-        )
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = ReelsSpacing.xLarge),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesEmptyContentSpacing)
     ) {
-        Column(
-            modifier = Modifier.padding(ReelsDimensions.favoritesEmptyCardPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesEmptyContentSpacing)
+        Surface(
+            modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconContainerSize),
+            shape = RoundedCornerShape(ReelsDimensions.favoritesEmptyIconCornerSize),
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.primary
         ) {
-            Surface(
-                modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconContainerSize),
-                shape = MaterialTheme.shapes.large,
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                contentColor = MaterialTheme.colorScheme.primary
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Filled.Sync,
-                        contentDescription = null,
-                        modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconSize)
-                    )
-                }
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = Icons.Filled.Sync,
+                    contentDescription = null,
+                    modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconSize)
+                )
             }
+        }
 
-            Text(
-                text = when (listType) {
-                    TmdbLibraryListType.Watchlist -> "Unable to load TMDB watchlist"
-                    TmdbLibraryListType.Rated -> "Unable to load TMDB ratings"
-                },
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold
+        Text(
+            text = when (listType) {
+                TmdbLibraryListType.Watchlist -> "Couldn't load your watchlist"
+                TmdbLibraryListType.Rated -> "Couldn't load your ratings"
+            },
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Bold
+        )
+
+        Text(
+            text = "Check your connection and try again.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+
+        Button(onClick = onRetry) {
+            Icon(
+                imageVector = Icons.Filled.Refresh,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
             )
-
             Text(
-                text = "Check your connection or reconnect TMDB from Settings.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
+                modifier = Modifier.padding(start = ReelsSpacing.small),
+                text = "Retry"
             )
         }
     }
@@ -962,83 +1099,77 @@ private fun LibraryErrorState(
 
 @Composable
 private fun DisconnectedTmdbLibraryState(
-    listType: TmdbLibraryListType,
     onConnectSettingsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.24f)
-        )
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = ReelsSpacing.medium),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)
     ) {
+        LibraryTmdbLogoMark()
+
         Column(
-            modifier = Modifier.padding(ReelsDimensions.favoritesEmptyCardPadding),
-            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesEmptyContentSpacing)
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
         ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.large),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                LibraryTmdbLogoMark()
+            Text(
+                text = "Connect to TMDB",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold
+            )
 
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
-                ) {
-                    Text(
-                        text = "Connect TMDB to sync your library",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Bold
-                    )
+            Text(
+                text = "Sign in to your TMDB account to sync your watchlist and ratings across devices.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+        }
 
-                    Text(
-                        text = when (listType) {
-                            TmdbLibraryListType.Watchlist -> {
-                                "Bring your TMDB watchlist into Reels."
-                            }
-                            TmdbLibraryListType.Rated -> {
-                                "Bring your TMDB ratings into Reels."
-                            }
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
-            ) {
-                TmdbFeatureRow(text = "Sync your TMDB watchlist")
-                TmdbFeatureRow(text = "View your movie ratings")
-                TmdbFeatureRow(text = "Local favorites stay available offline")
-            }
-
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = onConnectSettingsClick,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = ReelsTmdbBlue,
-                    contentColor = ReelsTmdbOnBlue
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(ReelsDimensions.favoritesFeatureCardCornerSize),
+            color = MaterialTheme.colorScheme.surface,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.24f))
+        ) {
+            Column {
+                TmdbFeatureRow(
+                    title = "Watchlist sync",
+                    description = "Access movies you want to watch",
+                    imageVector = Icons.Filled.Bookmark
                 )
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Settings,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
+                TmdbFeatureRow(
+                    title = "Ratings sync",
+                    description = "Your TMDB ratings in one place",
+                    imageVector = Icons.Filled.Star
                 )
-
-                Text(
-                    modifier = Modifier.padding(start = ReelsSpacing.small),
-                    text = "Connect in Settings",
-                    fontWeight = FontWeight.Bold
+                TmdbFeatureRow(
+                    title = "Offline access",
+                    description = "Cache synced content locally",
+                    imageVector = Icons.Filled.DownloadDone
                 )
             }
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = onConnectSettingsClick
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Settings,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+
+            Text(
+                modifier = Modifier.padding(start = ReelsSpacing.small),
+                text = "Connect in Settings",
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
@@ -1066,11 +1197,18 @@ private fun LibraryTmdbLogoMark(
 
 @Composable
 private fun TmdbFeatureRow(
-    text: String,
+    title: String,
+    description: String,
+    imageVector: ImageVector,
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = ReelsSpacing.large,
+                vertical = ReelsSpacing.medium
+            ),
         horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -1082,19 +1220,26 @@ private fun TmdbFeatureRow(
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
-                    imageVector = Icons.Filled.Star,
+                    imageVector = imageVector,
                     contentDescription = null,
                     modifier = Modifier.size(ReelsDimensions.favoritesFeatureIconSize)
                 )
             }
         }
 
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.SemiBold
-        )
+        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.SemiBold
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 
@@ -1103,63 +1248,63 @@ private fun EmptyLibraryState(
     selectedTab: LibraryTab,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.24f)
-        )
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = ReelsSpacing.xLarge),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesEmptyContentSpacing)
     ) {
-        Column(
-            modifier = Modifier.padding(ReelsDimensions.favoritesEmptyCardPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesEmptyContentSpacing)
+        Surface(
+            modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconContainerSize),
+            shape = RoundedCornerShape(ReelsDimensions.favoritesEmptyIconCornerSize),
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.primary
         ) {
-            Surface(
-                modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconContainerSize),
-                shape = MaterialTheme.shapes.large,
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                contentColor = MaterialTheme.colorScheme.primary
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = when (selectedTab) {
-                            LibraryTab.Movies -> Icons.Outlined.FavoriteBorder
-                            LibraryTab.People -> Icons.Filled.Person
-                            LibraryTab.Tmdb -> Icons.Filled.Sync
-                            LibraryTab.Rated -> Icons.Filled.Star
-                        },
-                        contentDescription = null,
-                        modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconSize)
-                    )
-                }
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = when (selectedTab) {
+                        LibraryTab.Movies -> Icons.Outlined.FavoriteBorder
+                        LibraryTab.People -> Icons.Filled.Person
+                        LibraryTab.Tmdb -> Icons.Filled.Bookmark
+                        LibraryTab.Rated -> Icons.Filled.Star
+                    },
+                    contentDescription = null,
+                    modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconSize)
+                )
             }
-
-            Text(
-                text = when (selectedTab) {
-                    LibraryTab.Movies -> "No saved movies yet"
-                    LibraryTab.People -> "No saved people yet"
-                    LibraryTab.Tmdb -> "No TMDB watchlist yet"
-                    LibraryTab.Rated -> "No TMDB ratings yet"
-                },
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                text = when (selectedTab) {
-                    LibraryTab.Movies -> "Save movies from details to keep their posters, ratings, and key info available offline."
-                    LibraryTab.People -> "Save people from cast details to keep their profiles and known-for movies available offline."
-                    LibraryTab.Tmdb -> "Connect TMDB in Settings, then add movies to your TMDB watchlist from Movie Details."
-                    LibraryTab.Rated -> "Rate movies from Movie Details to sync them with your TMDB account."
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
-            )
         }
+
+        Text(
+            text = when (selectedTab) {
+                LibraryTab.Movies -> "No saved movies yet"
+                LibraryTab.People -> "No saved people yet"
+                LibraryTab.Tmdb -> "Your watchlist is empty"
+                LibraryTab.Rated -> "No rated movies yet"
+            },
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Bold
+        )
+
+        Text(
+            text = when (selectedTab) {
+                LibraryTab.Movies -> "Save movies from Movie Details to keep them available here and offline."
+                LibraryTab.People -> "Save people from Cast Details to keep their profiles close at hand."
+                LibraryTab.Tmdb -> "Add movies to your TMDB watchlist and they will appear here."
+                LibraryTab.Rated -> "Rate movies from Movie Details to sync them with TMDB."
+            },
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
     }
 }
+
+@Composable
+private fun libraryPlaceholderColor(): Color {
+    return MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f)
+}
+
+private const val LIBRARY_LOADING_PLACEHOLDER_COUNT = 6
+private const val LIBRARY_APPEND_PLACEHOLDER_COUNT = 2
