@@ -8,7 +8,7 @@
 package com.norbertotaveras.reels.domain.model.settings
 
 enum class AppTheme(val label: String) {
-    System(label = "Use system setting"),
+    System(label = "System default"),
     Dark(label = "Dark"),
     Light(label = "Light");
 

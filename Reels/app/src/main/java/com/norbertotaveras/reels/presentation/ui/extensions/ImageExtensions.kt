@@ -33,16 +33,19 @@ private fun TmdbImageType.sizePath(imageQuality: ImageQuality): String {
         TmdbImageType.Poster -> when (imageQuality) {
             ImageQuality.High -> "w342"
             ImageQuality.Standard -> "w185"
+            ImageQuality.Low -> "w92"
         }
 
         TmdbImageType.Backdrop -> when (imageQuality) {
             ImageQuality.High -> "w780"
             ImageQuality.Standard -> "w300"
+            ImageQuality.Low -> "w300"
         }
 
         TmdbImageType.Profile -> when (imageQuality) {
             ImageQuality.High -> "w185"
             ImageQuality.Standard -> "w92"
+            ImageQuality.Low -> "w45"
         }
     }
 }

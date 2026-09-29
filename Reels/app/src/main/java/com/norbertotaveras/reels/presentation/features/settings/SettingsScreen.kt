@@ -32,16 +32,22 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Monitor
+import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Sync
-import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -170,15 +176,6 @@ fun SettingsScreen(
             SettingsDivider()
 
             SettingsRow(
-                icon = Icons.Filled.VerifiedUser,
-                title = "UI States Reference",
-                subtitle = "Production state catalogue",
-                onClick = { onEvent(SettingsEvent.UiStatesReferenceClicked) }
-            )
-
-            SettingsDivider()
-
-            SettingsRow(
                 icon = Icons.Filled.Shield,
                 title = "Privacy Notice",
                 subtitle = state.privacyLabel,
@@ -208,21 +205,23 @@ fun SettingsScreen(
         SettingsPreferenceDialog.ImageQuality -> {
             SettingsOptionDialog(
                 title = "Image Quality",
-                description = "Choose the image quality used for posters and backdrops.",
+                description = "Higher quality uses more mobile data.",
                 icon = Icons.Filled.Image,
                 options = ImageQuality.entries,
                 selectedOption = state.selectedImageQuality,
-                optionLabel = { option ->
-                    when (option) {
-                        ImageQuality.High -> "High quality"
-                        ImageQuality.Standard -> "Standard quality"
-                    }
-                },
+                optionLabel = ImageQuality::label,
                 optionDescription = { option ->
                     when (option) {
-                        ImageQuality.High -> "Sharper artwork with higher data use"
-                        ImageQuality.Standard -> "Balanced artwork quality and data use"
+                        ImageQuality.High -> "Sharp posters · Uses the most data"
+                        ImageQuality.Standard -> "Balanced quality · Recommended"
+                        ImageQuality.Low -> "Reduced quality · Best on slow connections"
                     }
+                },
+                confirmLabel = "Save",
+                supportingContent = {
+                    SettingsInfoBanner(
+                        text = "Saved offline movies always use the quality they were downloaded at."
+                    )
                 },
                 onOptionSelected = { imageQuality ->
                     onEvent(SettingsEvent.ImageQualitySelected(imageQuality))
@@ -232,24 +231,8 @@ fun SettingsScreen(
         }
 
         SettingsPreferenceDialog.LanguageRegion -> {
-            SettingsOptionDialog(
-                title = "Language & Region",
-                description = "Choose how movie information is localized.",
-                icon = Icons.Filled.Language,
-                options = LanguageRegion.entries,
+            LanguageRegionDialog(
                 selectedOption = state.selectedLanguageRegion,
-                optionLabel = { option ->
-                    when (option) {
-                        LanguageRegion.EnglishUnitedStates -> "English"
-                        LanguageRegion.SpanishUnitedStates -> "Spanish"
-                    }
-                },
-                optionDescription = { option ->
-                    when (option) {
-                        LanguageRegion.EnglishUnitedStates -> "United States"
-                        LanguageRegion.SpanishUnitedStates -> "United States"
-                    }
-                },
                 onOptionSelected = { languageRegion ->
                     onEvent(SettingsEvent.LanguageRegionSelected(languageRegion))
                 },
@@ -273,9 +256,16 @@ fun SettingsScreen(
                 },
                 optionDescription = { option ->
                     when (option) {
-                        AppTheme.System -> "Follow your device appearance"
-                        AppTheme.Dark -> "Use the cinematic dark theme"
-                        AppTheme.Light -> "Use the warm light theme"
+                        AppTheme.System -> "Follows your device's dark/light setting"
+                        AppTheme.Dark -> "Cinematic dark theme"
+                        AppTheme.Light -> "Cinema-inspired warm light"
+                    }
+                },
+                optionIcon = { option ->
+                    when (option) {
+                        AppTheme.System -> Icons.Filled.Monitor
+                        AppTheme.Dark -> Icons.Filled.DarkMode
+                        AppTheme.Light -> Icons.Filled.LightMode
                     }
                 },
                 onOptionSelected = { theme ->
@@ -306,7 +296,7 @@ private fun ClearImageCacheDialog(
         },
         title = {
             Text(
-                text = "Clear Image Cache",
+                text = "Clear Image Cache?",
                 modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
@@ -316,7 +306,8 @@ private fun ClearImageCacheDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)) {
                 Text(
-                    text = "Free up storage by removing locally cached artwork.",
+                    text = "This will remove 42 MB of cached poster images from your device. " +
+                        "They will be re-downloaded the next time you browse.",
                     modifier = Modifier.fillMaxWidth(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -331,16 +322,26 @@ private fun ClearImageCacheDialog(
                         modifier = Modifier.padding(ReelsSpacing.large),
                         verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
                     ) {
-                        CacheBreakdownRow(label = "Posters", value = "24 MB")
-                        CacheBreakdownRow(label = "Portraits", value = "8 MB")
-                        CacheBreakdownRow(label = "Backdrops", value = "10 MB")
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                        CacheBreakdownRow(label = "Total", value = "42 MB", emphasized = true)
+                        CacheBreakdownRow(
+                            icon = Icons.Filled.Movie,
+                            label = "Movie posters",
+                            value = "28 MB"
+                        )
+                        CacheBreakdownRow(
+                            icon = Icons.Filled.Person,
+                            label = "Person portraits",
+                            value = "11 MB"
+                        )
+                        CacheBreakdownRow(
+                            icon = Icons.Filled.Image,
+                            label = "Backdrop images",
+                            value = "3 MB"
+                        )
                     }
                 }
 
                 Text(
-                    text = "Your saved movies and people will not be removed.",
+                    text = "Saved offline content is not affected.",
                     modifier = Modifier.fillMaxWidth(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -351,7 +352,7 @@ private fun ClearImageCacheDialog(
         confirmButton = {
             TextButton(onClick = onConfirm) {
                 Text(
-                    text = "Clear Cache",
+                    text = "Clear cache",
                     color = MaterialTheme.colorScheme.error
                 )
             }
@@ -382,7 +383,7 @@ private fun PrivacyNoticeDialog(
             Text(
                 text = "Privacy Notice",
                 modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
@@ -390,24 +391,76 @@ private fun PrivacyNoticeDialog(
         text = {
             Column(
                 modifier = Modifier
-                    .heightIn(max = 420.dp)
+                    .heightIn(max = 460.dp)
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
             ) {
-                PrivacyNoticeSection(
-                    title = "What we collect",
-                    text = "Your saved movies, saved people, preferences, and optional TMDB session are stored locally on this device."
+                Text(
+                    text = "Last updated September 2026",
+                    modifier = Modifier.fillMaxWidth(),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
                 )
 
-                PrivacyNoticeSection(
-                    title = "What we don't collect",
-                    text = "Reels does not collect personal information, track your activity, or sell your data."
+                PrivacyNoticeList(
+                    title = "WHAT WE COLLECT",
+                    items = listOf(
+                        PrivacyNoticeItem(
+                            title = "Search queries",
+                            description = "Stored locally only, never sent to our servers."
+                        ),
+                        PrivacyNoticeItem(
+                            title = "Saved movies",
+                            description = "Stored on-device. Synced to TMDB only when connected."
+                        ),
+                        PrivacyNoticeItem(
+                            title = "App preferences",
+                            description = "Theme, quality, and language settings stored locally."
+                        )
+                    ),
+                    included = true
                 )
 
-                PrivacyNoticeSection(
-                    title = "Third parties",
-                    text = "Movie data, artwork, cast details, and trailers are provided by TMDB. Connecting an account lets Reels sync your TMDB watchlist and ratings."
+                PrivacyNoticeList(
+                    title = "WHAT WE DON'T COLLECT",
+                    items = listOf(
+                        PrivacyNoticeItem(title = "Personal identity or contact information"),
+                        PrivacyNoticeItem(title = "Precise location data"),
+                        PrivacyNoticeItem(title = "Advertising identifiers"),
+                        PrivacyNoticeItem(title = "Cross-app tracking")
+                    ),
+                    included = false
                 )
+
+                Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)) {
+                    PrivacySectionLabel(text = "THIRD PARTIES")
+
+                    Surface(
+                        shape = MaterialTheme.shapes.medium,
+                        color = MaterialTheme.colorScheme.surfaceVariant
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(ReelsSpacing.medium),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                text = "The Movie Database (TMDB)",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            Text(
+                                text = "When connected, your watchlist and ratings are synced " +
+                                    "with TMDB under their privacy policy. Reels does not share " +
+                                    "data with any other third party.",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
             }
         },
         confirmButton = {
@@ -422,29 +475,200 @@ private fun PrivacyNoticeDialog(
 }
 
 @Composable
-private fun PrivacyNoticeSection(
+private fun PrivacyNoticeList(
     title: String,
-    text: String,
+    items: List<PrivacyNoticeItem>,
+    included: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
     ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurface,
-            fontWeight = FontWeight.Bold
-        )
+        PrivacySectionLabel(text = title)
 
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        items.forEach { item ->
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
+                verticalAlignment = Alignment.Top
+            ) {
+                Icon(
+                    imageVector = if (included) Icons.Filled.Check else Icons.Filled.Close,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(top = 2.dp)
+                        .size(14.dp),
+                    tint = if (included) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    }
+                )
+
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        text = item.title,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    item.description?.let { description ->
+                        Text(
+                            text = description,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
     }
 }
+
+@Composable
+private fun PrivacySectionLabel(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        fontWeight = FontWeight.Bold
+    )
+}
+
+private data class PrivacyNoticeItem(
+    val title: String,
+    val description: String? = null,
+)
+
+@Composable
+private fun LanguageRegionDialog(
+    selectedOption: LanguageRegion,
+    onOptionSelected: (LanguageRegion) -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var pendingOption by remember(selectedOption) { mutableStateOf(selectedOption) }
+
+    AlertDialog(
+        modifier = modifier.widthIn(max = 360.dp),
+        onDismissRequest = onDismiss,
+        icon = {
+            DialogIcon(icon = Icons.Filled.Language)
+        },
+        title = {
+            Text(
+                text = "Language & Region",
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .heightIn(max = 480.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
+            ) {
+                Text(
+                    text = "Sets the language for movie titles and metadata.",
+                    modifier = Modifier.fillMaxWidth(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
+
+                PrivacySectionLabel(text = "LANGUAGE")
+
+                Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)) {
+                    LanguageRegion.entries.forEach { option ->
+                        SettingsOptionRow(
+                            label = option.languageName,
+                            description = option.regionName,
+                            selected = option == pendingOption,
+                            onClick = { pendingOption = option }
+                        )
+                    }
+                }
+
+                PrivacySectionLabel(text = "REGION")
+
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.medium,
+                    color = MaterialTheme.colorScheme.surfaceVariant
+                ) {
+                    Row(
+                        modifier = Modifier.padding(ReelsSpacing.medium),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        OptionIcon(icon = Icons.Filled.Language)
+
+                        Spacer(modifier = Modifier.width(ReelsSpacing.medium))
+
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
+                            Text(
+                                text = "All regions",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "Movie availability varies by region",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onOptionSelected(pendingOption) }) {
+                Text(text = "Apply")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = "Cancel")
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surface,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
+        textContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+}
+
+private val LanguageRegion.languageName: String
+    get() = when (this) {
+        LanguageRegion.EnglishUnitedStates -> "English"
+        LanguageRegion.SpanishSpain -> "Español"
+        LanguageRegion.FrenchFrance -> "Français"
+        LanguageRegion.JapaneseJapan -> "日本語"
+    }
+
+private val LanguageRegion.regionName: String
+    get() = when (this) {
+        LanguageRegion.EnglishUnitedStates -> "United States"
+        LanguageRegion.SpanishSpain -> "España"
+        LanguageRegion.FrenchFrance -> "France"
+        LanguageRegion.JapaneseJapan -> "日本"
+    }
 
 @Composable
 private fun <T> SettingsOptionDialog(
@@ -455,6 +679,9 @@ private fun <T> SettingsOptionDialog(
     selectedOption: T,
     optionLabel: (T) -> String,
     optionDescription: (T) -> String,
+    optionIcon: ((T) -> ImageVector)? = null,
+    confirmLabel: String = "Apply",
+    supportingContent: (@Composable () -> Unit)? = null,
     onOptionSelected: (T) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
@@ -492,16 +719,19 @@ private fun <T> SettingsOptionDialog(
                         SettingsOptionRow(
                             label = optionLabel(option),
                             description = optionDescription(option),
+                            icon = optionIcon?.invoke(option),
                             selected = option == pendingOption,
                             onClick = { pendingOption = option }
                         )
                     }
                 }
+
+                supportingContent?.invoke()
             }
         },
         confirmButton = {
             TextButton(onClick = { onOptionSelected(pendingOption) }) {
-                Text(text = "Apply")
+                Text(text = confirmLabel)
             }
         },
         dismissButton = {
@@ -519,6 +749,7 @@ private fun <T> SettingsOptionDialog(
 private fun SettingsOptionRow(
     label: String,
     description: String,
+    icon: ImageVector? = null,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -542,6 +773,11 @@ private fun SettingsOptionRow(
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        if (icon != null) {
+            OptionIcon(icon = icon)
+            Spacer(modifier = Modifier.width(ReelsSpacing.medium))
+        }
+
         RadioButton(
             selected = selected,
             onClick = onClick
@@ -562,6 +798,57 @@ private fun SettingsOptionRow(
 
             Text(
                 text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun OptionIcon(
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .size(40.dp)
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceVariant),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(20.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
+    }
+}
+
+@Composable
+private fun SettingsInfoBanner(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surfaceVariant
+    ) {
+        Row(
+            modifier = Modifier.padding(ReelsSpacing.medium),
+            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Info,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = text,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -599,28 +886,39 @@ private fun DialogIcon(
 
 @Composable
 private fun CacheBreakdownRow(
+    icon: ImageVector,
     label: String,
     value: String,
     modifier: Modifier = Modifier,
-    emphasized: Boolean = false,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            fontWeight = if (emphasized) FontWeight.Bold else FontWeight.Medium
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Medium
+            )
+        }
 
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = if (emphasized) FontWeight.Bold else FontWeight.Medium
+            fontWeight = FontWeight.Medium
         )
     }
 }

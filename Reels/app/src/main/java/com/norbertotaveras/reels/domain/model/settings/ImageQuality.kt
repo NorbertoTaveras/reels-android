@@ -12,18 +12,23 @@ enum class ImageQuality(
     val tmdbSizePath: String,
 ) {
     High(
-        label = "High quality posters and backdrops",
+        label = "High quality",
         tmdbSizePath = "w780"
     ),
     Standard(
-        label = "Standard quality posters and backdrops",
+        label = "Standard",
         tmdbSizePath = "w342"
+    ),
+    Low(
+        label = "Low — saves data",
+        tmdbSizePath = "w185"
     );
 
     fun next(): ImageQuality {
         return when (this) {
             High -> Standard
-            Standard -> High
+            Standard -> Low
+            Low -> High
         }
     }
 }

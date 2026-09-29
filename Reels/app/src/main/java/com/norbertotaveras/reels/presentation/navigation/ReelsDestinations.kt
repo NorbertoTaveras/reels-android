@@ -13,7 +13,6 @@ object ReelsDestinations {
     const val SEARCH = "search"
     const val FAVORITES = "favorites"
     const val SETTINGS = "settings"
-    const val UI_STATES = "uiStates"
     const val MOVIE_DETAILS = "movieDetails"
     const val MOVIE_ID_ARG = "movieId"
     const val MOVIE_DETAILS_ROUTE = "$MOVIE_DETAILS/{$MOVIE_ID_ARG}"

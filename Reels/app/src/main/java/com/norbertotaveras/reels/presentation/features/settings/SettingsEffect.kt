@@ -9,7 +9,6 @@ package com.norbertotaveras.reels.presentation.features.settings
 
 sealed interface SettingsEffect {
     data object NavigateToLibrary : SettingsEffect
-    data object NavigateToUiStates : SettingsEffect
     data object ClearImageCache : SettingsEffect
     data class OpenExternalUrl(val url: String) : SettingsEffect
     data class ShowMessage(val message: String) : SettingsEffect

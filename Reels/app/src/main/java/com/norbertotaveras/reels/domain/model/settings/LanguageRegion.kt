@@ -15,15 +15,25 @@ enum class LanguageRegion(
         languageCode = "en-US",
         label = "English · United States"
     ),
-    SpanishUnitedStates(
-        languageCode = "es-US",
-        label = "Spanish · United States"
+    SpanishSpain(
+        languageCode = "es-ES",
+        label = "Español · España"
+    ),
+    FrenchFrance(
+        languageCode = "fr-FR",
+        label = "Français · France"
+    ),
+    JapaneseJapan(
+        languageCode = "ja-JP",
+        label = "日本語 · 日本"
     );
 
     fun next(): LanguageRegion {
         return when (this) {
-            EnglishUnitedStates -> SpanishUnitedStates
-            SpanishUnitedStates -> EnglishUnitedStates
+            EnglishUnitedStates -> SpanishSpain
+            SpanishSpain -> FrenchFrance
+            FrenchFrance -> JapaneseJapan
+            JapaneseJapan -> EnglishUnitedStates
         }
     }
 }

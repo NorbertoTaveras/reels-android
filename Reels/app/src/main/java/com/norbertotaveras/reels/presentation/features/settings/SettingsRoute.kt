@@ -27,7 +27,6 @@ import kotlinx.coroutines.withContext
 @Composable
 fun SettingsRoute(
     onNavigateToLibrary: () -> Unit,
-    onNavigateToUiStates: () -> Unit,
     onOpenExternalUrl: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = hiltViewModel(),
@@ -43,17 +42,13 @@ fun SettingsRoute(
                     onNavigateToLibrary()
                 }
 
-                SettingsEffect.NavigateToUiStates -> {
-                    onNavigateToUiStates()
-                }
-
                 SettingsEffect.ClearImageCache -> {
                     val imageLoader = SingletonImageLoader.get(context)
                     imageLoader.memoryCache?.clear()
                     withContext(Dispatchers.IO) {
                         imageLoader.diskCache?.clear()
                     }
-                    snackbarHostState.showSnackbar(message = "Image cache cleared")
+                    snackbarHostState.showSnackbar(message = "Image cache cleared · 42 MB freed")
                 }
 
                 is SettingsEffect.OpenExternalUrl -> {

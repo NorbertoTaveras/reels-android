@@ -82,7 +82,6 @@ class SettingsViewModel @Inject constructor(
             SettingsEvent.TmdbAccountClicked -> onTmdbAccountClicked()
             SettingsEvent.TmdbAccountFinishClicked -> onTmdbAccountFinishClicked()
             SettingsEvent.TmdbAccountDisconnectClicked -> onTmdbAccountDisconnectClicked()
-            SettingsEvent.UiStatesReferenceClicked -> onUiStatesReferenceClicked()
             SettingsEvent.PrivacyClicked -> onPrivacyClicked()
             SettingsEvent.PrivacyNoticeDismissed -> onPrivacyNoticeDismissed()
             SettingsEvent.TmdbAttributionClicked -> onTmdbAttributionClicked()
@@ -328,12 +327,6 @@ class SettingsViewModel @Inject constructor(
     private fun onPrivacyClicked() {
         _state.update { currentState ->
             currentState.copy(isPrivacyNoticeVisible = true)
-        }
-    }
-
-    private fun onUiStatesReferenceClicked() {
-        viewModelScope.launch {
-            _effect.emit(SettingsEffect.NavigateToUiStates)
         }
     }
 

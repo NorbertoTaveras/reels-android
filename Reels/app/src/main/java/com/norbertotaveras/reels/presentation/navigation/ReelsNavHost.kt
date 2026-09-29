@@ -42,7 +42,6 @@ import com.norbertotaveras.reels.presentation.features.movies.favorites.Favorite
 import com.norbertotaveras.reels.presentation.features.movies.list.MoviesListRoute
 import com.norbertotaveras.reels.presentation.features.movies.search.SearchRoute
 import com.norbertotaveras.reels.presentation.features.settings.SettingsRoute
-import com.norbertotaveras.reels.presentation.features.settings.states.UiStatesReferenceScreen
 
 @Composable
 fun ReelsNavHost(modifier: Modifier = Modifier) {
@@ -159,15 +158,8 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
                     onNavigateToLibrary = {
                         navController.navigateToBottomNavRoute(ReelsDestinations.FAVORITES)
                     },
-                    onNavigateToUiStates = {
-                        navController.navigate(ReelsDestinations.UI_STATES)
-                    },
                     onOpenExternalUrl = openExternalUrl
                 )
-            }
-
-            composable(ReelsDestinations.UI_STATES) {
-                UiStatesReferenceScreen(onBackClick = navController::navigateUp)
             }
 
             composable(

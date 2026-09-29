@@ -12,9 +12,9 @@ import com.norbertotaveras.reels.domain.model.settings.ImageQuality
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 
 data class SettingsUiState(
-    val imageQualityLabel: String = "High quality posters and backdrops",
+    val imageQualityLabel: String = "High quality",
     val languageRegionLabel: String = "English · United States",
-    val themeLabel: String = "Use system setting",
+    val themeLabel: String = "System default",
     val selectedImageQuality: ImageQuality = ImageQuality.High,
     val selectedLanguageRegion: LanguageRegion = LanguageRegion.EnglishUnitedStates,
     val selectedTheme: AppTheme = AppTheme.System,

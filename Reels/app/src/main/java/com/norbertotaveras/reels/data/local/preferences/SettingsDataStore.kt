@@ -35,9 +35,7 @@ class SettingsDataStore @Inject constructor(
     val settings: Flow<AppSettings> = context.settingsDataStore.data.map { preferences ->
         AppSettings(
             imageQuality = preferences[IMAGE_QUALITY_KEY].toEnumOrDefault(ImageQuality.High),
-            languageRegion = preferences[LANGUAGE_REGION_KEY].toEnumOrDefault(
-                LanguageRegion.EnglishUnitedStates
-            ),
+            languageRegion = preferences[LANGUAGE_REGION_KEY].toLanguageRegion(),
             theme = preferences[THEME_KEY].toEnumOrDefault(AppTheme.System),
             recentSearches = preferences[RECENT_SEARCHES_KEY].toRecentSearches(),
             discoverFilters = preferences[DISCOVER_FILTERS_KEY].toDiscoverFilters()
@@ -76,6 +74,13 @@ class SettingsDataStore @Inject constructor(
 
     private inline fun <reified T : Enum<T>> String?.toEnumOrDefault(default: T): T {
         return enumValues<T>().firstOrNull { value -> value.name == this } ?: default
+    }
+
+    private fun String?.toLanguageRegion(): LanguageRegion {
+        return when (this) {
+            LEGACY_SPANISH_REGION -> LanguageRegion.SpanishSpain
+            else -> toEnumOrDefault(LanguageRegion.EnglishUnitedStates)
+        }
     }
 
     private fun String?.toRecentSearches(): List<String> {
@@ -141,6 +146,7 @@ class SettingsDataStore @Inject constructor(
     }
 
     private companion object {
+        const val LEGACY_SPANISH_REGION = "SpanishUnitedStates"
         val IMAGE_QUALITY_KEY = stringPreferencesKey("image_quality")
         val LANGUAGE_REGION_KEY = stringPreferencesKey("language_region")
         val THEME_KEY = stringPreferencesKey("theme")
