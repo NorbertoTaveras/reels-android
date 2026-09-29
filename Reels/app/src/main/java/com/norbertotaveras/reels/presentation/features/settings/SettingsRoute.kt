@@ -27,6 +27,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun SettingsRoute(
     onNavigateToLibrary: () -> Unit,
+    onNavigateToUiStates: () -> Unit,
     onOpenExternalUrl: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = hiltViewModel(),
@@ -40,6 +41,10 @@ fun SettingsRoute(
             when (effect) {
                 SettingsEffect.NavigateToLibrary -> {
                     onNavigateToLibrary()
+                }
+
+                SettingsEffect.NavigateToUiStates -> {
+                    onNavigateToUiStates()
                 }
 
                 SettingsEffect.ClearImageCache -> {

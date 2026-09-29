@@ -333,11 +333,7 @@ class SettingsViewModel @Inject constructor(
 
     private fun onUiStatesReferenceClicked() {
         viewModelScope.launch {
-            _effect.emit(
-                SettingsEffect.ShowMessage(
-                    message = "UI states reference is planned for a native screen."
-                )
-            )
+            _effect.emit(SettingsEffect.NavigateToUiStates)
         }
     }
 
