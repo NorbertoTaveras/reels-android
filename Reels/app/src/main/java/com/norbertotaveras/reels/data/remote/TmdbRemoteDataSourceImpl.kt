@@ -128,6 +128,16 @@ class TmdbRemoteDataSourceImpl @Inject constructor(
         )
     }
 
+    override suspend fun getTrendingMovies(
+        timeWindow: String,
+        language: String?
+    ): MoviesResponseDto {
+        return service.getTrendingMovies(
+            timeWindow = timeWindow,
+            language = language
+        )
+    }
+
     override suspend fun getMovieDetails(
         movieId: Int,
         language: String?

@@ -92,6 +92,12 @@ interface TmdbService {
         @Query("page") page: Int?
     ): MoviesResponseDto
 
+    @GET("trending/movie/{timeWindow}")
+    suspend fun getTrendingMovies(
+        @Path("timeWindow") timeWindow: String,
+        @Query("language") language: String?
+    ): MoviesResponseDto
+
     @GET("movie/{movieId}")
     suspend fun getMovieDetails(
         @Path("movieId") movieId: Int,

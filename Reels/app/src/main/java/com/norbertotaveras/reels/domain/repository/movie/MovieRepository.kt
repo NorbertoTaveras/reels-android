@@ -34,6 +34,10 @@ interface MovieRepository {
         language: String = "en-US",
     ): Flow<PagingData<MovieDataModel>>
 
+    suspend fun getTrendingMovies(
+        language: String = "en-US",
+    ): Result<List<MovieDataModel>>
+
     suspend fun getMovieDetails(
         movieId: Int,
         language: String = "en-US",

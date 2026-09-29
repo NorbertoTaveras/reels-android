@@ -113,7 +113,11 @@ fun SearchScreen(
             if (!hasSearchableQuery) {
                 item {
                     if (trimmedQuery.isBlank()) {
-                        SearchIdleContent(state.recentSearches, onEvent)
+                        SearchIdleContent(
+                            recentSearches = state.recentSearches,
+                            trendingSearches = state.trendingSearches,
+                            onEvent = onEvent
+                        )
                     } else {
                         SearchPromptState()
                     }
@@ -142,7 +146,13 @@ fun SearchScreen(
                 }
 
                 !hasCachedMovies -> {
-                    item { SearchNoResultsState(trimmedQuery, onEvent) }
+                    item {
+                        SearchNoResultsState(
+                            query = trimmedQuery,
+                            suggestions = state.trendingSearches,
+                            onEvent = onEvent
+                        )
+                    }
                 }
 
                 else -> {
@@ -319,6 +329,7 @@ private fun SearchResultsHeader(
 @Composable
 private fun SearchIdleContent(
     recentSearches: List<String>,
+    trendingSearches: List<String>,
     onEvent: (SearchEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -331,7 +342,12 @@ private fun SearchIdleContent(
         } else {
             RecentSearchesSection(recentSearches, onEvent)
         }
-        TrendingSearchesSection(onEvent)
+        if (trendingSearches.isNotEmpty()) {
+            TrendingSearchesSection(
+                suggestions = trendingSearches,
+                onEvent = onEvent
+            )
+        }
     }
 }
 
@@ -370,6 +386,7 @@ private fun SearchPromptState(modifier: Modifier = Modifier) {
 @Composable
 private fun SearchNoResultsState(
     query: String,
+    suggestions: List<String>,
     onEvent: (SearchEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -388,7 +405,13 @@ private fun SearchNoResultsState(
             title = "No results found",
             message = "No movies match \"$query\". Try a different title or keyword."
         )
-        SearchSuggestionsSection(title = "TRY INSTEAD", onEvent = onEvent)
+        if (suggestions.isNotEmpty()) {
+            SearchSuggestionsSection(
+                title = "TRY INSTEAD",
+                suggestions = suggestions,
+                onEvent = onEvent
+            )
+        }
     }
 }
 
@@ -644,12 +667,14 @@ private fun RecentSearchRow(
 
 @Composable
 private fun TrendingSearchesSection(
+    suggestions: List<String>,
     onEvent: (SearchEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SearchSuggestionsSection(
         modifier = modifier,
         title = "TRENDING",
+        suggestions = suggestions,
         showTrendingIcon = true,
         onEvent = onEvent
     )
@@ -658,6 +683,7 @@ private fun TrendingSearchesSection(
 @Composable
 private fun SearchSuggestionsSection(
     title: String,
+    suggestions: List<String>,
     onEvent: (SearchEvent) -> Unit,
     modifier: Modifier = Modifier,
     showTrendingIcon: Boolean = false,
@@ -694,7 +720,7 @@ private fun SearchSuggestionsSection(
             horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
             verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
         ) {
-            TRENDING_SEARCHES.forEach { query ->
+            suggestions.forEach { query ->
                 SearchSuggestionChip(
                     label = query,
                     onClick = { onEvent(SearchEvent.RecentSearchClicked(query)) }
@@ -828,13 +854,5 @@ private fun SearchCachedResultsBanner(
         }
     }
 }
-
-private val TRENDING_SEARCHES = listOf(
-    "Oppenheimer",
-    "Saltburn",
-    "Dune",
-    "Poor Things",
-    "Maestro"
-)
 
 private const val MIN_SEARCH_QUERY_LENGTH = 2

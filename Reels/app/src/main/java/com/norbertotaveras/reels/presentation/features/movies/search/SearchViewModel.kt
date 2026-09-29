@@ -13,6 +13,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.domain.usecase.movie.GetMovieGenresUseCase
+import com.norbertotaveras.reels.domain.usecase.movie.GetTrendingMoviesUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.SearchMoviesUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateRecentSearchesUseCase
@@ -40,6 +41,7 @@ import kotlinx.coroutines.launch
 class SearchViewModel @Inject constructor(
     private val searchMoviesUseCase: SearchMoviesUseCase,
     private val getMovieGenresUseCase: GetMovieGenresUseCase,
+    private val getTrendingMoviesUseCase: GetTrendingMoviesUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
     private val updateRecentSearchesUseCase: UpdateRecentSearchesUseCase,
 ) : ViewModel() {
@@ -159,6 +161,7 @@ class SearchViewModel @Inject constructor(
     private fun observeSettings() {
         viewModelScope.launch {
             var loadedGenreLanguage: String? = null
+            var loadedTrendingLanguage: String? = null
 
             observeSettingsUseCase()
                 .collect { settings ->
@@ -174,6 +177,11 @@ class SearchViewModel @Inject constructor(
                     if (loadedGenreLanguage != language) {
                         loadedGenreLanguage = language
                         loadGenres(language = language)
+                    }
+
+                    if (loadedTrendingLanguage != language) {
+                        loadedTrendingLanguage = language
+                        loadTrendingSearches(language = language)
                     }
                 }
         }
@@ -214,8 +222,42 @@ class SearchViewModel @Inject constructor(
         }
     }
 
+    private fun loadTrendingSearches(language: String) {
+        viewModelScope.launch {
+            getTrendingMoviesUseCase(language = language).fold(
+                onSuccess = { movies ->
+                    val trendingSearches = movies
+                        .asSequence()
+                        .map { movie -> movie.title.trim() }
+                        .filter { title -> title.isNotEmpty() }
+                        .distinctBy { title -> title.lowercase() }
+                        .take(MAX_TRENDING_SEARCHES)
+                        .toList()
+
+                    _state.update { currentState ->
+                        if (currentState.language == language) {
+                            currentState.copy(trendingSearches = trendingSearches)
+                        } else {
+                            currentState
+                        }
+                    }
+                },
+                onFailure = {
+                    _state.update { currentState ->
+                        if (currentState.language == language) {
+                            currentState.copy(trendingSearches = emptyList())
+                        } else {
+                            currentState
+                        }
+                    }
+                }
+            )
+        }
+    }
+
     private companion object {
         const val MIN_QUERY_LENGTH = 2
         const val MAX_RECENT_SEARCHES = 5
+        const val MAX_TRENDING_SEARCHES = 5
     }
 }

@@ -117,6 +117,19 @@ class TmdbRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getTrendingMovies(
+        language: String,
+    ): Result<List<MovieDataModel>> {
+        return tmdbResult {
+            remoteDataSource.getTrendingMovies(
+                timeWindow = TRENDING_TIME_WINDOW,
+                language = language
+            ).results.map { movieDto ->
+                movieDto.toMovieDataModel()
+            }
+        }
+    }
+
     override suspend fun getMovieDetails(
         movieId: Int,
         language: String,
@@ -221,5 +234,9 @@ class TmdbRepositoryImpl @Inject constructor(
             prefetchDistance = 5,
             enablePlaceholders = false
         )
+    }
+
+    private companion object {
+        const val TRENDING_TIME_WINDOW = "day"
     }
 }

@@ -11,5 +11,6 @@ data class SearchUiState(
     val query: String = "",
     val language: String = "en-US",
     val recentSearches: List<String> = emptyList(),
+    val trendingSearches: List<String> = emptyList(),
     val genreNamesById: Map<Int, String> = emptyMap()
 )

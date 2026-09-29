@@ -69,6 +69,11 @@ interface TmdbRemoteDataSource {
         page: Int? = null
     ): MoviesResponseDto
 
+    suspend fun getTrendingMovies(
+        timeWindow: String,
+        language: String? = null
+    ): MoviesResponseDto
+
     suspend fun getMovieDetails(
         movieId: Int,
         language: String? = null
