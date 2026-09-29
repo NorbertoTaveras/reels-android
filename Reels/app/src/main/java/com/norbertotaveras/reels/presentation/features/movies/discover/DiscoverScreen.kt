@@ -71,7 +71,6 @@ import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
 import com.norbertotaveras.reels.domain.model.discover.DiscoverSort
 import com.norbertotaveras.reels.domain.model.discover.hasActiveFilters
-import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
@@ -462,9 +461,9 @@ private fun DiscoverFilterSheet(
                         state.filterErrorMessage != null -> Unit
 
                         else -> {
-                            state.genres.toDiscoverFilterGenres().forEach { genre ->
+                            state.genres.forEach { genre ->
                                 DiscoverFilterChip(
-                                    label = genre.displayName,
+                                    label = genre.name,
                                     selected = state.filterSheetFilters.genreId == genre.id,
                                     onClick = {
                                         onEvent(
@@ -476,7 +475,7 @@ private fun DiscoverFilterSheet(
                                             } else {
                                                     DiscoverEvent.GenreSelected(
                                                         genreId = genre.id,
-                                                        genreName = genre.displayName
+                                                        genreName = genre.name
                                                     )
                                             }
                                         )
@@ -1459,29 +1458,6 @@ private val DISCOVER_FILTER_SKELETON_WIDTHS = listOf(
     72.dp,
     80.dp
 )
-private val DISCOVER_GENRES = listOf(
-    DiscoverGenreDefinition(id = 28),
-    DiscoverGenreDefinition(id = 12),
-    DiscoverGenreDefinition(id = 16),
-    DiscoverGenreDefinition(id = 35),
-    DiscoverGenreDefinition(id = 18),
-    DiscoverGenreDefinition(id = 36),
-    DiscoverGenreDefinition(id = 27),
-    DiscoverGenreDefinition(id = 10749),
-    DiscoverGenreDefinition(id = 878, displayNameOverride = "Sci-Fi"),
-    DiscoverGenreDefinition(id = 53)
-)
-
-private data class DiscoverGenreDefinition(
-    val id: Int,
-    val displayNameOverride: String? = null,
-)
-
-private data class DiscoverGenreFilter(
-    val id: Int,
-    val displayName: String,
-)
-
 private data class DiscoverReleasePeriod(
     val label: String,
     val yearFrom: Int,
@@ -1549,17 +1525,6 @@ private fun discoverReleasePeriods(): List<DiscoverReleasePeriod> {
                     yearFrom = decadeStart,
                     yearTo = decadeStart + 9
                 )
-            )
-        }
-    }
-}
-
-private fun List<GenreDataModel>.toDiscoverFilterGenres(): List<DiscoverGenreFilter> {
-    return DISCOVER_GENRES.mapNotNull { definition ->
-        firstOrNull { genre -> genre.id == definition.id }?.let { genre ->
-            DiscoverGenreFilter(
-                id = genre.id,
-                displayName = definition.displayNameOverride ?: genre.name
             )
         }
     }
