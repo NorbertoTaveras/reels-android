@@ -71,6 +71,7 @@ import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
 import com.norbertotaveras.reels.domain.model.discover.DiscoverSort
 import com.norbertotaveras.reels.domain.model.discover.hasActiveFilters
+import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
@@ -447,7 +448,10 @@ private fun DiscoverFilterSheet(
                     )
                 }
 
-                DiscoverChipSection(title = "Genre") {
+                DiscoverChipSection(
+                    title = "Genre",
+                    maxItemsInEachRow = DISCOVER_GENRE_COLUMNS
+                ) {
                     when {
                         state.isLoadingFilters -> {
                             DISCOVER_FILTER_SKELETON_WIDTHS.forEach { width ->
@@ -458,9 +462,9 @@ private fun DiscoverFilterSheet(
                         state.filterErrorMessage != null -> Unit
 
                         else -> {
-                            state.genres.forEach { genre ->
+                            state.genres.toDiscoverFilterGenres().forEach { genre ->
                                 DiscoverFilterChip(
-                                    label = genre.name.toDiscoverGenreDisplayName(),
+                                    label = genre.displayName,
                                     selected = state.filterSheetFilters.genreId == genre.id,
                                     onClick = {
                                         onEvent(
@@ -472,7 +476,7 @@ private fun DiscoverFilterSheet(
                                             } else {
                                                     DiscoverEvent.GenreSelected(
                                                         genreId = genre.id,
-                                                        genreName = genre.name.toDiscoverGenreDisplayName()
+                                                        genreName = genre.displayName
                                                     )
                                             }
                                         )
@@ -513,7 +517,7 @@ private fun DiscoverFilterSheet(
                     }
                 }
 
-                DiscoverChipSection(title = "Min Rating") {
+                DiscoverChipSection(title = "Minimum Rating") {
                     DISCOVER_RATINGS.forEach { rating ->
                         DiscoverFilterChip(
                             label = rating?.let { "$it+" } ?: "Any",
@@ -795,6 +799,7 @@ private fun DiscoverRemovableFilterChip(
 private fun DiscoverChipSection(
     title: String,
     modifier: Modifier = Modifier,
+    maxItemsInEachRow: Int = Int.MAX_VALUE,
     content: @Composable () -> Unit,
 ) {
     Column(
@@ -805,7 +810,8 @@ private fun DiscoverChipSection(
 
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.discoverFilterRowSpacing),
-            verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
+            verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
+            maxItemsInEachRow = maxItemsInEachRow
         ) {
             content()
         }
@@ -1440,6 +1446,7 @@ private val DISCOVER_SORTS = listOf(
 )
 private const val DISCOVER_PLACEHOLDER_COUNT = 12
 private const val DISCOVER_APPEND_PLACEHOLDER_COUNT = 3
+private const val DISCOVER_GENRE_COLUMNS = 4
 private val DISCOVER_FILTER_SKELETON_WIDTHS = listOf(
     72.dp,
     90.dp,
@@ -1451,6 +1458,28 @@ private val DISCOVER_FILTER_SKELETON_WIDTHS = listOf(
     88.dp,
     72.dp,
     80.dp
+)
+private val DISCOVER_GENRES = listOf(
+    DiscoverGenreDefinition(id = 28),
+    DiscoverGenreDefinition(id = 12),
+    DiscoverGenreDefinition(id = 16),
+    DiscoverGenreDefinition(id = 35),
+    DiscoverGenreDefinition(id = 18),
+    DiscoverGenreDefinition(id = 36),
+    DiscoverGenreDefinition(id = 27),
+    DiscoverGenreDefinition(id = 10749),
+    DiscoverGenreDefinition(id = 878, displayNameOverride = "Sci-Fi"),
+    DiscoverGenreDefinition(id = 53)
+)
+
+private data class DiscoverGenreDefinition(
+    val id: Int,
+    val displayNameOverride: String? = null,
+)
+
+private data class DiscoverGenreFilter(
+    val id: Int,
+    val displayName: String,
 )
 
 private data class DiscoverReleasePeriod(
@@ -1525,10 +1554,14 @@ private fun discoverReleasePeriods(): List<DiscoverReleasePeriod> {
     }
 }
 
-private fun String.toDiscoverGenreDisplayName(): String {
-    return when (this) {
-        "Science Fiction" -> "Sci-Fi"
-        else -> this
+private fun List<GenreDataModel>.toDiscoverFilterGenres(): List<DiscoverGenreFilter> {
+    return DISCOVER_GENRES.mapNotNull { definition ->
+        firstOrNull { genre -> genre.id == definition.id }?.let { genre ->
+            DiscoverGenreFilter(
+                id = genre.id,
+                displayName = definition.displayNameOverride ?: genre.name
+            )
+        }
     }
 }
 
