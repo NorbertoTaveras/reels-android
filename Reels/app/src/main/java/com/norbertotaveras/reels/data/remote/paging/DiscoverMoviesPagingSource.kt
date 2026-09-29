@@ -12,6 +12,8 @@ import androidx.paging.PagingState
 import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieDto
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
+import com.norbertotaveras.reels.data.remote.releaseDateFromParameter
+import com.norbertotaveras.reels.data.remote.releaseDateToParameter
 import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
 
 class DiscoverMoviesPagingSource(
@@ -27,7 +29,8 @@ class DiscoverMoviesPagingSource(
                 page = page,
                 sortBy = filters.sort.apiValue,
                 genreId = filters.genreId,
-                year = filters.year,
+                releaseDateFrom = filters.releaseDateFromParameter(),
+                releaseDateTo = filters.releaseDateToParameter(),
                 minimumRating = filters.minimumRating
             )
 

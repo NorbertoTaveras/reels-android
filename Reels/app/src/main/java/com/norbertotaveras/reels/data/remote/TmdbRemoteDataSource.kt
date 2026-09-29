@@ -117,7 +117,8 @@ interface TmdbRemoteDataSource {
         page: Int? = null,
         sortBy: String,
         genreId: Int? = null,
-        year: Int? = null,
+        releaseDateFrom: String? = null,
+        releaseDateTo: String? = null,
         minimumRating: Int? = null,
         includeAdult: Boolean = false
     ): MoviesResponseDto

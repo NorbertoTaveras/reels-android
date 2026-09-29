@@ -17,6 +17,8 @@ data class DiscoverUiState(
     val language: String = "en-US",
     val genres: List<GenreDataModel> = emptyList(),
     val isLoadingFilters: Boolean = true,
+    val filterResultCount: Int? = null,
+    val isLoadingFilterResultCount: Boolean = false,
     val isFilterSheetVisible: Boolean = false,
     val filterErrorMessage: String? = null,
 )

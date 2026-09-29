@@ -17,6 +17,8 @@ import com.norbertotaveras.reels.data.local.db.ReelsDatabase
 import com.norbertotaveras.reels.data.local.mapper.toMovieDataModel
 import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
+import com.norbertotaveras.reels.data.remote.releaseDateFromParameter
+import com.norbertotaveras.reels.data.remote.releaseDateToParameter
 import com.norbertotaveras.reels.data.remote.paging.CachedMoviesRemoteMediator
 import com.norbertotaveras.reels.data.remote.paging.CachedSearchMoviesRemoteMediator
 import com.norbertotaveras.reels.data.remote.paging.DiscoverMoviesPagingSource
@@ -114,6 +116,23 @@ class TmdbRepositoryImpl @Inject constructor(
             }
         ).flow.map { pagingData ->
             pagingData.map { movieDto -> movieDto.toMovieDataModel() }
+        }
+    }
+
+    override suspend fun getDiscoverMovieCount(
+        filters: DiscoverFilterDataModel,
+        language: String,
+    ): Result<Int> {
+        return tmdbResult {
+            remoteDataSource.discoverMovies(
+                language = language,
+                page = 1,
+                sortBy = filters.sort.apiValue,
+                genreId = filters.genreId,
+                releaseDateFrom = filters.releaseDateFromParameter(),
+                releaseDateTo = filters.releaseDateToParameter(),
+                minimumRating = filters.minimumRating
+            ).totalResults
         }
     }
 

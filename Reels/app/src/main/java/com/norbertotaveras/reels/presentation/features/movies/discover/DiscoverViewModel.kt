@@ -13,6 +13,7 @@ import androidx.paging.cachedIn
 import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
 import com.norbertotaveras.reels.domain.model.discover.DiscoverSort
 import com.norbertotaveras.reels.domain.usecase.movie.DiscoverMoviesUseCase
+import com.norbertotaveras.reels.domain.usecase.movie.GetDiscoverMovieCountUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.GetMovieGenresUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateDiscoverFiltersUseCase
@@ -20,6 +21,8 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -36,10 +39,13 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalCoroutinesApi::class)
 class DiscoverViewModel @Inject constructor(
     private val discoverMoviesUseCase: DiscoverMoviesUseCase,
+    private val getDiscoverMovieCountUseCase: GetDiscoverMovieCountUseCase,
     private val getMovieGenresUseCase: GetMovieGenresUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
     private val updateDiscoverFiltersUseCase: UpdateDiscoverFiltersUseCase,
 ) : ViewModel() {
+    private var filterResultCountJob: Job? = null
+
     private val _state = MutableStateFlow(DiscoverUiState())
     val state: StateFlow<DiscoverUiState> = _state.asStateFlow()
 
@@ -59,7 +65,6 @@ class DiscoverViewModel @Inject constructor(
 
     init {
         observeSettings()
-        loadGenres()
     }
 
     fun onEvent(event: DiscoverEvent) {
@@ -73,9 +78,13 @@ class DiscoverViewModel @Inject constructor(
                 genreId = event.genreId,
                 genreName = event.genreName
             )
-            is DiscoverEvent.YearSelected -> updateYear(year = event.year)
+            is DiscoverEvent.ReleasePeriodSelected -> updateReleasePeriod(
+                yearFrom = event.yearFrom,
+                yearTo = event.yearTo,
+                label = event.label
+            )
             is DiscoverEvent.RatingSelected -> updateRating(minimumRating = event.minimumRating)
-            DiscoverEvent.ClearFiltersClicked -> updateFilters(filters = DiscoverFilterDataModel())
+            DiscoverEvent.ClearFiltersClicked -> clearFilters()
             DiscoverEvent.RetryFiltersClicked -> loadGenres()
             is DiscoverEvent.MovieClicked -> onMovieClicked(movieId = event.movieId)
         }
@@ -88,37 +97,48 @@ class DiscoverViewModel @Inject constructor(
                 isFilterSheetVisible = true
             )
         }
+        loadFilterResultCount()
     }
 
     private fun hideFilters() {
+        filterResultCountJob?.cancel()
         _state.update { currentState ->
             currentState.copy(
                 draftFilters = null,
-                isFilterSheetVisible = false
+                isFilterSheetVisible = false,
+                filterResultCount = null,
+                isLoadingFilterResultCount = false
             )
         }
     }
 
     private fun applyFilters() {
+        filterResultCountJob?.cancel()
         val filters = state.value.draftFilters ?: state.value.filters
         _state.update { currentState ->
             currentState.copy(
                 filters = filters,
                 draftFilters = null,
-                isFilterSheetVisible = false
+                isFilterSheetVisible = false,
+                filterResultCount = null,
+                isLoadingFilterResultCount = false
             )
         }
         persistFilters(filters = filters)
     }
 
     private fun resetDraftFilters() {
+        val filters = DiscoverFilterDataModel()
         _state.update { currentState ->
-            currentState.copy(draftFilters = DiscoverFilterDataModel())
+            currentState.copy(draftFilters = filters)
         }
+        loadFilterResultCount(filters = filters)
     }
 
     private fun observeSettings() {
         viewModelScope.launch {
+            var loadedGenreLanguage: String? = null
+
             observeSettingsUseCase()
                 .map { settings -> settings.languageRegion.languageCode to settings.discoverFilters }
                 .distinctUntilChanged()
@@ -129,11 +149,20 @@ class DiscoverViewModel @Inject constructor(
                             filters = filters
                         )
                     }
+
+                    if (loadedGenreLanguage != language) {
+                        loadedGenreLanguage = language
+                        loadGenres(language = language)
+                    }
+
+                    if (state.value.isFilterSheetVisible) {
+                        loadFilterResultCount()
+                    }
                 }
         }
     }
 
-    private fun loadGenres() {
+    private fun loadGenres(language: String = state.value.language) {
         viewModelScope.launch {
             _state.update { currentState ->
                 currentState.copy(
@@ -142,7 +171,7 @@ class DiscoverViewModel @Inject constructor(
                 )
             }
 
-            getMovieGenresUseCase(language = state.value.language)
+            getMovieGenresUseCase(language = language)
                 .onSuccess { genres ->
                     _state.update { currentState ->
                         currentState.copy(
@@ -178,8 +207,18 @@ class DiscoverViewModel @Inject constructor(
         }
     }
 
-    private fun updateYear(year: Int?) {
-        updateDraftFilters { filters -> filters.copy(year = year) }
+    private fun updateReleasePeriod(
+        yearFrom: Int?,
+        yearTo: Int?,
+        label: String?,
+    ) {
+        updateDraftFilters { filters ->
+            filters.copy(
+                releaseYearFrom = yearFrom,
+                releaseYearTo = yearTo,
+                releasePeriodLabel = label
+            )
+        }
     }
 
     private fun updateRating(minimumRating: Int?) {
@@ -194,10 +233,21 @@ class DiscoverViewModel @Inject constructor(
             return
         }
 
+        var updatedFilters = state.value.filterSheetFilters
         _state.update { currentState ->
+            updatedFilters = transform(currentState.draftFilters ?: currentState.filters)
             currentState.copy(
-                draftFilters = transform(currentState.draftFilters ?: currentState.filters)
+                draftFilters = updatedFilters
             )
+        }
+        loadFilterResultCount(filters = updatedFilters)
+    }
+
+    private fun clearFilters() {
+        if (state.value.isFilterSheetVisible) {
+            resetDraftFilters()
+        } else {
+            updateFilters(filters = DiscoverFilterDataModel())
         }
     }
 
@@ -215,9 +265,64 @@ class DiscoverViewModel @Inject constructor(
         }
     }
 
+    private fun loadFilterResultCount(
+        filters: DiscoverFilterDataModel = state.value.filterSheetFilters,
+    ) {
+        val language = state.value.language
+        filterResultCountJob?.cancel()
+        _state.update { currentState ->
+            currentState.copy(isLoadingFilterResultCount = true)
+        }
+
+        filterResultCountJob = viewModelScope.launch {
+            delay(FILTER_COUNT_DEBOUNCE_MILLIS)
+            getDiscoverMovieCountUseCase(
+                filters = filters,
+                language = language
+            ).fold(
+                onSuccess = { count ->
+                    _state.update { currentState ->
+                        if (
+                            currentState.isFilterSheetVisible &&
+                            currentState.filterSheetFilters == filters &&
+                            currentState.language == language
+                        ) {
+                            currentState.copy(
+                                filterResultCount = count,
+                                isLoadingFilterResultCount = false
+                            )
+                        } else {
+                            currentState
+                        }
+                    }
+                },
+                onFailure = {
+                    _state.update { currentState ->
+                        if (
+                            currentState.isFilterSheetVisible &&
+                            currentState.filterSheetFilters == filters &&
+                            currentState.language == language
+                        ) {
+                            currentState.copy(
+                                filterResultCount = null,
+                                isLoadingFilterResultCount = false
+                            )
+                        } else {
+                            currentState
+                        }
+                    }
+                }
+            )
+        }
+    }
+
     private fun onMovieClicked(movieId: Int) {
         viewModelScope.launch {
             _effect.emit(DiscoverEffect.NavigateToMovieDetails(movieId = movieId))
         }
+    }
+
+    private companion object {
+        const val FILTER_COUNT_DEBOUNCE_MILLIS = 250L
     }
 }

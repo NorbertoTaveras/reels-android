@@ -149,7 +149,8 @@ interface TmdbService {
         @Query("page") page: Int?,
         @Query("sort_by") sortBy: String,
         @Query("with_genres") genreId: Int?,
-        @Query("primary_release_year") year: Int?,
+        @Query("primary_release_date.gte") releaseDateFrom: String?,
+        @Query("primary_release_date.lte") releaseDateTo: String?,
         @Query("vote_average.gte") minimumRating: Int?,
         @Query("include_adult") includeAdult: Boolean = false,
         @Query("include_video") includeVideo: Boolean = false

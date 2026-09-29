@@ -119,7 +119,12 @@ class SettingsDataStore @Inject constructor(
                     .toEnumOrDefault(DiscoverSort.Popularity),
                 genreId = jsonObject.optionalInt(DISCOVER_GENRE_ID),
                 genreName = jsonObject.optionalString(DISCOVER_GENRE_NAME),
-                year = jsonObject.optionalInt(DISCOVER_YEAR),
+                releaseYearFrom = jsonObject.optionalInt(DISCOVER_RELEASE_YEAR_FROM)
+                    ?: jsonObject.optionalInt(DISCOVER_YEAR),
+                releaseYearTo = jsonObject.optionalInt(DISCOVER_RELEASE_YEAR_TO)
+                    ?: jsonObject.optionalInt(DISCOVER_YEAR),
+                releasePeriodLabel = jsonObject.optionalString(DISCOVER_RELEASE_PERIOD_LABEL)
+                    ?: jsonObject.optionalInt(DISCOVER_YEAR)?.toString(),
                 minimumRating = jsonObject.optionalInt(DISCOVER_MINIMUM_RATING)
             )
         } catch (_: JSONException) {
@@ -132,7 +137,9 @@ class SettingsDataStore @Inject constructor(
             .put(DISCOVER_SORT, sort.name)
             .put(DISCOVER_GENRE_ID, genreId)
             .put(DISCOVER_GENRE_NAME, genreName)
-            .put(DISCOVER_YEAR, year)
+            .put(DISCOVER_RELEASE_YEAR_FROM, releaseYearFrom)
+            .put(DISCOVER_RELEASE_YEAR_TO, releaseYearTo)
+            .put(DISCOVER_RELEASE_PERIOD_LABEL, releasePeriodLabel)
             .put(DISCOVER_MINIMUM_RATING, minimumRating)
             .toString()
     }
@@ -157,6 +164,9 @@ class SettingsDataStore @Inject constructor(
         const val DISCOVER_GENRE_ID = "genreId"
         const val DISCOVER_GENRE_NAME = "genreName"
         const val DISCOVER_YEAR = "year"
+        const val DISCOVER_RELEASE_YEAR_FROM = "releaseYearFrom"
+        const val DISCOVER_RELEASE_YEAR_TO = "releaseYearTo"
+        const val DISCOVER_RELEASE_PERIOD_LABEL = "releasePeriodLabel"
         const val DISCOVER_MINIMUM_RATING = "minimumRating"
     }
 }

@@ -71,7 +71,6 @@ import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
 import com.norbertotaveras.reels.domain.model.discover.DiscoverSort
 import com.norbertotaveras.reels.domain.model.discover.hasActiveFilters
-import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
@@ -84,6 +83,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.isReelsLightTheme
 import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContentColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
+import java.text.NumberFormat
 
 @Composable
 fun DiscoverScreen(
@@ -223,7 +223,6 @@ fun DiscoverScreen(
         if (state.isFilterSheetVisible) {
             DiscoverFilterSheet(
                 state = state,
-                movieCount = movies.itemCount,
                 onEvent = onEvent
             )
         }
@@ -393,7 +392,6 @@ private fun DiscoverFilterButton(
 @Composable
 private fun DiscoverFilterSheet(
     state: DiscoverUiState,
-    movieCount: Int,
     onEvent: (DiscoverEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -460,11 +458,9 @@ private fun DiscoverFilterSheet(
                         state.filterErrorMessage != null -> Unit
 
                         else -> {
-                            state.genres
-                                .toDiscoverFilterGenres()
-                                .forEach { genre ->
+                            state.genres.forEach { genre ->
                                 DiscoverFilterChip(
-                                    label = genre.displayName,
+                                    label = genre.name.toDiscoverGenreDisplayName(),
                                     selected = state.filterSheetFilters.genreId == genre.id,
                                     onClick = {
                                         onEvent(
@@ -474,10 +470,10 @@ private fun DiscoverFilterSheet(
                                                     genreName = null
                                                 )
                                             } else {
-                                                DiscoverEvent.GenreSelected(
-                                                    genreId = genre.id,
-                                                    genreName = genre.displayName
-                                                )
+                                                    DiscoverEvent.GenreSelected(
+                                                        genreId = genre.id,
+                                                        genreName = genre.name.toDiscoverGenreDisplayName()
+                                                    )
                                             }
                                         )
                                     }
@@ -498,16 +494,18 @@ private fun DiscoverFilterSheet(
                 }
 
                 DiscoverChipSection(title = "Release Year") {
-                    DISCOVER_YEARS.forEach { filter ->
+                    discoverReleasePeriods().forEach { period ->
+                        val isSelected = state.filterSheetFilters.releaseYearFrom == period.yearFrom &&
+                            state.filterSheetFilters.releaseYearTo == period.yearTo
                         DiscoverFilterChip(
-                            label = filter.label,
-                            selected = state.filterSheetFilters.year == filter.year,
+                            label = period.label,
+                            selected = isSelected,
                             onClick = {
                                 onEvent(
-                                    DiscoverEvent.YearSelected(
-                                        year = filter.year.takeUnless {
-                                            state.filterSheetFilters.year == filter.year
-                                        }
+                                    DiscoverEvent.ReleasePeriodSelected(
+                                        yearFrom = period.yearFrom.takeUnless { isSelected },
+                                        yearTo = period.yearTo.takeUnless { isSelected },
+                                        label = period.label.takeUnless { isSelected }
                                     )
                                 )
                             }
@@ -538,8 +536,8 @@ private fun DiscoverFilterSheet(
             }
 
             DiscoverFilterSheetFooter(
-                movieCount = movieCount,
-                isLoading = state.isLoadingFilters,
+                movieCount = state.filterResultCount,
+                isLoading = state.isLoadingFilters || state.isLoadingFilterResultCount,
                 onApplyClick = {
                     onEvent(DiscoverEvent.ApplyFiltersClicked)
                 }
@@ -614,12 +612,18 @@ private fun DiscoverAppliedFiltersRow(
             }
         }
 
-        filters.year?.let { year ->
+        filters.releasePeriodLabel?.let { releasePeriodLabel ->
             item {
                 DiscoverRemovableFilterChip(
-                    label = year.toString(),
+                    label = releasePeriodLabel,
                     onRemoveClick = {
-                        onEvent(DiscoverEvent.YearSelected(null))
+                        onEvent(
+                            DiscoverEvent.ReleasePeriodSelected(
+                                yearFrom = null,
+                                yearTo = null,
+                                label = null
+                            )
+                        )
                     }
                 )
             }
@@ -712,11 +716,17 @@ private fun DiscoverActiveFiltersRow(
                 )
             }
 
-            state.filterSheetFilters.year?.let { year ->
+            state.filterSheetFilters.releasePeriodLabel?.let { releasePeriodLabel ->
                 DiscoverRemovableFilterChip(
-                    label = year.toString(),
+                    label = releasePeriodLabel,
                     onRemoveClick = {
-                        onEvent(DiscoverEvent.YearSelected(year = null))
+                        onEvent(
+                            DiscoverEvent.ReleasePeriodSelected(
+                                yearFrom = null,
+                                yearTo = null,
+                                label = null
+                            )
+                        )
                     }
                 )
             }
@@ -1056,7 +1066,7 @@ private fun DiscoverLanguageRow(
 
 @Composable
 private fun DiscoverFilterSheetFooter(
-    movieCount: Int,
+    movieCount: Int?,
     isLoading: Boolean,
     onApplyClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -1100,9 +1110,11 @@ private fun DiscoverFilterSheetFooter(
 
                 Text(
                     text = if (isLoading) {
-                        "Loading filters…"
+                        "Checking movies…"
                     } else {
-                        "Show ${movieCount.toMovieCountLabel(capitalize = true)}"
+                        movieCount?.let { count ->
+                            "Show ${count.toMovieCountLabel(capitalize = true)}"
+                        } ?: "Show Movies"
                     },
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontSize = 14.sp,
@@ -1419,27 +1431,7 @@ private fun discoverPlaceholderColor(): Color {
     return MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.52f)
 }
 
-private val DISCOVER_YEARS = listOf(
-    DiscoverYearFilter(label = "2024", year = 2024),
-    DiscoverYearFilter(label = "2023", year = 2023),
-    DiscoverYearFilter(label = "2022", year = 2022),
-    DiscoverYearFilter(label = "2021", year = 2021),
-    DiscoverYearFilter(label = "2010s", year = 2010),
-    DiscoverYearFilter(label = "2000s", year = 2000)
-)
 private val DISCOVER_RATINGS = listOf(null, 5, 6, 7, 8)
-private val DISCOVER_GENRE_ORDER = listOf(
-    "Action",
-    "Adventure",
-    "Animation",
-    "Comedy",
-    "Drama",
-    "History",
-    "Horror",
-    "Romance",
-    "Science Fiction",
-    "Thriller"
-)
 private val DISCOVER_SORTS = listOf(
     DiscoverSort.Popularity,
     DiscoverSort.HighestRated,
@@ -1461,14 +1453,10 @@ private val DISCOVER_FILTER_SKELETON_WIDTHS = listOf(
     80.dp
 )
 
-private data class DiscoverYearFilter(
+private data class DiscoverReleasePeriod(
     val label: String,
-    val year: Int,
-)
-
-private data class DiscoverGenreFilter(
-    val id: Int,
-    val displayName: String,
+    val yearFrom: Int,
+    val yearTo: Int,
 )
 
 private val DiscoverSort.displayLabel: String
@@ -1490,11 +1478,12 @@ private val DiscoverSort.descriptionLabel: String
     }
 
 private fun Int.toMovieCountLabel(capitalize: Boolean = false): String {
+    val formattedCount = NumberFormat.getIntegerInstance().format(this)
     return when {
         this == 1 && capitalize -> "1 Movie"
         this == 1 -> "1 movie"
-        capitalize -> "$this Movies"
-        else -> "$this movies"
+        capitalize -> "$formattedCount Movies"
+        else -> "$formattedCount movies"
     }
 }
 
@@ -1508,12 +1497,29 @@ private fun String.toDiscoverLanguageLabel(): String {
     }
 }
 
-private fun List<GenreDataModel>.toDiscoverFilterGenres(): List<DiscoverGenreFilter> {
-    return DISCOVER_GENRE_ORDER.mapNotNull { expectedName ->
-        firstOrNull { genre -> genre.name == expectedName }?.let { genre ->
-            DiscoverGenreFilter(
-                id = genre.id,
-                displayName = expectedName.toDiscoverGenreDisplayName()
+private fun discoverReleasePeriods(): List<DiscoverReleasePeriod> {
+    val currentYear = java.time.Year.now().value
+    val latestCompletedDecade = (currentYear / 10 - 1) * 10
+
+    return buildList {
+        repeat(4) { offset ->
+            val year = currentYear - offset
+            add(
+                DiscoverReleasePeriod(
+                    label = year.toString(),
+                    yearFrom = year,
+                    yearTo = year
+                )
+            )
+        }
+        repeat(2) { offset ->
+            val decadeStart = latestCompletedDecade - (offset * 10)
+            add(
+                DiscoverReleasePeriod(
+                    label = "${decadeStart}s",
+                    yearFrom = decadeStart,
+                    yearTo = decadeStart + 9
+                )
             )
         }
     }
@@ -1539,7 +1545,7 @@ private val DiscoverUiState.activeFilterCount: Int
     get() {
         var count = 0
         if (filters.genreId != null) count += 1
-        if (filters.year != null) count += 1
+        if (filters.releaseYearFrom != null || filters.releaseYearTo != null) count += 1
         if (filters.minimumRating != null) count += 1
         if (filters.sort != DiscoverSort.Popularity) count += 1
         return count

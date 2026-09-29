@@ -219,7 +219,8 @@ class TmdbRemoteDataSourceImpl @Inject constructor(
         page: Int?,
         sortBy: String,
         genreId: Int?,
-        year: Int?,
+        releaseDateFrom: String?,
+        releaseDateTo: String?,
         minimumRating: Int?,
         includeAdult: Boolean
     ): MoviesResponseDto {
@@ -228,7 +229,8 @@ class TmdbRemoteDataSourceImpl @Inject constructor(
             page = page,
             sortBy = sortBy,
             genreId = genreId,
-            year = year,
+            releaseDateFrom = releaseDateFrom,
+            releaseDateTo = releaseDateTo,
             minimumRating = minimumRating,
             includeAdult = includeAdult
         )
