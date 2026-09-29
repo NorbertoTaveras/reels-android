@@ -113,6 +113,9 @@ object ReelsDimensions {
     val favoritesEmptyIconSize = 34.dp
     val favoritesEmptyContentSpacing = 12.dp
     val favoritesTmdbLogoSize = 64.dp
+    val favoritesDisconnectedContentMaxWidth = 328.dp
+    val favoritesDisconnectedBodyMaxWidth = 280.dp
+    val favoritesConnectButtonMaxWidth = 236.dp
     val favoritesFeatureCardCornerSize = 16.dp
     val favoritesFeatureIconContainerSize = 32.dp
     val favoritesFeatureIconSize = 16.dp

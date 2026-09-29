@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -32,9 +33,9 @@ import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.WifiOff
@@ -44,6 +45,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SecondaryTabRow
@@ -60,6 +62,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -69,6 +72,7 @@ import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import coil3.compose.AsyncImage
+import com.norbertotaveras.reels.R
 import com.norbertotaveras.reels.domain.model.favorite.FavoriteMovieDataModel
 import com.norbertotaveras.reels.domain.model.favorite.SavedPersonDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
@@ -1067,17 +1071,21 @@ private fun LibraryErrorState(
         }
 
         Text(
-            text = when (listType) {
-                TmdbLibraryListType.Watchlist -> "Couldn't load your watchlist"
-                TmdbLibraryListType.Rated -> "Couldn't load your ratings"
-            },
+            text = "Something went wrong",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold
         )
 
         Text(
-            text = "Check your connection and try again.",
+            text = when (listType) {
+                TmdbLibraryListType.Watchlist -> {
+                    "Unable to load your watchlist. Check your connection and try again."
+                }
+                TmdbLibraryListType.Rated -> {
+                    "Unable to load your ratings. Check your connection and try again."
+                }
+            },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -1124,6 +1132,9 @@ private fun DisconnectedTmdbLibraryState(
 
             Text(
                 text = "Sign in to your TMDB account to sync your watchlist and ratings across devices.",
+                modifier = Modifier.widthIn(
+                    max = ReelsDimensions.favoritesDisconnectedBodyMaxWidth
+                ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
@@ -1131,7 +1142,9 @@ private fun DisconnectedTmdbLibraryState(
         }
 
         Surface(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .widthIn(max = ReelsDimensions.favoritesDisconnectedContentMaxWidth)
+                .fillMaxWidth(),
             shape = RoundedCornerShape(ReelsDimensions.favoritesFeatureCardCornerSize),
             color = MaterialTheme.colorScheme.surface,
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.24f))
@@ -1142,10 +1155,16 @@ private fun DisconnectedTmdbLibraryState(
                     description = "Access movies you want to watch",
                     imageVector = Icons.Filled.Bookmark
                 )
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f)
+                )
                 TmdbFeatureRow(
                     title = "Ratings sync",
                     description = "Your TMDB ratings in one place",
                     imageVector = Icons.Filled.Star
+                )
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f)
                 )
                 TmdbFeatureRow(
                     title = "Offline access",
@@ -1156,11 +1175,13 @@ private fun DisconnectedTmdbLibraryState(
         }
 
         Button(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .widthIn(max = ReelsDimensions.favoritesConnectButtonMaxWidth)
+                .fillMaxWidth(),
             onClick = onConnectSettingsClick
         ) {
             Icon(
-                imageVector = Icons.Filled.Settings,
+                imageVector = Icons.Filled.Link,
                 contentDescription = null,
                 modifier = Modifier.size(18.dp)
             )
@@ -1185,11 +1206,13 @@ private fun LibraryTmdbLogoMark(
         contentColor = ReelsTmdbOnBlue
     ) {
         Box(contentAlignment = Alignment.Center) {
-            Text(
-                text = "TMDB",
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Black,
-                maxLines = 1
+            Icon(
+                painter = painterResource(R.drawable.tmdb_logo),
+                contentDescription = "TMDB logo",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(ReelsSpacing.medium),
+                tint = ReelsTmdbOnBlue
             )
         }
     }
