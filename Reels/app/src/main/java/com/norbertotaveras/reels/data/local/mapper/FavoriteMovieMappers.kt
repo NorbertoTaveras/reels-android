@@ -7,11 +7,11 @@
 
 package com.norbertotaveras.reels.data.local.mapper
 
+import com.norbertotaveras.reels.data.local.entity.FavoriteMovieEntity
 import com.norbertotaveras.reels.domain.model.favorite.FavoriteMovieDataModel
 import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDetailsDataModel
-import com.norbertotaveras.reels.data.local.entity.FavoriteMovieEntity
 
 fun MovieDetailsDataModel.toFavoriteMovieEntity(
     favoritedAt: Long = System.currentTimeMillis()

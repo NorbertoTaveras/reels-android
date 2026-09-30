@@ -7,12 +7,8 @@
 
 package com.norbertotaveras.reels.data.remote.dto.movie
 
-import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 data class MovieDto(
     @SerializedName("id")
     val id: Int,
@@ -32,18 +28,4 @@ data class MovieDto(
     val genreIds: List<Int>,
     @SerializedName("rating")
     val accountRating: Double? = null,
-) : Parcelable {
-    fun toMovieDataModel(): MovieDataModel {
-        return MovieDataModel(
-            id = id,
-            title = title,
-            overview = overview,
-            posterPath = posterPath,
-            backdropPath = backdropPath,
-            releaseDate = releaseDate,
-            voteAverage = voteAverage,
-            genreIds = genreIds,
-            accountRating = accountRating
-        )
-    }
-}
+)

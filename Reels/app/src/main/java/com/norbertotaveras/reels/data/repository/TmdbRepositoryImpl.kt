@@ -17,6 +17,13 @@ import com.norbertotaveras.reels.data.local.db.ReelsDatabase
 import com.norbertotaveras.reels.data.local.mapper.toMovieDataModel
 import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
+import com.norbertotaveras.reels.data.remote.mapper.genre.toGenreDataModel
+import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieCreditsDataModel
+import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDataModel as toRemoteMovieDataModel
+import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDetailsDataModel
+import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieVideosDataModel
+import com.norbertotaveras.reels.data.remote.mapper.person.toPersonDetailsDataModel
+import com.norbertotaveras.reels.data.remote.mapper.person.toPersonMovieCreditsDataModel
 import com.norbertotaveras.reels.data.remote.releaseDateFromParameter
 import com.norbertotaveras.reels.data.remote.releaseDateToParameter
 import com.norbertotaveras.reels.data.remote.paging.CachedMoviesRemoteMediator
@@ -115,7 +122,7 @@ class TmdbRepositoryImpl @Inject constructor(
                 )
             }
         ).flow.map { pagingData ->
-            pagingData.map { movieDto -> movieDto.toMovieDataModel() }
+            pagingData.map { movieDto -> movieDto.toRemoteMovieDataModel() }
         }
     }
 
@@ -144,7 +151,7 @@ class TmdbRepositoryImpl @Inject constructor(
                 timeWindow = TRENDING_TIME_WINDOW,
                 language = language
             ).results.map { movieDto ->
-                movieDto.toMovieDataModel()
+                movieDto.toRemoteMovieDataModel()
             }
         }
     }
@@ -196,7 +203,7 @@ class TmdbRepositoryImpl @Inject constructor(
                 language = language,
                 page = page
             ).results.map {
-                movieDto -> movieDto.toMovieDataModel()
+                movieDto -> movieDto.toRemoteMovieDataModel()
             }
         }
     }

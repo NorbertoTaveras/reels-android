@@ -7,11 +7,8 @@
 
 package com.norbertotaveras.reels.domain.model.movie
 
-import android.os.Parcelable
 import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 data class MovieDetailsDataModel(
     val id: Int,
     val title: String,
@@ -25,4 +22,4 @@ data class MovieDetailsDataModel(
     val popularity: Double,
     val voteCount: Int,
     val genres: List<GenreDataModel>
-) : Parcelable
+)

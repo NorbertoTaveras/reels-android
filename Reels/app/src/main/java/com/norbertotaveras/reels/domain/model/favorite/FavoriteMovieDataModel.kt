@@ -7,10 +7,7 @@
 
 package com.norbertotaveras.reels.domain.model.favorite
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 data class FavoriteMovieDataModel(
     val id: Int,
     val title: String,
@@ -25,4 +22,4 @@ data class FavoriteMovieDataModel(
     val popularity: Double,
     val genreNames: List<String>,
     val favoritedAt: Long
-) : Parcelable
+)

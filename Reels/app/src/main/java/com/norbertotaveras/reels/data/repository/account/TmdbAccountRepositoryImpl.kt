@@ -16,6 +16,9 @@ import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
 import com.norbertotaveras.reels.data.remote.error.TmdbSessionExpiredException
 import com.norbertotaveras.reels.data.remote.error.isTmdbSessionExpiredError
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
+import com.norbertotaveras.reels.data.remote.mapper.account.toTmdbAccountDataModel
+import com.norbertotaveras.reels.data.remote.mapper.account.toTmdbMovieAccountStateDataModel
+import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDataModel
 import com.norbertotaveras.reels.data.remote.paging.TmdbAccountMoviesPagingSource
 import com.norbertotaveras.reels.data.remote.paging.TmdbAccountMovieListType
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher

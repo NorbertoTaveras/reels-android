@@ -7,10 +7,7 @@
 
 package com.norbertotaveras.reels.domain.model.person
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 data class PersonDetailsDataModel(
     val id: Int,
     val name: String,
@@ -19,4 +16,4 @@ data class PersonDetailsDataModel(
     val placeOfBirth: String?,
     val profilePath: String?,
     val knownForDepartment: String?
-) : Parcelable
+)

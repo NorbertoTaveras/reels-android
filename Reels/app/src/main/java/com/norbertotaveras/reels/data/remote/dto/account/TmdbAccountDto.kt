@@ -8,7 +8,6 @@
 package com.norbertotaveras.reels.data.remote.dto.account
 
 import com.google.gson.annotations.SerializedName
-import com.norbertotaveras.reels.domain.model.account.TmdbAccountDataModel
 
 data class TmdbAccountDto(
     @SerializedName("id")
@@ -17,12 +16,4 @@ data class TmdbAccountDto(
     val username: String,
     @SerializedName("name")
     val name: String?,
-) {
-    fun toTmdbAccountDataModel(): TmdbAccountDataModel {
-        return TmdbAccountDataModel(
-            accountId = id,
-            username = username,
-            displayName = name
-        )
-    }
-}
+)

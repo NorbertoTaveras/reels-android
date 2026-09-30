@@ -7,11 +7,8 @@
 
 package com.norbertotaveras.reels.domain.model.favorite
 
-import android.os.Parcelable
 import com.norbertotaveras.reels.domain.model.person.PersonMovieCreditDataModel
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 data class SavedPersonDataModel(
     val id: Int,
     val name: String,
@@ -22,4 +19,4 @@ data class SavedPersonDataModel(
     val knownForDepartment: String?,
     val knownFor: List<PersonMovieCreditDataModel>,
     val savedAt: Long
-) : Parcelable
+)
