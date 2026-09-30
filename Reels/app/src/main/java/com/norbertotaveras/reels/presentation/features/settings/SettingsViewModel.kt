@@ -9,7 +9,6 @@ package com.norbertotaveras.reels.presentation.features.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.norbertotaveras.reels.BuildConfig
 import com.norbertotaveras.reels.domain.model.settings.AppTheme
 import com.norbertotaveras.reels.domain.model.settings.ImageQuality
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
@@ -344,46 +343,4 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    private companion object {
-        const val TMDB_WEBSITE_URL = "https://www.themoviedb.org/"
-
-        fun buildAppVersionLabel(): String {
-            return "${BuildConfig.VERSION_NAME} (build ${BuildConfig.VERSION_CODE})"
-        }
-
-        fun buildAppConfigurationLabel(): String {
-            val flavorLabel = BuildConfig.FLAVOR.toDisplayLabel()
-            val buildTypeLabel = BuildConfig.BUILD_TYPE.toDisplayLabel()
-            val tokenStatusLabel = if (BuildConfig.TMDB_READ_TOKEN.isBlank()) {
-                "Token missing"
-            } else {
-                "Token configured"
-            }
-
-            return "$flavorLabel $buildTypeLabel · $tokenStatusLabel"
-        }
-
-        fun buildSavedLibraryLabel(
-            movieCount: Int,
-            personCount: Int
-        ): String {
-            if (movieCount == 0 && personCount == 0) {
-                return "Manage movies and people"
-            }
-
-            val movieLabel = "$movieCount ${if (movieCount == 1) "movie" else "movies"}"
-            val personLabel = "$personCount ${if (personCount == 1) "person" else "people"}"
-            return "$movieLabel · $personLabel"
-        }
-
-        fun String.toDisplayLabel(): String {
-            return replaceFirstChar { character ->
-                if (character.isLowerCase()) {
-                    character.titlecase()
-                } else {
-                    character.toString()
-                }
-            }
-        }
-    }
 }

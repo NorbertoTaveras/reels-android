@@ -432,7 +432,7 @@ class MovieDetailsViewModel @Inject constructor(
                     }
                     _effect.emit(
                         MovieDetailsEffect.ShowMessage(
-                            message = "Rated ${rating.toRatingLabel()} on TMDB"
+                            message = "Rated ${rating.toRatingText()} on TMDB"
                         )
                     )
                 },
@@ -590,16 +590,4 @@ class MovieDetailsViewModel @Inject constructor(
         }
     }
 
-    private companion object {
-        const val DEFAULT_LANGUAGE = "en-US"
-        const val DEFAULT_TMDB_RATING = 8.0
-    }
-}
-
-private fun Double.toRatingLabel(): String {
-    return if (this % 1.0 == 0.0) {
-        toInt().toString()
-    } else {
-        toString()
-    }
 }
