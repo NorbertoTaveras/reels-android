@@ -55,18 +55,6 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 
-private data class MovieInfoRowData(
-    val label: String,
-    val value: String,
-    val icon: MovieInfoIcon,
-)
-
-private enum class MovieInfoIcon {
-    ReleaseDate,
-    Language,
-    Popularity
-}
-
 @Composable
 fun MovieDetailsContent(
     movie: MovieDetailsDataModel,
@@ -536,68 +524,6 @@ private fun OfflineFavoriteNotice(
         }
     }
 }
-
-private val previewCast = listOf(
-    CastMemberDataModel(
-        id = 1,
-        name = "Timothée Chalamet",
-        characterName = "Paul Atreides",
-        profilePath = null
-    ),
-    CastMemberDataModel(
-        id = 2,
-        name = "Zendaya",
-        characterName = "Chani",
-        profilePath = null
-    ),
-    CastMemberDataModel(
-        id = 3,
-        name = "Rebecca Ferguson",
-        characterName = "Lady Jessica",
-        profilePath = null
-    ),
-    CastMemberDataModel(
-        id = 4,
-        name = "Josh Brolin",
-        characterName = "Gurney Halleck",
-        profilePath = null
-    )
-)
-
-private val previewTrailers = listOf(
-    TrailerCarouselItem(
-        id = "official",
-        title = "Official Trailer",
-        thumbnailUrl = null,
-        source = "YouTube",
-        duration = "3:12"
-    ),
-    TrailerCarouselItem(
-        id = "final",
-        title = "Final Trailer",
-        thumbnailUrl = null,
-        source = "YouTube",
-        duration = "2:45"
-    )
-)
-
-private val previewSimilarMovies = listOf(
-    PosterCarouselItem(
-        id = 1,
-        title = "Oppenheimer",
-        posterUrl = null
-    ),
-    PosterCarouselItem(
-        id = 2,
-        title = "Poor Things",
-        posterUrl = null
-    ),
-    PosterCarouselItem(
-        id = 3,
-        title = "Killers of the Flower Moon",
-        posterUrl = null
-    )
-)
 
 @Preview(showBackground = true)
 @Composable

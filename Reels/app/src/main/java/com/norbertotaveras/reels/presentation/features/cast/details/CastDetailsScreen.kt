@@ -36,7 +36,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -45,6 +44,7 @@ import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import com.norbertotaveras.reels.presentation.ui.theme.reelsPlaceholderColor
 
 @Composable
 fun CastDetailsScreen(
@@ -127,7 +127,7 @@ private fun CastDetailsLoadingState(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(ReelsDimensions.castDetailsHeroHeight)
-                    .background(castDetailsPlaceholderColor())
+                    .background(reelsPlaceholderColor())
             ) {
                 Surface(
                     modifier = Modifier
@@ -349,7 +349,7 @@ private fun CastDetailsPlaceholderBox(
     Box(
         modifier = modifier
             .clip(MaterialTheme.shapes.large)
-            .background(castDetailsPlaceholderColor())
+            .background(reelsPlaceholderColor())
     )
 }
 
@@ -364,13 +364,6 @@ private fun CastDetailsPlaceholderBar(
             .width(width)
             .height(height)
             .clip(MaterialTheme.shapes.medium)
-            .background(castDetailsPlaceholderColor())
+            .background(reelsPlaceholderColor())
     )
 }
-
-@Composable
-private fun castDetailsPlaceholderColor(): Color {
-    return MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.52f)
-}
-
-private const val CAST_DETAILS_KNOWN_FOR_PLACEHOLDER_COUNT = 3

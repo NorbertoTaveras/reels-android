@@ -12,12 +12,6 @@ import com.norbertotaveras.reels.BuildConfig
 import com.norbertotaveras.reels.domain.model.settings.ImageQuality
 import com.norbertotaveras.reels.presentation.ui.theme.LocalImageQuality
 
-enum class TmdbImageType {
-    Poster,
-    Backdrop,
-    Profile
-}
-
 @Composable
 fun String?.toTmdbImageUrl(
     imageType: TmdbImageType = TmdbImageType.Poster

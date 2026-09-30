@@ -44,7 +44,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -61,6 +60,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContentColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsPlaceholderColor
 
 @Composable
 fun FilmographyScreen(
@@ -446,7 +446,7 @@ private fun FilmographyPlaceholderCard(
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.poster)
                 .clip(MaterialTheme.shapes.medium)
-                .background(filmographyPlaceholderColor())
+                .background(reelsPlaceholderColor())
         )
 
         Box(
@@ -454,7 +454,7 @@ private fun FilmographyPlaceholderCard(
                 .fillMaxWidth(0.82f)
                 .height(12.dp)
                 .clip(MaterialTheme.shapes.small)
-                .background(filmographyPlaceholderColor())
+                .background(reelsPlaceholderColor())
         )
 
         Box(
@@ -462,7 +462,7 @@ private fun FilmographyPlaceholderCard(
                 .width(36.dp)
                 .height(10.dp)
                 .clip(MaterialTheme.shapes.small)
-                .background(filmographyPlaceholderColor())
+                .background(reelsPlaceholderColor())
         )
     }
 }
@@ -491,11 +491,6 @@ private fun FilmographyEndCap(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
-}
-
-@Composable
-private fun filmographyPlaceholderColor(): Color {
-    return MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.52f)
 }
 
 @Composable
@@ -592,5 +587,3 @@ private fun FilmographyMessageState(
         }
     }
 }
-
-private const val FILMOGRAPHY_PLACEHOLDER_COUNT = 12

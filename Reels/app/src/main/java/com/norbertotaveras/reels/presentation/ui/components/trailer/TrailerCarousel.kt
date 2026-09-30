@@ -23,14 +23,6 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 
-data class TrailerCarouselItem(
-    val id: String,
-    val title: String,
-    val thumbnailUrl: String?,
-    val source: String? = null,
-    val duration: String? = null,
-)
-
 @Composable
 fun TrailerCarousel(
     trailers: List<TrailerCarouselItem>,

@@ -540,11 +540,6 @@ private fun PrivacySectionLabel(
     )
 }
 
-private data class PrivacyNoticeItem(
-    val title: String,
-    val description: String? = null,
-)
-
 @Composable
 private fun LanguageRegionDialog(
     selectedOption: LanguageRegion,

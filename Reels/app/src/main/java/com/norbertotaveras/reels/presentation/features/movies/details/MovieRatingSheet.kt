@@ -217,11 +217,3 @@ private fun RatingChoice(
         }
     }
 }
-
-private fun Double.toRatingText(): String {
-    return if (this % 1.0 == 0.0) {
-        toInt().toString()
-    } else {
-        String.format("%.1f", this)
-    }
-}

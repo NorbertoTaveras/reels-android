@@ -45,6 +45,7 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import com.norbertotaveras.reels.presentation.ui.theme.reelsPlaceholderColor
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -165,7 +166,7 @@ private fun MovieDetailsLoadingState(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(ReelsDimensions.detailsLoadingHeroHeight)
-                    .background(detailsPlaceholderColor())
+                    .background(reelsPlaceholderColor())
             ) {
                 Surface(
                     modifier = Modifier
@@ -420,7 +421,7 @@ private fun PlaceholderBox(
     Box(
         modifier = modifier
             .clip(MaterialTheme.shapes.large)
-            .background(detailsPlaceholderColor())
+            .background(reelsPlaceholderColor())
     )
 }
 
@@ -435,11 +436,6 @@ private fun PlaceholderBar(
             .width(width)
             .height(height)
             .clip(MaterialTheme.shapes.medium)
-            .background(detailsPlaceholderColor())
+            .background(reelsPlaceholderColor())
     )
-}
-
-@Composable
-private fun detailsPlaceholderColor(): Color {
-    return MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.52f)
 }

@@ -42,7 +42,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -60,6 +59,7 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
+import com.norbertotaveras.reels.presentation.ui.theme.reelsPlaceholderColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsMutedContainerColor
 
 @Composable
@@ -471,7 +471,7 @@ private fun MovieCastPlaceholderRow(
                 modifier = Modifier
                     .size(ReelsDimensions.fullCastProfileSize)
                     .clip(RoundedCornerShape(ReelsDimensions.fullCastProfileCornerRadius))
-                    .background(fullCastPlaceholderColor())
+                    .background(reelsPlaceholderColor())
             )
 
             Column(
@@ -496,13 +496,8 @@ private fun MovieCastPlaceholderBar(
             .width(width)
             .height(height)
             .clip(MaterialTheme.shapes.medium)
-            .background(fullCastPlaceholderColor())
+            .background(reelsPlaceholderColor())
     )
-}
-
-@Composable
-private fun fullCastPlaceholderColor(): Color {
-    return MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.52f)
 }
 
 @Preview(showBackground = true)
@@ -537,5 +532,3 @@ private fun MovieCastScreenPreview() {
         )
     }
 }
-
-private const val FULL_CAST_PLACEHOLDER_COUNT = 8

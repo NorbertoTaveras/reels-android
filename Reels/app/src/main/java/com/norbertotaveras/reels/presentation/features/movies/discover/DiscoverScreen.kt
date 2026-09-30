@@ -76,15 +76,11 @@ import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetrySt
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsGenreChipContainer
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightGenreChipContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
-import com.norbertotaveras.reels.presentation.ui.theme.isReelsLightTheme
 import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContentColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
-import java.text.NumberFormat
-import java.util.Calendar
+import com.norbertotaveras.reels.presentation.ui.theme.reelsPlaceholderColor
 
 @Composable
 fun DiscoverScreen(
@@ -1256,7 +1252,7 @@ private fun DiscoverPlaceholderCard(
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.poster)
                 .clip(MaterialTheme.shapes.large)
-                .background(discoverPlaceholderColor())
+                .background(reelsPlaceholderColor())
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -1266,7 +1262,7 @@ private fun DiscoverPlaceholderCard(
                 .fillMaxWidth(0.92f)
                 .size(height = 14.dp, width = 1.dp)
                 .clip(MaterialTheme.shapes.medium)
-                .background(discoverPlaceholderColor())
+                .background(reelsPlaceholderColor())
         )
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -1276,7 +1272,7 @@ private fun DiscoverPlaceholderCard(
                 .fillMaxWidth(0.4f)
                 .size(height = 10.dp, width = 1.dp)
                 .clip(MaterialTheme.shapes.medium)
-                .background(discoverPlaceholderColor())
+                .background(reelsPlaceholderColor())
         )
     }
 }
@@ -1431,121 +1427,3 @@ private fun DiscoverErrorState(
         }
     }
 }
-
-@Composable
-private fun discoverPlaceholderColor(): Color {
-    return MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.52f)
-}
-
-private val DISCOVER_RATINGS = listOf(null, 5, 6, 7, 8)
-private val DISCOVER_SORTS = listOf(
-    DiscoverSort.Popularity,
-    DiscoverSort.HighestRated,
-    DiscoverSort.Newest,
-    DiscoverSort.Alphabetical
-)
-private const val DISCOVER_PLACEHOLDER_COUNT = 12
-private const val DISCOVER_APPEND_PLACEHOLDER_COUNT = 3
-private const val DISCOVER_GENRE_COLUMNS = 4
-private val DISCOVER_FILTER_SKELETON_WIDTHS = listOf(
-    72.dp,
-    90.dp,
-    82.dp,
-    76.dp,
-    68.dp,
-    78.dp,
-    66.dp,
-    88.dp,
-    72.dp,
-    80.dp
-)
-private data class DiscoverReleasePeriod(
-    val label: String,
-    val yearFrom: Int,
-    val yearTo: Int,
-)
-
-private val DiscoverSort.displayLabel: String
-    get() = when (this) {
-        DiscoverSort.Popularity -> "Popularity"
-        DiscoverSort.HighestRated -> "Rating"
-        DiscoverSort.Newest -> "Release Date"
-        DiscoverSort.Alphabetical -> "A - Z"
-        else -> label
-    }
-
-private val DiscoverSort.descriptionLabel: String
-    get() = when (this) {
-        DiscoverSort.Popularity -> "Most watched first"
-        DiscoverSort.HighestRated -> "Highest rated first"
-        DiscoverSort.Newest -> "Newest releases first"
-        DiscoverSort.Alphabetical -> "Alphabetical order"
-        DiscoverSort.Revenue -> "Highest box office first"
-    }
-
-private fun Int.toMovieCountLabel(capitalize: Boolean = false): String {
-    val formattedCount = NumberFormat.getIntegerInstance().format(this)
-    return when {
-        this == 1 && capitalize -> "1 Movie"
-        this == 1 -> "1 movie"
-        capitalize -> "$formattedCount Movies"
-        else -> "$formattedCount movies"
-    }
-}
-
-private fun String.toDiscoverLanguageLabel(): String {
-    return when (this) {
-        "en-US" -> "English · All regions"
-        "en-GB" -> "English · United Kingdom"
-        "es-ES" -> "Spanish · Spain"
-        "fr-FR" -> "French · France"
-        else -> this
-    }
-}
-
-private fun discoverReleasePeriods(): List<DiscoverReleasePeriod> {
-    val currentYear = Calendar.getInstance().get(Calendar.YEAR)
-    val latestCompletedDecade = (currentYear / 10 - 1) * 10
-
-    return buildList {
-        repeat(4) { offset ->
-            val year = currentYear - offset
-            add(
-                DiscoverReleasePeriod(
-                    label = year.toString(),
-                    yearFrom = year,
-                    yearTo = year
-                )
-            )
-        }
-        repeat(2) { offset ->
-            val decadeStart = latestCompletedDecade - (offset * 10)
-            add(
-                DiscoverReleasePeriod(
-                    label = "${decadeStart}s",
-                    yearFrom = decadeStart,
-                    yearTo = decadeStart + 9
-                )
-            )
-        }
-    }
-}
-
-@Composable
-private fun discoverFilterControlColor(): Color {
-    return if (isReelsLightTheme()) {
-        ReelsLightGenreChipContainer
-    } else {
-        ReelsGenreChipContainer.copy(alpha = 0.58f)
-    }
-}
-
-private val DiscoverUiState.activeFilterCount: Int
-    get() {
-        var count = 0
-        if (filters.genreId != null) count += 1
-        if (filters.releaseYearFrom != null || filters.releaseYearTo != null) count += 1
-        if (filters.minimumRating != null) count += 1
-        if (filters.sort != DiscoverSort.Popularity) count += 1
-        return count
-    }

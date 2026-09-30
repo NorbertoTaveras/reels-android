@@ -19,15 +19,6 @@ data class FavoritesUiState(
     val removingPersonIds: Set<Int> = emptySet(),
 )
 
-enum class LibraryTab(
-    val title: String,
-) {
-    Movies(title = "Movies"),
-    People(title = "People"),
-    Tmdb(title = "Watchlist"),
-    Rated(title = "Rated")
-}
-
 val FavoritesUiState.selectedItemCount: Int
     get() = when (selectedTab) {
         LibraryTab.Movies -> movies.size

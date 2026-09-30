@@ -472,9 +472,6 @@ private fun HeroRateButton(
     }
 }
 
-
-
-
 @Preview(showBackground = true)
 @Composable
 private fun MovieHeroHeaderPreview() {

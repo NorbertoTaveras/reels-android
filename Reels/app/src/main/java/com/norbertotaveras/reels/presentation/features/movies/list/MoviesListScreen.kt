@@ -68,6 +68,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContainerColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContentColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsPlaceholderColor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
@@ -575,7 +576,7 @@ private fun HomeLoadingState(
                     .padding(horizontal = ReelsSpacing.screenHorizontal)
                     .aspectRatio(ReelsDimensions.heroCardAspectRatio)
                     .clip(MaterialTheme.shapes.extraLarge)
-                    .background(placeholderColor())
+                    .background(reelsPlaceholderColor())
             ) {
                 Column(
                     modifier = Modifier
@@ -627,7 +628,7 @@ private fun PosterPlaceholderCard(
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.poster)
                 .clip(MaterialTheme.shapes.large)
-                .background(placeholderColor())
+                .background(reelsPlaceholderColor())
         )
 
         PlaceholderBar(width = ReelsDimensions.posterCardWidth, height = 18.dp)
@@ -646,13 +647,8 @@ private fun PlaceholderBar(
             .width(width)
             .size(width = width, height = height)
             .clip(MaterialTheme.shapes.medium)
-            .background(placeholderColor())
+            .background(reelsPlaceholderColor())
     )
-}
-
-@Composable
-private fun placeholderColor(): Color {
-    return MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.52f)
 }
 
 @Composable
@@ -777,15 +773,3 @@ private fun HomePosterCard(
         }
     }
 }
-
-private const val HERO_MOVIE_LIMIT = 3
-private const val HERO_AUTO_SCROLL_DELAY_MS = 2_800L
-private const val HERO_CROSSFADE_DURATION_MS = 650
-private const val HOME_SECTION_LIMIT = 10
-private const val SECTION_PLACEHOLDER_COUNT = 4
-private val HOME_LOADING_SECTION_TITLES = listOf(
-    MovieCategory.POPULAR.label,
-    MovieCategory.NOW_PLAYING.label,
-    MovieCategory.UPCOMING.label,
-    MovieCategory.TOP_RATED.label
-)

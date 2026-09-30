@@ -33,9 +33,3 @@ data class SettingsUiState(
     val isClearImageCacheDialogVisible: Boolean = false,
     val isPrivacyNoticeVisible: Boolean = false,
 )
-
-enum class SettingsPreferenceDialog {
-    ImageQuality,
-    LanguageRegion,
-    Theme
-}

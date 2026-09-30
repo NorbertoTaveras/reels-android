@@ -855,5 +855,3 @@ private fun SearchCachedResultsBanner(
         }
     }
 }
-
-private const val MIN_SEARCH_QUERY_LENGTH = 2

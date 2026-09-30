@@ -40,7 +40,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -63,6 +62,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContentColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsPlaceholderColor
 
 @Composable
 fun MovieCategoryScreen(
@@ -427,7 +427,7 @@ private fun MovieCategoryPlaceholderCard(
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.poster)
                 .clip(MaterialTheme.shapes.medium)
-                .background(categoryPlaceholderColor())
+                .background(reelsPlaceholderColor())
         )
 
         CategoryPlaceholderBar(widthFraction = 0.92f, height = 12.dp)
@@ -446,13 +446,8 @@ private fun CategoryPlaceholderBar(
             .fillMaxWidth(widthFraction)
             .height(height)
             .clip(MaterialTheme.shapes.medium)
-            .background(categoryPlaceholderColor())
+            .background(reelsPlaceholderColor())
     )
-}
-
-@Composable
-private fun categoryPlaceholderColor(): Color {
-    return MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.52f)
 }
 
 @Composable
@@ -575,14 +570,3 @@ private fun MovieCategoryEndCap(
         )
     }
 }
-
-private val MovieCategory.supportingText: String
-    get() = when (this) {
-        MovieCategory.POPULAR -> "What everyone is watching right now"
-        MovieCategory.NOW_PLAYING -> "Movies playing in theaters now"
-        MovieCategory.UPCOMING -> "Movies arriving in theaters soon"
-        MovieCategory.TOP_RATED -> "The highest-rated movies on TMDB"
-    }
-
-private const val CATEGORY_PLACEHOLDER_COUNT = 12
-private const val CATEGORY_APPEND_PLACEHOLDER_COUNT = 3

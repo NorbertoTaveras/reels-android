@@ -89,6 +89,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContentColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsPlaceholderColor
 
 @Composable
 fun FavoritesScreen(
@@ -238,17 +239,6 @@ private fun LibraryHeader(
         )
     }
 }
-
-private enum class TmdbLibraryListType {
-    Watchlist,
-    Rated
-}
-
-private val TmdbLibraryListType.emptyTab: LibraryTab
-    get() = when (this) {
-        TmdbLibraryListType.Watchlist -> LibraryTab.Tmdb
-        TmdbLibraryListType.Rated -> LibraryTab.Rated
-    }
 
 private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovieItems(
     state: FavoritesUiState,
@@ -462,7 +452,7 @@ private fun LibraryPosterPlaceholder(
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.poster)
                 .clip(RoundedCornerShape(ReelsDimensions.favoritesPosterCornerSize))
-                .background(libraryPlaceholderColor())
+                .background(reelsPlaceholderColor(alpha = 0.72f))
         )
 
         Box(
@@ -470,7 +460,7 @@ private fun LibraryPosterPlaceholder(
                 .fillMaxWidth(0.82f)
                 .height(14.dp)
                 .clip(RoundedCornerShape(4.dp))
-                .background(libraryPlaceholderColor())
+                .background(reelsPlaceholderColor(alpha = 0.72f))
         )
 
         Box(
@@ -478,7 +468,7 @@ private fun LibraryPosterPlaceholder(
                 .fillMaxWidth(0.36f)
                 .height(11.dp)
                 .clip(RoundedCornerShape(4.dp))
-                .background(libraryPlaceholderColor())
+                .background(reelsPlaceholderColor(alpha = 0.72f))
         )
     }
 }
@@ -1323,11 +1313,3 @@ private fun EmptyLibraryState(
         )
     }
 }
-
-@Composable
-private fun libraryPlaceholderColor(): Color {
-    return MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f)
-}
-
-private const val LIBRARY_LOADING_PLACEHOLDER_COUNT = 6
-private const val LIBRARY_APPEND_PLACEHOLDER_COUNT = 2

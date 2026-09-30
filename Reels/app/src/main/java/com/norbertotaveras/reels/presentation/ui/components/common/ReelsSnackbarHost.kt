@@ -14,11 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.CloudSync
-import androidx.compose.material.icons.filled.ErrorOutline
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,12 +26,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsAccent
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsError
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
 @Composable
@@ -130,42 +123,6 @@ private fun SnackbarLeadingVisual(
             contentDescription = contentDescription,
             modifier = Modifier.size(22.dp),
             tint = visual.tint
-        )
-    }
-}
-
-private data class SnackbarVisual(
-    val icon: ImageVector,
-    val tint: Color,
-    val isLoading: Boolean = false,
-)
-
-private fun snackbarVisualFor(message: String): SnackbarVisual {
-    val normalizedMessage = message.lowercase()
-
-    return when {
-        normalizedMessage.contains("syncing") -> SnackbarVisual(
-            icon = Icons.Filled.CloudSync,
-            tint = ReelsAccent,
-            isLoading = true
-        )
-
-        normalizedMessage.contains("rated") -> SnackbarVisual(
-            icon = Icons.Filled.Star,
-            tint = ReelsAccent
-        )
-
-        normalizedMessage.contains("unable") ||
-            normalizedMessage.contains("error") ||
-            normalizedMessage.contains("failed") ||
-            normalizedMessage.contains("retry") -> SnackbarVisual(
-                icon = Icons.Filled.ErrorOutline,
-                tint = ReelsError
-            )
-
-        else -> SnackbarVisual(
-            icon = Icons.Filled.CheckCircle,
-            tint = ReelsAccent
         )
     }
 }

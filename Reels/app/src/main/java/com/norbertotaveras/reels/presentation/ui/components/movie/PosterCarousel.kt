@@ -25,14 +25,6 @@ import androidx.compose.ui.unit.dp
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 
-data class PosterCarouselItem(
-    val id: Int,
-    val title: String,
-    val posterUrl: String?,
-    val releaseYear: String? = null,
-    val rating: String? = null,
-)
-
 @Composable
 fun PosterCarousel(
     items: List<PosterCarouselItem>,
