@@ -130,7 +130,7 @@ internal fun DiscoverPosterCard(
 }
 
 @Composable
-internal fun DiscoverRatingBadge(
+private fun DiscoverRatingBadge(
     rating: Double,
     modifier: Modifier = Modifier,
 ) {
@@ -353,4 +353,3 @@ internal fun DiscoverErrorState(
         }
     }
 }
-

@@ -33,15 +33,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import com.norbertotaveras.reels.extensions.toReleaseYear
-import com.norbertotaveras.reels.presentation.ui.components.movie.PosterCarouselItem
-import com.norbertotaveras.reels.presentation.ui.components.trailer.TrailerCarouselItem
 import com.norbertotaveras.reels.presentation.ui.extensions.toErrorTitle
-import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing

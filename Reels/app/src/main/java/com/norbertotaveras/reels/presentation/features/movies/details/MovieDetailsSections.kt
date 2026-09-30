@@ -7,18 +7,14 @@
 
 package com.norbertotaveras.reels.presentation.features.movies.details
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.DownloadDone
@@ -33,27 +29,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.norbertotaveras.reels.domain.model.cast.CastMemberDataModel
-import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
-import com.norbertotaveras.reels.domain.model.movie.MovieDetailsDataModel
 import com.norbertotaveras.reels.extensions.toDisplayTmdbDate
 import com.norbertotaveras.reels.extensions.toDisplayLanguageName
-import com.norbertotaveras.reels.extensions.toReleaseYear
-import com.norbertotaveras.reels.presentation.ui.components.cast.CastCarousel
-import com.norbertotaveras.reels.presentation.ui.components.movie.MovieHeroHeader
-import com.norbertotaveras.reels.presentation.ui.components.movie.PosterCarouselItem
-import com.norbertotaveras.reels.presentation.ui.components.movie.SimilarMoviesSection
-import com.norbertotaveras.reels.presentation.ui.components.trailer.TrailerCarousel
-import com.norbertotaveras.reels.presentation.ui.components.trailer.TrailerCarouselItem
-import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
-import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 
 @Composable
 internal fun MovieDetailsInlineNotice(

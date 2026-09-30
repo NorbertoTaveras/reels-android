@@ -11,19 +11,6 @@ import java.io.IOException
 import java.net.SocketTimeoutException
 import retrofit2.HttpException
 
-class TmdbConfigurationException(
-    message: String,
-) : IOException(message)
-
-class TmdbSessionExpiredException : IOException(
-    "Your TMDB session expired. Connect again in Settings."
-)
-
-class TmdbNetworkException(
-    override val message: String,
-    cause: Throwable? = null,
-) : Exception(message, cause)
-
 fun Throwable.toTmdbNetworkException(): TmdbNetworkException {
     val userMessage = when (this) {
         is TmdbNetworkException -> message

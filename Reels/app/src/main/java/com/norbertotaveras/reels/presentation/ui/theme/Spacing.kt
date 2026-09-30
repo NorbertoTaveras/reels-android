@@ -19,10 +19,3 @@ object ReelsSpacing {
     val screenHorizontal = 20.dp
     val section = 28.dp
 }
-
-object ReelsRatios {
-    val poster = 2f / 3f
-    val backdrop = 16f / 9f
-    val trailer = 16f / 9f
-    val castPortrait = 1f
-}
