@@ -5,32 +5,30 @@
  * modification, distribution, or use is prohibited.
  */
 
-package com.norbertotaveras.reels.data.repository
+package com.norbertotaveras.reels.data.repository.movie
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingData
 import androidx.paging.map
 import com.norbertotaveras.reels.data.local.dao.CachedMovieDao
 import com.norbertotaveras.reels.data.local.db.ReelsDatabase
 import com.norbertotaveras.reels.data.local.mapper.toMovieDataModel
 import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
-import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
 import com.norbertotaveras.reels.data.remote.mapper.genre.toGenreDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieCreditsDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDataModel as toRemoteMovieDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDetailsDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieVideosDataModel
-import com.norbertotaveras.reels.data.remote.mapper.person.toPersonDetailsDataModel
-import com.norbertotaveras.reels.data.remote.mapper.person.toPersonMovieCreditsDataModel
-import com.norbertotaveras.reels.data.remote.releaseDateFromParameter
-import com.norbertotaveras.reels.data.remote.releaseDateToParameter
 import com.norbertotaveras.reels.data.remote.paging.CachedMoviesRemoteMediator
 import com.norbertotaveras.reels.data.remote.paging.CachedSearchMoviesRemoteMediator
 import com.norbertotaveras.reels.data.remote.paging.DiscoverMoviesPagingSource
 import com.norbertotaveras.reels.data.remote.paging.cacheKey
 import com.norbertotaveras.reels.data.remote.paging.searchCacheKey
+import com.norbertotaveras.reels.data.remote.paging.tmdbPagingConfig
+import com.norbertotaveras.reels.data.remote.releaseDateFromParameter
+import com.norbertotaveras.reels.data.remote.releaseDateToParameter
+import com.norbertotaveras.reels.data.repository.tmdbResult
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
@@ -39,31 +37,27 @@ import com.norbertotaveras.reels.domain.model.movie.MovieCreditsDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDetailsDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieVideosDataModel
-import com.norbertotaveras.reels.domain.model.person.PersonDetailsDataModel
-import com.norbertotaveras.reels.domain.model.person.PersonMovieCreditsDataModel
 import com.norbertotaveras.reels.domain.repository.movie.MovieRepository
-import com.norbertotaveras.reels.domain.repository.person.PersonRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 
 @Singleton
 @OptIn(ExperimentalPagingApi::class)
-class TmdbRepositoryImpl @Inject constructor(
+class TmdbMovieRepositoryImpl @Inject constructor(
     private val remoteDataSource: TmdbRemoteDataSource,
     private val database: ReelsDatabase,
     private val cachedMovieDao: CachedMovieDao,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : MovieRepository, PersonRepository {
+) : MovieRepository {
     override fun getMovies(
         category: MovieCategory,
         language: String,
     ): Flow<PagingData<MovieDataModel>> {
         return Pager(
-            config = defaultPagingConfig(),
+            config = tmdbPagingConfig(),
             remoteMediator = CachedMoviesRemoteMediator(
                 database = database,
                 cachedMovieDao = cachedMovieDao,
@@ -85,7 +79,7 @@ class TmdbRepositoryImpl @Inject constructor(
         includeAdult: Boolean,
     ): Flow<PagingData<MovieDataModel>> {
         return Pager(
-            config = defaultPagingConfig(),
+            config = tmdbPagingConfig(),
             remoteMediator = CachedSearchMoviesRemoteMediator(
                 database = database,
                 cachedMovieDao = cachedMovieDao,
@@ -113,7 +107,7 @@ class TmdbRepositoryImpl @Inject constructor(
         language: String,
     ): Flow<PagingData<MovieDataModel>> {
         return Pager(
-            config = defaultPagingConfig(),
+            config = tmdbPagingConfig(),
             pagingSourceFactory = {
                 DiscoverMoviesPagingSource(
                     remoteDataSource = remoteDataSource,
@@ -130,7 +124,7 @@ class TmdbRepositoryImpl @Inject constructor(
         filters: DiscoverFilterDataModel,
         language: String,
     ): Result<Int> {
-        return tmdbResult {
+        return tmdbResult(ioDispatcher) {
             remoteDataSource.discoverMovies(
                 language = language,
                 page = 1,
@@ -146,7 +140,7 @@ class TmdbRepositoryImpl @Inject constructor(
     override suspend fun getTrendingMovies(
         language: String,
     ): Result<List<MovieDataModel>> {
-        return tmdbResult {
+        return tmdbResult(ioDispatcher) {
             remoteDataSource.getTrendingMovies(
                 timeWindow = TRENDING_TIME_WINDOW,
                 language = language
@@ -160,7 +154,7 @@ class TmdbRepositoryImpl @Inject constructor(
         movieId: Int,
         language: String,
     ): Result<MovieDetailsDataModel> {
-        return tmdbResult {
+        return tmdbResult(ioDispatcher) {
             remoteDataSource.getMovieDetails(
                 movieId = movieId,
                 language = language
@@ -172,7 +166,7 @@ class TmdbRepositoryImpl @Inject constructor(
         movieId: Int,
         language: String,
     ): Result<MovieCreditsDataModel> {
-        return tmdbResult {
+        return tmdbResult(ioDispatcher) {
             remoteDataSource.getMovieCredits(
                 movieId = movieId,
                 language = language
@@ -184,7 +178,7 @@ class TmdbRepositoryImpl @Inject constructor(
         movieId: Int,
         language: String,
     ): Result<MovieVideosDataModel> {
-        return tmdbResult {
+        return tmdbResult(ioDispatcher) {
             remoteDataSource.getMovieVideos(
                 movieId = movieId,
                 language = language
@@ -197,13 +191,13 @@ class TmdbRepositoryImpl @Inject constructor(
         language: String,
         page: Int,
     ): Result<List<MovieDataModel>> {
-        return tmdbResult {
+        return tmdbResult(ioDispatcher) {
             remoteDataSource.getSimilarMovies(
                 movieId = movieId,
                 language = language,
                 page = page
-            ).results.map {
-                movieDto -> movieDto.toRemoteMovieDataModel()
+            ).results.map { movieDto ->
+                movieDto.toRemoteMovieDataModel()
             }
         }
     }
@@ -211,55 +205,12 @@ class TmdbRepositoryImpl @Inject constructor(
     override suspend fun getMovieGenres(
         language: String,
     ): Result<List<GenreDataModel>> {
-        return tmdbResult {
-            remoteDataSource.getMovieGenres(
-                language = language
-            ).genres?.map { genreDto -> genreDto.toGenreDataModel() } ?: emptyList()
+        return tmdbResult(ioDispatcher) {
+            remoteDataSource.getMovieGenres(language = language)
+                .genres
+                .orEmpty()
+                .map { genreDto -> genreDto.toGenreDataModel() }
         }
-    }
-
-    override suspend fun getPersonDetails(
-        personId: Int,
-        language: String,
-    ): Result<PersonDetailsDataModel> {
-        return tmdbResult {
-            remoteDataSource.getPersonDetails(
-                personId = personId,
-                language = language
-            ).toPersonDetailsDataModel()
-        }
-    }
-
-    override suspend fun getPersonMovieCredits(
-        personId: Int,
-        language: String,
-    ): Result<PersonMovieCreditsDataModel> {
-        return tmdbResult {
-            remoteDataSource.getPersonMovieCredits(
-                personId = personId,
-                language = language
-            ).toPersonMovieCreditsDataModel()
-        }
-    }
-
-    private suspend fun <T> tmdbResult(block: suspend () -> T): Result<T> {
-        return runCatching {
-            withContext(ioDispatcher) {
-                block()
-            }
-        }.fold(
-            onSuccess = { value -> Result.success(value) },
-            onFailure = { error -> Result.failure(error.toTmdbNetworkException()) }
-        )
-    }
-
-    private fun defaultPagingConfig(): PagingConfig {
-        return PagingConfig(
-            pageSize = 20,
-            initialLoadSize = 20,
-            prefetchDistance = 5,
-            enablePlaceholders = false
-        )
     }
 
     private companion object {

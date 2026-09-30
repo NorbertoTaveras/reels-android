@@ -7,10 +7,11 @@
 
 package com.norbertotaveras.reels.di.modules
 
-import com.norbertotaveras.reels.data.repository.TmdbRepositoryImpl
 import com.norbertotaveras.reels.data.repository.account.TmdbAccountRepositoryImpl
 import com.norbertotaveras.reels.data.repository.favorites.FavoriteMoviesRepositoryImpl
 import com.norbertotaveras.reels.data.repository.favorites.SavedPeopleRepositoryImpl
+import com.norbertotaveras.reels.data.repository.movie.TmdbMovieRepositoryImpl
+import com.norbertotaveras.reels.data.repository.person.TmdbPersonRepositoryImpl
 import com.norbertotaveras.reels.data.repository.settings.SettingsRepositoryImpl
 import com.norbertotaveras.reels.domain.repository.account.TmdbAccountRepository
 import com.norbertotaveras.reels.domain.repository.favorites.FavoriteMoviesRepository
@@ -42,13 +43,13 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindMovieRepository(
-        implementation: TmdbRepositoryImpl
+        implementation: TmdbMovieRepositoryImpl
     ): MovieRepository
 
     @Binds
     @Singleton
     abstract fun bindPersonRepository(
-        implementation: TmdbRepositoryImpl
+        implementation: TmdbPersonRepositoryImpl
     ): PersonRepository
 
     @Binds

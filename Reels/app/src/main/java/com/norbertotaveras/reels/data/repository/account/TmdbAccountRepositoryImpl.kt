@@ -8,7 +8,6 @@
 package com.norbertotaveras.reels.data.repository.account
 
 import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.norbertotaveras.reels.data.local.preferences.TmdbAccountDataStore
@@ -21,6 +20,7 @@ import com.norbertotaveras.reels.data.remote.mapper.account.toTmdbMovieAccountSt
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDataModel
 import com.norbertotaveras.reels.data.remote.paging.TmdbAccountMoviesPagingSource
 import com.norbertotaveras.reels.data.remote.paging.TmdbAccountMovieListType
+import com.norbertotaveras.reels.data.remote.paging.tmdbPagingConfig
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.account.TmdbAccountStateDataModel
 import com.norbertotaveras.reels.domain.model.account.TmdbMovieAccountStateDataModel
@@ -172,15 +172,6 @@ class TmdbAccountRepositoryImpl @Inject constructor(
         return accountState
     }
 
-    private fun defaultPagingConfig(): PagingConfig {
-        return PagingConfig(
-            pageSize = 20,
-            initialLoadSize = 20,
-            prefetchDistance = 5,
-            enablePlaceholders = false
-        )
-    }
-
     private fun getAccountMovies(
         language: String,
         listType: TmdbAccountMovieListType,
@@ -193,7 +184,7 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                 flowOf(PagingData.empty())
             } else {
                 Pager(
-                    config = defaultPagingConfig(),
+                    config = tmdbPagingConfig(),
                     pagingSourceFactory = {
                         TmdbAccountMoviesPagingSource(
                             remoteDataSource = remoteDataSource,
