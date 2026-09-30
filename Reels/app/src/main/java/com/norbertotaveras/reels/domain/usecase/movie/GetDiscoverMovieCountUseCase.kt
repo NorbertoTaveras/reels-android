@@ -16,7 +16,7 @@ class GetDiscoverMovieCountUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         filters: DiscoverFilterDataModel,
-        language: String = "en-US",
+        language: String,
     ): Result<Int> {
         return repository.getDiscoverMovieCount(
             filters = filters,

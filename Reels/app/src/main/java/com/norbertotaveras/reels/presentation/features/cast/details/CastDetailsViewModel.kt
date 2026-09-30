@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.norbertotaveras.reels.domain.model.favorite.SavedPersonDataModel
 import com.norbertotaveras.reels.domain.model.person.PersonDetailsDataModel
+import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 import com.norbertotaveras.reels.domain.usecase.favorites.GetSavedPersonDetailsUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveIsPersonSavedUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ToggleSavedPersonUseCase
@@ -54,7 +55,7 @@ class CastDetailsViewModel @Inject constructor(
     private val personId: Int = checkNotNull(
         savedStateHandle.get<Int>(ReelsDestinations.PERSON_ID_ARG)
     )
-    private var currentLanguage: String = DEFAULT_LANGUAGE
+    private var currentLanguage: String = LanguageRegion.Default.languageCode
     private var loadPersonJob: Job? = null
 
     init {
@@ -224,9 +225,6 @@ class CastDetailsViewModel @Inject constructor(
         }
     }
 
-    private companion object {
-        const val DEFAULT_LANGUAGE = "en-US"
-    }
 }
 
 private fun SavedPersonDataModel.toPersonDetails(): PersonDetailsDataModel {

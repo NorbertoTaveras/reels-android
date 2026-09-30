@@ -16,7 +16,7 @@ class GetPersonDetailsUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         personId: Int,
-        language: String = "en-US"
+        language: String
     ): Result<PersonDetailsDataModel> {
         return repository.getPersonDetails(
             personId = personId,

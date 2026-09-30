@@ -7,5 +7,4 @@
 
 package com.norbertotaveras.reels.presentation.features.movies.details
 
-internal const val DEFAULT_LANGUAGE = "en-US"
 internal const val DEFAULT_TMDB_RATING = 8.0

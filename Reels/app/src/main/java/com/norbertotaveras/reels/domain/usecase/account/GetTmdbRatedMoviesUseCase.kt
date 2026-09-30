@@ -17,7 +17,7 @@ class GetTmdbRatedMoviesUseCase @Inject constructor(
     private val repository: TmdbAccountRepository,
 ) {
     operator fun invoke(
-        language: String = "en-US",
+        language: String,
     ): Flow<PagingData<MovieDataModel>> {
         return repository.getRatedMovies(language = language)
     }

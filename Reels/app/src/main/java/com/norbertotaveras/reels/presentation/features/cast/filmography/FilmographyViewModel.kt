@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.domain.model.person.PersonMovieCreditDataModel
+import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 import com.norbertotaveras.reels.domain.usecase.person.GetPersonDetailsUseCase
 import com.norbertotaveras.reels.domain.usecase.person.GetPersonMovieCreditsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
@@ -49,7 +50,7 @@ class FilmographyViewModel @Inject constructor(
     private val _effect = MutableSharedFlow<FilmographyEffect>()
     val effect: SharedFlow<FilmographyEffect> = _effect.asSharedFlow()
 
-    private var currentLanguage: String = DEFAULT_LANGUAGE
+    private var currentLanguage: String = LanguageRegion.Default.languageCode
     private var loadFilmographyJob: Job? = null
 
     init {
@@ -148,9 +149,6 @@ class FilmographyViewModel @Inject constructor(
         }
     }
 
-    private companion object {
-        const val DEFAULT_LANGUAGE = "en-US"
-    }
 }
 
 private fun List<PersonMovieCreditDataModel>.sortedBy(

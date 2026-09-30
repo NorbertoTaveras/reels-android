@@ -18,7 +18,7 @@ class SearchMoviesUseCase @Inject constructor(
 ) {
     operator fun invoke(
         query: String,
-        language: String = "en-US",
+        language: String,
         includeAdult: Boolean = false
     ): Flow<PagingData<MovieDataModel>> {
         return repository.searchMovies(

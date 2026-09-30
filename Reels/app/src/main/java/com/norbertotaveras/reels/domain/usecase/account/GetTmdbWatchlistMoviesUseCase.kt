@@ -17,7 +17,7 @@ class GetTmdbWatchlistMoviesUseCase @Inject constructor(
     private val repository: TmdbAccountRepository,
 ) {
     operator fun invoke(
-        language: String = "en-US",
+        language: String,
     ): Flow<PagingData<MovieDataModel>> {
         return repository.getWatchlistMovies(language = language)
     }

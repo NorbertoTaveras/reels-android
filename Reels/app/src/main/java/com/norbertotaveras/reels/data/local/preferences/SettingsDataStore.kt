@@ -79,7 +79,7 @@ class SettingsDataStore @Inject constructor(
     private fun String?.toLanguageRegion(): LanguageRegion {
         return when (this) {
             LEGACY_SPANISH_REGION -> LanguageRegion.SpanishSpain
-            else -> toEnumOrDefault(LanguageRegion.EnglishUnitedStates)
+            else -> toEnumOrDefault(LanguageRegion.Default)
         }
     }
 

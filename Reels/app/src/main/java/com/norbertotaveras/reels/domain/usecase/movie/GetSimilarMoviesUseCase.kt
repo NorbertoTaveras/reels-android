@@ -16,7 +16,7 @@ class GetSimilarMoviesUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         movieId: Int,
-        language: String = "en-US",
+        language: String,
         page: Int = 1
     ): Result<List<MovieDataModel>> {
         return repository.getSimilarMovies(

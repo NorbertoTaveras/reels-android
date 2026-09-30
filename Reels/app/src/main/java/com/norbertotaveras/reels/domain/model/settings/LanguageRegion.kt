@@ -28,6 +28,10 @@ enum class LanguageRegion(
         label = "日本語 · 日本"
     );
 
+    companion object {
+        val Default = EnglishUnitedStates
+    }
+
     fun next(): LanguageRegion {
         return when (this) {
             EnglishUnitedStates -> SpanishSpain

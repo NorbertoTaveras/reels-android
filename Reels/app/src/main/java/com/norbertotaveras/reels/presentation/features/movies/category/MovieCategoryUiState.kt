@@ -8,8 +8,9 @@
 package com.norbertotaveras.reels.presentation.features.movies.category
 
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
+import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 
 data class MovieCategoryUiState(
     val category: MovieCategory = MovieCategory.POPULAR,
-    val language: String = "en-US",
+    val language: String = LanguageRegion.Default.languageCode,
 )

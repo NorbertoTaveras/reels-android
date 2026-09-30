@@ -25,11 +25,11 @@ interface TmdbAccountRepository {
     suspend fun getMovieAccountState(movieId: Int): Result<TmdbMovieAccountStateDataModel?>
 
     fun getWatchlistMovies(
-        language: String = "en-US",
+        language: String,
     ): Flow<PagingData<MovieDataModel>>
 
     fun getRatedMovies(
-        language: String = "en-US",
+        language: String,
     ): Flow<PagingData<MovieDataModel>>
 
     suspend fun updateMovieWatchlist(

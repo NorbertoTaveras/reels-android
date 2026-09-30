@@ -13,11 +13,11 @@ import com.norbertotaveras.reels.domain.model.person.PersonMovieCreditsDataModel
 interface PersonRepository {
     suspend fun getPersonDetails(
         personId: Int,
-        language: String = "en-US",
+        language: String,
     ): Result<PersonDetailsDataModel>
 
     suspend fun getPersonMovieCredits(
         personId: Int,
-        language: String = "en-US",
+        language: String,
     ): Result<PersonMovieCreditsDataModel>
 }

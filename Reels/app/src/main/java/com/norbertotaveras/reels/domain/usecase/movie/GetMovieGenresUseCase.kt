@@ -15,7 +15,7 @@ class GetMovieGenresUseCase @Inject constructor(
     private val repository: MovieRepository
 ) {
     suspend operator fun invoke(
-        language: String = "en-US"
+        language: String
     ): Result<List<GenreDataModel>> {
         return repository.getMovieGenres(language = language)
     }

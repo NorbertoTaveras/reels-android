@@ -10,11 +10,12 @@ package com.norbertotaveras.reels.presentation.features.movies.discover
 import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
 import com.norbertotaveras.reels.domain.model.discover.hasActiveFilters
 import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
+import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 
 data class DiscoverUiState(
     val filters: DiscoverFilterDataModel = DiscoverFilterDataModel(),
     val draftFilters: DiscoverFilterDataModel? = null,
-    val language: String = "en-US",
+    val language: String = LanguageRegion.Default.languageCode,
     val genres: List<GenreDataModel> = emptyList(),
     val isLoadingFilters: Boolean = true,
     val filterResultCount: Int? = null,

@@ -25,46 +25,46 @@ interface MovieRepository {
 
     fun searchMovies(
         query: String,
-        language: String = "en-US",
+        language: String,
         includeAdult: Boolean = false,
     ): Flow<PagingData<MovieDataModel>>
 
     fun discoverMovies(
         filters: DiscoverFilterDataModel,
-        language: String = "en-US",
+        language: String,
     ): Flow<PagingData<MovieDataModel>>
 
     suspend fun getDiscoverMovieCount(
         filters: DiscoverFilterDataModel,
-        language: String = "en-US",
+        language: String,
     ): Result<Int>
 
     suspend fun getTrendingMovies(
-        language: String = "en-US",
+        language: String,
     ): Result<List<MovieDataModel>>
 
     suspend fun getMovieDetails(
         movieId: Int,
-        language: String = "en-US",
+        language: String,
     ): Result<MovieDetailsDataModel>
 
     suspend fun getMovieCredits(
         movieId: Int,
-        language: String = "en-US",
+        language: String,
     ): Result<MovieCreditsDataModel>
 
     suspend fun getMovieVideos(
         movieId: Int,
-        language: String = "en-US",
+        language: String,
     ): Result<MovieVideosDataModel>
 
     suspend fun getSimilarMovies(
         movieId: Int,
-        language: String = "en-US",
+        language: String,
         page: Int = 1,
     ): Result<List<MovieDataModel>>
 
     suspend fun getMovieGenres(
-        language: String = "en-US",
+        language: String,
     ): Result<List<GenreDataModel>>
 }

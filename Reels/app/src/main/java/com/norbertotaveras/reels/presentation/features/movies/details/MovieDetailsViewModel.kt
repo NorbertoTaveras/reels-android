@@ -10,6 +10,7 @@ package com.norbertotaveras.reels.presentation.features.movies.details
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 import com.norbertotaveras.reels.presentation.navigation.ReelsDestinations
 import com.norbertotaveras.reels.domain.usecase.account.DeleteTmdbMovieRatingUseCase
 import com.norbertotaveras.reels.domain.usecase.account.GetTmdbMovieAccountStateUseCase
@@ -75,7 +76,7 @@ class MovieDetailsViewModel @Inject constructor(
     private val movieId: Int = checkNotNull(
         savedStateHandle.get<Int>(ReelsDestinations.MOVIE_ID_ARG)
     )
-    private var currentLanguage: String = DEFAULT_LANGUAGE
+    private var currentLanguage: String = LanguageRegion.Default.languageCode
     private var loadMovieJob: Job? = null
 
     init {

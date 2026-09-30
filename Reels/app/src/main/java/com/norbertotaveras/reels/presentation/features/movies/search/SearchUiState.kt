@@ -7,9 +7,11 @@
 
 package com.norbertotaveras.reels.presentation.features.movies.search
 
+import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
+
 data class SearchUiState(
     val query: String = "",
-    val language: String = "en-US",
+    val language: String = LanguageRegion.Default.languageCode,
     val recentSearches: List<String> = emptyList(),
     val trendingSearches: List<String> = emptyList(),
     val genreNamesById: Map<Int, String> = emptyMap()

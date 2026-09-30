@@ -16,7 +16,7 @@ class GetMovieCreditsUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         movieId: Int,
-        language: String = "en-US"
+        language: String
     ): Result<MovieCreditsDataModel> {
         return repository.getMovieCredits(
             movieId = movieId,

@@ -10,6 +10,7 @@ package com.norbertotaveras.reels.presentation.features.movies.cast
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveSavedPeopleUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ToggleSavedPersonUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.GetMovieCreditsUseCase
@@ -52,7 +53,7 @@ class MovieCastViewModel @Inject constructor(
     private val _effect = MutableSharedFlow<MovieCastEffect>()
     val effect: SharedFlow<MovieCastEffect> = _effect.asSharedFlow()
 
-    private var currentLanguage: String = DEFAULT_LANGUAGE
+    private var currentLanguage: String = LanguageRegion.Default.languageCode
     private var loadCastJob: Job? = null
 
     init {
@@ -206,7 +207,4 @@ class MovieCastViewModel @Inject constructor(
         }
     }
 
-    private companion object {
-        const val DEFAULT_LANGUAGE = "en-US"
-    }
 }

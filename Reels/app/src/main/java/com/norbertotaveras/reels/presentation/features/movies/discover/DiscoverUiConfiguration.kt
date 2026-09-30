@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.norbertotaveras.reels.domain.model.discover.DiscoverSort
+import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsGenreChipContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightGenreChipContainer
 import com.norbertotaveras.reels.presentation.ui.theme.isReelsLightTheme
@@ -70,7 +71,7 @@ internal fun Int.toMovieCountLabel(capitalize: Boolean = false): String {
 
 internal fun String.toDiscoverLanguageLabel(): String {
     return when (this) {
-        "en-US" -> "English · All regions"
+        LanguageRegion.Default.languageCode -> "English · All regions"
         "en-GB" -> "English · United Kingdom"
         "es-ES" -> "Spanish · Spain"
         "fr-FR" -> "French · France"
