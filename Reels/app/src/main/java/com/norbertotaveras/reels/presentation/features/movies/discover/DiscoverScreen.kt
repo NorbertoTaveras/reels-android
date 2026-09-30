@@ -84,6 +84,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.isReelsLightTheme
 import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContentColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
 import java.text.NumberFormat
+import java.util.Calendar
 
 @Composable
 fun DiscoverScreen(
@@ -1503,7 +1504,7 @@ private fun String.toDiscoverLanguageLabel(): String {
 }
 
 private fun discoverReleasePeriods(): List<DiscoverReleasePeriod> {
-    val currentYear = java.time.Year.now().value
+    val currentYear = Calendar.getInstance().get(Calendar.YEAR)
     val latestCompletedDecade = (currentYear / 10 - 1) * 10
 
     return buildList {
