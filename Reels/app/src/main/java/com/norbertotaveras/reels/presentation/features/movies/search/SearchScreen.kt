@@ -337,9 +337,7 @@ private fun SearchIdleContent(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(ReelsDimensions.searchSectionGroupSpacing)
     ) {
-        if (recentSearches.isEmpty()) {
-            SearchEmptyState()
-        } else {
+        if (recentSearches.isNotEmpty()) {
             RecentSearchesSection(recentSearches, onEvent)
         }
         if (trendingSearches.isNotEmpty()) {
@@ -347,6 +345,9 @@ private fun SearchIdleContent(
                 suggestions = trendingSearches,
                 onEvent = onEvent
             )
+        }
+        if (recentSearches.isEmpty() && trendingSearches.isEmpty()) {
+            SearchEmptyState()
         }
     }
 }
