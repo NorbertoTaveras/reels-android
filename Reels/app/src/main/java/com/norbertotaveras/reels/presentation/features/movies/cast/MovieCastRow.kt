@@ -1,0 +1,189 @@
+/*
+ * Copyright (c) 2026 Norberto Taveras. All rights reserved.
+ *
+ * This source code is proprietary and confidential. Unauthorized copying,
+ * modification, distribution, or use is prohibited.
+ */
+
+package com.norbertotaveras.reels.presentation.features.movies.cast
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.CloudOff
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
+import com.norbertotaveras.reels.domain.model.cast.CastMemberDataModel
+import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
+import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
+import com.norbertotaveras.reels.presentation.ui.extensions.toErrorTitle
+import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
+import com.norbertotaveras.reels.presentation.ui.theme.reelsPlaceholderColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsMutedContainerColor
+
+@Composable
+internal fun MovieCastRow(
+    castMember: CastMemberDataModel,
+    isSaved: Boolean,
+    isSaving: Boolean,
+    onClick: () -> Unit,
+    onSaveClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(ReelsDimensions.fullCastRowCornerRadius),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(
+            width = ReelsDimensions.fullCastBorderWidth,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(
+                horizontal = ReelsDimensions.fullCastRowHorizontalPadding,
+                vertical = ReelsDimensions.fullCastRowVerticalPadding
+            ),
+            horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.fullCastRowContentSpacing),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(ReelsDimensions.fullCastProfileSize)
+                    .clip(RoundedCornerShape(ReelsDimensions.fullCastProfileCornerRadius))
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
+            ) {
+                val profileUrl = castMember.profilePath.toTmdbImageUrl(
+                    imageType = TmdbImageType.Profile
+                )
+
+                if (profileUrl.isNullOrBlank()) {
+                    Icon(
+                        imageVector = Icons.Outlined.AccountCircle,
+                        contentDescription = null,
+                        modifier = Modifier.size(28.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    AsyncImage(
+                        model = profileUrl,
+                        contentDescription = castMember.name,
+                        modifier = Modifier.matchParentSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(ReelsDimensions.fullCastRowTextSpacing)
+            ) {
+                Text(
+                    text = castMember.name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Text(
+                    text = castMember.characterName.ifBlank { "Character unavailable" },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            Surface(
+                modifier = Modifier
+                    .size(ReelsDimensions.fullCastSaveButtonSize)
+                    .clickable(
+                        enabled = !isSaving,
+                        role = Role.Button,
+                        onClickLabel = if (isSaved) {
+                            "Remove from library"
+                        } else {
+                            "Save to library"
+                        },
+                        onClick = onSaveClick
+                    ),
+                shape = RoundedCornerShape(ReelsDimensions.fullCastSaveButtonCornerRadius),
+                color = reelsMutedContainerColor(),
+                contentColor = if (isSaved) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
+                border = BorderStroke(
+                    width = ReelsDimensions.fullCastBorderWidth,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                )
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    if (isSaving) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    } else {
+                        Icon(
+                            imageVector = if (isSaved) {
+                                Icons.Filled.Favorite
+                            } else {
+                                Icons.Outlined.FavoriteBorder
+                            },
+                            contentDescription = null,
+                            modifier = Modifier.size(ReelsDimensions.fullCastSaveIconSize)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
