@@ -12,10 +12,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveSavedPeopleUseCase
-import com.norbertotaveras.reels.domain.usecase.favorites.ToggleSavedPersonUseCase
+import com.norbertotaveras.reels.domain.usecase.favorites.ToggleSavedCastMemberUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.GetMovieCreditsUseCase
-import com.norbertotaveras.reels.domain.usecase.person.GetPersonDetailsUseCase
-import com.norbertotaveras.reels.domain.usecase.person.GetPersonMovieCreditsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.presentation.navigation.ReelsDestinations
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
@@ -37,10 +35,8 @@ import javax.inject.Inject
 class MovieCastViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getMovieCreditsUseCase: GetMovieCreditsUseCase,
-    private val getPersonDetailsUseCase: GetPersonDetailsUseCase,
-    private val getPersonMovieCreditsUseCase: GetPersonMovieCreditsUseCase,
     private val observeSavedPeopleUseCase: ObserveSavedPeopleUseCase,
-    private val toggleSavedPersonUseCase: ToggleSavedPersonUseCase,
+    private val toggleSavedCastMemberUseCase: ToggleSavedCastMemberUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
 ) : ViewModel() {
     private val movieId: Int = checkNotNull(
@@ -154,46 +150,27 @@ class MovieCastViewModel @Inject constructor(
             }
 
             try {
-                val personResult = getPersonDetailsUseCase(
+                toggleSavedCastMemberUseCase(
                     personId = personId,
+                    isSaved = isSaved,
                     language = currentLanguage
-                )
-                val creditsResult = getPersonMovieCreditsUseCase(
-                    personId = personId,
-                    language = currentLanguage
-                )
-
-                personResult.fold(
-                    onSuccess = { person ->
-                        toggleSavedPersonUseCase(
-                            isSaved = isSaved,
-                            person = person,
-                            knownFor = creditsResult.getOrNull()?.cast.orEmpty()
-                        ).onSuccess { saved ->
-                            _effect.emit(
-                                MovieCastEffect.ShowMessage(
-                                    message = if (saved) {
-                                        "Saved to library."
-                                    } else {
-                                        "Removed from library."
-                                    }
-                                )
+                ).fold(
+                    onSuccess = { saved ->
+                        _effect.emit(
+                            MovieCastEffect.ShowMessage(
+                                message = if (saved) {
+                                    "Saved to library."
+                                } else {
+                                    "Removed from library."
+                                }
                             )
-                        }.onFailure { error ->
-                            _effect.emit(
-                                MovieCastEffect.ShowMessage(
-                                    message = error.toUserMessage(
-                                        fallback = "Unable to update library."
-                                    )
-                                )
-                            )
-                        }
+                        )
                     },
                     onFailure = { error ->
                         _effect.emit(
                             MovieCastEffect.ShowMessage(
                                 message = error.toUserMessage(
-                                    fallback = "Unable to load person details."
+                                    fallback = "Unable to update library."
                                 )
                             )
                         )

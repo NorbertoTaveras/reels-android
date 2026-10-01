@@ -7,6 +7,7 @@
 
 package com.norbertotaveras.reels.domain.usecase.account
 
+import com.norbertotaveras.reels.domain.model.account.TmdbMovieAccountStateDataModel
 import com.norbertotaveras.reels.domain.repository.account.TmdbAccountRepository
 import javax.inject.Inject
 
@@ -16,10 +17,13 @@ class UpdateTmdbWatchlistUseCase @Inject constructor(
     suspend operator fun invoke(
         movieId: Int,
         watchlist: Boolean,
-    ): Result<Unit> {
+    ): Result<TmdbMovieAccountStateDataModel?> {
         return repository.updateMovieWatchlist(
             movieId = movieId,
             watchlist = watchlist
+        ).fold(
+            onSuccess = { repository.getMovieAccountState(movieId = movieId) },
+            onFailure = { error -> Result.failure(error) }
         )
     }
 }

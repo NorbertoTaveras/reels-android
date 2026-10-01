@@ -20,14 +20,12 @@ import com.norbertotaveras.reels.domain.usecase.account.UpdateTmdbWatchlistUseCa
 import com.norbertotaveras.reels.domain.usecase.favorites.GetFavoriteMovieDetailsUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveSavedPeopleUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveIsFavoriteUseCase
-import com.norbertotaveras.reels.domain.usecase.favorites.ToggleSavedPersonUseCase
+import com.norbertotaveras.reels.domain.usecase.favorites.ToggleSavedCastMemberUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ToggleFavoriteMovieUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.GetMovieCreditsUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.GetMovieDetailsUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.GetMovieVideosUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.GetSimilarMoviesUseCase
-import com.norbertotaveras.reels.domain.usecase.person.GetPersonDetailsUseCase
-import com.norbertotaveras.reels.domain.usecase.person.GetPersonMovieCreditsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -57,14 +55,12 @@ class MovieDetailsViewModel @Inject constructor(
     private val toggleFavoriteMovieUseCase: ToggleFavoriteMovieUseCase,
     private val getFavoriteMovieDetailsUseCase: GetFavoriteMovieDetailsUseCase,
     private val observeSavedPeopleUseCase: ObserveSavedPeopleUseCase,
-    private val toggleSavedPersonUseCase: ToggleSavedPersonUseCase,
+    private val toggleSavedCastMemberUseCase: ToggleSavedCastMemberUseCase,
     private val observeTmdbAccountUseCase: ObserveTmdbAccountUseCase,
     private val getTmdbMovieAccountStateUseCase: GetTmdbMovieAccountStateUseCase,
     private val updateTmdbWatchlistUseCase: UpdateTmdbWatchlistUseCase,
     private val rateTmdbMovieUseCase: RateTmdbMovieUseCase,
     private val deleteTmdbMovieRatingUseCase: DeleteTmdbMovieRatingUseCase,
-    private val getPersonDetailsUseCase: GetPersonDetailsUseCase,
-    private val getPersonMovieCreditsUseCase: GetPersonMovieCreditsUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(MovieDetailsUiState())
@@ -303,10 +299,7 @@ class MovieDetailsViewModel @Inject constructor(
         getTmdbMovieAccountStateUseCase(movieId = movieId)
             .onSuccess { accountState ->
                 _state.update { currentState ->
-                    currentState.copy(
-                        isWatchlisted = accountState?.isWatchlisted ?: false,
-                        tmdbRating = accountState?.rating
-                    )
+                    currentState.withTmdbAccountState(accountState = accountState)
                 }
             }
     }
@@ -332,10 +325,9 @@ class MovieDetailsViewModel @Inject constructor(
                 movieId = movieId,
                 watchlist = shouldWatchlist
             ).fold(
-                onSuccess = {
-                    refreshMovieAccountState()
+                onSuccess = { accountState ->
                     _state.update { currentState ->
-                        currentState.copy(
+                        currentState.withTmdbAccountState(accountState = accountState).copy(
                             isAccountActionLoading = false,
                             isRatingSheetVisible = false
                         )
@@ -423,10 +415,9 @@ class MovieDetailsViewModel @Inject constructor(
                 movieId = movieId,
                 rating = rating
             ).fold(
-                onSuccess = {
-                    refreshMovieAccountState()
+                onSuccess = { accountState ->
                     _state.update { currentState ->
-                        currentState.copy(
+                        currentState.withTmdbAccountState(accountState = accountState).copy(
                             isAccountActionLoading = false,
                             isRatingSheetVisible = false
                         )
@@ -470,10 +461,11 @@ class MovieDetailsViewModel @Inject constructor(
             }
 
             deleteTmdbMovieRatingUseCase(movieId = movieId).fold(
-                onSuccess = {
-                    refreshMovieAccountState()
+                onSuccess = { accountState ->
                     _state.update { currentState ->
-                        currentState.copy(isAccountActionLoading = false)
+                        currentState.withTmdbAccountState(accountState = accountState).copy(
+                            isAccountActionLoading = false
+                        )
                     }
                     _effect.emit(
                         MovieDetailsEffect.ShowMessage(
@@ -513,57 +505,37 @@ class MovieDetailsViewModel @Inject constructor(
                 state.copy(savingPersonIds = state.savingPersonIds + personId)
             }
 
-            val personResult = getPersonDetailsUseCase(
-                personId = personId,
-                language = currentLanguage
-            )
-            val creditsResult = getPersonMovieCreditsUseCase(
-                personId = personId,
-                language = currentLanguage
-            )
-
-            personResult.fold(
-                onSuccess = { person ->
-                    toggleSavedPersonUseCase(
-                        isSaved = isSaved,
-                        person = person,
-                        knownFor = creditsResult.getOrNull()?.cast.orEmpty()
-                    ).fold(
-                        onSuccess = { saved ->
-                            _effect.emit(
-                                MovieDetailsEffect.ShowMessage(
-                                    message = if (saved) {
-                                        "Saved to library."
-                                    } else {
-                                        "Removed from library."
-                                    }
-                                )
-                            )
-                        },
-                        onFailure = { error ->
-                            _effect.emit(
-                                MovieDetailsEffect.ShowMessage(
-                                    message = error.toUserMessage(
-                                        fallback = "Unable to update library."
-                                    )
-                                )
-                            )
-                        }
-                    )
-                },
-                onFailure = { error ->
-                    _effect.emit(
-                        MovieDetailsEffect.ShowMessage(
-                            message = error.toUserMessage(
-                                fallback = "Unable to load person details."
+            try {
+                toggleSavedCastMemberUseCase(
+                    personId = personId,
+                    isSaved = isSaved,
+                    language = currentLanguage
+                ).fold(
+                    onSuccess = { saved ->
+                        _effect.emit(
+                            MovieDetailsEffect.ShowMessage(
+                                message = if (saved) {
+                                    "Saved to library."
+                                } else {
+                                    "Removed from library."
+                                }
                             )
                         )
-                    )
+                    },
+                    onFailure = { error ->
+                        _effect.emit(
+                            MovieDetailsEffect.ShowMessage(
+                                message = error.toUserMessage(
+                                    fallback = "Unable to update library."
+                                )
+                            )
+                        )
+                    }
+                )
+            } finally {
+                _state.update { state ->
+                    state.copy(savingPersonIds = state.savingPersonIds - personId)
                 }
-            )
-
-            _state.update { state ->
-                state.copy(savingPersonIds = state.savingPersonIds - personId)
             }
         }
     }

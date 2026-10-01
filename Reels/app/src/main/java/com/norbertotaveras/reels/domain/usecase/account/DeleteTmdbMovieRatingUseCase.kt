@@ -7,13 +7,19 @@
 
 package com.norbertotaveras.reels.domain.usecase.account
 
+import com.norbertotaveras.reels.domain.model.account.TmdbMovieAccountStateDataModel
 import com.norbertotaveras.reels.domain.repository.account.TmdbAccountRepository
 import javax.inject.Inject
 
 class DeleteTmdbMovieRatingUseCase @Inject constructor(
     private val repository: TmdbAccountRepository,
 ) {
-    suspend operator fun invoke(movieId: Int): Result<Unit> {
-        return repository.deleteMovieRating(movieId = movieId)
+    suspend operator fun invoke(
+        movieId: Int,
+    ): Result<TmdbMovieAccountStateDataModel?> {
+        return repository.deleteMovieRating(movieId = movieId).fold(
+            onSuccess = { repository.getMovieAccountState(movieId = movieId) },
+            onFailure = { error -> Result.failure(error) }
+        )
     }
 }
