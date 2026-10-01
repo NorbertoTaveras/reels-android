@@ -29,9 +29,10 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object ServiceModule {
     @Singleton
-    @Provides
-    fun provideTmdbRetrofit(): Retrofit {
-        return buildRetrofit(
+    @get:Provides
+    val tmdbMovieService: TmdbMovieService by lazy {
+        buildService(
+            clazz = TmdbMovieService::class.java,
             baseUrl = BuildConfig.BASE_URL,
             token = BuildConfig.TMDB_READ_TOKEN,
             addAuth = true,
@@ -40,29 +41,36 @@ object ServiceModule {
     }
 
     @Singleton
-    @Provides
-    fun provideTmdbMovieService(retrofit: Retrofit): TmdbMovieService {
-        return retrofit.create(TmdbMovieService::class.java)
+    @get:Provides
+    val tmdbPersonService: TmdbPersonService by lazy {
+        buildService(
+            clazz = TmdbPersonService::class.java,
+            baseUrl = BuildConfig.BASE_URL,
+            token = BuildConfig.TMDB_READ_TOKEN,
+            addAuth = true,
+            addExpose = false
+        )
     }
 
     @Singleton
-    @Provides
-    fun provideTmdbPersonService(retrofit: Retrofit): TmdbPersonService {
-        return retrofit.create(TmdbPersonService::class.java)
+    @get:Provides
+    val tmdbAccountService: TmdbAccountService by lazy {
+        buildService(
+            clazz = TmdbAccountService::class.java,
+            baseUrl = BuildConfig.BASE_URL,
+            token = BuildConfig.TMDB_READ_TOKEN,
+            addAuth = true,
+            addExpose = false
+        )
     }
 
-    @Singleton
-    @Provides
-    fun provideTmdbAccountService(retrofit: Retrofit): TmdbAccountService {
-        return retrofit.create(TmdbAccountService::class.java)
-    }
-
-    private fun buildRetrofit(
+    private fun <T> buildService(
+        clazz: Class<T>,
         baseUrl: String,
         addAuth: Boolean,
         addExpose: Boolean,
         token: String,
-    ): Retrofit {
+    ): T {
         val gson = when (addExpose) {
             true -> GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
             else -> GsonBuilder().create()
@@ -76,7 +84,7 @@ object ServiceModule {
             }
         }
 
-        return Retrofit
+        val retrofit = Retrofit
             .Builder()
             .baseUrl(baseUrl)
             .client(
@@ -90,6 +98,7 @@ object ServiceModule {
             )
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
+        return retrofit.create(clazz)
     }
 
     private fun tmdbAuthInterceptor(
