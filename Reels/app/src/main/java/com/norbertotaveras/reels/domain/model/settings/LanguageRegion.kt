@@ -9,24 +9,11 @@ package com.norbertotaveras.reels.domain.model.settings
 
 enum class LanguageRegion(
     val languageCode: String,
-    val label: String,
 ) {
-    EnglishUnitedStates(
-        languageCode = "en-US",
-        label = "English · United States"
-    ),
-    SpanishSpain(
-        languageCode = "es-ES",
-        label = "Español · España"
-    ),
-    FrenchFrance(
-        languageCode = "fr-FR",
-        label = "Français · France"
-    ),
-    JapaneseJapan(
-        languageCode = "ja-JP",
-        label = "日本語 · 日本"
-    );
+    EnglishUnitedStates(languageCode = "en-US"),
+    SpanishSpain(languageCode = "es-ES"),
+    FrenchFrance(languageCode = "fr-FR"),
+    JapaneseJapan(languageCode = "ja-JP");
 
     companion object {
         val Default = EnglishUnitedStates

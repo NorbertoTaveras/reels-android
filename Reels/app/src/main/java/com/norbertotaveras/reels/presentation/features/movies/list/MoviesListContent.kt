@@ -28,9 +28,10 @@ import androidx.paging.compose.LazyPagingItems
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.CenteredErrorState
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
+import com.norbertotaveras.reels.presentation.ui.extensions.displayLabel
 import com.norbertotaveras.reels.presentation.ui.extensions.toErrorTitle
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
 @Composable
@@ -94,7 +95,7 @@ internal fun MoviesListContent(
 
         item {
             HomeMovieSection(
-                title = MovieCategory.POPULAR.label,
+                title = MovieCategory.POPULAR.displayLabel,
                 category = MovieCategory.POPULAR,
                 movies = popularMovies,
                 onEvent = onEvent
@@ -103,7 +104,7 @@ internal fun MoviesListContent(
 
         item {
             HomeMovieSection(
-                title = MovieCategory.NOW_PLAYING.label,
+                title = MovieCategory.NOW_PLAYING.displayLabel,
                 category = MovieCategory.NOW_PLAYING,
                 movies = nowPlayingMovies,
                 onEvent = onEvent
@@ -112,7 +113,7 @@ internal fun MoviesListContent(
 
         item {
             HomeMovieSection(
-                title = MovieCategory.UPCOMING.label,
+                title = MovieCategory.UPCOMING.displayLabel,
                 category = MovieCategory.UPCOMING,
                 movies = upcomingMovies,
                 onEvent = onEvent
@@ -121,7 +122,7 @@ internal fun MoviesListContent(
 
         item {
             HomeMovieSection(
-                title = MovieCategory.TOP_RATED.label,
+                title = MovieCategory.TOP_RATED.displayLabel,
                 category = MovieCategory.TOP_RATED,
                 movies = topRatedMovies,
                 onEvent = onEvent

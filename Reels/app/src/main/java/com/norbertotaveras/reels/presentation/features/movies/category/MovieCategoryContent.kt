@@ -22,6 +22,7 @@ import androidx.paging.compose.LazyPagingItems
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
 import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
+import com.norbertotaveras.reels.presentation.ui.extensions.displayLabel
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 
@@ -49,7 +50,7 @@ internal fun MovieCategoryContent(
                 modifier = modifier,
                 category = state.category,
                 message = refreshState.error.toUserMessage(
-                    fallback = "Unable to load ${state.category.label} movies."
+                    fallback = "Unable to load ${state.category.displayLabel} movies."
                 ),
                 retryLabel = "Try Again",
                 onBackClick = {

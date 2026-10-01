@@ -7,22 +7,10 @@
 
 package com.norbertotaveras.reels.domain.model.settings
 
-enum class ImageQuality(
-    val label: String,
-    val tmdbSizePath: String,
-) {
-    High(
-        label = "High quality",
-        tmdbSizePath = "w780"
-    ),
-    Standard(
-        label = "Standard",
-        tmdbSizePath = "w342"
-    ),
-    Low(
-        label = "Low — saves data",
-        tmdbSizePath = "w185"
-    );
+enum class ImageQuality {
+    High,
+    Standard,
+    Low;
 
     fun next(): ImageQuality {
         return when (this) {

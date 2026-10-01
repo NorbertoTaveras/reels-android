@@ -22,6 +22,7 @@ import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateImageQualityUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateLanguageRegionUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateThemeUseCase
+import com.norbertotaveras.reels.presentation.ui.extensions.displayLabel
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -92,9 +93,9 @@ class SettingsViewModel @Inject constructor(
             observeSettingsUseCase().collect { settings ->
                 _state.update { currentState ->
                     currentState.copy(
-                        imageQualityLabel = settings.imageQuality.label,
-                        languageRegionLabel = settings.languageRegion.label,
-                        themeLabel = settings.theme.label,
+                        imageQualityLabel = settings.imageQuality.displayLabel,
+                        languageRegionLabel = settings.languageRegion.displayLabel,
+                        themeLabel = settings.theme.displayLabel,
                         selectedImageQuality = settings.imageQuality,
                         selectedLanguageRegion = settings.languageRegion,
                         selectedTheme = settings.theme

@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.norbertotaveras.reels.domain.model.settings.AppTheme
 import com.norbertotaveras.reels.domain.model.settings.ImageQuality
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
+import com.norbertotaveras.reels.presentation.ui.extensions.displayLabel
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
@@ -162,7 +163,7 @@ fun SettingsScreen(
                 icon = Icons.Filled.Image,
                 options = ImageQuality.entries,
                 selectedOption = state.selectedImageQuality,
-                optionLabel = ImageQuality::label,
+                optionLabel = { option -> option.displayLabel },
                 optionDescription = { option ->
                     when (option) {
                         ImageQuality.High -> "Sharp posters · Uses the most data"
@@ -200,13 +201,7 @@ fun SettingsScreen(
                 icon = Icons.Filled.Palette,
                 options = AppTheme.entries,
                 selectedOption = state.selectedTheme,
-                optionLabel = { option ->
-                    when (option) {
-                        AppTheme.System -> "System default"
-                        AppTheme.Dark -> "Dark"
-                        AppTheme.Light -> "Light"
-                    }
-                },
+                optionLabel = { option -> option.displayLabel },
                 optionDescription = { option ->
                     when (option) {
                         AppTheme.System -> "Follows your device's dark/light setting"

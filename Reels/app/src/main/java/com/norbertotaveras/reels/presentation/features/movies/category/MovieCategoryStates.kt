@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
+import com.norbertotaveras.reels.presentation.ui.extensions.displayLabel
 import com.norbertotaveras.reels.presentation.ui.extensions.toErrorTitle
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
@@ -128,7 +129,7 @@ internal fun MovieCategoryErrorState(
 
                 Text(
                     text = message.toErrorTitle(
-                        fallback = "Unable to load ${category.label.lowercase()}"
+                        fallback = "Unable to load ${category.displayLabel.lowercase()}"
                     ),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,

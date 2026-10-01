@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
+import com.norbertotaveras.reels.presentation.ui.extensions.displayLabel
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
@@ -73,7 +74,7 @@ internal fun MovieCategoryHeader(
             verticalArrangement = Arrangement.spacedBy(ReelsDimensions.categoryHeaderTextSpacing)
         ) {
             Text(
-                text = category.label,
+                text = category.displayLabel,
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontSize = 24.sp,
                     lineHeight = 30.sp

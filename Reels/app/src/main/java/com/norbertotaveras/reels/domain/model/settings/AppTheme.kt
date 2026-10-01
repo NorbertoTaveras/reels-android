@@ -7,10 +7,10 @@
 
 package com.norbertotaveras.reels.domain.model.settings
 
-enum class AppTheme(val label: String) {
-    System(label = "System default"),
-    Dark(label = "Dark"),
-    Light(label = "Light");
+enum class AppTheme {
+    System,
+    Dark,
+    Light;
 
     fun next(): AppTheme {
         return when (this) {
