@@ -11,6 +11,7 @@ import com.norbertotaveras.reels.data.local.dao.SavedPersonDao
 import com.norbertotaveras.reels.data.local.mapper.toDataModel
 import com.norbertotaveras.reels.data.local.mapper.toSavedPersonEntity
 import com.norbertotaveras.reels.data.local.mapper.toSavedPersonKnownForEntity
+import com.norbertotaveras.reels.data.repository.repositoryResult
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.favorite.SavedPersonDataModel
 import com.norbertotaveras.reels.domain.model.person.PersonDetailsDataModel
@@ -48,27 +49,23 @@ class SavedPeopleRepositoryImpl @Inject constructor(
         person: PersonDetailsDataModel,
         knownFor: List<PersonMovieCreditDataModel>
     ): Result<Unit> {
-        return runCatching {
-            withContext(ioDispatcher) {
-                val savedAt = System.currentTimeMillis()
-                savedPersonDao.upsertSavedPersonWithKnownFor(
-                    person = person.toSavedPersonEntity(savedAt = savedAt),
-                    knownFor = knownFor.mapIndexed { index, movie ->
-                        movie.toSavedPersonKnownForEntity(
-                            personId = person.id,
-                            position = index
-                        )
-                    }
-                )
-            }
+        return repositoryResult(ioDispatcher) {
+            val savedAt = System.currentTimeMillis()
+            savedPersonDao.upsertSavedPersonWithKnownFor(
+                person = person.toSavedPersonEntity(savedAt = savedAt),
+                knownFor = knownFor.mapIndexed { index, movie ->
+                    movie.toSavedPersonKnownForEntity(
+                        personId = person.id,
+                        position = index
+                    )
+                }
+            )
         }
     }
 
     override suspend fun removeSavedPerson(personId: Int): Result<Unit> {
-        return runCatching {
-            withContext(ioDispatcher) {
-                savedPersonDao.deleteSavedPerson(personId = personId)
-            }
+        return repositoryResult(ioDispatcher) {
+            savedPersonDao.deleteSavedPerson(personId = personId)
         }
     }
 }

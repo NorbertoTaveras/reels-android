@@ -13,6 +13,7 @@ import com.norbertotaveras.reels.data.local.dao.FavoriteMovieDao
 import com.norbertotaveras.reels.data.local.mapper.toFavoriteMovieDataModel
 import com.norbertotaveras.reels.data.local.mapper.toFavoriteMovieEntity
 import com.norbertotaveras.reels.data.local.mapper.toMovieDetailsDataModel
+import com.norbertotaveras.reels.data.repository.repositoryResult
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.repository.favorites.FavoriteMoviesRepository
 import javax.inject.Inject
@@ -38,18 +39,14 @@ class FavoriteMoviesRepositoryImpl @Inject constructor(
     }
 
     override suspend fun toggleFavoriteMovie(movie: MovieDetailsDataModel): Result<Unit> {
-        return runCatching {
-            withContext(ioDispatcher) {
-                favoriteMovieDao.toggleFavoriteMovie(movie = movie.toFavoriteMovieEntity())
-            }
+        return repositoryResult(ioDispatcher) {
+            favoriteMovieDao.toggleFavoriteMovie(movie = movie.toFavoriteMovieEntity())
         }
     }
 
     override suspend fun removeFavoriteMovie(movieId: Int): Result<Unit> {
-        return runCatching {
-            withContext(ioDispatcher) {
-                favoriteMovieDao.deleteFavoriteMovie(movieId = movieId)
-            }
+        return repositoryResult(ioDispatcher) {
+            favoriteMovieDao.deleteFavoriteMovie(movieId = movieId)
         }
     }
 

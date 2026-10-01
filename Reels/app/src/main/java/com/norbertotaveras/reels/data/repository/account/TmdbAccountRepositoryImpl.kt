@@ -21,6 +21,7 @@ import com.norbertotaveras.reels.data.remote.mapper.account.toTmdbMovieAccountSt
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDataModel
 import com.norbertotaveras.reels.data.remote.paging.TmdbMoviesPagingSource
 import com.norbertotaveras.reels.data.remote.paging.tmdbPagingConfig
+import com.norbertotaveras.reels.data.repository.repositoryResult
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.account.TmdbAccountStateDataModel
 import com.norbertotaveras.reels.domain.model.account.TmdbMovieAccountStateDataModel
@@ -28,7 +29,6 @@ import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.domain.repository.account.TmdbAccountRepository
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -36,7 +36,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withContext
 
 @Singleton
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -227,20 +226,18 @@ class TmdbAccountRepositoryImpl @Inject constructor(
         clearAccountOnExpiredSession: Boolean = false,
         block: suspend () -> T,
     ): Result<T> {
-        return try {
-            val value = withContext(ioDispatcher) {
-                block()
+        return repositoryResult(
+            dispatcher = ioDispatcher,
+            transformError = { error ->
+                if (clearAccountOnExpiredSession && error.isTmdbSessionExpiredError()) {
+                    accountDataStore.clearAccount()
+                    TmdbSessionExpiredException().toTmdbNetworkException()
+                } else {
+                    error.toTmdbNetworkException()
+                }
             }
-            Result.success(value)
-        } catch (error: CancellationException) {
-            throw error
-        } catch (error: Exception) {
-            if (clearAccountOnExpiredSession && error.isTmdbSessionExpiredError()) {
-                accountDataStore.clearAccount()
-                Result.failure(TmdbSessionExpiredException().toTmdbNetworkException())
-            } else {
-                Result.failure(error.toTmdbNetworkException())
-            }
+        ) {
+            block()
         }
     }
 
