@@ -14,20 +14,19 @@ import androidx.paging.map
 import com.norbertotaveras.reels.data.local.dao.CachedMovieDao
 import com.norbertotaveras.reels.data.local.db.ReelsDatabase
 import com.norbertotaveras.reels.data.local.mapper.toMovieDataModel
-import com.norbertotaveras.reels.data.remote.movie.TmdbMovieRemoteDataSource
 import com.norbertotaveras.reels.data.remote.mapper.genre.toGenreDataModel
+import com.norbertotaveras.reels.data.remote.mapper.movie.toDiscoverMovieRequestParameters
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieCreditsDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDataModel as toRemoteMovieDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDetailsDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieVideosDataModel
+import com.norbertotaveras.reels.data.remote.movie.TmdbMovieRemoteDataSource
 import com.norbertotaveras.reels.data.remote.paging.CachedMoviesRemoteMediator
 import com.norbertotaveras.reels.data.remote.paging.CachedSearchMoviesRemoteMediator
 import com.norbertotaveras.reels.data.remote.paging.DiscoverMoviesPagingSource
 import com.norbertotaveras.reels.data.remote.paging.cacheKey
 import com.norbertotaveras.reels.data.remote.paging.searchCacheKey
 import com.norbertotaveras.reels.data.remote.paging.tmdbPagingConfig
-import com.norbertotaveras.reels.data.remote.releaseDateFromParameter
-import com.norbertotaveras.reels.data.remote.releaseDateToParameter
 import com.norbertotaveras.reels.data.repository.tmdbResult
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
@@ -125,14 +124,11 @@ class TmdbMovieRepositoryImpl @Inject constructor(
         language: String,
     ): Result<Int> {
         return tmdbResult(ioDispatcher) {
+            val parameters = filters.toDiscoverMovieRequestParameters()
             remoteDataSource.discoverMovies(
                 language = language,
                 page = 1,
-                sortBy = filters.sort.apiValue,
-                genreId = filters.genreId,
-                releaseDateFrom = filters.releaseDateFromParameter(),
-                releaseDateTo = filters.releaseDateToParameter(),
-                minimumRating = filters.minimumRating
+                parameters = parameters
             ).totalResults
         }
     }

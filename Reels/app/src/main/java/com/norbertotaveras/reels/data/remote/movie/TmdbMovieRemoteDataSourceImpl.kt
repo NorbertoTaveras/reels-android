@@ -98,21 +98,17 @@ class TmdbMovieRemoteDataSourceImpl @Inject constructor(
     override suspend fun discoverMovies(
         language: String?,
         page: Int?,
-        sortBy: String,
-        genreId: Int?,
-        releaseDateFrom: String?,
-        releaseDateTo: String?,
-        minimumRating: Int?,
+        parameters: DiscoverMovieRequestParameters,
         includeAdult: Boolean,
     ): MoviesResponseDto {
         return service.discoverMovies(
             language = language,
             page = page,
-            sortBy = sortBy,
-            genreId = genreId,
-            releaseDateFrom = releaseDateFrom,
-            releaseDateTo = releaseDateTo,
-            minimumRating = minimumRating,
+            sortBy = parameters.sortBy,
+            genreId = parameters.genreId,
+            releaseDateFrom = parameters.releaseDateFrom,
+            releaseDateTo = parameters.releaseDateTo,
+            minimumRating = parameters.minimumRating,
             includeAdult = includeAdult
         )
     }

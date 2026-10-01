@@ -56,11 +56,7 @@ interface TmdbMovieRemoteDataSource {
     suspend fun discoverMovies(
         language: String? = null,
         page: Int? = null,
-        sortBy: String,
-        genreId: Int? = null,
-        releaseDateFrom: String? = null,
-        releaseDateTo: String? = null,
-        minimumRating: Int? = null,
+        parameters: DiscoverMovieRequestParameters,
         includeAdult: Boolean = false,
     ): MoviesResponseDto
 

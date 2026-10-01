@@ -9,29 +9,26 @@ package com.norbertotaveras.reels.data.remote.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.norbertotaveras.reels.data.remote.movie.TmdbMovieRemoteDataSource
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieDto
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
-import com.norbertotaveras.reels.data.remote.releaseDateFromParameter
-import com.norbertotaveras.reels.data.remote.releaseDateToParameter
+import com.norbertotaveras.reels.data.remote.mapper.movie.toDiscoverMovieRequestParameters
+import com.norbertotaveras.reels.data.remote.movie.TmdbMovieRemoteDataSource
 import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
 
 class DiscoverMoviesPagingSource(
     private val remoteDataSource: TmdbMovieRemoteDataSource,
-    private val filters: DiscoverFilterDataModel,
+    filters: DiscoverFilterDataModel,
     private val language: String,
 ) : PagingSource<Int, MovieDto>() {
+    private val requestParameters = filters.toDiscoverMovieRequestParameters()
+
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MovieDto> {
         return try {
             val page = params.key ?: TMDB_FIRST_PAGE
             val response = remoteDataSource.discoverMovies(
                 language = language,
                 page = page,
-                sortBy = filters.sort.apiValue,
-                genreId = filters.genreId,
-                releaseDateFrom = filters.releaseDateFromParameter(),
-                releaseDateTo = filters.releaseDateToParameter(),
-                minimumRating = filters.minimumRating
+                parameters = requestParameters
             )
 
             LoadResult.Page(
