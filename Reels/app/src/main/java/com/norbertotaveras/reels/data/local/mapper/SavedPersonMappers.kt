@@ -62,18 +62,6 @@ fun PersonMovieCreditDataModel.toSavedPersonKnownForEntity(
     )
 }
 
-fun SavedPersonDataModel.toPersonDetailsDataModel(): PersonDetailsDataModel {
-    return PersonDetailsDataModel(
-        id = id,
-        name = name,
-        biography = biography,
-        birthday = birthday,
-        placeOfBirth = placeOfBirth,
-        profilePath = profilePath,
-        knownForDepartment = knownForDepartment
-    )
-}
-
 private fun SavedPersonKnownForEntity.toDataModel(): PersonMovieCreditDataModel {
     return PersonMovieCreditDataModel(
         id = movieId,

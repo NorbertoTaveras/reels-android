@@ -10,19 +10,15 @@ package com.norbertotaveras.reels.presentation.features.cast.details
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.norbertotaveras.reels.domain.mapper.favorite.toPersonDetailsDataModel
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
-import com.norbertotaveras.reels.domain.usecase.favorites.GetSavedPersonDetailsUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveIsPersonSavedUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ToggleSavedPersonUseCase
-import com.norbertotaveras.reels.domain.usecase.person.GetPersonDetailsUseCase
-import com.norbertotaveras.reels.domain.usecase.person.GetPersonMovieCreditsUseCase
+import com.norbertotaveras.reels.domain.usecase.person.LoadPersonDetailsContentUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.presentation.navigation.ReelsDestinations
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -38,11 +34,9 @@ import javax.inject.Inject
 @HiltViewModel
 class CastDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val getPersonDetailsUseCase: GetPersonDetailsUseCase,
-    private val getPersonMovieCreditsUseCase: GetPersonMovieCreditsUseCase,
+    private val loadPersonDetailsContentUseCase: LoadPersonDetailsContentUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
     private val observeIsPersonSavedUseCase: ObserveIsPersonSavedUseCase,
-    private val getSavedPersonDetailsUseCase: GetSavedPersonDetailsUseCase,
     private val toggleSavedPersonUseCase: ToggleSavedPersonUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(CastDetailsUiState())
@@ -83,63 +77,26 @@ class CastDetailsViewModel @Inject constructor(
                 )
             }
 
-            val personResultDeferred = async {
-                getPersonDetailsUseCase(
-                    personId = personId,
-                    language = language
-                )
-            }
-
-            val creditsResultDeferred = async {
-                getPersonMovieCreditsUseCase(
-                    personId = personId,
-                    language = language
-                )
-            }
-
-            val personResult = personResultDeferred.await()
-            val creditsResult = creditsResultDeferred.await()
-
-            val savedPerson = if (personResult.isFailure) {
-                getSavedPersonDetailsUseCase(personId = personId)
-            } else {
-                null
-            }
-
-            _state.update { currentState ->
-                personResult.fold(
-                    onSuccess = { person ->
+            loadPersonDetailsContentUseCase(
+                personId = personId,
+                language = language
+            ).fold(
+                onSuccess = { content ->
+                    _state.update { currentState ->
+                        currentState.withContent(content = content)
+                    }
+                },
+                onFailure = { error ->
+                    _state.update { currentState ->
                         currentState.copy(
-                            person = person,
-                            knownFor = creditsResult
-                                .getOrNull()
-                                ?.cast
-                                .orEmpty(),
-                            isOfflineSavedPerson = false,
-                            errorMessage = null,
+                            errorMessage = error.toUserMessage(
+                                fallback = "Unable to load cast details."
+                            ),
                             isLoading = false
                         )
-                    },
-                    onFailure = { error ->
-                        if (savedPerson != null) {
-                            currentState.copy(
-                                person = savedPerson.toPersonDetailsDataModel(),
-                                knownFor = savedPerson.knownFor,
-                                isOfflineSavedPerson = true,
-                                errorMessage = null,
-                                isLoading = false
-                            )
-                        } else {
-                            currentState.copy(
-                                errorMessage = error.toUserMessage(
-                                    fallback = "Unable to load cast details."
-                                ),
-                                isLoading = false
-                            )
-                        }
                     }
-                )
-            }
+                }
+            )
         }
     }
 
