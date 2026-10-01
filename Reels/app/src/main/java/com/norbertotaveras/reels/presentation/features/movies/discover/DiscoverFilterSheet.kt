@@ -114,14 +114,12 @@ internal fun DiscoverFilterSheet(
                                         onEvent(
                                             if (state.filterSheetFilters.genreId == genre.id) {
                                                 DiscoverEvent.GenreSelected(
-                                                    genreId = null,
-                                                    genreName = null
+                                                    genreId = null
                                                 )
                                             } else {
-                                                    DiscoverEvent.GenreSelected(
-                                                        genreId = genre.id,
-                                                        genreName = genre.name
-                                                    )
+                                                DiscoverEvent.GenreSelected(
+                                                    genreId = genre.id
+                                                )
                                             }
                                         )
                                     }
@@ -152,8 +150,7 @@ internal fun DiscoverFilterSheet(
                                 onEvent(
                                     DiscoverEvent.ReleasePeriodSelected(
                                         yearFrom = period.yearFrom.takeUnless { isSelected },
-                                        yearTo = period.yearTo.takeUnless { isSelected },
-                                        label = period.label.takeUnless { isSelected }
+                                        yearTo = period.yearTo.takeUnless { isSelected }
                                     )
                                 )
                             }

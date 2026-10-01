@@ -95,7 +95,7 @@ internal fun DiscoverContent(
         if (state.hasActiveFilters) {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 DiscoverAppliedFiltersRow(
-                    filters = state.filters,
+                    state = state,
                     onEvent = onEvent
                 )
             }

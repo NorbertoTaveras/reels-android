@@ -49,13 +49,10 @@ internal object SettingsJsonCodec {
                 sort = jsonObject.optString(DISCOVER_SORT)
                     .toEnumOrDefault(DiscoverSort.Popularity),
                 genreId = jsonObject.optionalInt(DISCOVER_GENRE_ID),
-                genreName = jsonObject.optionalString(DISCOVER_GENRE_NAME),
                 releaseYearFrom = jsonObject.optionalInt(DISCOVER_RELEASE_YEAR_FROM)
                     ?: jsonObject.optionalInt(LEGACY_DISCOVER_YEAR),
                 releaseYearTo = jsonObject.optionalInt(DISCOVER_RELEASE_YEAR_TO)
                     ?: jsonObject.optionalInt(LEGACY_DISCOVER_YEAR),
-                releasePeriodLabel = jsonObject.optionalString(DISCOVER_RELEASE_PERIOD_LABEL)
-                    ?: jsonObject.optionalInt(LEGACY_DISCOVER_YEAR)?.toString(),
                 minimumRating = jsonObject.optionalInt(DISCOVER_MINIMUM_RATING)
             )
         } catch (_: JSONException) {
@@ -67,10 +64,8 @@ internal object SettingsJsonCodec {
         return JSONObject()
             .put(DISCOVER_SORT, filters.sort.name)
             .put(DISCOVER_GENRE_ID, filters.genreId)
-            .put(DISCOVER_GENRE_NAME, filters.genreName)
             .put(DISCOVER_RELEASE_YEAR_FROM, filters.releaseYearFrom)
             .put(DISCOVER_RELEASE_YEAR_TO, filters.releaseYearTo)
-            .put(DISCOVER_RELEASE_PERIOD_LABEL, filters.releasePeriodLabel)
             .put(DISCOVER_MINIMUM_RATING, filters.minimumRating)
             .toString()
     }
@@ -83,16 +78,10 @@ internal object SettingsJsonCodec {
         return if (isNull(name)) null else optInt(name)
     }
 
-    private fun JSONObject.optionalString(name: String): String? {
-        return if (isNull(name)) null else optString(name).takeIf { value -> value.isNotBlank() }
-    }
-
     private const val DISCOVER_SORT = "sort"
     private const val DISCOVER_GENRE_ID = "genreId"
-    private const val DISCOVER_GENRE_NAME = "genreName"
     private const val LEGACY_DISCOVER_YEAR = "year"
     private const val DISCOVER_RELEASE_YEAR_FROM = "releaseYearFrom"
     private const val DISCOVER_RELEASE_YEAR_TO = "releaseYearTo"
-    private const val DISCOVER_RELEASE_PERIOD_LABEL = "releasePeriodLabel"
     private const val DISCOVER_MINIMUM_RATING = "minimumRating"
 }

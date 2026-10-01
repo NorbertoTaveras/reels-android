@@ -32,34 +32,35 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
 import com.norbertotaveras.reels.domain.model.discover.DiscoverSort
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun DiscoverAppliedFiltersRow(
-    filters: DiscoverFilterDataModel,
+    state: DiscoverUiState,
     onEvent: (DiscoverEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val filters = state.filters
+
     LazyRow(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        filters.genreName?.let { genreName ->
+        state.genreLabel(filters = filters)?.let { genreName ->
             item {
                 DiscoverRemovableFilterChip(
                     label = genreName,
                     onRemoveClick = {
-                        onEvent(DiscoverEvent.GenreSelected(null, null))
+                        onEvent(DiscoverEvent.GenreSelected(genreId = null))
                     }
                 )
             }
         }
 
-        filters.releasePeriodLabel?.let { releasePeriodLabel ->
+        filters.releasePeriodDisplayLabel?.let { releasePeriodLabel ->
             item {
                 DiscoverRemovableFilterChip(
                     label = releasePeriodLabel,
@@ -67,8 +68,7 @@ internal fun DiscoverAppliedFiltersRow(
                         onEvent(
                             DiscoverEvent.ReleasePeriodSelected(
                                 yearFrom = null,
-                                yearTo = null,
-                                label = null
+                                yearTo = null
                             )
                         )
                     }
@@ -101,7 +101,7 @@ internal fun DiscoverAppliedFiltersRow(
         item {
             TextButton(
                 onClick = {
-                    onEvent(DiscoverEvent.ResetDraftFiltersClicked)
+                    onEvent(DiscoverEvent.ClearFiltersClicked)
                 }
             ) {
                 Icon(
@@ -149,29 +149,27 @@ internal fun DiscoverActiveFiltersRow(
             horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
             verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
         ) {
-            state.filterSheetFilters.genreName?.let { genreName ->
+            state.genreLabel(filters = state.filterSheetFilters)?.let { genreName ->
                 DiscoverRemovableFilterChip(
                     label = genreName,
                     onRemoveClick = {
                         onEvent(
                             DiscoverEvent.GenreSelected(
-                                genreId = null,
-                                genreName = null
+                                genreId = null
                             )
                         )
                     }
                 )
             }
 
-            state.filterSheetFilters.releasePeriodLabel?.let { releasePeriodLabel ->
+            state.filterSheetFilters.releasePeriodDisplayLabel?.let { releasePeriodLabel ->
                 DiscoverRemovableFilterChip(
                     label = releasePeriodLabel,
                     onRemoveClick = {
                         onEvent(
                             DiscoverEvent.ReleasePeriodSelected(
                                 yearFrom = null,
-                                yearTo = null,
-                                label = null
+                                yearTo = null
                             )
                         )
                     }

@@ -10,10 +10,8 @@ package com.norbertotaveras.reels.domain.model.discover
 data class DiscoverFilterDataModel(
     val sort: DiscoverSort = DiscoverSort.Popularity,
     val genreId: Int? = null,
-    val genreName: String? = null,
     val releaseYearFrom: Int? = null,
     val releaseYearTo: Int? = null,
-    val releasePeriodLabel: String? = null,
     val minimumRating: Int? = null,
 )
 

@@ -15,11 +15,10 @@ sealed interface DiscoverEvent {
     data object ApplyFiltersClicked : DiscoverEvent
     data object ResetDraftFiltersClicked : DiscoverEvent
     data class SortSelected(val sort: DiscoverSort) : DiscoverEvent
-    data class GenreSelected(val genreId: Int?, val genreName: String?) : DiscoverEvent
+    data class GenreSelected(val genreId: Int?) : DiscoverEvent
     data class ReleasePeriodSelected(
         val yearFrom: Int?,
         val yearTo: Int?,
-        val label: String?,
     ) : DiscoverEvent
     data class RatingSelected(val minimumRating: Int?) : DiscoverEvent
     data object ClearFiltersClicked : DiscoverEvent

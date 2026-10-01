@@ -74,14 +74,10 @@ class DiscoverViewModel @Inject constructor(
             DiscoverEvent.ApplyFiltersClicked -> applyFilters()
             DiscoverEvent.ResetDraftFiltersClicked -> resetDraftFilters()
             is DiscoverEvent.SortSelected -> updateSort(sort = event.sort)
-            is DiscoverEvent.GenreSelected -> updateGenre(
-                genreId = event.genreId,
-                genreName = event.genreName
-            )
+            is DiscoverEvent.GenreSelected -> updateGenre(genreId = event.genreId)
             is DiscoverEvent.ReleasePeriodSelected -> updateReleasePeriod(
                 yearFrom = event.yearFrom,
-                yearTo = event.yearTo,
-                label = event.label
+                yearTo = event.yearTo
             )
             is DiscoverEvent.RatingSelected -> updateRating(minimumRating = event.minimumRating)
             DiscoverEvent.ClearFiltersClicked -> clearFilters()
@@ -198,25 +194,18 @@ class DiscoverViewModel @Inject constructor(
         updateDraftFilters { filters -> filters.copy(sort = sort) }
     }
 
-    private fun updateGenre(genreId: Int?, genreName: String?) {
-        updateDraftFilters { filters ->
-            filters.copy(
-                genreId = genreId,
-                genreName = genreName
-            )
-        }
+    private fun updateGenre(genreId: Int?) {
+        updateDraftFilters { filters -> filters.copy(genreId = genreId) }
     }
 
     private fun updateReleasePeriod(
         yearFrom: Int?,
         yearTo: Int?,
-        label: String?,
     ) {
         updateDraftFilters { filters ->
             filters.copy(
                 releaseYearFrom = yearFrom,
-                releaseYearTo = yearTo,
-                releasePeriodLabel = label
+                releaseYearTo = yearTo
             )
         }
     }
