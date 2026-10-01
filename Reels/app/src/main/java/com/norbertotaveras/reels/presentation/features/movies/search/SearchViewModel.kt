@@ -12,11 +12,14 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
+import com.norbertotaveras.reels.domain.model.search.SearchQueryPolicy
 import com.norbertotaveras.reels.domain.usecase.movie.GetMovieGenresUseCase
-import com.norbertotaveras.reels.domain.usecase.movie.GetTrendingMoviesUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.SearchMoviesUseCase
+import com.norbertotaveras.reels.domain.usecase.search.ClearRecentSearchesUseCase
+import com.norbertotaveras.reels.domain.usecase.search.GetTrendingSearchesUseCase
+import com.norbertotaveras.reels.domain.usecase.search.RemoveRecentSearchUseCase
+import com.norbertotaveras.reels.domain.usecase.search.SaveRecentSearchUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
-import com.norbertotaveras.reels.domain.usecase.settings.UpdateRecentSearchesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,9 +44,11 @@ import kotlinx.coroutines.launch
 class SearchViewModel @Inject constructor(
     private val searchMoviesUseCase: SearchMoviesUseCase,
     private val getMovieGenresUseCase: GetMovieGenresUseCase,
-    private val getTrendingMoviesUseCase: GetTrendingMoviesUseCase,
+    private val getTrendingSearchesUseCase: GetTrendingSearchesUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
-    private val updateRecentSearchesUseCase: UpdateRecentSearchesUseCase,
+    private val saveRecentSearchUseCase: SaveRecentSearchUseCase,
+    private val removeRecentSearchUseCase: RemoveRecentSearchUseCase,
+    private val clearRecentSearchesUseCase: ClearRecentSearchesUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(SearchUiState())
     val state: StateFlow<SearchUiState> = _state.asStateFlow()
@@ -57,7 +62,7 @@ class SearchViewModel @Inject constructor(
         .debounce(400)
         .distinctUntilChanged()
         .flatMapLatest { (query, language) ->
-            if (query.length < MIN_QUERY_LENGTH) {
+            if (!SearchQueryPolicy.isValid(query = query)) {
                 flowOf(PagingData.empty())
             } else {
                 searchMoviesUseCase(
@@ -107,26 +112,24 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun onClearRecentSearches() {
-        _state.update { currentState ->
-            currentState.copy(recentSearches = emptyList())
-        }
-
         viewModelScope.launch {
-            updateRecentSearchesUseCase(recentSearches = emptyList())
+            val recentSearches = clearRecentSearchesUseCase()
+            _state.update { currentState ->
+                currentState.copy(recentSearches = recentSearches)
+            }
         }
     }
 
     private fun onRecentSearchRemoved(query: String) {
-        val recentSearches = state.value.recentSearches.filterNot { recent ->
-            recent.equals(query, ignoreCase = true)
-        }
-
-        _state.update { currentState ->
-            currentState.copy(recentSearches = recentSearches)
-        }
-
+        val recentSearches = state.value.recentSearches
         viewModelScope.launch {
-            updateRecentSearchesUseCase(recentSearches = recentSearches)
+            val updatedSearches = removeRecentSearchUseCase(
+                query = query,
+                recentSearches = recentSearches
+            )
+            _state.update { currentState ->
+                currentState.copy(recentSearches = updatedSearches)
+            }
         }
     }
 
@@ -140,21 +143,16 @@ class SearchViewModel @Inject constructor(
 
     private fun saveCurrentQueryAsRecentSearch() {
         val currentState = state.value
-        val query = currentState.query.trim()
-
-        if (query.length < MIN_QUERY_LENGTH) return
-
-        val recentSearches = buildRecentSearches(
-            query = query,
-            currentRecentSearches = currentState.recentSearches
-        )
-
-        _state.update { currentState ->
-            currentState.copy(recentSearches = recentSearches)
-        }
+        if (!SearchQueryPolicy.isValid(query = currentState.query)) return
 
         viewModelScope.launch {
-            updateRecentSearchesUseCase(recentSearches = recentSearches)
+            val recentSearches = saveRecentSearchUseCase(
+                query = currentState.query,
+                recentSearches = currentState.recentSearches
+            )
+            _state.update { latestState ->
+                latestState.copy(recentSearches = recentSearches)
+            }
         }
     }
 
@@ -187,20 +185,6 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private fun buildRecentSearches(
-        query: String,
-        currentRecentSearches: List<String>,
-    ): List<String> {
-        return buildList {
-            add(query)
-            addAll(
-                currentRecentSearches.filterNot { recent ->
-                    recent.equals(query, ignoreCase = true)
-                }
-            )
-        }.take(MAX_RECENT_SEARCHES)
-    }
-
     private fun loadGenres(language: String) {
         viewModelScope.launch {
             getMovieGenresUseCase(language = language).fold(
@@ -224,16 +208,8 @@ class SearchViewModel @Inject constructor(
 
     private fun loadTrendingSearches(language: String) {
         viewModelScope.launch {
-            getTrendingMoviesUseCase(language = language).fold(
-                onSuccess = { movies ->
-                    val trendingSearches = movies
-                        .asSequence()
-                        .map { movie -> movie.title.trim() }
-                        .filter { title -> title.isNotEmpty() }
-                        .distinctBy { title -> title.lowercase() }
-                        .take(MAX_TRENDING_SEARCHES)
-                        .toList()
-
+            getTrendingSearchesUseCase(language = language).fold(
+                onSuccess = { trendingSearches ->
                     _state.update { currentState ->
                         if (currentState.language == language) {
                             currentState.copy(trendingSearches = trendingSearches)
@@ -253,11 +229,5 @@ class SearchViewModel @Inject constructor(
                 }
             )
         }
-    }
-
-    private companion object {
-        const val MIN_QUERY_LENGTH = 2
-        const val MAX_RECENT_SEARCHES = 5
-        const val MAX_TRENDING_SEARCHES = 5
     }
 }

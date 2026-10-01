@@ -5,15 +5,17 @@
  * modification, distribution, or use is prohibited.
  */
 
-package com.norbertotaveras.reels.domain.usecase.settings
+package com.norbertotaveras.reels.domain.usecase.search
 
 import com.norbertotaveras.reels.domain.repository.settings.SettingsRepository
 import javax.inject.Inject
 
-class UpdateRecentSearchesUseCase @Inject constructor(
+class ClearRecentSearchesUseCase @Inject constructor(
     private val repository: SettingsRepository,
 ) {
-    suspend operator fun invoke(recentSearches: List<String>) {
+    suspend operator fun invoke(): List<String> {
+        val recentSearches = emptyList<String>()
         repository.updateRecentSearches(recentSearches = recentSearches)
+        return recentSearches
     }
 }
