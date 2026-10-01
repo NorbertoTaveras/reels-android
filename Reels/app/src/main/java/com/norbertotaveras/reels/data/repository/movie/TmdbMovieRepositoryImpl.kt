@@ -14,6 +14,7 @@ import androidx.paging.map
 import com.norbertotaveras.reels.data.local.dao.CachedMovieDao
 import com.norbertotaveras.reels.data.local.db.ReelsDatabase
 import com.norbertotaveras.reels.data.local.mapper.toMovieDataModel
+import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
 import com.norbertotaveras.reels.data.remote.mapper.genre.toGenreDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toDiscoverMovieRequestParameters
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieCreditsDataModel
@@ -21,9 +22,9 @@ import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDataModel as to
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDetailsDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieVideosDataModel
 import com.norbertotaveras.reels.data.remote.movie.TmdbMovieRemoteDataSource
-import com.norbertotaveras.reels.data.remote.paging.CachedMoviesRemoteMediator
-import com.norbertotaveras.reels.data.remote.paging.CachedSearchMoviesRemoteMediator
+import com.norbertotaveras.reels.data.remote.paging.CachedMovieListRemoteMediator
 import com.norbertotaveras.reels.data.remote.paging.DiscoverMoviesPagingSource
+import com.norbertotaveras.reels.data.remote.paging.MovieCachePolicy
 import com.norbertotaveras.reels.data.remote.paging.cacheKey
 import com.norbertotaveras.reels.data.remote.paging.searchCacheKey
 import com.norbertotaveras.reels.data.remote.paging.tmdbPagingConfig
@@ -55,21 +56,18 @@ class TmdbMovieRepositoryImpl @Inject constructor(
         category: MovieCategory,
         language: String,
     ): Flow<PagingData<MovieDataModel>> {
-        return Pager(
-            config = tmdbPagingConfig(),
-            remoteMediator = CachedMoviesRemoteMediator(
-                database = database,
-                cachedMovieDao = cachedMovieDao,
-                remoteDataSource = remoteDataSource,
-                category = category,
-                language = language
-            ),
-            pagingSourceFactory = {
-                cachedMovieDao.pagingSource(listKey = category.cacheKey(language = language))
+        val listKey = category.cacheKey(language = language)
+        return cachedMovies(
+            listKey = listKey,
+            cacheTimeoutMillis = MovieCachePolicy.CATEGORY_CACHE_TIMEOUT_MILLIS,
+            loadPage = { page ->
+                remoteDataSource.getMovies(
+                    category = category.value,
+                    language = language,
+                    page = page
+                )
             }
-        ).flow.map { pagingData ->
-            pagingData.map { cachedMovie -> cachedMovie.toMovieDataModel() }
-        }
+        )
     }
 
     override fun searchMovies(
@@ -77,28 +75,23 @@ class TmdbMovieRepositoryImpl @Inject constructor(
         language: String,
         includeAdult: Boolean,
     ): Flow<PagingData<MovieDataModel>> {
-        return Pager(
-            config = tmdbPagingConfig(),
-            remoteMediator = CachedSearchMoviesRemoteMediator(
-                database = database,
-                cachedMovieDao = cachedMovieDao,
-                remoteDataSource = remoteDataSource,
-                query = query,
-                language = language,
-                includeAdult = includeAdult
-            ),
-            pagingSourceFactory = {
-                cachedMovieDao.pagingSource(
-                    listKey = searchCacheKey(
-                        query = query,
-                        language = language,
-                        includeAdult = includeAdult
-                    )
+        val listKey = searchCacheKey(
+            query = query,
+            language = language,
+            includeAdult = includeAdult
+        )
+        return cachedMovies(
+            listKey = listKey,
+            cacheTimeoutMillis = MovieCachePolicy.SEARCH_CACHE_TIMEOUT_MILLIS,
+            loadPage = { page ->
+                remoteDataSource.searchMovies(
+                    query = query,
+                    language = language,
+                    page = page,
+                    includeAdult = includeAdult
                 )
             }
-        ).flow.map { pagingData ->
-            pagingData.map { cachedMovie -> cachedMovie.toMovieDataModel() }
-        }
+        )
     }
 
     override fun discoverMovies(
@@ -206,6 +199,28 @@ class TmdbMovieRepositoryImpl @Inject constructor(
                 .genres
                 .orEmpty()
                 .map { genreDto -> genreDto.toGenreDataModel() }
+        }
+    }
+
+    private fun cachedMovies(
+        listKey: String,
+        cacheTimeoutMillis: Long,
+        loadPage: suspend (page: Int) -> MoviesResponseDto,
+    ): Flow<PagingData<MovieDataModel>> {
+        return Pager(
+            config = tmdbPagingConfig(),
+            remoteMediator = CachedMovieListRemoteMediator(
+                database = database,
+                cachedMovieDao = cachedMovieDao,
+                listKey = listKey,
+                cacheTimeoutMillis = cacheTimeoutMillis,
+                loadPage = loadPage
+            ),
+            pagingSourceFactory = {
+                cachedMovieDao.pagingSource(listKey = listKey)
+            }
+        ).flow.map { pagingData ->
+            pagingData.map { cachedMovie -> cachedMovie.toMovieDataModel() }
         }
     }
 

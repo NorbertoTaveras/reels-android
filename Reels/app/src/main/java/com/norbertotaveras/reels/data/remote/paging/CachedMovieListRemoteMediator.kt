@@ -18,31 +18,25 @@ import com.norbertotaveras.reels.data.local.entity.CachedMovieEntity
 import com.norbertotaveras.reels.data.local.entity.CachedMovieListEntryEntity
 import com.norbertotaveras.reels.data.local.entity.MovieRemoteKeyEntity
 import com.norbertotaveras.reels.data.local.mapper.toCachedMovieEntity
-import com.norbertotaveras.reels.data.remote.movie.TmdbMovieRemoteDataSource
+import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
+import kotlinx.coroutines.CancellationException
 
 @OptIn(ExperimentalPagingApi::class)
-class CachedSearchMoviesRemoteMediator(
+internal class CachedMovieListRemoteMediator(
     private val database: ReelsDatabase,
     private val cachedMovieDao: CachedMovieDao,
-    private val remoteDataSource: TmdbMovieRemoteDataSource,
-    private val query: String,
-    private val language: String,
-    private val includeAdult: Boolean,
+    private val listKey: String,
+    private val cacheTimeoutMillis: Long,
+    private val loadPage: suspend (page: Int) -> MoviesResponseDto,
 ) : RemoteMediator<Int, CachedMovieEntity>() {
-    private val listKey = searchCacheKey(
-        query = query,
-        language = language,
-        includeAdult = includeAdult
-    )
-
     override suspend fun initialize(): InitializeAction {
         val lastUpdatedAt = cachedMovieDao.getRemoteKey(listKey = listKey)?.lastUpdatedAt
             ?: return InitializeAction.LAUNCH_INITIAL_REFRESH
         val isCacheFresh = MovieCachePolicy.isFresh(
             lastUpdatedAt = lastUpdatedAt,
             now = System.currentTimeMillis(),
-            timeoutMillis = MovieCachePolicy.SEARCH_CACHE_TIMEOUT_MILLIS
+            timeoutMillis = cacheTimeoutMillis
         )
 
         return if (isCacheFresh) {
@@ -57,21 +51,9 @@ class CachedSearchMoviesRemoteMediator(
         state: PagingState<Int, CachedMovieEntity>,
     ): MediatorResult {
         return try {
-            val page = when (loadType) {
-                LoadType.REFRESH -> TMDB_FIRST_PAGE
-                LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
-                LoadType.APPEND -> {
-                    cachedMovieDao.getRemoteKey(listKey = listKey)?.nextPage
-                        ?: return MediatorResult.Success(endOfPaginationReached = true)
-                }
-            }
-
-            val response = remoteDataSource.searchMovies(
-                query = query,
-                language = language,
-                page = page,
-                includeAdult = includeAdult
-            )
+            val page = pageFor(loadType = loadType)
+                ?: return MediatorResult.Success(endOfPaginationReached = true)
+            val response = loadPage(page)
             val now = System.currentTimeMillis()
             val endOfPaginationReached = page >= response.totalPages
             val listStartPosition = (page - 1) * state.config.pageSize
@@ -108,8 +90,18 @@ class CachedSearchMoviesRemoteMediator(
             }
 
             MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
+        } catch (error: CancellationException) {
+            throw error
         } catch (error: Exception) {
             MediatorResult.Error(error.toTmdbNetworkException())
+        }
+    }
+
+    private suspend fun pageFor(loadType: LoadType): Int? {
+        return when (loadType) {
+            LoadType.REFRESH -> TMDB_FIRST_PAGE
+            LoadType.PREPEND -> null
+            LoadType.APPEND -> cachedMovieDao.getRemoteKey(listKey = listKey)?.nextPage
         }
     }
 
