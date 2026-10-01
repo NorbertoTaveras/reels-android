@@ -11,12 +11,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
-import com.norbertotaveras.reels.domain.usecase.account.GetTmdbRatedMoviesUseCase
-import com.norbertotaveras.reels.domain.usecase.account.GetTmdbWatchlistMoviesUseCase
+import com.norbertotaveras.reels.domain.usecase.account.GetTmdbLibraryMoviesUseCase
 import com.norbertotaveras.reels.domain.usecase.account.ObserveTmdbAccountUseCase
-import com.norbertotaveras.reels.domain.usecase.favorites.ObserveFavoriteMoviesUseCase
-import com.norbertotaveras.reels.domain.usecase.favorites.ObserveSavedPeopleUseCase
+import com.norbertotaveras.reels.domain.usecase.favorites.ObserveLibraryContentUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.RemoveFavoriteMovieUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.RemoveSavedPersonUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
@@ -42,13 +41,11 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
 class FavoritesViewModel @Inject constructor(
-    private val observeFavoriteMoviesUseCase: ObserveFavoriteMoviesUseCase,
-    private val observeSavedPeopleUseCase: ObserveSavedPeopleUseCase,
+    private val observeLibraryContentUseCase: ObserveLibraryContentUseCase,
     private val removeFavoriteMovieUseCase: RemoveFavoriteMovieUseCase,
     private val removeSavedPersonUseCase: RemoveSavedPersonUseCase,
     private val observeTmdbAccountUseCase: ObserveTmdbAccountUseCase,
-    private val getTmdbWatchlistMoviesUseCase: GetTmdbWatchlistMoviesUseCase,
-    private val getTmdbRatedMoviesUseCase: GetTmdbRatedMoviesUseCase,
+    private val getTmdbLibraryMoviesUseCase: GetTmdbLibraryMoviesUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(FavoritesUiState())
@@ -67,7 +64,10 @@ class FavoritesViewModel @Inject constructor(
         tmdbRefreshRequests
     ) { language, _ -> language }
         .flatMapLatest { language ->
-            getTmdbWatchlistMoviesUseCase(language = language)
+            getTmdbLibraryMoviesUseCase(
+                list = TmdbLibraryList.Watchlist,
+                language = language
+            )
         }
         .cachedIn(viewModelScope)
 
@@ -76,12 +76,15 @@ class FavoritesViewModel @Inject constructor(
         tmdbRefreshRequests
     ) { language, _ -> language }
         .flatMapLatest { language ->
-            getTmdbRatedMoviesUseCase(language = language)
+            getTmdbLibraryMoviesUseCase(
+                list = TmdbLibraryList.Rated,
+                language = language
+            )
         }
         .cachedIn(viewModelScope)
 
     init {
-        observeFavorites()
+        observeLibraryContent()
         observeTmdbAccount()
     }
 
@@ -97,18 +100,13 @@ class FavoritesViewModel @Inject constructor(
         }
     }
 
-    private fun observeFavorites() {
+    private fun observeLibraryContent() {
         viewModelScope.launch {
-            combine(
-                observeFavoriteMoviesUseCase(),
-                observeSavedPeopleUseCase()
-            ) { movies, people ->
-                movies to people
-            }.collectLatest { (movies, people) ->
+            observeLibraryContentUseCase().collectLatest { content ->
                 _state.update { currentState ->
                     currentState.copy(
-                        movies = movies,
-                        people = people
+                        movies = content.movies,
+                        people = content.people
                     )
                 }
             }

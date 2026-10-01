@@ -16,8 +16,7 @@ import com.norbertotaveras.reels.domain.usecase.account.DisconnectTmdbAccountUse
 import com.norbertotaveras.reels.domain.usecase.account.FinishTmdbAuthenticationUseCase
 import com.norbertotaveras.reels.domain.usecase.account.ObserveTmdbAccountUseCase
 import com.norbertotaveras.reels.domain.usecase.account.StartTmdbAuthenticationUseCase
-import com.norbertotaveras.reels.domain.usecase.favorites.ObserveFavoriteMoviesUseCase
-import com.norbertotaveras.reels.domain.usecase.favorites.ObserveSavedPeopleUseCase
+import com.norbertotaveras.reels.domain.usecase.favorites.ObserveLibraryContentUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateImageQualityUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateLanguageRegionUseCase
@@ -32,15 +31,13 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val observeSettingsUseCase: ObserveSettingsUseCase,
-    private val observeFavoriteMoviesUseCase: ObserveFavoriteMoviesUseCase,
-    private val observeSavedPeopleUseCase: ObserveSavedPeopleUseCase,
+    private val observeLibraryContentUseCase: ObserveLibraryContentUseCase,
     private val observeTmdbAccountUseCase: ObserveTmdbAccountUseCase,
     private val startTmdbAuthenticationUseCase: StartTmdbAuthenticationUseCase,
     private val finishTmdbAuthenticationUseCase: FinishTmdbAuthenticationUseCase,
@@ -107,15 +104,12 @@ class SettingsViewModel @Inject constructor(
 
     private fun observeSavedLibrary() {
         viewModelScope.launch {
-            combine(
-                observeFavoriteMoviesUseCase(),
-                observeSavedPeopleUseCase()
-            ) { movies, people ->
-                buildSavedLibraryLabel(
-                    movieCount = movies.size,
-                    personCount = people.size
+            observeLibraryContentUseCase().collect { content ->
+                val savedLibraryLabel = buildSavedLibraryLabel(
+                    movieCount = content.movies.size,
+                    personCount = content.people.size
                 )
-            }.collect { savedLibraryLabel ->
+
                 _state.update { currentState ->
                     currentState.copy(savedLibraryLabel = savedLibraryLabel)
                 }
