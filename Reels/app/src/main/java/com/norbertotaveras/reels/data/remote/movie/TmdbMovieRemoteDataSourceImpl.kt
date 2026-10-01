@@ -7,7 +7,6 @@
 
 package com.norbertotaveras.reels.data.remote.movie
 
-import com.norbertotaveras.reels.data.remote.TmdbService
 import com.norbertotaveras.reels.data.remote.dto.genre.GenresResponseDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieCreditsDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieDetailsDto
@@ -16,7 +15,7 @@ import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
 import javax.inject.Inject
 
 class TmdbMovieRemoteDataSourceImpl @Inject constructor(
-    private val service: TmdbService,
+    private val service: TmdbMovieService,
 ) : TmdbMovieRemoteDataSource {
     override suspend fun getMovies(
         category: String,

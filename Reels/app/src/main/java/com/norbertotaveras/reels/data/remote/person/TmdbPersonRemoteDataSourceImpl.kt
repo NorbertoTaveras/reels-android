@@ -7,13 +7,12 @@
 
 package com.norbertotaveras.reels.data.remote.person
 
-import com.norbertotaveras.reels.data.remote.TmdbService
 import com.norbertotaveras.reels.data.remote.dto.person.PersonDetailsDto
 import com.norbertotaveras.reels.data.remote.dto.person.PersonMovieCreditsDto
 import javax.inject.Inject
 
 class TmdbPersonRemoteDataSourceImpl @Inject constructor(
-    private val service: TmdbService,
+    private val service: TmdbPersonService,
 ) : TmdbPersonRemoteDataSource {
     override suspend fun getPersonDetails(
         personId: Int,

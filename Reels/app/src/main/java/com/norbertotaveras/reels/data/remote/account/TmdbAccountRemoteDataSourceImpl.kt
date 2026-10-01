@@ -7,7 +7,6 @@
 
 package com.norbertotaveras.reels.data.remote.account
 
-import com.norbertotaveras.reels.data.remote.TmdbService
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbAccountDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbCreateSessionRequestDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbMovieAccountStateDto
@@ -19,7 +18,7 @@ import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
 import javax.inject.Inject
 
 class TmdbAccountRemoteDataSourceImpl @Inject constructor(
-    private val service: TmdbService,
+    private val service: TmdbAccountService,
 ) : TmdbAccountRemoteDataSource {
     override suspend fun createRequestToken(): TmdbRequestTokenDto {
         return service.createRequestToken()
