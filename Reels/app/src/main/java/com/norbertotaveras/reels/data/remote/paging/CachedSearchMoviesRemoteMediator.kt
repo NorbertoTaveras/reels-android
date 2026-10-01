@@ -58,7 +58,7 @@ class CachedSearchMoviesRemoteMediator(
     ): MediatorResult {
         return try {
             val page = when (loadType) {
-                LoadType.REFRESH -> FIRST_PAGE
+                LoadType.REFRESH -> TMDB_FIRST_PAGE
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
                     cachedMovieDao.getRemoteKey(listKey = listKey)?.nextPage
@@ -119,16 +119,4 @@ class CachedSearchMoviesRemoteMediator(
         cachedMovieDao.clearExpiredRemoteKeys(cutoffMillis = cutoffMillis)
         cachedMovieDao.clearOrphanMovies()
     }
-
-    private companion object {
-        const val FIRST_PAGE = 1
-    }
-}
-
-fun searchCacheKey(
-    query: String,
-    language: String,
-    includeAdult: Boolean,
-): String {
-    return "search:${query.trim().lowercase()}:language:$language:adult:$includeAdult"
 }

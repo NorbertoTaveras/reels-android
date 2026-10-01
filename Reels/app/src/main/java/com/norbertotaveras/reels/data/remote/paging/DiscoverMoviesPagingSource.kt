@@ -23,7 +23,7 @@ class DiscoverMoviesPagingSource(
 ) : PagingSource<Int, MovieDto>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MovieDto> {
         return try {
-            val page = params.key ?: 1
+            val page = params.key ?: TMDB_FIRST_PAGE
             val response = remoteDataSource.discoverMovies(
                 language = language,
                 page = page,
@@ -36,7 +36,7 @@ class DiscoverMoviesPagingSource(
 
             LoadResult.Page(
                 data = response.results,
-                prevKey = if (page == FIRST_PAGE) null else page - 1,
+                prevKey = if (page == TMDB_FIRST_PAGE) null else page - 1,
                 nextKey = if (page >= response.totalPages) null else page + 1
             )
         } catch (error: Exception) {
@@ -48,9 +48,5 @@ class DiscoverMoviesPagingSource(
         val anchorPosition = state.anchorPosition ?: return null
         val anchorPage = state.closestPageToPosition(anchorPosition)
         return anchorPage?.prevKey?.plus(1) ?: anchorPage?.nextKey?.minus(1)
-    }
-
-    private companion object {
-        const val FIRST_PAGE = 1
     }
 }

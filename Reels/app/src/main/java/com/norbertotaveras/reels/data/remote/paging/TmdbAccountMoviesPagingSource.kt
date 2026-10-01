@@ -20,12 +20,12 @@ class TmdbAccountMoviesPagingSource(
     private val accountId: Int,
     private val sessionId: String,
     private val language: String,
-    private val listType: TmdbAccountMovieListType = TmdbAccountMovieListType.Watchlist,
+    private val listType: TmdbAccountMovieListType,
     private val onSessionExpired: suspend () -> Unit,
 ) : PagingSource<Int, MovieDto>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MovieDto> {
         return try {
-            val page = params.key ?: FIRST_PAGE
+            val page = params.key ?: TMDB_FIRST_PAGE
             val response = when (listType) {
                 TmdbAccountMovieListType.Watchlist -> remoteDataSource.getWatchlistMovies(
                     accountId = accountId,
@@ -43,7 +43,7 @@ class TmdbAccountMoviesPagingSource(
 
             LoadResult.Page(
                 data = response.results,
-                prevKey = if (page == FIRST_PAGE) null else page - 1,
+                prevKey = if (page == TMDB_FIRST_PAGE) null else page - 1,
                 nextKey = if (page >= response.totalPages) null else page + 1
             )
         } catch (error: Exception) {
@@ -60,9 +60,5 @@ class TmdbAccountMoviesPagingSource(
         val anchorPosition = state.anchorPosition ?: return null
         val anchorPage = state.closestPageToPosition(anchorPosition)
         return anchorPage?.prevKey?.plus(1) ?: anchorPage?.nextKey?.minus(1)
-    }
-
-    private companion object {
-        const val FIRST_PAGE = 1
     }
 }

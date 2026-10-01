@@ -20,3 +20,4 @@ internal fun tmdbPagingConfig(): PagingConfig {
 
 private const val TMDB_PAGE_SIZE = 20
 private const val TMDB_PREFETCH_DISTANCE = 5
+internal const val TMDB_FIRST_PAGE = 1
