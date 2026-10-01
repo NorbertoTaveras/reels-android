@@ -9,6 +9,7 @@ package com.norbertotaveras.reels.presentation.features.movies.details
 
 import androidx.compose.runtime.Composable
 import com.norbertotaveras.reels.domain.model.account.TmdbMovieAccountStateDataModel
+import com.norbertotaveras.reels.domain.model.movie.MovieDetailsContentDataModel
 import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.presentation.ui.components.movie.PosterCarouselItem
 import com.norbertotaveras.reels.presentation.ui.components.trailer.TrailerCarouselItem
@@ -44,5 +45,19 @@ internal fun MovieDetailsUiState.withTmdbAccountState(
     return copy(
         isWatchlisted = accountState?.isWatchlisted ?: false,
         tmdbRating = accountState?.rating
+    )
+}
+
+internal fun MovieDetailsUiState.withContent(
+    content: MovieDetailsContentDataModel,
+): MovieDetailsUiState {
+    return copy(
+        movie = content.movie,
+        cast = content.cast,
+        trailers = content.trailers,
+        similarMovies = content.similarMovies,
+        isOfflineFavorite = content.isOfflineFavorite,
+        errorMessage = null,
+        isLoading = false
     )
 }

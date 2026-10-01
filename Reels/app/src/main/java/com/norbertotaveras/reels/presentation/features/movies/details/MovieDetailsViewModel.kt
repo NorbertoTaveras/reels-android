@@ -17,20 +17,15 @@ import com.norbertotaveras.reels.domain.usecase.account.GetTmdbMovieAccountState
 import com.norbertotaveras.reels.domain.usecase.account.ObserveTmdbAccountUseCase
 import com.norbertotaveras.reels.domain.usecase.account.RateTmdbMovieUseCase
 import com.norbertotaveras.reels.domain.usecase.account.UpdateTmdbWatchlistUseCase
-import com.norbertotaveras.reels.domain.usecase.favorites.GetFavoriteMovieDetailsUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveSavedPeopleUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveIsFavoriteUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ToggleSavedCastMemberUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ToggleFavoriteMovieUseCase
-import com.norbertotaveras.reels.domain.usecase.movie.GetMovieCreditsUseCase
-import com.norbertotaveras.reels.domain.usecase.movie.GetMovieDetailsUseCase
-import com.norbertotaveras.reels.domain.usecase.movie.GetMovieVideosUseCase
-import com.norbertotaveras.reels.domain.usecase.movie.GetSimilarMoviesUseCase
+import com.norbertotaveras.reels.domain.usecase.movie.LoadMovieDetailsContentUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -47,13 +42,9 @@ import javax.inject.Inject
 @HiltViewModel
 class MovieDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val getMovieDetailsUseCase: GetMovieDetailsUseCase,
-    private val getMovieCreditsUseCase: GetMovieCreditsUseCase,
-    private val getMovieVideosUseCase: GetMovieVideosUseCase,
-    private val getSimilarMoviesUseCase: GetSimilarMoviesUseCase,
+    private val loadMovieDetailsContentUseCase: LoadMovieDetailsContentUseCase,
     private val observeIsFavoriteUseCase: ObserveIsFavoriteUseCase,
     private val toggleFavoriteMovieUseCase: ToggleFavoriteMovieUseCase,
-    private val getFavoriteMovieDetailsUseCase: GetFavoriteMovieDetailsUseCase,
     private val observeSavedPeopleUseCase: ObserveSavedPeopleUseCase,
     private val toggleSavedCastMemberUseCase: ToggleSavedCastMemberUseCase,
     private val observeTmdbAccountUseCase: ObserveTmdbAccountUseCase,
@@ -111,81 +102,26 @@ class MovieDetailsViewModel @Inject constructor(
                 )
             }
 
-            val movieResult = getMovieDetailsUseCase(
+            loadMovieDetailsContentUseCase(
                 movieId = movieId,
                 language = language
-            )
-
-            movieResult.fold(
-                onSuccess = { movie ->
-                    val creditsDeferred = async {
-                        getMovieCreditsUseCase(
-                            movieId = movieId,
-                            language = language
-                        )
-                    }
-                    val videosDeferred = async {
-                        getMovieVideosUseCase(
-                            movieId = movieId,
-                            language = language
-                        )
-                    }
-                    val similarDeferred = async {
-                        getSimilarMoviesUseCase(
-                            movieId = movieId,
-                            language = language
-                        )
-                    }
-
-                    val cast = creditsDeferred.await()
-                        .getOrNull()
-                        ?.cast
-                        ?.take(10)
-                        .orEmpty()
-                    val trailers = videosDeferred.await()
-                        .getOrNull()
-                        ?.videos
-                        ?.filter { video -> video.isPlayableTrailer }
-                        ?.take(10)
-                        .orEmpty()
-                    val similarMovies = similarDeferred.await()
-                        .getOrNull()
-                        ?.take(10)
-                        .orEmpty()
-
+            ).fold(
+                onSuccess = { content ->
                     _state.update { currentState ->
-                        currentState.copy(
-                            movie = movie,
-                            cast = cast,
-                            trailers = trailers,
-                            similarMovies = similarMovies,
-                            isOfflineFavorite = false,
-                            isLoading = false
-                        )
+                        currentState.withContent(content = content)
                     }
-                    refreshMovieAccountState()
+                    if (!content.isOfflineFavorite) {
+                        refreshMovieAccountState()
+                    }
                 },
                 onFailure = { error ->
-                    val offlineFavorite = getFavoriteMovieDetailsUseCase(movieId = movieId)
                     _state.update { currentState ->
-                        if (offlineFavorite != null) {
-                            currentState.copy(
-                                movie = offlineFavorite,
-                                cast = emptyList(),
-                                trailers = emptyList(),
-                                similarMovies = emptyList(),
-                                isOfflineFavorite = true,
-                                errorMessage = null,
-                                isLoading = false
-                            )
-                        } else {
-                            currentState.copy(
-                                errorMessage = error.toUserMessage(
-                                    fallback = "Unable to load movie details."
-                                ),
-                                isLoading = false
-                            )
-                        }
+                        currentState.copy(
+                            errorMessage = error.toUserMessage(
+                                fallback = "Unable to load movie details."
+                            ),
+                            isLoading = false
+                        )
                     }
                 }
             )
