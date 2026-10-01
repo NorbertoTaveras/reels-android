@@ -18,7 +18,7 @@ import com.norbertotaveras.reels.data.local.entity.CachedMovieEntity
 import com.norbertotaveras.reels.data.local.entity.CachedMovieListEntryEntity
 import com.norbertotaveras.reels.data.local.entity.MovieRemoteKeyEntity
 import com.norbertotaveras.reels.data.local.mapper.toCachedMovieEntity
-import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
+import com.norbertotaveras.reels.data.remote.movie.TmdbMovieRemoteDataSource
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 
@@ -26,7 +26,7 @@ import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 class CachedMoviesRemoteMediator(
     private val database: ReelsDatabase,
     private val cachedMovieDao: CachedMovieDao,
-    private val remoteDataSource: TmdbRemoteDataSource,
+    private val remoteDataSource: TmdbMovieRemoteDataSource,
     private val category: MovieCategory,
     private val language: String,
 ) : RemoteMediator<Int, CachedMovieEntity>() {

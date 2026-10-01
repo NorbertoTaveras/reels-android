@@ -1,0 +1,70 @@
+/*
+ * Copyright (c) 2026 Norberto Taveras. All rights reserved.
+ *
+ * This source code is proprietary and confidential. Unauthorized copying,
+ * modification, distribution, or use is prohibited.
+ */
+
+package com.norbertotaveras.reels.data.remote.movie
+
+import com.norbertotaveras.reels.data.remote.dto.genre.GenresResponseDto
+import com.norbertotaveras.reels.data.remote.dto.movie.MovieCreditsDto
+import com.norbertotaveras.reels.data.remote.dto.movie.MovieDetailsDto
+import com.norbertotaveras.reels.data.remote.dto.movie.MovieVideosDto
+import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
+
+interface TmdbMovieRemoteDataSource {
+    suspend fun getMovies(
+        category: String,
+        language: String? = null,
+        page: Int? = null,
+    ): MoviesResponseDto
+
+    suspend fun getTrendingMovies(
+        timeWindow: String,
+        language: String? = null,
+    ): MoviesResponseDto
+
+    suspend fun getMovieDetails(
+        movieId: Int,
+        language: String? = null,
+    ): MovieDetailsDto
+
+    suspend fun getMovieCredits(
+        movieId: Int,
+        language: String? = null,
+    ): MovieCreditsDto
+
+    suspend fun getMovieVideos(
+        movieId: Int,
+        language: String? = null,
+    ): MovieVideosDto
+
+    suspend fun getSimilarMovies(
+        movieId: Int,
+        language: String? = null,
+        page: Int? = null,
+    ): MoviesResponseDto
+
+    suspend fun searchMovies(
+        query: String,
+        language: String? = null,
+        page: Int? = null,
+        includeAdult: Boolean = false,
+    ): MoviesResponseDto
+
+    suspend fun discoverMovies(
+        language: String? = null,
+        page: Int? = null,
+        sortBy: String,
+        genreId: Int? = null,
+        releaseDateFrom: String? = null,
+        releaseDateTo: String? = null,
+        minimumRating: Int? = null,
+        includeAdult: Boolean = false,
+    ): MoviesResponseDto
+
+    suspend fun getMovieGenres(
+        language: String? = null,
+    ): GenresResponseDto
+}

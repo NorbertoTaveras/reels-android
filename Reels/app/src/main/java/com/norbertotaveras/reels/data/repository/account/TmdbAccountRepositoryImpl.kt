@@ -11,7 +11,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.norbertotaveras.reels.data.local.preferences.TmdbAccountDataStore
-import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
+import com.norbertotaveras.reels.data.remote.account.TmdbAccountRemoteDataSource
 import com.norbertotaveras.reels.data.remote.error.TmdbSessionExpiredException
 import com.norbertotaveras.reels.data.remote.error.isTmdbSessionExpiredError
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
@@ -40,7 +40,7 @@ import kotlinx.coroutines.withContext
 @Singleton
 @OptIn(ExperimentalCoroutinesApi::class)
 class TmdbAccountRepositoryImpl @Inject constructor(
-    private val remoteDataSource: TmdbRemoteDataSource,
+    private val remoteDataSource: TmdbAccountRemoteDataSource,
     private val accountDataStore: TmdbAccountDataStore,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : TmdbAccountRepository {

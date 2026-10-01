@@ -7,7 +7,7 @@
 
 package com.norbertotaveras.reels.data.repository.person
 
-import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
+import com.norbertotaveras.reels.data.remote.person.TmdbPersonRemoteDataSource
 import com.norbertotaveras.reels.data.remote.mapper.person.toPersonDetailsDataModel
 import com.norbertotaveras.reels.data.remote.mapper.person.toPersonMovieCreditsDataModel
 import com.norbertotaveras.reels.data.repository.tmdbResult
@@ -21,7 +21,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 
 @Singleton
 class TmdbPersonRepositoryImpl @Inject constructor(
-    private val remoteDataSource: TmdbRemoteDataSource,
+    private val remoteDataSource: TmdbPersonRemoteDataSource,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : PersonRepository {
     override suspend fun getPersonDetails(

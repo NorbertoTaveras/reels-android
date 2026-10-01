@@ -14,7 +14,7 @@ import androidx.paging.map
 import com.norbertotaveras.reels.data.local.dao.CachedMovieDao
 import com.norbertotaveras.reels.data.local.db.ReelsDatabase
 import com.norbertotaveras.reels.data.local.mapper.toMovieDataModel
-import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
+import com.norbertotaveras.reels.data.remote.movie.TmdbMovieRemoteDataSource
 import com.norbertotaveras.reels.data.remote.mapper.genre.toGenreDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieCreditsDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDataModel as toRemoteMovieDataModel
@@ -47,7 +47,7 @@ import kotlinx.coroutines.flow.map
 @Singleton
 @OptIn(ExperimentalPagingApi::class)
 class TmdbMovieRepositoryImpl @Inject constructor(
-    private val remoteDataSource: TmdbRemoteDataSource,
+    private val remoteDataSource: TmdbMovieRemoteDataSource,
     private val database: ReelsDatabase,
     private val cachedMovieDao: CachedMovieDao,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,

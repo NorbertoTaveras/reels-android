@@ -9,14 +9,14 @@ package com.norbertotaveras.reels.data.remote.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.norbertotaveras.reels.data.remote.TmdbRemoteDataSource
+import com.norbertotaveras.reels.data.remote.account.TmdbAccountRemoteDataSource
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieDto
 import com.norbertotaveras.reels.data.remote.error.TmdbSessionExpiredException
 import com.norbertotaveras.reels.data.remote.error.isTmdbSessionExpiredError
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
 
 class TmdbAccountMoviesPagingSource(
-    private val remoteDataSource: TmdbRemoteDataSource,
+    private val remoteDataSource: TmdbAccountRemoteDataSource,
     private val accountId: Int,
     private val sessionId: String,
     private val language: String,
