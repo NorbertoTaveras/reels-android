@@ -20,8 +20,6 @@ data class SettingsUiState(
     val selectedTheme: AppTheme = AppTheme.System,
     val savedLibraryLabel: String = "Manage movies and people",
     val clearImageCacheLabel: String = "42 MB · Frees cached poster images",
-    val tmdbAccountTitle: String = "Connect TMDB Account",
-    val tmdbAccountLabel: String = "Sync watchlist and ratings with TMDB",
     val tmdbAccountName: String = "",
     val isTmdbAccountLoading: Boolean = false,
     val isTmdbAccountConnected: Boolean = false,

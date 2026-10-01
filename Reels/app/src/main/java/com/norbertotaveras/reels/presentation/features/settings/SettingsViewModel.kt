@@ -21,7 +21,6 @@ import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateImageQualityUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateLanguageRegionUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateThemeUseCase
-import com.norbertotaveras.reels.presentation.ui.extensions.displayLabel
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -89,14 +88,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             observeSettingsUseCase().collect { settings ->
                 _state.update { currentState ->
-                    currentState.copy(
-                        imageQualityLabel = settings.imageQuality.displayLabel,
-                        languageRegionLabel = settings.languageRegion.displayLabel,
-                        themeLabel = settings.theme.displayLabel,
-                        selectedImageQuality = settings.imageQuality,
-                        selectedLanguageRegion = settings.languageRegion,
-                        selectedTheme = settings.theme
-                    )
+                    currentState.withSettings(settings = settings)
                 }
             }
         }
@@ -105,13 +97,8 @@ class SettingsViewModel @Inject constructor(
     private fun observeSavedLibrary() {
         viewModelScope.launch {
             observeLibraryContentUseCase().collect { content ->
-                val savedLibraryLabel = buildSavedLibraryLabel(
-                    movieCount = content.movies.size,
-                    personCount = content.people.size
-                )
-
                 _state.update { currentState ->
-                    currentState.copy(savedLibraryLabel = savedLibraryLabel)
+                    currentState.withLibraryContent(content = content)
                 }
             }
         }
@@ -121,30 +108,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             observeTmdbAccountUseCase().collect { accountState ->
                 _state.update { currentState ->
-                    val account = accountState.account
-                    val accountName = account?.displayName
-                        ?.takeIf { displayName -> displayName.isNotBlank() }
-                        ?: account?.username
-                        ?: ""
-                    currentState.copy(
-                        isTmdbAccountConnected = accountState.isConnected,
-                        isTmdbAccountApprovalPending = accountState.isApprovalPending,
-                        tmdbAccountName = accountName,
-                        tmdbAccountTitle = when {
-                            accountState.isConnected -> "TMDB Account"
-                            accountState.isApprovalPending -> "TMDB Approval Pending"
-                            else -> "Connect TMDB Account"
-                        },
-                        tmdbAccountLabel = when {
-                            accountState.isConnected -> {
-                                "Connected as ${accountName.ifBlank { "TMDB user" }}"
-                            }
-                            accountState.isApprovalPending -> {
-                                "Approve access in your browser, then finish connection"
-                            }
-                            else -> "Sync watchlist and ratings with TMDB"
-                        }
-                    )
+                    currentState.withTmdbAccountState(accountState = accountState)
                 }
             }
         }
@@ -230,13 +194,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun onTmdbAccountClicked() {
-        viewModelScope.launch {
-            if (_state.value.isTmdbAccountLoading) return@launch
-
-            _state.update { currentState ->
-                currentState.copy(isTmdbAccountLoading = true)
-            }
-
+        runTmdbAccountAction {
             startTmdbAuthenticationUseCase()
                 .onSuccess { approvalUrl ->
                     _effect.emit(SettingsEffect.OpenExternalUrl(url = approvalUrl))
@@ -255,21 +213,11 @@ class SettingsViewModel @Inject constructor(
                         )
                     )
                 }
-
-            _state.update { currentState ->
-                currentState.copy(isTmdbAccountLoading = false)
-            }
         }
     }
 
     private fun onTmdbAccountFinishClicked() {
-        viewModelScope.launch {
-            if (_state.value.isTmdbAccountLoading) return@launch
-
-            _state.update { currentState ->
-                currentState.copy(isTmdbAccountLoading = true)
-            }
-
+        runTmdbAccountAction {
             finishTmdbAuthenticationUseCase()
                 .onSuccess {
                     _effect.emit(SettingsEffect.ShowMessage(message = "TMDB account connected."))
@@ -283,21 +231,11 @@ class SettingsViewModel @Inject constructor(
                         )
                     )
                 }
-
-            _state.update { currentState ->
-                currentState.copy(isTmdbAccountLoading = false)
-            }
         }
     }
 
     private fun onTmdbAccountDisconnectClicked() {
-        viewModelScope.launch {
-            if (_state.value.isTmdbAccountLoading) return@launch
-
-            _state.update { currentState ->
-                currentState.copy(isTmdbAccountLoading = true)
-            }
-
+        runTmdbAccountAction {
             disconnectTmdbAccountUseCase()
                 .onSuccess {
                     _effect.emit(SettingsEffect.ShowMessage(message = "TMDB account disconnected."))
@@ -311,9 +249,23 @@ class SettingsViewModel @Inject constructor(
                         )
                     )
                 }
+        }
+    }
+
+    private fun runTmdbAccountAction(action: suspend () -> Unit) {
+        viewModelScope.launch {
+            if (_state.value.isTmdbAccountLoading) return@launch
 
             _state.update { currentState ->
-                currentState.copy(isTmdbAccountLoading = false)
+                currentState.copy(isTmdbAccountLoading = true)
+            }
+
+            try {
+                action()
+            } finally {
+                _state.update { currentState ->
+                    currentState.copy(isTmdbAccountLoading = false)
+                }
             }
         }
     }
