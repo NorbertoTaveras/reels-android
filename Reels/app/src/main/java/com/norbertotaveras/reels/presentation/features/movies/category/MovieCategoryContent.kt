@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
+import com.norbertotaveras.reels.presentation.ui.components.common.CachedContentBanner
 import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
 import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
 import com.norbertotaveras.reels.presentation.ui.extensions.displayLabel
@@ -33,8 +34,12 @@ internal fun MovieCategoryContent(
     onEvent: (MovieCategoryEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (val refreshState = movies.loadState.refresh) {
-        is LoadState.Loading -> {
+    val refreshState = movies.loadState.refresh
+    val cachedRefreshError = movies.loadState.mediator?.refresh as? LoadState.Error
+    val hasCachedMovies = movies.itemCount > 0
+
+    when {
+        refreshState is LoadState.Loading && !hasCachedMovies -> {
             MovieCategoryLoadingState(
                 modifier = modifier,
                 category = state.category,
@@ -45,7 +50,7 @@ internal fun MovieCategoryContent(
             return
         }
 
-        is LoadState.Error -> {
+        refreshState is LoadState.Error && !hasCachedMovies -> {
             MovieCategoryErrorState(
                 modifier = modifier,
                 category = state.category,
@@ -60,8 +65,6 @@ internal fun MovieCategoryContent(
             )
             return
         }
-
-        is LoadState.NotLoading -> Unit
     }
 
     LazyVerticalGrid(
@@ -89,6 +92,14 @@ internal fun MovieCategoryContent(
                     onEvent(MovieCategoryEvent.BackClicked)
                 }
             )
+        }
+
+        if (cachedRefreshError != null || refreshState is LoadState.Error) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                CachedContentBanner(
+                    message = "Showing saved movies. New results will load when the connection improves."
+                )
+            }
         }
 
         if (movies.itemCount == 0) {
