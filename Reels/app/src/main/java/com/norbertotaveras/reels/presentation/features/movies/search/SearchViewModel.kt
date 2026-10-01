@@ -13,10 +13,9 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.domain.model.search.SearchQueryPolicy
-import com.norbertotaveras.reels.domain.usecase.movie.GetMovieGenresUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.SearchMoviesUseCase
 import com.norbertotaveras.reels.domain.usecase.search.ClearRecentSearchesUseCase
-import com.norbertotaveras.reels.domain.usecase.search.GetTrendingSearchesUseCase
+import com.norbertotaveras.reels.domain.usecase.search.LoadSearchMetadataUseCase
 import com.norbertotaveras.reels.domain.usecase.search.RemoveRecentSearchUseCase
 import com.norbertotaveras.reels.domain.usecase.search.SaveRecentSearchUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
@@ -28,14 +27,17 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -43,8 +45,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalCoroutinesApi::class)
 class SearchViewModel @Inject constructor(
     private val searchMoviesUseCase: SearchMoviesUseCase,
-    private val getMovieGenresUseCase: GetMovieGenresUseCase,
-    private val getTrendingSearchesUseCase: GetTrendingSearchesUseCase,
+    private val loadSearchMetadataUseCase: LoadSearchMetadataUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
     private val saveRecentSearchUseCase: SaveRecentSearchUseCase,
     private val removeRecentSearchUseCase: RemoveRecentSearchUseCase,
@@ -56,10 +57,17 @@ class SearchViewModel @Inject constructor(
     private val _effect = MutableSharedFlow<SearchEffect>()
     val effect: SharedFlow<SearchEffect> = _effect.asSharedFlow()
 
+    private val settings = observeSettingsUseCase()
+        .shareIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            replay = 1
+        )
+
     @OptIn(FlowPreview::class)
     val searchResults: Flow<PagingData<MovieDataModel>> = state
         .map { uiState -> uiState.query.trim() to uiState.language }
-        .debounce(400)
+        .debounce(SEARCH_DEBOUNCE_MILLIS)
         .distinctUntilChanged()
         .flatMapLatest { (query, language) ->
             if (!SearchQueryPolicy.isValid(query = query)) {
@@ -75,6 +83,7 @@ class SearchViewModel @Inject constructor(
 
     init {
         observeSettings()
+        observeSearchMetadata()
     }
 
     fun onEvent(event: SearchEvent) {
@@ -158,76 +167,25 @@ class SearchViewModel @Inject constructor(
 
     private fun observeSettings() {
         viewModelScope.launch {
-            var loadedGenreLanguage: String? = null
-            var loadedTrendingLanguage: String? = null
-
-            observeSettingsUseCase()
-                .collect { settings ->
-                    val language = settings.languageRegion.languageCode
-
-                    _state.update { currentState ->
-                        currentState.copy(
-                            language = language,
-                            recentSearches = settings.recentSearches
-                        )
-                    }
-
-                    if (loadedGenreLanguage != language) {
-                        loadedGenreLanguage = language
-                        loadGenres(language = language)
-                    }
-
-                    if (loadedTrendingLanguage != language) {
-                        loadedTrendingLanguage = language
-                        loadTrendingSearches(language = language)
-                    }
+            settings.collect { settings ->
+                _state.update { currentState ->
+                    currentState.withSettings(settings = settings)
                 }
+            }
         }
     }
 
-    private fun loadGenres(language: String) {
+    private fun observeSearchMetadata() {
         viewModelScope.launch {
-            getMovieGenresUseCase(language = language).fold(
-                onSuccess = { genres ->
+            settings
+                .map { appSettings -> appSettings.languageRegion.languageCode }
+                .distinctUntilChanged()
+                .collectLatest { language ->
+                    val metadata = loadSearchMetadataUseCase(language = language)
                     _state.update { currentState ->
-                        currentState.copy(
-                            genreNamesById = genres.associate { genre ->
-                                genre.id to genre.name
-                            }
-                        )
-                    }
-                },
-                onFailure = {
-                    _state.update { currentState ->
-                        currentState.copy(genreNamesById = emptyMap())
+                        currentState.withMetadata(metadata = metadata)
                     }
                 }
-            )
-        }
-    }
-
-    private fun loadTrendingSearches(language: String) {
-        viewModelScope.launch {
-            getTrendingSearchesUseCase(language = language).fold(
-                onSuccess = { trendingSearches ->
-                    _state.update { currentState ->
-                        if (currentState.language == language) {
-                            currentState.copy(trendingSearches = trendingSearches)
-                        } else {
-                            currentState
-                        }
-                    }
-                },
-                onFailure = {
-                    _state.update { currentState ->
-                        if (currentState.language == language) {
-                            currentState.copy(trendingSearches = emptyList())
-                        } else {
-                            currentState
-                        }
-                    }
-                }
-            )
         }
     }
 }

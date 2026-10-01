@@ -7,4 +7,4 @@
 
 package com.norbertotaveras.reels.presentation.features.movies.search
 
-internal const val MIN_SEARCH_QUERY_LENGTH = 2
+internal const val SEARCH_DEBOUNCE_MILLIS = 400L

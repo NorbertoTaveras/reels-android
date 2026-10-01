@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
+import com.norbertotaveras.reels.domain.model.search.SearchQueryPolicy
 import com.norbertotaveras.reels.extensions.toRelativeReleaseAge
 import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
@@ -42,7 +43,7 @@ internal fun SearchContent(
     modifier: Modifier = Modifier,
 ) {
     val trimmedQuery = state.query.trim()
-    val hasSearchableQuery = trimmedQuery.length >= MIN_SEARCH_QUERY_LENGTH
+    val hasSearchableQuery = SearchQueryPolicy.isValid(query = trimmedQuery)
     var dismissedCachedQuery by rememberSaveable { mutableStateOf<String?>(null) }
 
     Column(
