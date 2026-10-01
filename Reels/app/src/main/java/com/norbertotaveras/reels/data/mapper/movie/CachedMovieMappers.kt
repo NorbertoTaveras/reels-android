@@ -5,7 +5,7 @@
  * modification, distribution, or use is prohibited.
  */
 
-package com.norbertotaveras.reels.data.local.mapper
+package com.norbertotaveras.reels.data.mapper.movie
 
 import com.norbertotaveras.reels.data.local.entity.CachedMovieEntity
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieDto
@@ -27,7 +27,7 @@ fun MovieDto.toCachedMovieEntity(
     )
 }
 
-fun CachedMovieEntity.toMovieDataModel(): MovieDataModel {
+fun CachedMovieEntity.toCachedMovieDataModel(): MovieDataModel {
     return MovieDataModel(
         id = id,
         title = title,

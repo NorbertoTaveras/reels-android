@@ -8,7 +8,7 @@
 package com.norbertotaveras.reels.data.repository.favorites
 
 import com.norbertotaveras.reels.data.local.dao.SavedPersonDao
-import com.norbertotaveras.reels.data.local.mapper.toDataModel
+import com.norbertotaveras.reels.data.local.mapper.toSavedPersonDataModel
 import com.norbertotaveras.reels.data.local.mapper.toSavedPersonEntity
 import com.norbertotaveras.reels.data.local.mapper.toSavedPersonKnownForEntity
 import com.norbertotaveras.reels.data.repository.repositoryResult
@@ -30,7 +30,7 @@ class SavedPeopleRepositoryImpl @Inject constructor(
 ) : SavedPeopleRepository {
     override fun observeSavedPeople(): Flow<List<SavedPersonDataModel>> {
         return savedPersonDao.observeSavedPeople()
-            .map { people -> people.map { person -> person.toDataModel() } }
+            .map { people -> people.map { person -> person.toSavedPersonDataModel() } }
             .flowOn(ioDispatcher)
     }
 
@@ -41,7 +41,7 @@ class SavedPeopleRepositoryImpl @Inject constructor(
 
     override suspend fun getSavedPerson(personId: Int): SavedPersonDataModel? {
         return withContext(ioDispatcher) {
-            savedPersonDao.getSavedPerson(personId = personId)?.toDataModel()
+            savedPersonDao.getSavedPerson(personId = personId)?.toSavedPersonDataModel()
         }
     }
 

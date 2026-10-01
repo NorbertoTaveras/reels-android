@@ -13,12 +13,12 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.norbertotaveras.reels.data.local.dao.CachedMovieDao
 import com.norbertotaveras.reels.data.local.db.ReelsDatabase
-import com.norbertotaveras.reels.data.local.mapper.toMovieDataModel
+import com.norbertotaveras.reels.data.mapper.movie.toCachedMovieDataModel
 import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
 import com.norbertotaveras.reels.data.remote.mapper.genre.toGenreDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toDiscoverMovieRequestParameters
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieCreditsDataModel
-import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDataModel as toRemoteMovieDataModel
+import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDetailsDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieVideosDataModel
 import com.norbertotaveras.reels.data.remote.movie.TmdbMovieRemoteDataSource
@@ -113,7 +113,7 @@ class TmdbMovieRepositoryImpl @Inject constructor(
                 )
             }
         ).flow.map { pagingData ->
-            pagingData.map { movieDto -> movieDto.toRemoteMovieDataModel() }
+            pagingData.map { movieDto -> movieDto.toMovieDataModel() }
         }
     }
 
@@ -139,7 +139,7 @@ class TmdbMovieRepositoryImpl @Inject constructor(
                 timeWindow = TRENDING_TIME_WINDOW,
                 language = language
             ).results.map { movieDto ->
-                movieDto.toRemoteMovieDataModel()
+                movieDto.toMovieDataModel()
             }
         }
     }
@@ -191,7 +191,7 @@ class TmdbMovieRepositoryImpl @Inject constructor(
                 language = language,
                 page = page
             ).results.map { movieDto ->
-                movieDto.toRemoteMovieDataModel()
+                movieDto.toMovieDataModel()
             }
         }
     }
@@ -225,7 +225,7 @@ class TmdbMovieRepositoryImpl @Inject constructor(
                 cachedMovieDao.pagingSource(listKey = listKey)
             }
         ).flow.map { pagingData ->
-            pagingData.map { cachedMovie -> cachedMovie.toMovieDataModel() }
+            pagingData.map { cachedMovie -> cachedMovie.toCachedMovieDataModel() }
         }
     }
 

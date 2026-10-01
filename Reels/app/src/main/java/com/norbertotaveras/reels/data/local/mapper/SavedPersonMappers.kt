@@ -14,7 +14,7 @@ import com.norbertotaveras.reels.domain.model.favorite.SavedPersonDataModel
 import com.norbertotaveras.reels.domain.model.person.PersonDetailsDataModel
 import com.norbertotaveras.reels.domain.model.person.PersonMovieCreditDataModel
 
-fun SavedPersonWithKnownFor.toDataModel(): SavedPersonDataModel {
+fun SavedPersonWithKnownFor.toSavedPersonDataModel(): SavedPersonDataModel {
     return SavedPersonDataModel(
         id = person.id,
         name = person.name,
@@ -25,7 +25,7 @@ fun SavedPersonWithKnownFor.toDataModel(): SavedPersonDataModel {
         knownForDepartment = person.knownForDepartment,
         knownFor = knownFor
             .sortedBy { movie -> movie.position }
-            .map { movie -> movie.toDataModel() },
+            .map { movie -> movie.toPersonMovieCreditDataModel() },
         savedAt = person.savedAt
     )
 }
@@ -62,7 +62,7 @@ fun PersonMovieCreditDataModel.toSavedPersonKnownForEntity(
     )
 }
 
-private fun SavedPersonKnownForEntity.toDataModel(): PersonMovieCreditDataModel {
+private fun SavedPersonKnownForEntity.toPersonMovieCreditDataModel(): PersonMovieCreditDataModel {
     return PersonMovieCreditDataModel(
         id = movieId,
         title = title,

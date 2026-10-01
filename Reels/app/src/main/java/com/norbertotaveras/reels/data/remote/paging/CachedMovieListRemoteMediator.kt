@@ -17,7 +17,7 @@ import com.norbertotaveras.reels.data.local.db.ReelsDatabase
 import com.norbertotaveras.reels.data.local.entity.CachedMovieEntity
 import com.norbertotaveras.reels.data.local.entity.CachedMovieListEntryEntity
 import com.norbertotaveras.reels.data.local.entity.MovieRemoteKeyEntity
-import com.norbertotaveras.reels.data.local.mapper.toCachedMovieEntity
+import com.norbertotaveras.reels.data.mapper.movie.toCachedMovieEntity
 import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
 import kotlinx.coroutines.CancellationException
