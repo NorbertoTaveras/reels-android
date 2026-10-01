@@ -23,8 +23,8 @@ import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDetailsDataMode
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieVideosDataModel
 import com.norbertotaveras.reels.data.remote.movie.TmdbMovieRemoteDataSource
 import com.norbertotaveras.reels.data.remote.paging.CachedMovieListRemoteMediator
-import com.norbertotaveras.reels.data.remote.paging.DiscoverMoviesPagingSource
 import com.norbertotaveras.reels.data.remote.paging.MovieCachePolicy
+import com.norbertotaveras.reels.data.remote.paging.TmdbMoviesPagingSource
 import com.norbertotaveras.reels.data.remote.paging.cacheKey
 import com.norbertotaveras.reels.data.remote.paging.searchCacheKey
 import com.norbertotaveras.reels.data.remote.paging.tmdbPagingConfig
@@ -98,13 +98,18 @@ class TmdbMovieRepositoryImpl @Inject constructor(
         filters: DiscoverFilterDataModel,
         language: String,
     ): Flow<PagingData<MovieDataModel>> {
+        val parameters = filters.toDiscoverMovieRequestParameters()
         return Pager(
             config = tmdbPagingConfig(),
             pagingSourceFactory = {
-                DiscoverMoviesPagingSource(
-                    remoteDataSource = remoteDataSource,
-                    filters = filters,
-                    language = language
+                TmdbMoviesPagingSource(
+                    loadPage = { page ->
+                        remoteDataSource.discoverMovies(
+                            language = language,
+                            page = page,
+                            parameters = parameters
+                        )
+                    }
                 )
             }
         ).flow.map { pagingData ->

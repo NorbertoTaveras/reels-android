@@ -12,14 +12,14 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.norbertotaveras.reels.data.local.preferences.TmdbAccountDataStore
 import com.norbertotaveras.reels.data.remote.account.TmdbAccountRemoteDataSource
+import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
 import com.norbertotaveras.reels.data.remote.error.TmdbSessionExpiredException
 import com.norbertotaveras.reels.data.remote.error.isTmdbSessionExpiredError
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
 import com.norbertotaveras.reels.data.remote.mapper.account.toTmdbAccountDataModel
 import com.norbertotaveras.reels.data.remote.mapper.account.toTmdbMovieAccountStateDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDataModel
-import com.norbertotaveras.reels.data.remote.paging.TmdbAccountMoviesPagingSource
-import com.norbertotaveras.reels.data.remote.paging.TmdbAccountMovieListType
+import com.norbertotaveras.reels.data.remote.paging.TmdbMoviesPagingSource
 import com.norbertotaveras.reels.data.remote.paging.tmdbPagingConfig
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.account.TmdbAccountStateDataModel
@@ -28,6 +28,7 @@ import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.domain.repository.account.TmdbAccountRepository
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -107,8 +108,14 @@ class TmdbAccountRepositoryImpl @Inject constructor(
         language: String,
     ): Flow<PagingData<MovieDataModel>> {
         return getAccountMovies(
-            language = language,
-            listType = TmdbAccountMovieListType.Watchlist
+            loadPage = { accountId, sessionId, page ->
+                remoteDataSource.getWatchlistMovies(
+                    accountId = accountId,
+                    sessionId = sessionId,
+                    language = language,
+                    page = page
+                )
+            }
         )
     }
 
@@ -116,8 +123,14 @@ class TmdbAccountRepositoryImpl @Inject constructor(
         language: String,
     ): Flow<PagingData<MovieDataModel>> {
         return getAccountMovies(
-            language = language,
-            listType = TmdbAccountMovieListType.Rated
+            loadPage = { accountId, sessionId, page ->
+                remoteDataSource.getRatedMovies(
+                    accountId = accountId,
+                    sessionId = sessionId,
+                    language = language,
+                    page = page
+                )
+            }
         )
     }
 
@@ -173,8 +186,11 @@ class TmdbAccountRepositoryImpl @Inject constructor(
     }
 
     private fun getAccountMovies(
-        language: String,
-        listType: TmdbAccountMovieListType,
+        loadPage: suspend (
+            accountId: Int,
+            sessionId: String,
+            page: Int,
+        ) -> MoviesResponseDto,
     ): Flow<PagingData<MovieDataModel>> {
         return accountDataStore.accountState.flatMapLatest { accountState ->
             val accountId = accountState.account?.accountId
@@ -186,14 +202,17 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                 Pager(
                     config = tmdbPagingConfig(),
                     pagingSourceFactory = {
-                        TmdbAccountMoviesPagingSource(
-                            remoteDataSource = remoteDataSource,
-                            accountId = accountId,
-                            sessionId = sessionId,
-                            language = language,
-                            listType = listType,
-                            onSessionExpired = {
-                                accountDataStore.clearAccount()
+                        TmdbMoviesPagingSource(
+                            loadPage = { page ->
+                                loadPage(accountId, sessionId, page)
+                            },
+                            transformError = { error ->
+                                if (error.isTmdbSessionExpiredError()) {
+                                    accountDataStore.clearAccount()
+                                    TmdbSessionExpiredException()
+                                } else {
+                                    error
+                                }
                             }
                         )
                     }
@@ -208,21 +227,21 @@ class TmdbAccountRepositoryImpl @Inject constructor(
         clearAccountOnExpiredSession: Boolean = false,
         block: suspend () -> T,
     ): Result<T> {
-        return runCatching {
-            withContext(ioDispatcher) {
+        return try {
+            val value = withContext(ioDispatcher) {
                 block()
             }
-        }.fold(
-            onSuccess = { value -> Result.success(value) },
-            onFailure = { error ->
-                if (clearAccountOnExpiredSession && error.isTmdbSessionExpiredError()) {
-                    accountDataStore.clearAccount()
-                    Result.failure(TmdbSessionExpiredException().toTmdbNetworkException())
-                } else {
-                    Result.failure(error.toTmdbNetworkException())
-                }
+            Result.success(value)
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Exception) {
+            if (clearAccountOnExpiredSession && error.isTmdbSessionExpiredError()) {
+                accountDataStore.clearAccount()
+                Result.failure(TmdbSessionExpiredException().toTmdbNetworkException())
+            } else {
+                Result.failure(error.toTmdbNetworkException())
             }
-        )
+        }
     }
 
     private companion object {

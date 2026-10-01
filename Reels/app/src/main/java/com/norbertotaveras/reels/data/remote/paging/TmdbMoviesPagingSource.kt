@@ -10,34 +10,28 @@ package com.norbertotaveras.reels.data.remote.paging
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieDto
+import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
-import com.norbertotaveras.reels.data.remote.mapper.movie.toDiscoverMovieRequestParameters
-import com.norbertotaveras.reels.data.remote.movie.TmdbMovieRemoteDataSource
-import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
+import kotlinx.coroutines.CancellationException
 
-class DiscoverMoviesPagingSource(
-    private val remoteDataSource: TmdbMovieRemoteDataSource,
-    filters: DiscoverFilterDataModel,
-    private val language: String,
+internal class TmdbMoviesPagingSource(
+    private val loadPage: suspend (page: Int) -> MoviesResponseDto,
+    private val transformError: suspend (error: Throwable) -> Throwable = { error -> error },
 ) : PagingSource<Int, MovieDto>() {
-    private val requestParameters = filters.toDiscoverMovieRequestParameters()
-
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MovieDto> {
         return try {
             val page = params.key ?: TMDB_FIRST_PAGE
-            val response = remoteDataSource.discoverMovies(
-                language = language,
-                page = page,
-                parameters = requestParameters
-            )
+            val response = loadPage(page)
 
             LoadResult.Page(
                 data = response.results,
                 prevKey = if (page == TMDB_FIRST_PAGE) null else page - 1,
                 nextKey = if (page >= response.totalPages) null else page + 1
             )
+        } catch (error: CancellationException) {
+            throw error
         } catch (error: Exception) {
-            LoadResult.Error(error.toTmdbNetworkException())
+            LoadResult.Error(transformError(error).toTmdbNetworkException())
         }
     }
 
