@@ -44,6 +44,7 @@ class DiscoverViewModel @Inject constructor(
     private val observeSettingsUseCase: ObserveSettingsUseCase,
     private val updateDiscoverFiltersUseCase: UpdateDiscoverFiltersUseCase,
 ) : ViewModel() {
+    private var genreLoadingJob: Job? = null
     private var filterResultCountJob: Job? = null
 
     private val _state = MutableStateFlow(DiscoverUiState())
@@ -140,7 +141,7 @@ class DiscoverViewModel @Inject constructor(
                 .distinctUntilChanged()
                 .collect { (language, filters) ->
                     _state.update { currentState ->
-                        currentState.copy(
+                        currentState.withConfiguration(
                             language = language,
                             filters = filters
                         )
@@ -159,31 +160,28 @@ class DiscoverViewModel @Inject constructor(
     }
 
     private fun loadGenres(language: String = state.value.language) {
-        viewModelScope.launch {
+        genreLoadingJob?.cancel()
+        genreLoadingJob = viewModelScope.launch {
             _state.update { currentState ->
-                currentState.copy(
-                    isLoadingFilters = true,
-                    filterErrorMessage = null
-                )
+                currentState.withGenresLoading()
             }
 
             getMovieGenresUseCase(language = language)
                 .onSuccess { genres ->
                     _state.update { currentState ->
-                        currentState.copy(
+                        currentState.withGenres(
                             genres = genres,
-                            isLoadingFilters = false,
-                            filterErrorMessage = null
+                            language = language
                         )
                     }
                 }
                 .onFailure { error ->
                     _state.update { currentState ->
-                        currentState.copy(
-                            isLoadingFilters = false,
-                            filterErrorMessage = error.toUserMessage(
+                        currentState.withGenreError(
+                            message = error.toUserMessage(
                                 fallback = "Unable to load discover filters."
-                            )
+                            ),
+                            language = language
                         )
                     }
                 }
@@ -217,17 +215,15 @@ class DiscoverViewModel @Inject constructor(
     private fun updateDraftFilters(
         transform: (DiscoverFilterDataModel) -> DiscoverFilterDataModel,
     ) {
-        if (!state.value.isFilterSheetVisible) {
-            updateFilters(filters = transform(state.value.filters))
+        val currentState = state.value
+        if (!currentState.isFilterSheetVisible) {
+            updateFilters(filters = transform(currentState.filters))
             return
         }
 
-        var updatedFilters = state.value.filterSheetFilters
-        _state.update { currentState ->
-            updatedFilters = transform(currentState.draftFilters ?: currentState.filters)
-            currentState.copy(
-                draftFilters = updatedFilters
-            )
+        val updatedFilters = transform(currentState.filterSheetFilters)
+        _state.update { latestState ->
+            latestState.copy(draftFilters = updatedFilters)
         }
         loadFilterResultCount(filters = updatedFilters)
     }
@@ -260,45 +256,31 @@ class DiscoverViewModel @Inject constructor(
         val language = state.value.language
         filterResultCountJob?.cancel()
         _state.update { currentState ->
-            currentState.copy(isLoadingFilterResultCount = true)
+            currentState.withFilterCountLoading()
         }
 
         filterResultCountJob = viewModelScope.launch {
-            delay(FILTER_COUNT_DEBOUNCE_MILLIS)
+            delay(DISCOVER_FILTER_COUNT_DEBOUNCE_MILLIS)
             getDiscoverMovieCountUseCase(
                 filters = filters,
                 language = language
             ).fold(
                 onSuccess = { count ->
                     _state.update { currentState ->
-                        if (
-                            currentState.isFilterSheetVisible &&
-                            currentState.filterSheetFilters == filters &&
-                            currentState.language == language
-                        ) {
-                            currentState.copy(
-                                filterResultCount = count,
-                                isLoadingFilterResultCount = false
-                            )
-                        } else {
-                            currentState
-                        }
+                        currentState.withFilterResultCount(
+                            count = count,
+                            filters = filters,
+                            language = language
+                        )
                     }
                 },
                 onFailure = {
                     _state.update { currentState ->
-                        if (
-                            currentState.isFilterSheetVisible &&
-                            currentState.filterSheetFilters == filters &&
-                            currentState.language == language
-                        ) {
-                            currentState.copy(
-                                filterResultCount = null,
-                                isLoadingFilterResultCount = false
-                            )
-                        } else {
-                            currentState
-                        }
+                        currentState.withFilterResultCount(
+                            count = null,
+                            filters = filters,
+                            language = language
+                        )
                     }
                 }
             )
@@ -309,9 +291,5 @@ class DiscoverViewModel @Inject constructor(
         viewModelScope.launch {
             _effect.emit(DiscoverEffect.NavigateToMovieDetails(movieId = movieId))
         }
-    }
-
-    private companion object {
-        const val FILTER_COUNT_DEBOUNCE_MILLIS = 250L
     }
 }

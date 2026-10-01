@@ -28,6 +28,7 @@ internal val DISCOVER_SORTS = listOf(
 internal const val DISCOVER_PLACEHOLDER_COUNT = 12
 internal const val DISCOVER_APPEND_PLACEHOLDER_COUNT = 3
 internal const val DISCOVER_GENRE_COLUMNS = 4
+internal const val DISCOVER_FILTER_COUNT_DEBOUNCE_MILLIS = 250L
 internal val DISCOVER_FILTER_SKELETON_WIDTHS = listOf(
     72.dp,
     90.dp,
