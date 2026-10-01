@@ -9,10 +9,8 @@ package com.norbertotaveras.reels.presentation.features.movies.list
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 
 @Composable
@@ -22,8 +20,6 @@ fun MoviesListRoute(
     modifier: Modifier = Modifier,
     viewModel: MoviesListViewModel = hiltViewModel(),
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-
     LaunchedEffect(viewModel) {
         viewModel.effect.collect { effect ->
             when (effect) {
@@ -39,7 +35,6 @@ fun MoviesListRoute(
 
     MoviesListScreen(
         modifier = modifier,
-        state = state,
         popularMovies = viewModel.popularMovies.collectAsLazyPagingItems(),
         nowPlayingMovies = viewModel.nowPlayingMovies.collectAsLazyPagingItems(),
         upcomingMovies = viewModel.upcomingMovies.collectAsLazyPagingItems(),

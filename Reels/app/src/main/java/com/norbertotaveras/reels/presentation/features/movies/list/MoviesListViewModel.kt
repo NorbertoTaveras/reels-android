@@ -62,15 +62,8 @@ class MoviesListViewModel @Inject constructor(
 
     fun onEvent(event: MoviesListEvent) {
         when (event) {
-            is MoviesListEvent.CategorySelected -> onCategorySelected(category = event.category)
             is MoviesListEvent.SeeAllClicked -> onSeeAllClicked(category = event.category)
             is MoviesListEvent.MovieClicked -> onMovieClicked(movieId = event.movieId)
-        }
-    }
-
-    private fun onCategorySelected(category: MovieCategory) {
-        _state.update { currentState ->
-            currentState.copy(category = category)
         }
     }
 

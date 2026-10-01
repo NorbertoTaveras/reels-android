@@ -36,7 +36,6 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
 @Composable
 internal fun MoviesListContent(
-    state: MoviesListState,
     popularMovies: LazyPagingItems<MovieDataModel>,
     nowPlayingMovies: LazyPagingItems<MovieDataModel>,
     upcomingMovies: LazyPagingItems<MovieDataModel>,

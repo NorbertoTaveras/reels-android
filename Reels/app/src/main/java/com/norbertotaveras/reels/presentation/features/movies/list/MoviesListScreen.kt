@@ -14,7 +14,6 @@ import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 
 @Composable
 fun MoviesListScreen(
-    state: MoviesListState,
     popularMovies: LazyPagingItems<MovieDataModel>,
     nowPlayingMovies: LazyPagingItems<MovieDataModel>,
     upcomingMovies: LazyPagingItems<MovieDataModel>,
@@ -23,7 +22,6 @@ fun MoviesListScreen(
     modifier: Modifier = Modifier,
 ) {
     MoviesListContent(
-        state = state,
         popularMovies = popularMovies,
         nowPlayingMovies = nowPlayingMovies,
         upcomingMovies = upcomingMovies,
