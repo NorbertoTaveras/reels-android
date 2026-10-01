@@ -7,6 +7,8 @@
 
 package com.norbertotaveras.reels.presentation.features.cast.filmography
 
+import com.norbertotaveras.reels.domain.model.person.FilmographySort
+
 sealed interface FilmographyEvent {
     data object BackClicked : FilmographyEvent
     data object RetryClicked : FilmographyEvent

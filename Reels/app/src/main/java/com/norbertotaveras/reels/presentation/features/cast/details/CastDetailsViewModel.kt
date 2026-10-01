@@ -10,8 +10,7 @@ package com.norbertotaveras.reels.presentation.features.cast.details
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.norbertotaveras.reels.domain.model.favorite.SavedPersonDataModel
-import com.norbertotaveras.reels.domain.model.person.PersonDetailsDataModel
+import com.norbertotaveras.reels.domain.mapper.favorite.toPersonDetailsDataModel
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 import com.norbertotaveras.reels.domain.usecase.favorites.GetSavedPersonDetailsUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveIsPersonSavedUseCase
@@ -124,7 +123,7 @@ class CastDetailsViewModel @Inject constructor(
                     onFailure = { error ->
                         if (savedPerson != null) {
                             currentState.copy(
-                                person = savedPerson.toPersonDetails(),
+                                person = savedPerson.toPersonDetailsDataModel(),
                                 knownFor = savedPerson.knownFor,
                                 isOfflineSavedPerson = true,
                                 errorMessage = null,
@@ -224,17 +223,4 @@ class CastDetailsViewModel @Inject constructor(
             }
         }
     }
-
-}
-
-private fun SavedPersonDataModel.toPersonDetails(): PersonDetailsDataModel {
-    return PersonDetailsDataModel(
-        id = id,
-        name = name,
-        biography = biography,
-        birthday = birthday,
-        placeOfBirth = placeOfBirth,
-        profilePath = profilePath,
-        knownForDepartment = knownForDepartment
-    )
 }

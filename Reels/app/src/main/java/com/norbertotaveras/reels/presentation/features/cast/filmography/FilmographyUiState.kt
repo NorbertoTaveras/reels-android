@@ -7,6 +7,7 @@
 
 package com.norbertotaveras.reels.presentation.features.cast.filmography
 
+import com.norbertotaveras.reels.domain.model.person.FilmographySort
 import com.norbertotaveras.reels.domain.model.person.PersonMovieCreditDataModel
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 

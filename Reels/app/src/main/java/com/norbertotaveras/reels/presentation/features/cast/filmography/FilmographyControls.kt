@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.norbertotaveras.reels.domain.model.person.FilmographySort
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
@@ -45,7 +46,7 @@ internal fun FilmographySortRow(
             val sort = FilmographySort.entries[index]
 
             FilmographyFilterChip(
-                label = sort.label,
+                label = sort.displayLabel,
                 selected = selectedSort == sort,
                 onClick = {
                     onSortClick(sort)

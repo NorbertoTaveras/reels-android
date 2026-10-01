@@ -10,11 +10,11 @@ package com.norbertotaveras.reels.presentation.features.cast.filmography
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.norbertotaveras.reels.extensions.toReleaseYear
-import com.norbertotaveras.reels.domain.model.person.PersonMovieCreditDataModel
+import com.norbertotaveras.reels.domain.model.person.FilmographySort
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 import com.norbertotaveras.reels.domain.usecase.person.GetPersonDetailsUseCase
 import com.norbertotaveras.reels.domain.usecase.person.GetPersonMovieCreditsUseCase
+import com.norbertotaveras.reels.domain.usecase.person.SortPersonMovieCreditsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.presentation.navigation.ReelsDestinations
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
@@ -38,6 +38,7 @@ class FilmographyViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getPersonDetailsUseCase: GetPersonDetailsUseCase,
     private val getPersonMovieCreditsUseCase: GetPersonMovieCreditsUseCase,
+    private val sortPersonMovieCreditsUseCase: SortPersonMovieCreditsUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
 ) : ViewModel() {
     private val personId: Int = checkNotNull(
@@ -110,7 +111,10 @@ class FilmographyViewModel @Inject constructor(
                     onSuccess = { credits ->
                         currentState.copy(
                             personName = personResult.getOrNull()?.name ?: currentState.personName,
-                            movies = credits.cast.sortedBy(sort = currentState.sort),
+                            movies = sortPersonMovieCreditsUseCase(
+                                credits = credits.cast,
+                                sort = currentState.sort
+                            ),
                             isLoading = false,
                             errorMessage = null
                         )
@@ -132,7 +136,10 @@ class FilmographyViewModel @Inject constructor(
         _state.update { currentState ->
             currentState.copy(
                 sort = sort,
-                movies = currentState.movies.sortedBy(sort = sort)
+                movies = sortPersonMovieCreditsUseCase(
+                    credits = currentState.movies,
+                    sort = sort
+                )
             )
         }
     }
@@ -147,23 +154,5 @@ class FilmographyViewModel @Inject constructor(
         viewModelScope.launch {
             _effect.emit(FilmographyEffect.NavigateToMovieDetails(movieId = movieId))
         }
-    }
-
-}
-
-private fun List<PersonMovieCreditDataModel>.sortedBy(
-    sort: FilmographySort,
-): List<PersonMovieCreditDataModel> {
-    return when (sort) {
-        FilmographySort.Popular -> sortedByDescending { movie -> movie.popularity }
-        FilmographySort.Newest -> sortedWith(
-            compareByDescending<PersonMovieCreditDataModel> { movie ->
-                movie.releaseDate.toReleaseYear()?.toIntOrNull() ?: 0
-            }.thenByDescending { movie -> movie.popularity }
-        )
-        FilmographySort.HighestRated -> sortedWith(
-            compareByDescending<PersonMovieCreditDataModel> { movie -> movie.voteAverage }
-                .thenByDescending { movie -> movie.popularity }
-        )
     }
 }
