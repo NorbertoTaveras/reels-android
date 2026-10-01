@@ -14,8 +14,6 @@ class RemoveFavoriteMovieUseCase @Inject constructor(
     private val repository: FavoriteMoviesRepository
 ) {
     suspend operator fun invoke(movieId: Int): Result<Unit> {
-        return runCatching {
-            repository.removeFavoriteMovie(movieId = movieId)
-        }
+        return repository.removeFavoriteMovie(movieId = movieId)
     }
 }

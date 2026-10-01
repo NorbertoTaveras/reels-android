@@ -11,28 +11,37 @@ import com.norbertotaveras.reels.data.local.dao.SavedPersonDao
 import com.norbertotaveras.reels.data.local.mapper.toDataModel
 import com.norbertotaveras.reels.data.local.mapper.toSavedPersonEntity
 import com.norbertotaveras.reels.data.local.mapper.toSavedPersonKnownForEntity
+import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.favorite.SavedPersonDataModel
 import com.norbertotaveras.reels.domain.model.person.PersonDetailsDataModel
 import com.norbertotaveras.reels.domain.model.person.PersonMovieCreditDataModel
 import com.norbertotaveras.reels.domain.repository.favorites.SavedPeopleRepository
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 class SavedPeopleRepositoryImpl @Inject constructor(
-    private val savedPersonDao: SavedPersonDao
+    private val savedPersonDao: SavedPersonDao,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : SavedPeopleRepository {
     override fun observeSavedPeople(): Flow<List<SavedPersonDataModel>> {
         return savedPersonDao.observeSavedPeople()
             .map { people -> people.map { person -> person.toDataModel() } }
+            .flowOn(ioDispatcher)
     }
 
     override fun observeIsPersonSaved(personId: Int): Flow<Boolean> {
         return savedPersonDao.observeIsPersonSaved(personId = personId)
+            .flowOn(ioDispatcher)
     }
 
     override suspend fun getSavedPerson(personId: Int): SavedPersonDataModel? {
-        return savedPersonDao.getSavedPerson(personId = personId)?.toDataModel()
+        return withContext(ioDispatcher) {
+            savedPersonDao.getSavedPerson(personId = personId)?.toDataModel()
+        }
     }
 
     override suspend fun savePerson(
@@ -40,22 +49,26 @@ class SavedPeopleRepositoryImpl @Inject constructor(
         knownFor: List<PersonMovieCreditDataModel>
     ): Result<Unit> {
         return runCatching {
-            val savedAt = System.currentTimeMillis()
-            savedPersonDao.upsertSavedPersonWithKnownFor(
-                person = person.toSavedPersonEntity(savedAt = savedAt),
-                knownFor = knownFor.mapIndexed { index, movie ->
-                    movie.toSavedPersonKnownForEntity(
-                        personId = person.id,
-                        position = index
-                    )
-                }
-            )
+            withContext(ioDispatcher) {
+                val savedAt = System.currentTimeMillis()
+                savedPersonDao.upsertSavedPersonWithKnownFor(
+                    person = person.toSavedPersonEntity(savedAt = savedAt),
+                    knownFor = knownFor.mapIndexed { index, movie ->
+                        movie.toSavedPersonKnownForEntity(
+                            personId = person.id,
+                            position = index
+                        )
+                    }
+                )
+            }
         }
     }
 
     override suspend fun removeSavedPerson(personId: Int): Result<Unit> {
         return runCatching {
-            savedPersonDao.deleteSavedPerson(personId = personId)
+            withContext(ioDispatcher) {
+                savedPersonDao.deleteSavedPerson(personId = personId)
+            }
         }
     }
 }

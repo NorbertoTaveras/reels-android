@@ -15,8 +15,6 @@ class ToggleFavoriteMovieUseCase @Inject constructor(
     private val repository: FavoriteMoviesRepository
 ) {
     suspend operator fun invoke(movie: MovieDetailsDataModel): Result<Unit> {
-        return runCatching {
-            repository.toggleFavoriteMovie(movie = movie)
-        }
+        return repository.toggleFavoriteMovie(movie = movie)
     }
 }

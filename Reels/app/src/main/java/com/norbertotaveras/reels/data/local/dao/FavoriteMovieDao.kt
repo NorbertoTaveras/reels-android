@@ -11,6 +11,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.norbertotaveras.reels.data.local.entity.FavoriteMovieEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -30,4 +31,13 @@ interface FavoriteMovieDao {
 
     @Query("DELETE FROM favorite_movies WHERE id = :movieId")
     suspend fun deleteFavoriteMovie(movieId: Int)
+
+    @Transaction
+    suspend fun toggleFavoriteMovie(movie: FavoriteMovieEntity) {
+        if (getFavoriteMovie(movieId = movie.id) == null) {
+            upsertFavoriteMovie(movie = movie)
+        } else {
+            deleteFavoriteMovie(movieId = movie.id)
+        }
+    }
 }

@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.Flow
 interface FavoriteMoviesRepository {
     fun observeFavoriteMovies(): Flow<List<FavoriteMovieDataModel>>
     fun observeIsFavorite(movieId: Int): Flow<Boolean>
-    suspend fun toggleFavoriteMovie(movie: MovieDetailsDataModel)
-    suspend fun removeFavoriteMovie(movieId: Int)
+    suspend fun toggleFavoriteMovie(movie: MovieDetailsDataModel): Result<Unit>
+    suspend fun removeFavoriteMovie(movieId: Int): Result<Unit>
     suspend fun getFavoriteMovieDetails(movieId: Int): MovieDetailsDataModel?
 }

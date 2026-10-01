@@ -37,21 +37,19 @@ class FavoriteMoviesRepositoryImpl @Inject constructor(
             .flowOn(ioDispatcher)
     }
 
-    override suspend fun toggleFavoriteMovie(movie: MovieDetailsDataModel) {
-        withContext(ioDispatcher) {
-            val existingFavorite = favoriteMovieDao.getFavoriteMovie(movieId = movie.id)
-
-            if (existingFavorite == null) {
-                favoriteMovieDao.upsertFavoriteMovie(movie.toFavoriteMovieEntity())
-            } else {
-                favoriteMovieDao.deleteFavoriteMovie(movieId = movie.id)
+    override suspend fun toggleFavoriteMovie(movie: MovieDetailsDataModel): Result<Unit> {
+        return runCatching {
+            withContext(ioDispatcher) {
+                favoriteMovieDao.toggleFavoriteMovie(movie = movie.toFavoriteMovieEntity())
             }
         }
     }
 
-    override suspend fun removeFavoriteMovie(movieId: Int) {
-        withContext(ioDispatcher) {
-            favoriteMovieDao.deleteFavoriteMovie(movieId = movieId)
+    override suspend fun removeFavoriteMovie(movieId: Int): Result<Unit> {
+        return runCatching {
+            withContext(ioDispatcher) {
+                favoriteMovieDao.deleteFavoriteMovie(movieId = movieId)
+            }
         }
     }
 
