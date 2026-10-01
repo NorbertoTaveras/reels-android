@@ -55,7 +55,7 @@ class SavedPeopleRepositoryImpl @Inject constructor(
 
     override suspend fun removeSavedPerson(personId: Int): Result<Unit> {
         return runCatching {
-            savedPersonDao.deleteSavedPersonWithKnownFor(personId = personId)
+            savedPersonDao.deleteSavedPerson(personId = personId)
         }
     }
 }

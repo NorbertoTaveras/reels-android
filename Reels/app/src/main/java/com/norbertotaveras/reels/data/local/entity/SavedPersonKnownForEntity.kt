@@ -8,10 +8,23 @@
 package com.norbertotaveras.reels.data.local.entity
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 
 @Entity(
     tableName = "saved_person_known_for",
-    primaryKeys = ["personId", "movieId"]
+    primaryKeys = ["personId", "movieId"],
+    foreignKeys = [
+        ForeignKey(
+            entity = SavedPersonEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["personId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [
+        Index(value = ["personId"])
+    ]
 )
 data class SavedPersonKnownForEntity(
     val personId: Int,

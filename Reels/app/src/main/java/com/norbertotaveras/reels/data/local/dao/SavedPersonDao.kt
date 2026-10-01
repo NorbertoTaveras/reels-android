@@ -54,9 +54,4 @@ interface SavedPersonDao {
         }
     }
 
-    @Transaction
-    suspend fun deleteSavedPersonWithKnownFor(personId: Int) {
-        deleteKnownForMovies(personId = personId)
-        deleteSavedPerson(personId = personId)
-    }
 }
