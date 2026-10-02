@@ -66,7 +66,7 @@ class CastDetailsViewModel @Inject constructor(
         }
     }
 
-    fun loadPerson(language: String = currentLanguage) {
+    private fun loadPerson(language: String = currentLanguage) {
         loadPersonJob?.cancel()
         loadPersonJob = viewModelScope.launch {
             _state.update { currentState ->

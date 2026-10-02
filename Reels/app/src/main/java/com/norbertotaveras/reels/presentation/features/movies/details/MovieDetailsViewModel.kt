@@ -92,7 +92,7 @@ class MovieDetailsViewModel @Inject constructor(
         }
     }
 
-    fun loadMovie(language: String = currentLanguage) {
+    private fun loadMovie(language: String = currentLanguage) {
         loadMovieJob?.cancel()
         loadMovieJob = viewModelScope.launch {
             _state.update { currentState ->

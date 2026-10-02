@@ -61,7 +61,6 @@ interface MovieRepository {
     suspend fun getSimilarMovies(
         movieId: Int,
         language: String,
-        page: Int = 1,
     ): Result<List<MovieDataModel>>
 
     suspend fun getMovieGenres(

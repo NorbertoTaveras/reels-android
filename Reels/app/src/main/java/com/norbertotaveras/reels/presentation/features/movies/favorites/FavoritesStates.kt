@@ -43,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.norbertotaveras.reels.R
+import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTmdbBlue
@@ -50,7 +51,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsTmdbOnBlue
 
 @Composable
 internal fun LibraryErrorState(
-    listType: TmdbLibraryListType,
+    listType: TmdbLibraryList,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -85,10 +86,10 @@ internal fun LibraryErrorState(
 
         Text(
             text = when (listType) {
-                TmdbLibraryListType.Watchlist -> {
+                TmdbLibraryList.Watchlist -> {
                     "Unable to load your watchlist. Check your connection and try again."
                 }
-                TmdbLibraryListType.Rated -> {
+                TmdbLibraryList.Rated -> {
                     "Unable to load your ratings. Check your connection and try again."
                 }
             },

@@ -7,10 +7,11 @@
 
 package com.norbertotaveras.reels.data.remote.paging
 
+import com.norbertotaveras.reels.data.remote.mapper.movie.toTmdbPathSegment
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 
 fun MovieCategory.cacheKey(language: String): String {
-    return "category:$value:language:$language"
+    return "category:${toTmdbPathSegment()}:language:$language"
 }
 
 fun searchCacheKey(

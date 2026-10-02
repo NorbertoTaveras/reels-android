@@ -7,13 +7,10 @@
 
 package com.norbertotaveras.reels.presentation.features.movies.favorites
 
-internal enum class TmdbLibraryListType {
-    Watchlist,
-    Rated
-}
+import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 
-internal val TmdbLibraryListType.emptyTab: LibraryTab
+internal val TmdbLibraryList.emptyTab: LibraryTab
     get() = when (this) {
-        TmdbLibraryListType.Watchlist -> LibraryTab.Tmdb
-        TmdbLibraryListType.Rated -> LibraryTab.Rated
+        TmdbLibraryList.Watchlist -> LibraryTab.Tmdb
+        TmdbLibraryList.Rated -> LibraryTab.Rated
     }

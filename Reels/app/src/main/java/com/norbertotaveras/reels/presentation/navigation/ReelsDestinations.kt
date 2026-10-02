@@ -31,5 +31,4 @@ object ReelsDestinations {
     fun movieCastRoute(movieId: Int): String = "$MOVIE_CAST/$movieId"
     fun castDetailsRoute(personId: Int): String = "$CAST_DETAILS/$personId"
     fun filmographyRoute(personId: Int): String = "$FILMOGRAPHY/$personId"
-
 }

@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
+import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
@@ -131,7 +132,7 @@ internal fun FavoritesContent(
                     tmdbAccountMovieItems(
                         state = state,
                         movies = tmdbWatchlistMovies,
-                        listType = TmdbLibraryListType.Watchlist,
+                        listType = TmdbLibraryList.Watchlist,
                         onConnectSettingsClick = {
                             onEvent(FavoritesEvent.ConnectSettingsClicked)
                         },
@@ -146,7 +147,7 @@ internal fun FavoritesContent(
                     tmdbAccountMovieItems(
                         state = state,
                         movies = tmdbRatedMovies,
-                        listType = TmdbLibraryListType.Rated,
+                        listType = TmdbLibraryList.Rated,
                         onConnectSettingsClick = {
                             onEvent(FavoritesEvent.ConnectSettingsClicked)
                         },
@@ -202,7 +203,7 @@ private fun LibraryHeader(
 private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovieItems(
     state: FavoritesUiState,
     movies: LazyPagingItems<MovieDataModel>,
-    listType: TmdbLibraryListType,
+    listType: TmdbLibraryList,
     onConnectSettingsClick: () -> Unit,
     onMovieClick: (Int) -> Unit,
     onRefresh: () -> Unit,
@@ -260,7 +261,7 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
                 }
             ) { index ->
                 movies[index]?.let { movie ->
-                    TmdbWatchlistMovieCard(
+                    TmdbAccountMovieCard(
                         movie = movie,
                         listType = listType,
                         onClick = {
@@ -345,7 +346,7 @@ private fun LibraryTabs(
 
 @Composable
 private fun LibrarySyncStatus(
-    listType: TmdbLibraryListType,
+    listType: TmdbLibraryList,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -378,8 +379,8 @@ private fun LibrarySyncStatus(
 
                 Text(
                     text = when (listType) {
-                        TmdbLibraryListType.Watchlist -> "Synced via TMDB"
-                        TmdbLibraryListType.Rated -> "Your TMDB ratings"
+                        TmdbLibraryList.Watchlist -> "Synced via TMDB"
+                        TmdbLibraryList.Rated -> "Your TMDB ratings"
                     },
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant

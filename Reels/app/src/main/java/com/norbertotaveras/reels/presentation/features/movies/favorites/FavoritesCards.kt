@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
+import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
@@ -31,9 +32,9 @@ import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
 
 @Composable
-internal fun TmdbWatchlistMovieCard(
+internal fun TmdbAccountMovieCard(
     movie: MovieDataModel,
-    listType: TmdbLibraryListType,
+    listType: TmdbLibraryList,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -47,8 +48,8 @@ internal fun TmdbWatchlistMovieCard(
             onClick = onClick,
             topStartBadge = {
                 when (listType) {
-                    TmdbLibraryListType.Watchlist -> TmdbBadge()
-                    TmdbLibraryListType.Rated -> UserRatingBadge(
+                    TmdbLibraryList.Watchlist -> TmdbBadge()
+                    TmdbLibraryList.Rated -> UserRatingBadge(
                         rating = movie.accountRating?.let { rating ->
                             String.format("%.1f", rating)
                         }.orEmpty()
@@ -57,22 +58,19 @@ internal fun TmdbWatchlistMovieCard(
             },
             topEndBadge = {
                 RatingBadge(
-                    rating = when (listType) {
-                        TmdbLibraryListType.Watchlist -> String.format("%.1f", movie.voteAverage)
-                        TmdbLibraryListType.Rated -> String.format("%.1f", movie.voteAverage)
-                    }
+                    rating = String.format("%.1f", movie.voteAverage)
                 )
             },
             bottomEndBadge = {
                 when (listType) {
-                    TmdbLibraryListType.Watchlist -> LibraryOverlayIconBadge(
+                    TmdbLibraryList.Watchlist -> LibraryOverlayIconBadge(
                         imageVector = Icons.Filled.Bookmark,
                         contentDescription = "Saved to TMDB watchlist",
                         containerColor = ReelsTeal.copy(alpha = 0.92f),
                         contentColor = MaterialTheme.colorScheme.background
                     )
 
-                    TmdbLibraryListType.Rated -> LibraryOverlayIconBadge(
+                    TmdbLibraryList.Rated -> LibraryOverlayIconBadge(
                         imageVector = Icons.Filled.Close,
                         contentDescription = "Rated on TMDB",
                         containerColor = reelsRatingContainerColor().copy(alpha = 0.92f),

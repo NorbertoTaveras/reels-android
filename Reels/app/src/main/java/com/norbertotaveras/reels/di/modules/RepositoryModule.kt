@@ -30,7 +30,7 @@ import javax.inject.Singleton
 abstract class RepositoryModule {
     @Binds
     @Singleton
-    abstract fun provideFavoriteMoviesRepository(
+    abstract fun bindFavoriteMoviesRepository(
         implementation: FavoriteMoviesRepositoryImpl
     ): FavoriteMoviesRepository
 

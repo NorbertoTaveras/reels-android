@@ -66,8 +66,7 @@ class LoadMovieDetailsContentUseCase @Inject constructor(
             val similarDeferred = async {
                 movieRepository.getSimilarMovies(
                     movieId = movieId,
-                    language = language,
-                    page = 1
+                    language = language
                 )
             }
 

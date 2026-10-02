@@ -16,3 +16,15 @@ val MovieCategory.displayLabel: String
         MovieCategory.UPCOMING -> "Upcoming"
         MovieCategory.NOW_PLAYING -> "Now Playing"
     }
+
+val MovieCategory.routeValue: String
+    get() = name.lowercase()
+
+fun String?.toMovieCategory(): MovieCategory {
+    return when (this?.lowercase()) {
+        "top_rated" -> MovieCategory.TOP_RATED
+        "upcoming" -> MovieCategory.UPCOMING
+        "now_playing" -> MovieCategory.NOW_PLAYING
+        else -> MovieCategory.POPULAR
+    }
+}

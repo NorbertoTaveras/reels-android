@@ -15,6 +15,7 @@ import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 import com.norbertotaveras.reels.domain.usecase.movie.GetMoviesUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.presentation.navigation.ReelsDestinations
+import com.norbertotaveras.reels.presentation.ui.extensions.toMovieCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -37,9 +38,9 @@ class MovieCategoryViewModel @Inject constructor(
     getMoviesUseCase: GetMoviesUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
 ) : ViewModel() {
-    private val category = MovieCategory.fromValue(
-        savedStateHandle[ReelsDestinations.MOVIE_CATEGORY_ARG]
-    )
+    private val category = savedStateHandle
+        .get<String>(ReelsDestinations.MOVIE_CATEGORY_ARG)
+        .toMovieCategory()
 
     private val _state = MutableStateFlow(MovieCategoryUiState(category = category))
     val state: StateFlow<MovieCategoryUiState> = _state.asStateFlow()

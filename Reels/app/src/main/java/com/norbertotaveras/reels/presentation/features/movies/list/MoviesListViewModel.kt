@@ -13,6 +13,7 @@ import androidx.paging.cachedIn
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 import com.norbertotaveras.reels.domain.usecase.movie.GetMoviesUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
+import com.norbertotaveras.reels.presentation.ui.extensions.routeValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -88,7 +89,7 @@ class MoviesListViewModel @Inject constructor(
 
     private fun onSeeAllClicked(category: MovieCategory) {
         viewModelScope.launch {
-            _effect.emit(MoviesListEffect.NavigateToMovieCategory(categoryValue = category.value))
+            _effect.emit(MoviesListEffect.NavigateToMovieCategory(categoryValue = category.routeValue))
         }
     }
 }

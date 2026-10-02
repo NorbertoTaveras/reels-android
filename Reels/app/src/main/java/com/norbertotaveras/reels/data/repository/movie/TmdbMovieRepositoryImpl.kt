@@ -21,6 +21,7 @@ import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieCreditsDataMode
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDetailsDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieVideosDataModel
+import com.norbertotaveras.reels.data.remote.mapper.movie.toTmdbPathSegment
 import com.norbertotaveras.reels.data.remote.movie.TmdbMovieRemoteDataSource
 import com.norbertotaveras.reels.data.remote.paging.CachedMovieListRemoteMediator
 import com.norbertotaveras.reels.data.remote.paging.MovieCachePolicy
@@ -28,6 +29,7 @@ import com.norbertotaveras.reels.data.remote.paging.TmdbMoviesPagingSource
 import com.norbertotaveras.reels.data.remote.paging.cacheKey
 import com.norbertotaveras.reels.data.remote.paging.searchCacheKey
 import com.norbertotaveras.reels.data.remote.paging.tmdbPagingConfig
+import com.norbertotaveras.reels.data.remote.paging.TMDB_FIRST_PAGE
 import com.norbertotaveras.reels.data.repository.tmdbResult
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
@@ -62,7 +64,7 @@ class TmdbMovieRepositoryImpl @Inject constructor(
             cacheTimeoutMillis = MovieCachePolicy.CATEGORY_CACHE_TIMEOUT_MILLIS,
             loadPage = { page ->
                 remoteDataSource.getMovies(
-                    category = category.value,
+                    category = category.toTmdbPathSegment(),
                     language = language,
                     page = page
                 )
@@ -183,13 +185,12 @@ class TmdbMovieRepositoryImpl @Inject constructor(
     override suspend fun getSimilarMovies(
         movieId: Int,
         language: String,
-        page: Int,
     ): Result<List<MovieDataModel>> {
         return tmdbResult(ioDispatcher) {
             remoteDataSource.getSimilarMovies(
                 movieId = movieId,
                 language = language,
-                page = page
+                page = TMDB_FIRST_PAGE
             ).results.map { movieDto ->
                 movieDto.toMovieDataModel()
             }
