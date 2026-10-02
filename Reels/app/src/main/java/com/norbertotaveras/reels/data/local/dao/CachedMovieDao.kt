@@ -21,7 +21,18 @@ import com.norbertotaveras.reels.data.local.entity.MovieRemoteKeyEntity
 interface CachedMovieDao {
     @Query(
         """
-        SELECT cached_movies.* FROM cached_movies
+        SELECT
+            cached_movies.id,
+            cached_movies.title,
+            cached_movies.overview,
+            cached_movies.posterPath,
+            cached_movies.backdropPath,
+            cached_movies.releaseDate,
+            cached_movies.voteAverage,
+            cached_movies.genreIds,
+            cached_movie_list_entries.accountRating AS accountRating,
+            cached_movies.cachedAt
+        FROM cached_movies
         INNER JOIN cached_movie_list_entries
             ON cached_movies.id = cached_movie_list_entries.movieId
         WHERE cached_movie_list_entries.listKey = :listKey
@@ -32,7 +43,18 @@ interface CachedMovieDao {
 
     @Query(
         """
-        SELECT cached_movies.* FROM cached_movies
+        SELECT
+            cached_movies.id,
+            cached_movies.title,
+            cached_movies.overview,
+            cached_movies.posterPath,
+            cached_movies.backdropPath,
+            cached_movies.releaseDate,
+            cached_movies.voteAverage,
+            cached_movies.genreIds,
+            cached_movie_list_entries.accountRating AS accountRating,
+            cached_movies.cachedAt
+        FROM cached_movies
         INNER JOIN cached_movie_list_entries
             ON cached_movies.id = cached_movie_list_entries.movieId
         WHERE cached_movie_list_entries.listKey = :listKey

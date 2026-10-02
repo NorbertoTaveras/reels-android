@@ -82,7 +82,8 @@ internal class CachedMovieListRemoteMediator(
                         CachedMovieListEntryEntity(
                             listKey = listKey,
                             movieId = movie.id,
-                            position = listStartPosition + index
+                            position = listStartPosition + index,
+                            accountRating = movie.accountRating
                         )
                     }
                 )

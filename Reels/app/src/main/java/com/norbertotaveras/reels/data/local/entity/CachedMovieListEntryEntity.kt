@@ -31,4 +31,5 @@ data class CachedMovieListEntryEntity(
     val listKey: String,
     val movieId: Int,
     val position: Int,
+    val accountRating: Double? = null,
 )

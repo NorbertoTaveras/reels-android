@@ -386,7 +386,8 @@ class TmdbMovieRepositoryImpl @Inject constructor(
                             CachedMovieListEntryEntity(
                                 listKey = listKey,
                                 movieId = movie.id,
-                                position = index
+                                position = index,
+                                accountRating = movie.accountRating
                             )
                         }
                     )
