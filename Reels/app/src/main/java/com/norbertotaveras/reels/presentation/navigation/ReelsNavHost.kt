@@ -22,6 +22,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -44,7 +45,11 @@ import com.norbertotaveras.reels.presentation.features.movies.search.SearchRoute
 import com.norbertotaveras.reels.presentation.features.settings.SettingsRoute
 
 @Composable
-fun ReelsNavHost(modifier: Modifier = Modifier) {
+fun ReelsNavHost(
+    modifier: Modifier = Modifier,
+    tmdbAuthCallbackId: Long? = null,
+    onTmdbAuthCallbackConsumed: (Long) -> Unit = {},
+) {
     val navController = rememberNavController()
     val context = LocalContext.current
     val openExternalUrl: (String) -> Unit = openExternalUrl@{ url ->
@@ -71,6 +76,12 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     val currentRoute = currentDestination?.route
+
+    LaunchedEffect(tmdbAuthCallbackId) {
+        if (tmdbAuthCallbackId != null) {
+            navController.navigateToBottomNavRoute(ReelsDestinations.SETTINGS)
+        }
+    }
 
     val bottomNavRoutes = reelsBottomNavItems.map { item -> item.route }
     val showBottomBar = currentRoute in bottomNavRoutes
@@ -158,7 +169,9 @@ fun ReelsNavHost(modifier: Modifier = Modifier) {
                     onNavigateToLibrary = {
                         navController.navigateToBottomNavRoute(ReelsDestinations.FAVORITES)
                     },
-                    onOpenExternalUrl = openExternalUrl
+                    onOpenExternalUrl = openExternalUrl,
+                    tmdbAuthCallbackId = tmdbAuthCallbackId,
+                    onTmdbAuthCallbackConsumed = onTmdbAuthCallbackConsumed
                 )
             }
 

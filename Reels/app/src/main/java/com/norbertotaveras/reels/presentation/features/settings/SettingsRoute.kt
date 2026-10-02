@@ -28,12 +28,21 @@ import kotlinx.coroutines.withContext
 fun SettingsRoute(
     onNavigateToLibrary: () -> Unit,
     onOpenExternalUrl: (String) -> Unit,
+    tmdbAuthCallbackId: Long? = null,
+    onTmdbAuthCallbackConsumed: (Long) -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(tmdbAuthCallbackId) {
+        tmdbAuthCallbackId?.let { callbackId ->
+            viewModel.onEvent(SettingsEvent.TmdbAccountCallbackReceived)
+            onTmdbAuthCallbackConsumed(callbackId)
+        }
+    }
 
     LaunchedEffect(viewModel, context, snackbarHostState) {
         viewModel.effect.collect { effect ->

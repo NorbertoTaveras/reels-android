@@ -32,12 +32,15 @@ import com.norbertotaveras.reels.data.remote.paging.tmdbLibraryCacheKey
 import com.norbertotaveras.reels.data.repository.repositoryResult
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.account.TmdbAccountStateDataModel
+import com.norbertotaveras.reels.domain.model.account.TmdbAuthenticationCallback
 import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 import com.norbertotaveras.reels.domain.model.account.TmdbMovieAccountStateDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.domain.repository.account.TmdbAccountRepository
 import javax.inject.Inject
 import javax.inject.Singleton
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -64,15 +67,22 @@ class TmdbAccountRepositoryImpl @Inject constructor(
         return accountResult {
             val requestToken = remoteDataSource.createRequestToken().requestToken
             accountDataStore.savePendingRequestToken(requestToken = requestToken)
-            "$TMDB_AUTHENTICATE_URL/$requestToken"
+            val encodedCallback = URLEncoder.encode(
+                TmdbAuthenticationCallback.URI,
+                StandardCharsets.UTF_8.toString()
+            )
+            "$TMDB_AUTHENTICATE_URL/$requestToken?redirect_to=$encodedCallback"
         }
     }
 
     override suspend fun finishAuthentication(): Result<TmdbAccountStateDataModel> {
         return accountResult {
-            val pendingRequestToken = accountDataStore.accountState
-                .first()
-                .pendingRequestToken
+            val currentAccountState = accountDataStore.accountState.first()
+            if (currentAccountState.isConnected) {
+                return@accountResult currentAccountState
+            }
+
+            val pendingRequestToken = currentAccountState.pendingRequestToken
                 ?: error("Start TMDB connection before finishing authentication.")
 
             val sessionId = remoteDataSource.createSession(

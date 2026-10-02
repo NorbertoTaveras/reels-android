@@ -7,17 +7,22 @@
 
 package com.norbertotaveras.reels
 
+import android.content.Intent
 import android.os.Bundle
+import android.os.SystemClock
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.norbertotaveras.reels.domain.model.settings.AppSettings
 import com.norbertotaveras.reels.domain.model.settings.AppTheme
+import com.norbertotaveras.reels.domain.model.account.TmdbAuthenticationCallback
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.presentation.navigation.ReelsNavHost
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
@@ -29,8 +34,11 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var observeSettingsUseCase: ObserveSettingsUseCase
 
+    private var tmdbAuthCallbackId by mutableStateOf<Long?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        handleIntent(intent)
         enableEdgeToEdge()
         setContent {
             val settings by observeSettingsUseCase().collectAsStateWithLifecycle(
@@ -47,8 +55,33 @@ class MainActivity : ComponentActivity() {
                 darkTheme = darkTheme,
                 imageQuality = settings.imageQuality
             ) {
-                ReelsNavHost(modifier = Modifier.fillMaxSize())
+                ReelsNavHost(
+                    modifier = Modifier.fillMaxSize(),
+                    tmdbAuthCallbackId = tmdbAuthCallbackId,
+                    onTmdbAuthCallbackConsumed = { callbackId ->
+                        if (tmdbAuthCallbackId == callbackId) {
+                            tmdbAuthCallbackId = null
+                        }
+                    }
+                )
             }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        val callbackUri = intent?.data ?: return
+        val isTmdbCallback = callbackUri.scheme == TmdbAuthenticationCallback.SCHEME &&
+            callbackUri.host == TmdbAuthenticationCallback.HOST &&
+            callbackUri.path == TmdbAuthenticationCallback.PATH
+
+        if (isTmdbCallback) {
+            tmdbAuthCallbackId = SystemClock.elapsedRealtimeNanos()
         }
     }
 }

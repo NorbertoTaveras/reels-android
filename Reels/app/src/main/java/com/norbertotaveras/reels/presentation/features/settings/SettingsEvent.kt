@@ -24,6 +24,7 @@ sealed interface SettingsEvent {
     data object ClearImageCacheConfirmed : SettingsEvent
     data object ClearImageCacheDismissed : SettingsEvent
     data object TmdbAccountClicked : SettingsEvent
+    data object TmdbAccountCallbackReceived : SettingsEvent
     data object TmdbAccountFinishClicked : SettingsEvent
     data object TmdbAccountDisconnectClicked : SettingsEvent
     data object PrivacyClicked : SettingsEvent

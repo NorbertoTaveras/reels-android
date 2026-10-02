@@ -76,6 +76,7 @@ class SettingsViewModel @Inject constructor(
             SettingsEvent.ClearImageCacheConfirmed -> onClearImageCacheConfirmed()
             SettingsEvent.ClearImageCacheDismissed -> onClearImageCacheDismissed()
             SettingsEvent.TmdbAccountClicked -> onTmdbAccountClicked()
+            SettingsEvent.TmdbAccountCallbackReceived -> onTmdbAccountCallbackReceived()
             SettingsEvent.TmdbAccountFinishClicked -> onTmdbAccountFinishClicked()
             SettingsEvent.TmdbAccountDisconnectClicked -> onTmdbAccountDisconnectClicked()
             SettingsEvent.PrivacyClicked -> onPrivacyClicked()
@@ -200,7 +201,7 @@ class SettingsViewModel @Inject constructor(
                     _effect.emit(SettingsEffect.OpenExternalUrl(url = approvalUrl))
                     _effect.emit(
                         SettingsEffect.ShowMessage(
-                            message = "Approve Reels in TMDB, then return to finish."
+                            message = "Approve Reels in TMDB to finish connecting."
                         )
                     )
                 }
@@ -214,6 +215,11 @@ class SettingsViewModel @Inject constructor(
                     )
                 }
         }
+    }
+
+    private fun onTmdbAccountCallbackReceived() {
+        if (_state.value.isTmdbAccountConnected) return
+        onTmdbAccountFinishClicked()
     }
 
     private fun onTmdbAccountFinishClicked() {
