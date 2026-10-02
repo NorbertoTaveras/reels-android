@@ -150,7 +150,7 @@ fun MovieRatingSheet(
                 } else {
                     Text(
                         text = selectedRating?.let { rating ->
-                            "Submit ${rating.toRatingText()}/10 rating"
+                            "Submit ${rating.toRatingText()}/10 Rating"
                         } ?: "Tap a number to rate",
                         fontWeight = FontWeight.Bold
                     )
