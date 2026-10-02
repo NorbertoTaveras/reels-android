@@ -21,5 +21,6 @@ data class CachedMovieEntity(
     val releaseDate: String?,
     val voteAverage: Double,
     val genreIds: List<Int>,
+    val accountRating: Double?,
     val cachedAt: Long,
 )

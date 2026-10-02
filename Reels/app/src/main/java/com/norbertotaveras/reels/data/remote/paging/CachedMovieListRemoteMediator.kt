@@ -29,8 +29,14 @@ internal class CachedMovieListRemoteMediator(
     private val listKey: String,
     private val cacheTimeoutMillis: Long,
     private val loadPage: suspend (page: Int) -> MoviesResponseDto,
+    private val transformError: suspend (Exception) -> Throwable = { error ->
+        error.toTmdbNetworkException()
+    },
 ) : RemoteMediator<Int, CachedMovieEntity>() {
     override suspend fun initialize(): InitializeAction {
+        if (cachedMovieDao.getListEntryCount(listKey = listKey) == 0) {
+            return InitializeAction.LAUNCH_INITIAL_REFRESH
+        }
         val lastUpdatedAt = cachedMovieDao.getRemoteKey(listKey = listKey)?.lastUpdatedAt
             ?: return InitializeAction.LAUNCH_INITIAL_REFRESH
         val isCacheFresh = MovieCachePolicy.isFresh(
@@ -84,7 +90,8 @@ internal class CachedMovieListRemoteMediator(
                     remoteKey = MovieRemoteKeyEntity(
                         listKey = listKey,
                         nextPage = if (endOfPaginationReached) null else page + 1,
-                        lastUpdatedAt = now
+                        lastUpdatedAt = now,
+                        totalResults = response.totalResults
                     )
                 )
             }
@@ -93,7 +100,7 @@ internal class CachedMovieListRemoteMediator(
         } catch (error: CancellationException) {
             throw error
         } catch (error: Exception) {
-            MediatorResult.Error(error.toTmdbNetworkException())
+            MediatorResult.Error(transformError(error))
         }
     }
 

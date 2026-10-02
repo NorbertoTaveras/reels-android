@@ -10,6 +10,8 @@ package com.norbertotaveras.reels.data.remote.paging
 internal object MovieCachePolicy {
     const val CATEGORY_CACHE_TIMEOUT_MILLIS = 60 * 60 * 1000L
     const val SEARCH_CACHE_TIMEOUT_MILLIS = 24 * 60 * 60 * 1000L
+    const val DISCOVER_CACHE_TIMEOUT_MILLIS = 60 * 60 * 1000L
+    const val ACCOUNT_CACHE_TIMEOUT_MILLIS = 15 * 60 * 1000L
     const val CACHE_RETENTION_MILLIS = 7 * 24 * 60 * 60 * 1000L
 
     fun isFresh(

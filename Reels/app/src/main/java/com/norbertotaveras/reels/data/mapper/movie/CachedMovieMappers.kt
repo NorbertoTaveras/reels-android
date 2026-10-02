@@ -23,6 +23,24 @@ fun MovieDto.toCachedMovieEntity(
         releaseDate = releaseDate,
         voteAverage = voteAverage,
         genreIds = genreIds,
+        accountRating = accountRating,
+        cachedAt = cachedAt
+    )
+}
+
+fun MovieDataModel.toCachedMovieEntity(
+    cachedAt: Long,
+): CachedMovieEntity {
+    return CachedMovieEntity(
+        id = id,
+        title = title,
+        overview = overview,
+        posterPath = posterPath,
+        backdropPath = backdropPath,
+        releaseDate = releaseDate,
+        voteAverage = voteAverage,
+        genreIds = genreIds,
+        accountRating = accountRating,
         cachedAt = cachedAt
     )
 }
@@ -36,6 +54,7 @@ fun CachedMovieEntity.toCachedMovieDataModel(): MovieDataModel {
         backdropPath = backdropPath,
         releaseDate = releaseDate,
         voteAverage = voteAverage,
-        genreIds = genreIds
+        genreIds = genreIds,
+        accountRating = accountRating
     )
 }

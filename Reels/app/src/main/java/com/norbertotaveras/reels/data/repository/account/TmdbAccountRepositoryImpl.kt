@@ -9,8 +9,15 @@ package com.norbertotaveras.reels.data.repository.account
 
 import androidx.paging.Pager
 import androidx.paging.PagingData
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.map
+import com.norbertotaveras.reels.data.local.dao.CachedContentDao
+import com.norbertotaveras.reels.data.local.dao.CachedMovieDao
+import com.norbertotaveras.reels.data.local.db.ReelsDatabase
+import com.norbertotaveras.reels.data.local.mapper.toCachedMovieAccountStateEntity
+import com.norbertotaveras.reels.data.local.mapper.toTmdbMovieAccountStateDataModel
 import com.norbertotaveras.reels.data.local.preferences.TmdbAccountDataStore
+import com.norbertotaveras.reels.data.mapper.movie.toCachedMovieDataModel
 import com.norbertotaveras.reels.data.remote.account.TmdbAccountRemoteDataSource
 import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
 import com.norbertotaveras.reels.data.remote.error.TmdbSessionExpiredException
@@ -18,12 +25,14 @@ import com.norbertotaveras.reels.data.remote.error.isTmdbSessionExpiredError
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
 import com.norbertotaveras.reels.data.remote.mapper.account.toTmdbAccountDataModel
 import com.norbertotaveras.reels.data.remote.mapper.account.toTmdbMovieAccountStateDataModel
-import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDataModel
-import com.norbertotaveras.reels.data.remote.paging.TmdbMoviesPagingSource
+import com.norbertotaveras.reels.data.remote.paging.CachedMovieListRemoteMediator
+import com.norbertotaveras.reels.data.remote.paging.MovieCachePolicy
 import com.norbertotaveras.reels.data.remote.paging.tmdbPagingConfig
+import com.norbertotaveras.reels.data.remote.paging.tmdbLibraryCacheKey
 import com.norbertotaveras.reels.data.repository.repositoryResult
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.account.TmdbAccountStateDataModel
+import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 import com.norbertotaveras.reels.domain.model.account.TmdbMovieAccountStateDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.domain.repository.account.TmdbAccountRepository
@@ -38,10 +47,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.first
 
 @Singleton
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalPagingApi::class)
 class TmdbAccountRepositoryImpl @Inject constructor(
     private val remoteDataSource: TmdbAccountRemoteDataSource,
     private val accountDataStore: TmdbAccountDataStore,
+    private val database: ReelsDatabase,
+    private val cachedMovieDao: CachedMovieDao,
+    private val cachedContentDao: CachedContentDao,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : TmdbAccountRepository {
     override fun observeAccountState(): Flow<TmdbAccountStateDataModel> {
@@ -92,14 +104,23 @@ class TmdbAccountRepositoryImpl @Inject constructor(
     override suspend fun getMovieAccountState(
         movieId: Int
     ): Result<TmdbMovieAccountStateDataModel?> {
-        return accountResult(clearAccountOnExpiredSession = true) {
-            val accountState = accountDataStore.accountState.first()
-            val sessionId = accountState.sessionId ?: return@accountResult null
+        val accountState = accountDataStore.accountState.first()
+        val accountId = accountState.account?.accountId ?: return Result.success(null)
+        val sessionId = accountState.sessionId ?: return Result.success(null)
+        val remoteResult = accountResult(clearAccountOnExpiredSession = true) {
+            remoteDataSource.getMovieAccountState(movieId = movieId, sessionId = sessionId)
+                .toTmdbMovieAccountStateDataModel()
+                .also { state -> cacheMovieAccountState(accountId = accountId, state = state) }
+        }
 
-            remoteDataSource.getMovieAccountState(
-                movieId = movieId,
-                sessionId = sessionId
-            ).toTmdbMovieAccountStateDataModel()
+        return if (remoteResult.isSuccess) {
+            remoteResult
+        } else {
+            val cached = cachedContentDao.getMovieAccountState(
+                accountId = accountId,
+                movieId = movieId
+            )?.toTmdbMovieAccountStateDataModel()
+            cached?.let { state -> Result.success(state) } ?: remoteResult
         }
     }
 
@@ -107,6 +128,8 @@ class TmdbAccountRepositoryImpl @Inject constructor(
         language: String,
     ): Flow<PagingData<MovieDataModel>> {
         return getAccountMovies(
+            list = TmdbLibraryList.Watchlist,
+            language = language,
             loadPage = { accountId, sessionId, page ->
                 remoteDataSource.getWatchlistMovies(
                     accountId = accountId,
@@ -122,6 +145,8 @@ class TmdbAccountRepositoryImpl @Inject constructor(
         language: String,
     ): Flow<PagingData<MovieDataModel>> {
         return getAccountMovies(
+            list = TmdbLibraryList.Rated,
+            language = language,
             loadPage = { accountId, sessionId, page ->
                 remoteDataSource.getRatedMovies(
                     accountId = accountId,
@@ -147,6 +172,20 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                 movieId = movieId,
                 watchlist = watchlist
             )
+            val accountId = accountState.account?.accountId
+                ?: error("TMDB account details are unavailable.")
+            val cached = cachedContentDao.getMovieAccountState(accountId, movieId)
+                ?.toTmdbMovieAccountStateDataModel()
+                ?: TmdbMovieAccountStateDataModel(
+                    movieId = movieId,
+                    isWatchlisted = false,
+                    rating = null
+                )
+            cacheMovieAccountState(
+                accountId = accountId,
+                state = cached.copy(isWatchlisted = watchlist)
+            )
+            cachedMovieDao.invalidateAccountLists(accountId = accountId)
         }
     }
 
@@ -155,24 +194,48 @@ class TmdbAccountRepositoryImpl @Inject constructor(
         rating: Double
     ): Result<Unit> {
         return accountResult(clearAccountOnExpiredSession = true) {
-            val sessionId = requireConnectedAccountState().sessionId
+            val accountState = requireConnectedAccountState()
+            val sessionId = accountState.sessionId
                 ?: error("TMDB session is unavailable.")
             remoteDataSource.rateMovie(
                 movieId = movieId,
                 sessionId = sessionId,
                 rating = rating
             )
+            val accountId = accountState.account?.accountId
+                ?: error("TMDB account details are unavailable.")
+            val cached = cachedContentDao.getMovieAccountState(accountId, movieId)
+                ?.toTmdbMovieAccountStateDataModel()
+                ?: TmdbMovieAccountStateDataModel(
+                    movieId = movieId,
+                    isWatchlisted = false,
+                    rating = null
+                )
+            cacheMovieAccountState(accountId = accountId, state = cached.copy(rating = rating))
+            cachedMovieDao.invalidateAccountLists(accountId = accountId)
         }
     }
 
     override suspend fun deleteMovieRating(movieId: Int): Result<Unit> {
         return accountResult(clearAccountOnExpiredSession = true) {
-            val sessionId = requireConnectedAccountState().sessionId
+            val accountState = requireConnectedAccountState()
+            val sessionId = accountState.sessionId
                 ?: error("TMDB session is unavailable.")
             remoteDataSource.deleteMovieRating(
                 movieId = movieId,
                 sessionId = sessionId
             )
+            val accountId = accountState.account?.accountId
+                ?: error("TMDB account details are unavailable.")
+            val cached = cachedContentDao.getMovieAccountState(accountId, movieId)
+                ?.toTmdbMovieAccountStateDataModel()
+                ?: TmdbMovieAccountStateDataModel(
+                    movieId = movieId,
+                    isWatchlisted = false,
+                    rating = null
+                )
+            cacheMovieAccountState(accountId = accountId, state = cached.copy(rating = null))
+            cachedMovieDao.invalidateAccountLists(accountId = accountId)
         }
     }
 
@@ -184,7 +247,21 @@ class TmdbAccountRepositoryImpl @Inject constructor(
         return accountState
     }
 
+    private suspend fun cacheMovieAccountState(
+        accountId: Int,
+        state: TmdbMovieAccountStateDataModel,
+    ) {
+        cachedContentDao.upsertMovieAccountState(
+            state.toCachedMovieAccountStateEntity(
+                accountId = accountId,
+                cachedAt = System.currentTimeMillis()
+            )
+        )
+    }
+
     private fun getAccountMovies(
+        list: TmdbLibraryList,
+        language: String,
         loadPage: suspend (
             accountId: Int,
             sessionId: String,
@@ -198,25 +275,33 @@ class TmdbAccountRepositoryImpl @Inject constructor(
             if (!accountState.isConnected || accountId == null || sessionId == null) {
                 flowOf(PagingData.empty())
             } else {
+                val listKey = tmdbLibraryCacheKey(
+                    accountId = accountId,
+                    list = list,
+                    language = language
+                )
                 Pager(
                     config = tmdbPagingConfig(),
-                    pagingSourceFactory = {
-                        TmdbMoviesPagingSource(
-                            loadPage = { page ->
-                                loadPage(accountId, sessionId, page)
-                            },
-                            transformError = { error ->
-                                if (error.isTmdbSessionExpiredError()) {
-                                    accountDataStore.clearAccount()
-                                    TmdbSessionExpiredException()
-                                } else {
-                                    error
-                                }
+                    remoteMediator = CachedMovieListRemoteMediator(
+                        database = database,
+                        cachedMovieDao = cachedMovieDao,
+                        listKey = listKey,
+                        cacheTimeoutMillis = MovieCachePolicy.ACCOUNT_CACHE_TIMEOUT_MILLIS,
+                        loadPage = { page -> loadPage(accountId, sessionId, page) },
+                        transformError = { error ->
+                            if (error.isTmdbSessionExpiredError()) {
+                                accountDataStore.clearAccount()
+                                TmdbSessionExpiredException()
+                            } else {
+                                error.toTmdbNetworkException()
                             }
-                        )
+                        }
+                    ),
+                    pagingSourceFactory = {
+                        cachedMovieDao.pagingSource(listKey = listKey)
                     }
                 ).flow.map { pagingData ->
-                    pagingData.map { movieDto -> movieDto.toMovieDataModel() }
+                    pagingData.map { movie -> movie.toCachedMovieDataModel() }
                 }
             }
         }

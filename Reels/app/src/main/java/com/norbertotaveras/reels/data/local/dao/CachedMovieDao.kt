@@ -12,6 +12,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Upsert
 import com.norbertotaveras.reels.data.local.entity.CachedMovieEntity
 import com.norbertotaveras.reels.data.local.entity.CachedMovieListEntryEntity
 import com.norbertotaveras.reels.data.local.entity.MovieRemoteKeyEntity
@@ -29,10 +30,24 @@ interface CachedMovieDao {
     )
     fun pagingSource(listKey: String): PagingSource<Int, CachedMovieEntity>
 
+    @Query(
+        """
+        SELECT cached_movies.* FROM cached_movies
+        INNER JOIN cached_movie_list_entries
+            ON cached_movies.id = cached_movie_list_entries.movieId
+        WHERE cached_movie_list_entries.listKey = :listKey
+        ORDER BY cached_movie_list_entries.position ASC
+        """
+    )
+    suspend fun getMovies(listKey: String): List<CachedMovieEntity>
+
+    @Query("SELECT COUNT(*) FROM cached_movie_list_entries WHERE listKey = :listKey")
+    suspend fun getListEntryCount(listKey: String): Int
+
     @Query("SELECT * FROM movie_remote_keys WHERE listKey = :listKey LIMIT 1")
     suspend fun getRemoteKey(listKey: String): MovieRemoteKeyEntity?
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun upsertMovies(movies: List<CachedMovieEntity>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -46,6 +61,9 @@ interface CachedMovieDao {
 
     @Query("DELETE FROM movie_remote_keys WHERE listKey = :listKey")
     suspend fun clearRemoteKey(listKey: String)
+
+    @Query("DELETE FROM movie_remote_keys WHERE listKey LIKE 'account:' || :accountId || ':%'")
+    suspend fun invalidateAccountLists(accountId: Int)
 
     @Query(
         """

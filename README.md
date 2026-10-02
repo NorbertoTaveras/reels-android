@@ -36,7 +36,7 @@ cd Reels
 
 ## About
 
-Reels focuses on a polished movie browsing experience inspired by premium streaming and movie discovery apps. The v1 experience includes browsing movie categories, search, movie details, cast details, trailers, favorites, settings, offline favorite access, and release-ready app configuration.
+Reels focuses on a polished movie browsing experience inspired by premium streaming and movie discovery apps. The app includes category and Discover browsing, search, movie and cast details, trailers, filmography, local favorites, TMDB account sync, offline access, settings, and release-ready app configuration.
 
 Core screens:
 
@@ -108,7 +108,7 @@ Before preparing a signed build, review the [release checklist](Reels/docs/relea
   - Lifecycle and ViewModel for lifecycle-aware UI state.
   - Navigation Compose for screen navigation.
   - Paging 3 for paged movie lists and search results.
-  - Room for local favorite movie storage.
+  - Room for local favorites, saved people, and offline response caching.
   - DataStore for app preferences.
 - [Hilt](https://dagger.dev/hilt/) for dependency injection.
 - [Retrofit](https://square.github.io/retrofit/) and OkHttp for TMDB networking.
@@ -140,13 +140,18 @@ This keeps TMDB DTOs, Room entities, domain models, and UI models from leaking a
 
 ## Data & Offline Behavior
 
-Reels is online-first for browse, search, details, cast, trailers, and similar movies. Favorites are stored locally with Room so saved movies remain available offline.
+Reels is online-first and cache-backed. Fresh TMDB responses are preferred, while previously loaded content remains available from Room when the network is unavailable. Local favorites and saved people are also stored in Room independently of the response cache.
 
 Current offline scope:
 
-- Favorite movie list renders from local storage.
-- Movie details can fall back to locally saved favorite data when network details fail.
-- Full browse/search response caching is intentionally left outside v1.
+- Home categories, Search, Discover results, trending movies, and category pagination.
+- Movie details, full cast, trailers, and similar movies after they have been loaded once.
+- Person details and complete filmography after they have been loaded once.
+- TMDB watchlist, rated movies, and per-movie account state for the connected account.
+- Movie genres used by Discover filters.
+- Favorite movies and saved people, including their offline detail fallback.
+
+Actions that modify TMDB data, including watchlist and rating changes, still require a network connection. Cached account data is scoped by TMDB account ID and is never exposed while no account is connected.
 
 ## Open API
 
