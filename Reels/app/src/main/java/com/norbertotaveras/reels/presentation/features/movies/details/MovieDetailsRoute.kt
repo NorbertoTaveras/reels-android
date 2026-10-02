@@ -16,6 +16,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarHost
@@ -58,13 +60,22 @@ fun MovieDetailsRoute(
 
     Box(modifier = modifier.fillMaxSize()) {
         MovieDetailsScreen(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .then(
+                    if (state.isRatingSheetVisible) {
+                        Modifier.blur(12.dp)
+                    } else {
+                        Modifier
+                    }
+                ),
             state = state,
             onEvent = viewModel::onEvent
         )
 
         if (state.isRatingSheetVisible) {
             MovieRatingSheet(
+                movieTitle = state.movie?.title.orEmpty(),
                 selectedRating = state.selectedTmdbRating,
                 isLoading = state.isAccountActionLoading,
                 onRatingSelected = { rating ->
@@ -73,10 +84,8 @@ fun MovieDetailsRoute(
                 onSubmitClick = {
                     viewModel.onEvent(MovieDetailsEvent.RatingSubmitted)
                 },
-                onDeleteClick = state.tmdbRating?.let {
-                    {
-                        viewModel.onEvent(MovieDetailsEvent.DeleteRatingClicked)
-                    }
+                onClearClick = {
+                    viewModel.onEvent(MovieDetailsEvent.RatingCleared)
                 },
                 onDismiss = {
                     viewModel.onEvent(MovieDetailsEvent.RatingSheetDismissed)

@@ -143,6 +143,14 @@ object ReelsDimensions {
     val detailsInfoRowSpacing = 16.dp
     val detailsOverviewTopSpacing = 8.dp
     val detailsCarouselHeaderSpacing = 12.dp
+    val ratingSheetCornerSize = 24.dp
+    val ratingSheetBottomPadding = 24.dp
+    val ratingSheetSectionSpacing = 16.dp
+    val ratingSheetChoiceHeight = 48.dp
+    val ratingSheetChoiceCornerSize = 12.dp
+    val ratingSheetSummaryIconSize = 20.dp
+    val ratingSheetSubmitButtonHeight = 50.dp
+    val ratingSheetProgressSize = 18.dp
     val detailsCastCardWidth = 82.dp
     val detailsCastTextSpacing = 6.dp
     val detailsTrailerWidth = 178.dp

@@ -26,7 +26,7 @@ data class MovieDetailsUiState(
     val isTmdbAccountConnected: Boolean = false,
     val isWatchlisted: Boolean = false,
     val tmdbRating: Double? = null,
-    val selectedTmdbRating: Double = 8.0,
+    val selectedTmdbRating: Double? = null,
     val isRatingSheetVisible: Boolean = false,
     val isAccountActionLoading: Boolean = false,
     val errorMessage: String? = null

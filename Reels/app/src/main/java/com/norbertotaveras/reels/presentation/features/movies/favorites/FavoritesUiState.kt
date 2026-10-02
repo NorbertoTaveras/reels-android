@@ -17,6 +17,7 @@ data class FavoritesUiState(
     val isTmdbAccountConnected: Boolean = false,
     val removingMovieIds: Set<Int> = emptySet(),
     val removingPersonIds: Set<Int> = emptySet(),
+    val updatingTmdbMovieIds: Set<Int> = emptySet(),
 )
 
 val FavoritesUiState.selectedItemCount: Int

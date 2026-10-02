@@ -35,7 +35,9 @@ import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
 internal fun TmdbAccountMovieCard(
     movie: MovieDataModel,
     listType: TmdbLibraryList,
+    isUpdating: Boolean,
     onClick: () -> Unit,
+    onActionClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -65,16 +67,20 @@ internal fun TmdbAccountMovieCard(
                 when (listType) {
                     TmdbLibraryList.Watchlist -> LibraryOverlayIconBadge(
                         imageVector = Icons.Filled.Bookmark,
-                        contentDescription = "Saved to TMDB watchlist",
-                        containerColor = ReelsTeal.copy(alpha = 0.92f),
-                        contentColor = MaterialTheme.colorScheme.background
+                        contentDescription = "Remove from TMDB watchlist",
+                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.94f),
+                        contentColor = ReelsTeal,
+                        isLoading = isUpdating,
+                        onClick = onActionClick
                     )
 
                     TmdbLibraryList.Rated -> LibraryOverlayIconBadge(
                         imageVector = Icons.Filled.Close,
-                        contentDescription = "Rated on TMDB",
-                        containerColor = reelsRatingContainerColor().copy(alpha = 0.92f),
-                        contentColor = reelsRatingContentColor()
+                        contentDescription = "Remove TMDB rating",
+                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.94f),
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                        isLoading = isUpdating,
+                        onClick = onActionClick
                     )
                 }
             },

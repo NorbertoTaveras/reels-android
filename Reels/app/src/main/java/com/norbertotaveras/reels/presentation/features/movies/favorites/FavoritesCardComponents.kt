@@ -52,7 +52,6 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
-import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContentColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
 
 @Composable
@@ -97,7 +96,7 @@ internal fun UserRatingBadge(
         modifier = modifier,
         shape = MaterialTheme.shapes.extraLarge,
         color = reelsRatingContainerColor().copy(alpha = 0.92f),
-        contentColor = reelsImageRatingContentColor()
+        contentColor = MaterialTheme.colorScheme.onPrimary
     ) {
         Row(
             modifier = Modifier.padding(
@@ -132,20 +131,38 @@ internal fun LibraryOverlayIconBadge(
     contentDescription: String,
     containerColor: Color,
     contentColor: Color,
+    isLoading: Boolean,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = modifier.size(ReelsDimensions.favoritesHeartButtonSize),
-        shape = MaterialTheme.shapes.medium,
+        modifier = modifier
+            .size(ReelsDimensions.favoritesHeartButtonSize)
+            .clickable(
+                enabled = !isLoading,
+                role = Role.Button,
+                onClickLabel = contentDescription,
+                onClick = onClick
+            ),
+        shape = RoundedCornerShape(50),
         color = containerColor,
-        contentColor = contentColor
+        contentColor = contentColor,
+        shadowElevation = 1.dp
     ) {
         Box(contentAlignment = Alignment.Center) {
-            Icon(
-                imageVector = imageVector,
-                contentDescription = contentDescription,
-                modifier = Modifier.size(ReelsDimensions.favoritesHeartIconSize)
-            )
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(ReelsDimensions.favoritesHeartIconSize),
+                    color = contentColor,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Icon(
+                    imageVector = imageVector,
+                    contentDescription = null,
+                    modifier = Modifier.size(ReelsDimensions.favoritesHeartIconSize)
+                )
+            }
         }
     }
 }

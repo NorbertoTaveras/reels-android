@@ -139,6 +139,9 @@ internal fun FavoritesContent(
                         onMovieClick = { movieId ->
                             onEvent(FavoritesEvent.MovieClicked(movieId = movieId))
                         },
+                        onMovieActionClick = { movieId ->
+                            onEvent(FavoritesEvent.WatchlistMovieRemoved(movieId = movieId))
+                        },
                         onRefresh = tmdbWatchlistMovies::refresh
                     )
                 }
@@ -153,6 +156,9 @@ internal fun FavoritesContent(
                         },
                         onMovieClick = { movieId ->
                             onEvent(FavoritesEvent.MovieClicked(movieId = movieId))
+                        },
+                        onMovieActionClick = { movieId ->
+                            onEvent(FavoritesEvent.RatedMovieRemoved(movieId = movieId))
                         },
                         onRefresh = tmdbRatedMovies::refresh
                     )
@@ -206,6 +212,7 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
     listType: TmdbLibraryList,
     onConnectSettingsClick: () -> Unit,
     onMovieClick: (Int) -> Unit,
+    onMovieActionClick: (Int) -> Unit,
     onRefresh: () -> Unit,
 ) {
     when {
@@ -264,8 +271,12 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
                     TmdbAccountMovieCard(
                         movie = movie,
                         listType = listType,
+                        isUpdating = state.updatingTmdbMovieIds.contains(movie.id),
                         onClick = {
                             onMovieClick(movie.id)
+                        },
+                        onActionClick = {
+                            onMovieActionClick(movie.id)
                         }
                     )
                 }

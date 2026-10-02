@@ -13,8 +13,10 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
+import com.norbertotaveras.reels.domain.usecase.account.DeleteTmdbMovieRatingUseCase
 import com.norbertotaveras.reels.domain.usecase.account.GetTmdbLibraryMoviesUseCase
 import com.norbertotaveras.reels.domain.usecase.account.ObserveTmdbAccountUseCase
+import com.norbertotaveras.reels.domain.usecase.account.UpdateTmdbWatchlistUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveLibraryContentUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.RemoveFavoriteMovieUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.RemoveSavedPersonUseCase
@@ -47,6 +49,8 @@ class FavoritesViewModel @Inject constructor(
     private val observeTmdbAccountUseCase: ObserveTmdbAccountUseCase,
     private val getTmdbLibraryMoviesUseCase: GetTmdbLibraryMoviesUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
+    private val updateTmdbWatchlistUseCase: UpdateTmdbWatchlistUseCase,
+    private val deleteTmdbMovieRatingUseCase: DeleteTmdbMovieRatingUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(FavoritesUiState())
     val state: StateFlow<FavoritesUiState> = _state.asStateFlow()
@@ -96,6 +100,10 @@ class FavoritesViewModel @Inject constructor(
             is FavoritesEvent.PersonClicked -> onPersonClicked(personId = event.personId)
             is FavoritesEvent.FavoriteClicked -> onFavoriteClicked(movieId = event.movieId)
             is FavoritesEvent.SavedPersonClicked -> onSavedPersonClicked(personId = event.personId)
+            is FavoritesEvent.WatchlistMovieRemoved -> removeFromTmdbWatchlist(
+                movieId = event.movieId
+            )
+            is FavoritesEvent.RatedMovieRemoved -> removeTmdbRating(movieId = event.movieId)
             FavoritesEvent.ConnectSettingsClicked -> onConnectSettingsClicked()
         }
     }
@@ -219,6 +227,62 @@ class FavoritesViewModel @Inject constructor(
                 _state.update { currentState ->
                     currentState.copy(
                         removingPersonIds = currentState.removingPersonIds - personId
+                    )
+                }
+            }
+        }
+    }
+
+    private fun removeFromTmdbWatchlist(movieId: Int) {
+        updateTmdbMovie(
+            movieId = movieId,
+            successMessage = "Removed from TMDB watchlist.",
+            failureMessage = "Unable to update TMDB watchlist."
+        ) {
+            updateTmdbWatchlistUseCase(movieId = movieId, watchlist = false)
+        }
+    }
+
+    private fun removeTmdbRating(movieId: Int) {
+        updateTmdbMovie(
+            movieId = movieId,
+            successMessage = "Removed TMDB rating.",
+            failureMessage = "Unable to remove TMDB rating."
+        ) {
+            deleteTmdbMovieRatingUseCase(movieId = movieId)
+        }
+    }
+
+    private fun updateTmdbMovie(
+        movieId: Int,
+        successMessage: String,
+        failureMessage: String,
+        update: suspend () -> Result<*>,
+    ) {
+        viewModelScope.launch {
+            if (_state.value.updatingTmdbMovieIds.contains(movieId)) return@launch
+
+            _state.update { currentState ->
+                currentState.copy(
+                    updatingTmdbMovieIds = currentState.updatingTmdbMovieIds + movieId
+                )
+            }
+
+            try {
+                update().onSuccess {
+                    refreshTmdbLists()
+                    _effect.emit(FavoritesEffect.ShowMessage(message = successMessage))
+                }.onFailure { error ->
+                    _effect.emit(
+                        FavoritesEffect.ShowMessage(
+                            message = error.toUserMessage(fallback = failureMessage)
+                        )
+                    )
+                }
+            } finally {
+                _state.update { currentState ->
+                    currentState.copy(
+                        updatingTmdbMovieIds = currentState.updatingTmdbMovieIds - movieId
                     )
                 }
             }

@@ -11,21 +11,19 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -34,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
@@ -41,24 +40,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
-import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieRatingSheet(
-    selectedRating: Double,
+    movieTitle: String,
+    selectedRating: Double?,
     isLoading: Boolean,
     onRatingSelected: (Double) -> Unit,
     onSubmitClick: () -> Unit,
-    onDeleteClick: (() -> Unit)?,
+    onClearClick: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     ModalBottomSheet(
         modifier = modifier,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        shape = RoundedCornerShape(
+            topStart = ReelsDimensions.ratingSheetCornerSize,
+            topEnd = ReelsDimensions.ratingSheetCornerSize
+        ),
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface,
         onDismissRequest = onDismiss
@@ -67,24 +71,57 @@ fun MovieRatingSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = ReelsSpacing.screenHorizontal)
-                .padding(bottom = 28.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp)
+                .padding(bottom = ReelsDimensions.ratingSheetBottomPadding),
+            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.ratingSheetSectionSpacing)
         ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(6.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Rate this movie",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold
-                )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Text(
+                        text = "Rate this movie",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontSize = 17.sp,
+                            lineHeight = 21.sp
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
 
-                Text(
-                    text = "Choose a TMDB rating from 1 to 10.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                    Text(
+                        text = movieTitle,
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp
+                        ),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                if (selectedRating != null) {
+                    TextButton(
+                        enabled = !isLoading,
+                        onClick = onClearClick
+                    ) {
+                        Text(
+                            text = "Clear",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outlineVariant
+            )
+
+            selectedRating?.let { rating ->
+                SelectedRatingSummary(rating = rating)
             }
 
             RatingChoiceGrid(
@@ -93,66 +130,112 @@ fun MovieRatingSheet(
                 onRatingSelected = onRatingSelected
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
-                verticalAlignment = Alignment.CenterVertically
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(ReelsDimensions.ratingSheetSubmitButtonHeight),
+                enabled = selectedRating != null && !isLoading,
+                onClick = onSubmitClick,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = Color.White
+                )
             ) {
-                if (onDeleteClick != null) {
-                    TextButton(
-                        enabled = !isLoading,
-                        onClick = onDeleteClick
-                    ) {
-                        Text(text = "Remove")
-                    }
-                }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Button(
-                    enabled = !isLoading,
-                    onClick = onSubmitClick,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(ReelsDimensions.ratingSheetProgressSize),
+                        strokeWidth = 2.dp,
+                        color = Color.White
                     )
-                ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    } else {
-                        Text(text = "Submit ${selectedRating.toRatingText()}/10")
-                    }
+                } else {
+                    Text(
+                        text = selectedRating?.let { rating ->
+                            "Submit ${rating.toRatingText()}/10 rating"
+                        } ?: "Tap a number to rate",
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun SelectedRatingSummary(
+    rating: Double,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Star,
+            contentDescription = null,
+            modifier = Modifier.size(ReelsDimensions.ratingSheetSummaryIconSize),
+            tint = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = rating.toRatingText(),
+            modifier = Modifier.padding(start = ReelsSpacing.xSmall),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = " / 10",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
 @Composable
 private fun RatingChoiceGrid(
-    selectedRating: Double,
+    selectedRating: Double?,
     enabled: Boolean,
     onRatingSelected: (Double) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    FlowRow(
+    Column(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
-        maxItemsInEachRow = 5
+        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
     ) {
-        (1..10).forEach { rating ->
-            val selected = rating.toDouble() == selectedRating
+        RatingChoiceRow(
+            ratings = 1..5,
+            selectedRating = selectedRating,
+            enabled = enabled,
+            onRatingSelected = onRatingSelected
+        )
+        RatingChoiceRow(
+            ratings = 6..10,
+            selectedRating = selectedRating,
+            enabled = enabled,
+            onRatingSelected = onRatingSelected
+        )
+    }
+}
+
+@Composable
+private fun RatingChoiceRow(
+    ratings: IntRange,
+    selectedRating: Double?,
+    enabled: Boolean,
+    onRatingSelected: (Double) -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
+    ) {
+        ratings.forEach { rating ->
             RatingChoice(
                 rating = rating,
-                selected = selected,
+                selectedRating = selectedRating,
+                selected = rating.toDouble() == selectedRating,
                 enabled = enabled,
-                onClick = { onRatingSelected(rating.toDouble()) }
+                onClick = { onRatingSelected(rating.toDouble()) },
+                modifier = Modifier.weight(1f)
             )
         }
     }
@@ -161,6 +244,7 @@ private fun RatingChoiceGrid(
 @Composable
 private fun RatingChoice(
     rating: Int,
+    selectedRating: Double?,
     selected: Boolean,
     enabled: Boolean,
     onClick: () -> Unit,
@@ -168,43 +252,37 @@ private fun RatingChoice(
 ) {
     Surface(
         modifier = modifier
-            .height(46.dp)
+            .height(ReelsDimensions.ratingSheetChoiceHeight)
             .clickable(
                 enabled = enabled,
                 role = Role.Button,
                 onClick = onClick
             ),
-        shape = CircleShape,
-        color = if (selected) {
-            reelsRatingContainerColor()
-        } else {
-            MaterialTheme.colorScheme.surfaceVariant
-        },
-        contentColor = if (selected) {
-            reelsRatingContentColor()
-        } else {
-            MaterialTheme.colorScheme.onSurfaceVariant
-        },
+        shape = RoundedCornerShape(ReelsDimensions.ratingSheetChoiceCornerSize),
+        color = ratingChoiceContainerColor(
+            rating = rating,
+            selectedRating = selectedRating,
+            selected = selected
+        ),
+        contentColor = ratingChoiceContentColor(
+            rating = rating,
+            selectedRating = selectedRating,
+            selected = selected
+        ),
         border = BorderStroke(
             width = 1.dp,
-            color = if (selected) {
-                MaterialTheme.colorScheme.primary.copy(alpha = 0.28f)
-            } else {
-                MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)
-            }
+            color = ratingChoiceBorderColor(
+                rating = rating,
+                selectedRating = selectedRating,
+                selected = selected
+            )
         )
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 15.dp),
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Icon(
-                imageVector = Icons.Filled.Star,
-                contentDescription = null,
-                modifier = Modifier.size(16.dp)
-            )
-
             Text(
                 text = rating.toString(),
                 style = MaterialTheme.typography.titleSmall.copy(
@@ -216,4 +294,41 @@ private fun RatingChoice(
             )
         }
     }
+}
+
+@Composable
+private fun ratingChoiceContainerColor(
+    rating: Int,
+    selectedRating: Double?,
+    selected: Boolean,
+) = when {
+    selected -> MaterialTheme.colorScheme.primary
+    selectedRating != null && rating.toDouble() < selectedRating -> {
+        reelsRatingContainerColor()
+    }
+    else -> MaterialTheme.colorScheme.surfaceVariant
+}
+
+@Composable
+private fun ratingChoiceContentColor(
+    rating: Int,
+    selectedRating: Double?,
+    selected: Boolean,
+) = when {
+    selected -> Color.White
+    selectedRating != null && rating.toDouble() < selectedRating -> MaterialTheme.colorScheme.primary
+    else -> MaterialTheme.colorScheme.onSurfaceVariant
+}
+
+@Composable
+private fun ratingChoiceBorderColor(
+    rating: Int,
+    selectedRating: Double?,
+    selected: Boolean,
+) = when {
+    selected -> MaterialTheme.colorScheme.primary
+    selectedRating != null && rating.toDouble() < selectedRating -> {
+        MaterialTheme.colorScheme.primary.copy(alpha = 0.38f)
+    }
+    else -> MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)
 }

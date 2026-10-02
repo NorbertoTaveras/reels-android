@@ -83,7 +83,7 @@ class MovieDetailsViewModel @Inject constructor(
             is MovieDetailsEvent.RatingSelected -> onRatingSelected(rating = event.rating)
             MovieDetailsEvent.RatingSheetDismissed -> onRatingSheetDismissed()
             MovieDetailsEvent.RatingSubmitted -> onRatingSubmitted()
-            MovieDetailsEvent.DeleteRatingClicked -> onDeleteRatingClicked()
+            MovieDetailsEvent.RatingCleared -> onRatingCleared()
             is MovieDetailsEvent.CastClicked -> onCastClicked(personId = event.personId)
             is MovieDetailsEvent.CastSaveClicked -> onCastSaveClicked(personId = event.personId)
             MovieDetailsEvent.CastSeeAllClicked -> onCastSeeAllClicked()
@@ -308,7 +308,7 @@ class MovieDetailsViewModel @Inject constructor(
 
             _state.update { currentState ->
                 currentState.copy(
-                    selectedTmdbRating = currentState.tmdbRating ?: DEFAULT_TMDB_RATING,
+                    selectedTmdbRating = currentState.tmdbRating,
                     isRatingSheetVisible = true
                 )
             }
@@ -342,7 +342,7 @@ class MovieDetailsViewModel @Inject constructor(
                 return@launch
             }
 
-            val rating = state.value.selectedTmdbRating
+            val rating = state.value.selectedTmdbRating ?: return@launch
             _state.update { currentState ->
                 currentState.copy(isAccountActionLoading = true)
             }
@@ -380,7 +380,14 @@ class MovieDetailsViewModel @Inject constructor(
         }
     }
 
-    private fun onDeleteRatingClicked() {
+    private fun onRatingCleared() {
+        if (state.value.tmdbRating == null) {
+            _state.update { currentState ->
+                currentState.copy(selectedTmdbRating = null)
+            }
+            return
+        }
+
         viewModelScope.launch {
             if (state.value.isAccountActionLoading) return@launch
             if (!state.value.isTmdbAccountConnected) {
@@ -400,6 +407,7 @@ class MovieDetailsViewModel @Inject constructor(
                 onSuccess = { accountState ->
                     _state.update { currentState ->
                         currentState.withTmdbAccountState(accountState = accountState).copy(
+                            selectedTmdbRating = null,
                             isAccountActionLoading = false
                         )
                     }

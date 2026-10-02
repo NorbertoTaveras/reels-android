@@ -69,9 +69,6 @@ fun MovieDetailsScreen(
                 onRatingClick = {
                     onEvent(MovieDetailsEvent.RatingClicked)
                 },
-                onDeleteRatingClick = {
-                    onEvent(MovieDetailsEvent.DeleteRatingClicked)
-                },
                 onCastClick = { personId ->
                     onEvent(MovieDetailsEvent.CastClicked(personId = personId))
                 },
