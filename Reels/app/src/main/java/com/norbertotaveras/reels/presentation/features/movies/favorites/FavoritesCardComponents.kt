@@ -46,13 +46,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsAccent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
-import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
-import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
 
 @Composable
 internal fun PersonProfileImage(
@@ -95,8 +95,8 @@ internal fun UserRatingBadge(
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.extraLarge,
-        color = reelsRatingContainerColor().copy(alpha = 0.92f),
-        contentColor = MaterialTheme.colorScheme.onPrimary
+        color = ReelsAccent.copy(alpha = 0.96f),
+        contentColor = Color.White
     ) {
         Row(
             modifier = Modifier.padding(

@@ -22,10 +22,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.DownloadDone
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Button
@@ -43,7 +43,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.norbertotaveras.reels.R
-import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTmdbBlue
@@ -51,7 +50,6 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsTmdbOnBlue
 
 @Composable
 internal fun LibraryErrorState(
-    listType: TmdbLibraryList,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -70,7 +68,7 @@ internal fun LibraryErrorState(
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
-                    imageVector = Icons.Filled.Sync,
+                    imageVector = Icons.Filled.ErrorOutline,
                     contentDescription = null,
                     modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconSize)
                 )
@@ -85,14 +83,7 @@ internal fun LibraryErrorState(
         )
 
         Text(
-            text = when (listType) {
-                TmdbLibraryList.Watchlist -> {
-                    "Unable to load your watchlist. Check your connection and try again."
-                }
-                TmdbLibraryList.Rated -> {
-                    "Unable to load your ratings. Check your connection and try again."
-                }
-            },
+            text = "Unable to load your library. Check your connection and try again.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center

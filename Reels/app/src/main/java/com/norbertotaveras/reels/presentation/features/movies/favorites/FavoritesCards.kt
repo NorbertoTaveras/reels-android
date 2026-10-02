@@ -28,8 +28,6 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
-import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
-import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
 
 @Composable
 internal fun TmdbAccountMovieCard(
@@ -104,7 +102,14 @@ internal fun TmdbAccountMovieCard(
             )
 
             Text(
-                text = movie.releaseDate.toReleaseYear().orEmpty(),
+                text = movie.releaseDate.toReleaseYear()
+                    ?.let { releaseYear ->
+                        when (listType) {
+                            TmdbLibraryList.Watchlist -> releaseYear
+                            TmdbLibraryList.Rated -> "$releaseYear · Rated on TMDB"
+                        }
+                    }
+                    .orEmpty(),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,

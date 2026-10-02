@@ -77,6 +77,8 @@ internal fun FavoritesContent(
         item(span = { GridItemSpan(maxLineSpan) }) {
             LibraryHeader(
                 state = state,
+                watchlistCount = tmdbWatchlistMovies.itemCount,
+                ratedCount = tmdbRatedMovies.itemCount,
                 onTabSelected = { tab ->
                     onEvent(FavoritesEvent.TabSelected(tab = tab))
                 }
@@ -170,6 +172,8 @@ internal fun FavoritesContent(
 @Composable
 private fun LibraryHeader(
     state: FavoritesUiState,
+    watchlistCount: Int,
+    ratedCount: Int,
     onTabSelected: (LibraryTab) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -201,6 +205,12 @@ private fun LibraryHeader(
                 .fillMaxWidth()
                 .padding(top = ReelsSpacing.medium),
             selectedTab = state.selectedTab,
+            tabCounts = mapOf(
+                LibraryTab.Movies to state.movies.size,
+                LibraryTab.People to state.people.size,
+                LibraryTab.Tmdb to watchlistCount,
+                LibraryTab.Rated to ratedCount
+            ),
             onTabSelected = onTabSelected
         )
     }
@@ -225,7 +235,7 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
             }
         }
 
-        movies.loadState.refresh is LoadState.Loading -> {
+        movies.loadState.refresh is LoadState.Loading && movies.itemCount == 0 -> {
             repeat(LIBRARY_LOADING_PLACEHOLDER_COUNT) { index ->
                 item(key = "${listType.name}-loading-$index") {
                     LibraryPosterPlaceholder()
@@ -233,10 +243,9 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
             }
         }
 
-        movies.loadState.refresh is LoadState.Error -> {
+        movies.loadState.refresh is LoadState.Error && movies.itemCount == 0 -> {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 LibraryErrorState(
-                    listType = listType,
                     onRetry = onRefresh,
                     modifier = Modifier.padding(top = ReelsDimensions.favoritesEmptyTopPadding)
                 )
@@ -256,6 +265,7 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
             item(span = { GridItemSpan(maxLineSpan) }) {
                 LibrarySyncStatus(
                     listType = listType,
+                    isUsingCachedContent = movies.loadState.refresh is LoadState.Error,
                     onRefresh = onRefresh
                 )
             }
@@ -306,6 +316,7 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
 @Composable
 private fun LibraryTabs(
     selectedTab: LibraryTab,
+    tabCounts: Map<LibraryTab, Int>,
     onTabSelected: (LibraryTab) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -337,7 +348,7 @@ private fun LibraryTabs(
                 unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 text = {
                     Text(
-                        text = tab.title,
+                        text = "${tab.title} ${tabCounts[tab] ?: 0}",
                         style = MaterialTheme.typography.labelMedium.copy(
                             fontSize = 12.sp,
                             lineHeight = 16.sp
@@ -358,6 +369,7 @@ private fun LibraryTabs(
 @Composable
 private fun LibrarySyncStatus(
     listType: TmdbLibraryList,
+    isUsingCachedContent: Boolean,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -389,9 +401,15 @@ private fun LibrarySyncStatus(
                 )
 
                 Text(
-                    text = when (listType) {
-                        TmdbLibraryList.Watchlist -> "Synced via TMDB"
-                        TmdbLibraryList.Rated -> "Your TMDB ratings"
+                    text = when {
+                        isUsingCachedContent && listType == TmdbLibraryList.Rated -> {
+                            "Cached ratings · Last synced earlier"
+                        }
+                        isUsingCachedContent -> "Cached watchlist · Last synced earlier"
+                        listType == TmdbLibraryList.Rated -> {
+                            "Your TMDB ratings · Synced just now"
+                        }
+                        else -> "TMDB watchlist · Synced just now"
                     },
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
