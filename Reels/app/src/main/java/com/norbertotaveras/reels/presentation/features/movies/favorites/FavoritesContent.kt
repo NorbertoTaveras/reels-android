@@ -98,8 +98,6 @@ internal fun FavoritesContent(
         item(span = { GridItemSpan(maxLineSpan) }) {
             LibraryHeader(
                 state = state,
-                watchlistCount = tmdbWatchlistMovies.itemCount,
-                ratedCount = tmdbRatedMovies.itemCount,
                 isOffline = isUsingCachedTmdbContent,
                 onTabSelected = { tab ->
                     onEvent(FavoritesEvent.TabSelected(tab = tab))
@@ -202,8 +200,6 @@ internal fun FavoritesContent(
 @Composable
 private fun LibraryHeader(
     state: FavoritesUiState,
-    watchlistCount: Int,
-    ratedCount: Int,
     isOffline: Boolean,
     onTabSelected: (LibraryTab) -> Unit,
     modifier: Modifier = Modifier,
@@ -244,12 +240,6 @@ private fun LibraryHeader(
                 .fillMaxWidth()
                 .padding(top = ReelsSpacing.medium),
             selectedTab = state.selectedTab,
-            tabCounts = mapOf(
-                LibraryTab.Movies to state.movies.size,
-                LibraryTab.People to state.people.size,
-                LibraryTab.Tmdb to watchlistCount,
-                LibraryTab.Rated to ratedCount
-            ),
             onTabSelected = onTabSelected
         )
     }
@@ -370,7 +360,6 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
 @Composable
 private fun LibraryTabs(
     selectedTab: LibraryTab,
-    tabCounts: Map<LibraryTab, Int>,
     onTabSelected: (LibraryTab) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -402,7 +391,7 @@ private fun LibraryTabs(
                 unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 text = {
                     Text(
-                        text = "${tab.title} ${tabCounts[tab] ?: 0}",
+                        text = tab.title,
                         style = MaterialTheme.typography.labelMedium.copy(
                             fontSize = 12.sp,
                             lineHeight = 16.sp
