@@ -9,6 +9,7 @@ package com.norbertotaveras.reels.data.remote.account
 
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbAccountDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbCreateSessionRequestDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbDeleteSessionRequestDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbMovieAccountStateDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbRatingRequestDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbRequestTokenDto
@@ -27,6 +28,12 @@ class TmdbAccountRemoteDataSourceImpl @Inject constructor(
     override suspend fun createSession(requestToken: String): TmdbSessionDto {
         return service.createSession(
             request = TmdbCreateSessionRequestDto(requestToken = requestToken)
+        )
+    }
+
+    override suspend fun deleteSession(sessionId: String) {
+        service.deleteSession(
+            request = TmdbDeleteSessionRequestDto(sessionId = sessionId)
         )
     }
 

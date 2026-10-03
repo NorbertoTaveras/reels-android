@@ -65,6 +65,7 @@ class MovieDetailsViewModel @Inject constructor(
     )
     private var currentLanguage: String = LanguageRegion.Default.languageCode
     private var loadMovieJob: Job? = null
+    private var activeTmdbAccountId: Int? = null
 
     init {
         observeFavoriteState()
@@ -151,19 +152,31 @@ class MovieDetailsViewModel @Inject constructor(
     private fun observeTmdbAccountState() {
         viewModelScope.launch {
             observeTmdbAccountUseCase().collectLatest { accountState ->
+                val accountId = accountState.account?.accountId
+                val accountChanged = accountId != activeTmdbAccountId
+                activeTmdbAccountId = accountId
                 _state.update { currentState ->
                     currentState.copy(
                         isTmdbAccountConnected = accountState.isConnected,
-                        isWatchlisted = if (accountState.isConnected) {
+                        isWatchlisted = if (accountState.isConnected && !accountChanged) {
                             currentState.isWatchlisted
                         } else {
                             false
                         },
-                        tmdbRating = if (accountState.isConnected) {
+                        tmdbRating = if (accountState.isConnected && !accountChanged) {
                             currentState.tmdbRating
                         } else {
                             null
-                        }
+                        },
+                        selectedTmdbRating = if (accountState.isConnected && !accountChanged) {
+                            currentState.selectedTmdbRating
+                        } else {
+                            null
+                        },
+                        isRatingSheetVisible = currentState.isRatingSheetVisible &&
+                            accountState.isConnected &&
+                            !accountChanged,
+                        isAccountActionLoading = false
                     )
                 }
 

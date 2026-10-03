@@ -18,6 +18,8 @@ interface TmdbAccountRemoteDataSource {
 
     suspend fun createSession(requestToken: String): TmdbSessionDto
 
+    suspend fun deleteSession(sessionId: String)
+
     suspend fun getAccountDetails(sessionId: String): TmdbAccountDto
 
     suspend fun getMovieAccountState(

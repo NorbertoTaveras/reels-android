@@ -45,6 +45,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -127,7 +128,18 @@ class TmdbAccountRepositoryImpl @Inject constructor(
 
     override suspend fun disconnect(): Result<Unit> {
         return accountResult {
-            accountDataStore.clearAccount()
+            val sessionId = accountDataStore.accountState.first().sessionId
+            try {
+                if (!sessionId.isNullOrBlank()) {
+                    remoteDataSource.deleteSession(sessionId = sessionId)
+                }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                // Local disconnect must remain available when TMDB cannot be reached.
+            } finally {
+                accountDataStore.clearAccount()
+            }
         }
     }
 

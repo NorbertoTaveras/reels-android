@@ -9,6 +9,7 @@ package com.norbertotaveras.reels.data.remote.account
 
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbAccountDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbCreateSessionRequestDto
+import com.norbertotaveras.reels.data.remote.dto.account.TmdbDeleteSessionRequestDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbMovieAccountStateDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbMutationResponseDto
 import com.norbertotaveras.reels.data.remote.dto.account.TmdbRatingRequestDto
@@ -31,6 +32,11 @@ interface TmdbAccountService {
     suspend fun createSession(
         @Body request: TmdbCreateSessionRequestDto,
     ): TmdbSessionDto
+
+    @DELETE("authentication/session")
+    suspend fun deleteSession(
+        @Body request: TmdbDeleteSessionRequestDto,
+    ): TmdbMutationResponseDto
 
     @GET("account")
     suspend fun getAccountDetails(
