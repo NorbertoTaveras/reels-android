@@ -8,7 +8,6 @@
 package com.norbertotaveras.reels.presentation.features.movies.favorites
 
 sealed interface FavoritesEvent {
-    data object ScreenResumed : FavoritesEvent
     data class TabSelected(val tab: LibraryTab) : FavoritesEvent
     data class MovieClicked(val movieId: Int) : FavoritesEvent
     data class PersonClicked(val personId: Int) : FavoritesEvent

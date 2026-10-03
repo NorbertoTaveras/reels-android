@@ -97,7 +97,6 @@ class FavoritesViewModel @Inject constructor(
 
     fun onEvent(event: FavoritesEvent) {
         when (event) {
-            FavoritesEvent.ScreenResumed -> onScreenResumed()
             is FavoritesEvent.TabSelected -> onTabSelected(tab = event.tab)
             is FavoritesEvent.MovieClicked -> onMovieClicked(movieId = event.movieId)
             is FavoritesEvent.PersonClicked -> onPersonClicked(personId = event.personId)
@@ -161,10 +160,6 @@ class FavoritesViewModel @Inject constructor(
         if (tab == LibraryTab.Tmdb || tab == LibraryTab.Rated) {
             refreshTmdbLists()
         }
-    }
-
-    private fun onScreenResumed() {
-        refreshTmdbLists()
     }
 
     private fun refreshTmdbLists() {

@@ -17,13 +17,10 @@ class UpdateTmdbWatchlistUseCase @Inject constructor(
     suspend operator fun invoke(
         movieId: Int,
         watchlist: Boolean,
-    ): Result<TmdbMovieAccountStateDataModel?> {
+    ): Result<TmdbMovieAccountStateDataModel> {
         return repository.updateMovieWatchlist(
             movieId = movieId,
             watchlist = watchlist
-        ).fold(
-            onSuccess = { repository.getMovieAccountState(movieId = movieId) },
-            onFailure = { error -> Result.failure(error) }
         )
     }
 }

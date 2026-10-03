@@ -39,15 +39,25 @@ fun FavoritesRoute(
     val snackbarHostState = remember { SnackbarHostState() }
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    DisposableEffect(lifecycleOwner, viewModel) {
+    DisposableEffect(
+        lifecycleOwner,
+        tmdbWatchlistMovies,
+        tmdbRatedMovies
+    ) {
+        fun refreshTmdbLibrary() {
+            tmdbWatchlistMovies.refresh()
+            tmdbRatedMovies.refresh()
+        }
+
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                viewModel.onEvent(FavoritesEvent.ScreenResumed)
-                tmdbWatchlistMovies.refresh()
-                tmdbRatedMovies.refresh()
+                refreshTmdbLibrary()
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
+        if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            refreshTmdbLibrary()
+        }
 
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)

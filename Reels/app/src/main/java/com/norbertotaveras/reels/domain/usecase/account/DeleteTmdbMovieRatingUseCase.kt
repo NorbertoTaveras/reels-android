@@ -16,10 +16,7 @@ class DeleteTmdbMovieRatingUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         movieId: Int,
-    ): Result<TmdbMovieAccountStateDataModel?> {
-        return repository.deleteMovieRating(movieId = movieId).fold(
-            onSuccess = { repository.getMovieAccountState(movieId = movieId) },
-            onFailure = { error -> Result.failure(error) }
-        )
+    ): Result<TmdbMovieAccountStateDataModel> {
+        return repository.deleteMovieRating(movieId = movieId)
     }
 }

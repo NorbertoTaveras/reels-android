@@ -191,7 +191,7 @@ class TmdbAccountRepositoryImpl @Inject constructor(
     override suspend fun updateMovieWatchlist(
         movieId: Int,
         watchlist: Boolean
-    ): Result<Unit> {
+    ): Result<TmdbMovieAccountStateDataModel> {
         return accountResult(clearAccountOnExpiredSession = true) {
             val accountState = requireConnectedAccountState()
             remoteDataSource.updateWatchlist(
@@ -211,10 +211,8 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                     isWatchlisted = false,
                     rating = null
                 )
-            cacheMovieAccountState(
-                accountId = accountId,
-                state = cached.copy(isWatchlisted = watchlist)
-            )
+            val updatedState = cached.copy(isWatchlisted = watchlist)
+            cacheMovieAccountState(accountId = accountId, state = updatedState)
             updateMovieActivity(
                 accountId = accountId,
                 movieId = movieId,
@@ -222,13 +220,14 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                 isActive = watchlist
             )
             cachedMovieDao.invalidateAccountLists(accountId = accountId)
+            updatedState
         }
     }
 
     override suspend fun rateMovie(
         movieId: Int,
         rating: Double
-    ): Result<Unit> {
+    ): Result<TmdbMovieAccountStateDataModel> {
         return accountResult(clearAccountOnExpiredSession = true) {
             val accountState = requireConnectedAccountState()
             val sessionId = accountState.sessionId
@@ -247,7 +246,8 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                     isWatchlisted = false,
                     rating = null
                 )
-            cacheMovieAccountState(accountId = accountId, state = cached.copy(rating = rating))
+            val updatedState = cached.copy(rating = rating)
+            cacheMovieAccountState(accountId = accountId, state = updatedState)
             updateMovieActivity(
                 accountId = accountId,
                 movieId = movieId,
@@ -255,10 +255,13 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                 isActive = true
             )
             cachedMovieDao.invalidateAccountLists(accountId = accountId)
+            updatedState
         }
     }
 
-    override suspend fun deleteMovieRating(movieId: Int): Result<Unit> {
+    override suspend fun deleteMovieRating(
+        movieId: Int
+    ): Result<TmdbMovieAccountStateDataModel> {
         return accountResult(clearAccountOnExpiredSession = true) {
             val accountState = requireConnectedAccountState()
             val sessionId = accountState.sessionId
@@ -276,7 +279,8 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                     isWatchlisted = false,
                     rating = null
                 )
-            cacheMovieAccountState(accountId = accountId, state = cached.copy(rating = null))
+            val updatedState = cached.copy(rating = null)
+            cacheMovieAccountState(accountId = accountId, state = updatedState)
             updateMovieActivity(
                 accountId = accountId,
                 movieId = movieId,
@@ -284,6 +288,7 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                 isActive = false
             )
             cachedMovieDao.invalidateAccountLists(accountId = accountId)
+            updatedState
         }
     }
 

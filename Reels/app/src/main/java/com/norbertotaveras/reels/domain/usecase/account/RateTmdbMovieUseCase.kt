@@ -17,13 +17,10 @@ class RateTmdbMovieUseCase @Inject constructor(
     suspend operator fun invoke(
         movieId: Int,
         rating: Double,
-    ): Result<TmdbMovieAccountStateDataModel?> {
+    ): Result<TmdbMovieAccountStateDataModel> {
         return repository.rateMovie(
             movieId = movieId,
             rating = rating
-        ).fold(
-            onSuccess = { repository.getMovieAccountState(movieId = movieId) },
-            onFailure = { error -> Result.failure(error) }
         )
     }
 }

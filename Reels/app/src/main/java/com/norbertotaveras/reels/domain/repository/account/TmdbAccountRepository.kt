@@ -38,12 +38,12 @@ interface TmdbAccountRepository {
     suspend fun updateMovieWatchlist(
         movieId: Int,
         watchlist: Boolean
-    ): Result<Unit>
+    ): Result<TmdbMovieAccountStateDataModel>
 
     suspend fun rateMovie(
         movieId: Int,
         rating: Double
-    ): Result<Unit>
+    ): Result<TmdbMovieAccountStateDataModel>
 
-    suspend fun deleteMovieRating(movieId: Int): Result<Unit>
+    suspend fun deleteMovieRating(movieId: Int): Result<TmdbMovieAccountStateDataModel>
 }
