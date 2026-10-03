@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +38,11 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,6 +54,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
+import com.norbertotaveras.reels.presentation.ui.components.common.CachedContentBanner
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
@@ -60,6 +67,20 @@ internal fun FavoritesContent(
     onEvent: (FavoritesEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val isUsingCachedTmdbContent = when (state.selectedTab) {
+        LibraryTab.Tmdb -> tmdbWatchlistMovies.loadState.refresh is LoadState.Error &&
+            tmdbWatchlistMovies.itemCount > 0
+        LibraryTab.Rated -> tmdbRatedMovies.loadState.refresh is LoadState.Error &&
+            tmdbRatedMovies.itemCount > 0
+        else -> false
+    }
+    var dismissedCachedNoticeTab by rememberSaveable {
+        mutableStateOf<LibraryTab?>(null)
+    }
+    LaunchedEffect(isUsingCachedTmdbContent) {
+        if (!isUsingCachedTmdbContent) dismissedCachedNoticeTab = null
+    }
+
     LazyVerticalGrid(
         modifier = modifier
             .fillMaxSize()
@@ -79,6 +100,7 @@ internal fun FavoritesContent(
                 state = state,
                 watchlistCount = tmdbWatchlistMovies.itemCount,
                 ratedCount = tmdbRatedMovies.itemCount,
+                isOffline = isUsingCachedTmdbContent,
                 onTabSelected = { tab ->
                     onEvent(FavoritesEvent.TabSelected(tab = tab))
                 }
@@ -144,6 +166,10 @@ internal fun FavoritesContent(
                         onMovieActionClick = { movieId ->
                             onEvent(FavoritesEvent.WatchlistMovieRemoved(movieId = movieId))
                         },
+                        showCachedNotice = dismissedCachedNoticeTab != LibraryTab.Tmdb,
+                        onCachedNoticeDismiss = {
+                            dismissedCachedNoticeTab = LibraryTab.Tmdb
+                        },
                         onRefresh = tmdbWatchlistMovies::refresh
                     )
                 }
@@ -162,6 +188,10 @@ internal fun FavoritesContent(
                         onMovieActionClick = { movieId ->
                             onEvent(FavoritesEvent.RatedMovieRemoved(movieId = movieId))
                         },
+                        showCachedNotice = dismissedCachedNoticeTab != LibraryTab.Rated,
+                        onCachedNoticeDismiss = {
+                            dismissedCachedNoticeTab = LibraryTab.Rated
+                        },
                         onRefresh = tmdbRatedMovies::refresh
                     )
                 }
@@ -174,6 +204,7 @@ private fun LibraryHeader(
     state: FavoritesUiState,
     watchlistCount: Int,
     ratedCount: Int,
+    isOffline: Boolean,
     onTabSelected: (LibraryTab) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -181,15 +212,23 @@ private fun LibraryHeader(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesHeaderToBadgeSpacing)
     ) {
-        Text(
-            text = "Library",
-            style = MaterialTheme.typography.headlineSmall.copy(
-                fontSize = 24.sp,
-                lineHeight = 30.sp
-            ),
-            color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.Bold
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Library",
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontSize = 24.sp,
+                    lineHeight = 30.sp
+                ),
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Bold
+            )
+
+            if (isOffline) LibraryOfflineStatus()
+        }
 
         Text(
             text = state.librarySubtitle,
@@ -223,6 +262,8 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
     onConnectSettingsClick: () -> Unit,
     onMovieClick: (Int) -> Unit,
     onMovieActionClick: (Int) -> Unit,
+    showCachedNotice: Boolean,
+    onCachedNoticeDismiss: () -> Unit,
     onRefresh: () -> Unit,
 ) {
     when {
@@ -262,10 +303,22 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
         }
 
         else -> {
+            val isUsingCachedContent = movies.loadState.refresh is LoadState.Error
+            if (isUsingCachedContent && showCachedNotice) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    CachedContentBanner(
+                        message = when (listType) {
+                            TmdbLibraryList.Watchlist -> "Cached watchlist · Synced earlier"
+                            TmdbLibraryList.Rated -> "Cached ratings · Synced earlier"
+                        },
+                        onDismiss = onCachedNoticeDismiss
+                    )
+                }
+            }
+
             item(span = { GridItemSpan(maxLineSpan) }) {
                 LibrarySyncStatus(
                     listType = listType,
-                    isUsingCachedContent = movies.loadState.refresh is LoadState.Error,
                     onRefresh = onRefresh
                 )
             }
@@ -370,7 +423,6 @@ private fun LibraryTabs(
 @Composable
 private fun LibrarySyncStatus(
     listType: TmdbLibraryList,
-    isUsingCachedContent: Boolean,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -402,15 +454,11 @@ private fun LibrarySyncStatus(
                 )
 
                 Text(
-                    text = when {
-                        isUsingCachedContent && listType == TmdbLibraryList.Rated -> {
-                            "Cached ratings · Last synced earlier"
-                        }
-                        isUsingCachedContent -> "Cached watchlist · Last synced earlier"
-                        listType == TmdbLibraryList.Rated -> {
+                    text = when (listType) {
+                        TmdbLibraryList.Rated -> {
                             "Your TMDB ratings · Synced just now"
                         }
-                        else -> "TMDB watchlist · Synced just now"
+                        TmdbLibraryList.Watchlist -> "Synced via TMDB · just now"
                     },
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -424,6 +472,38 @@ private fun LibrarySyncStatus(
                     .size(ReelsDimensions.favoritesSyncStatusIconSize)
                     .clickable(role = Role.Button, onClick = onRefresh),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun LibraryOfflineStatus(
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.extraLarge,
+        color = ReelsTeal.copy(alpha = 0.12f),
+        contentColor = ReelsTeal
+    ) {
+        Row(
+            modifier = Modifier.padding(
+                horizontal = ReelsSpacing.small,
+                vertical = ReelsSpacing.xSmall
+            ),
+            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.CloudOff,
+                contentDescription = null,
+                modifier = Modifier.size(ReelsDimensions.favoritesOfflineStatusIconSize)
+            )
+            Text(
+                text = "Offline",
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Medium
             )
         }
     }

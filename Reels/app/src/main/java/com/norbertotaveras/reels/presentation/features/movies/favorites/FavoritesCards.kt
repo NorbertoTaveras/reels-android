@@ -18,8 +18,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
@@ -102,11 +105,18 @@ internal fun TmdbAccountMovieCard(
                 overflow = TextOverflow.Ellipsis
             )
 
+            val releaseYear = movie.releaseDate.toReleaseYear()
+            val activityLabel = activityAtMillis.toTmdbMovieActivityLabel(listType = listType)
             Text(
-                text = listOfNotNull(
-                    movie.releaseDate.toReleaseYear(),
-                    activityAtMillis.toTmdbMovieActivityLabel(listType = listType)
-                ).joinToString(separator = " · "),
+                text = buildAnnotatedString {
+                    releaseYear?.let { year ->
+                        append(year)
+                        append(" · ")
+                    }
+                    withStyle(SpanStyle(color = ReelsTeal)) {
+                        append(activityLabel)
+                    }
+                },
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,

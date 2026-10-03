@@ -11,6 +11,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 object ReelsDimensions {
+    val cachedContentDismissButtonSize = 24.dp
+    val cachedContentDismissIconSize = 16.dp
+
     val topPadding = 16.dp
     val homeScreenBottomPadding = 72.dp
     val sectionSpacing = 34.dp
@@ -122,6 +125,7 @@ object ReelsDimensions {
     val favoritesSyncStatusCornerSize = 12.dp
     val favoritesSyncStatusDotSize = 8.dp
     val favoritesSyncStatusIconSize = 18.dp
+    val favoritesOfflineStatusIconSize = 12.dp
 
     val detailsHeroHeight = 282.dp
     val detailsHeaderHeight = 438.dp
