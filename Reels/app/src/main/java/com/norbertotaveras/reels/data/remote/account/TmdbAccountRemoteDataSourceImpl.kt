@@ -70,7 +70,8 @@ class TmdbAccountRemoteDataSourceImpl @Inject constructor(
             accountId = accountId,
             sessionId = sessionId,
             language = language,
-            page = page
+            page = page,
+            sortBy = CREATED_AT_DESCENDING
         )
     }
 
@@ -84,7 +85,8 @@ class TmdbAccountRemoteDataSourceImpl @Inject constructor(
             accountId = accountId,
             sessionId = sessionId,
             language = language,
-            page = page
+            page = page,
+            sortBy = CREATED_AT_DESCENDING
         )
     }
 
@@ -108,5 +110,9 @@ class TmdbAccountRemoteDataSourceImpl @Inject constructor(
             movieId = movieId,
             sessionId = sessionId
         )
+    }
+
+    private companion object {
+        const val CREATED_AT_DESCENDING = "created_at.desc"
     }
 }

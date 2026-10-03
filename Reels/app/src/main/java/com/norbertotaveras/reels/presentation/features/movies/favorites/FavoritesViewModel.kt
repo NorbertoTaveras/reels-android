@@ -16,6 +16,7 @@ import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.domain.usecase.account.DeleteTmdbMovieRatingUseCase
 import com.norbertotaveras.reels.domain.usecase.account.GetTmdbLibraryMoviesUseCase
 import com.norbertotaveras.reels.domain.usecase.account.ObserveTmdbAccountUseCase
+import com.norbertotaveras.reels.domain.usecase.account.ObserveTmdbMovieActivitiesUseCase
 import com.norbertotaveras.reels.domain.usecase.account.UpdateTmdbWatchlistUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveLibraryContentUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.RemoveFavoriteMovieUseCase
@@ -47,6 +48,7 @@ class FavoritesViewModel @Inject constructor(
     private val removeFavoriteMovieUseCase: RemoveFavoriteMovieUseCase,
     private val removeSavedPersonUseCase: RemoveSavedPersonUseCase,
     private val observeTmdbAccountUseCase: ObserveTmdbAccountUseCase,
+    private val observeTmdbMovieActivitiesUseCase: ObserveTmdbMovieActivitiesUseCase,
     private val getTmdbLibraryMoviesUseCase: GetTmdbLibraryMoviesUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
     private val updateTmdbWatchlistUseCase: UpdateTmdbWatchlistUseCase,
@@ -90,6 +92,7 @@ class FavoritesViewModel @Inject constructor(
     init {
         observeLibraryContent()
         observeTmdbAccount()
+        observeTmdbMovieActivities()
     }
 
     fun onEvent(event: FavoritesEvent) {
@@ -127,6 +130,24 @@ class FavoritesViewModel @Inject constructor(
                 _state.update { currentState ->
                     currentState.copy(
                         isTmdbAccountConnected = accountState.isConnected
+                    )
+                }
+            }
+        }
+    }
+
+    private fun observeTmdbMovieActivities() {
+        viewModelScope.launch {
+            observeTmdbMovieActivitiesUseCase().collectLatest { activities ->
+                _state.update { currentState ->
+                    currentState.copy(
+                        tmdbActivityTimes = activities
+                            .groupBy { activity -> activity.listType }
+                            .mapValues { (_, listActivities) ->
+                                listActivities.associate { activity ->
+                                    activity.movieId to activity.occurredAtMillis
+                                }
+                            }
                     )
                 }
             }

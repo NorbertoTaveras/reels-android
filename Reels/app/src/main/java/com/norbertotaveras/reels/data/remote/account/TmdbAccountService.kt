@@ -56,6 +56,7 @@ interface TmdbAccountService {
         @Query("session_id") sessionId: String,
         @Query("language") language: String?,
         @Query("page") page: Int?,
+        @Query("sort_by") sortBy: String?,
     ): MoviesResponseDto
 
     @GET("account/{accountId}/rated/movies")
@@ -64,6 +65,7 @@ interface TmdbAccountService {
         @Query("session_id") sessionId: String,
         @Query("language") language: String?,
         @Query("page") page: Int?,
+        @Query("sort_by") sortBy: String?,
     ): MoviesResponseDto
 
     @POST("movie/{movieId}/rating")

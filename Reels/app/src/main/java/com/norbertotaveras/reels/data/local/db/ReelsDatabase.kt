@@ -16,6 +16,7 @@ import com.norbertotaveras.reels.data.local.dao.CachedMovieDao
 import com.norbertotaveras.reels.data.local.converter.ReelsTypeConverters
 import com.norbertotaveras.reels.data.local.dao.FavoriteMovieDao
 import com.norbertotaveras.reels.data.local.dao.SavedPersonDao
+import com.norbertotaveras.reels.data.local.dao.TmdbMovieActivityDao
 import com.norbertotaveras.reels.data.local.entity.CachedGenreEntity
 import com.norbertotaveras.reels.data.local.entity.CachedContentStatusEntity
 import com.norbertotaveras.reels.data.local.entity.CachedMovieCastEntity
@@ -30,6 +31,7 @@ import com.norbertotaveras.reels.data.local.entity.FavoriteMovieEntity
 import com.norbertotaveras.reels.data.local.entity.MovieRemoteKeyEntity
 import com.norbertotaveras.reels.data.local.entity.SavedPersonEntity
 import com.norbertotaveras.reels.data.local.entity.SavedPersonKnownForEntity
+import com.norbertotaveras.reels.data.local.entity.TmdbMovieActivityEntity
 
 @Database(
     entities = [
@@ -46,16 +48,18 @@ import com.norbertotaveras.reels.data.local.entity.SavedPersonKnownForEntity
         CachedPersonMovieCreditEntity::class,
         CachedGenreEntity::class,
         CachedContentStatusEntity::class,
-        CachedMovieAccountStateEntity::class
+        CachedMovieAccountStateEntity::class,
+        TmdbMovieActivityEntity::class
     ],
-    version = 6,
+    version = 7,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3),
         AutoMigration(from = 3, to = 4),
         AutoMigration(from = 4, to = 5),
-        AutoMigration(from = 5, to = 6)
+        AutoMigration(from = 5, to = 6),
+        AutoMigration(from = 6, to = 7)
     ]
 )
 @TypeConverters(ReelsTypeConverters::class)
@@ -64,4 +68,5 @@ abstract class ReelsDatabase : RoomDatabase() {
     abstract fun savedPersonDao(): SavedPersonDao
     abstract fun cachedMovieDao(): CachedMovieDao
     abstract fun cachedContentDao(): CachedContentDao
+    abstract fun tmdbMovieActivityDao(): TmdbMovieActivityDao
 }

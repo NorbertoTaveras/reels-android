@@ -13,6 +13,7 @@ import com.norbertotaveras.reels.data.local.dao.CachedContentDao
 import com.norbertotaveras.reels.data.local.dao.CachedMovieDao
 import com.norbertotaveras.reels.data.local.dao.FavoriteMovieDao
 import com.norbertotaveras.reels.data.local.dao.SavedPersonDao
+import com.norbertotaveras.reels.data.local.dao.TmdbMovieActivityDao
 import com.norbertotaveras.reels.data.local.db.ReelsDatabase
 import dagger.Module
 import dagger.Provides
@@ -63,5 +64,12 @@ object DatabaseModule {
         database: ReelsDatabase
     ): CachedContentDao {
         return database.cachedContentDao()
+    }
+
+    @Provides
+    fun provideTmdbMovieActivityDao(
+        database: ReelsDatabase
+    ): TmdbMovieActivityDao {
+        return database.tmdbMovieActivityDao()
     }
 }

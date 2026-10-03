@@ -281,6 +281,7 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
                     TmdbAccountMovieCard(
                         movie = movie,
                         listType = listType,
+                        activityAtMillis = state.tmdbActivityTimes[listType]?.get(movie.id),
                         isUpdating = state.updatingTmdbMovieIds.contains(movie.id),
                         onClick = {
                             onMovieClick(movie.id)

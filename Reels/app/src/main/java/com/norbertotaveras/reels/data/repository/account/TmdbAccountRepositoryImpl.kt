@@ -13,8 +13,11 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.map
 import com.norbertotaveras.reels.data.local.dao.CachedContentDao
 import com.norbertotaveras.reels.data.local.dao.CachedMovieDao
+import com.norbertotaveras.reels.data.local.dao.TmdbMovieActivityDao
 import com.norbertotaveras.reels.data.local.db.ReelsDatabase
+import com.norbertotaveras.reels.data.local.entity.TmdbMovieActivityEntity
 import com.norbertotaveras.reels.data.local.mapper.toCachedMovieAccountStateEntity
+import com.norbertotaveras.reels.data.local.mapper.toTmdbMovieActivityDataModel
 import com.norbertotaveras.reels.data.local.mapper.toTmdbMovieAccountStateDataModel
 import com.norbertotaveras.reels.data.local.preferences.TmdbAccountDataStore
 import com.norbertotaveras.reels.data.mapper.movie.toCachedMovieDataModel
@@ -35,6 +38,7 @@ import com.norbertotaveras.reels.domain.model.account.TmdbAccountStateDataModel
 import com.norbertotaveras.reels.domain.model.account.TmdbAuthenticationCallback
 import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 import com.norbertotaveras.reels.domain.model.account.TmdbMovieAccountStateDataModel
+import com.norbertotaveras.reels.domain.model.account.TmdbMovieActivityDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.domain.repository.account.TmdbAccountRepository
 import javax.inject.Inject
@@ -57,10 +61,26 @@ class TmdbAccountRepositoryImpl @Inject constructor(
     private val database: ReelsDatabase,
     private val cachedMovieDao: CachedMovieDao,
     private val cachedContentDao: CachedContentDao,
+    private val tmdbMovieActivityDao: TmdbMovieActivityDao,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : TmdbAccountRepository {
     override fun observeAccountState(): Flow<TmdbAccountStateDataModel> {
         return accountDataStore.accountState
+    }
+
+    override fun observeMovieActivities(): Flow<List<TmdbMovieActivityDataModel>> {
+        return accountDataStore.accountState.flatMapLatest { accountState ->
+            val accountId = accountState.account?.accountId
+            if (!accountState.isConnected || accountId == null) {
+                flowOf(emptyList())
+            } else {
+                tmdbMovieActivityDao.observeActivities(accountId = accountId).map { activities ->
+                    activities.mapNotNull { activity ->
+                        activity.toTmdbMovieActivityDataModel()
+                    }
+                }
+            }
+        }
     }
 
     override suspend fun startAuthentication(): Result<String> {
@@ -195,6 +215,12 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                 accountId = accountId,
                 state = cached.copy(isWatchlisted = watchlist)
             )
+            updateMovieActivity(
+                accountId = accountId,
+                movieId = movieId,
+                listType = TmdbLibraryList.Watchlist,
+                isActive = watchlist
+            )
             cachedMovieDao.invalidateAccountLists(accountId = accountId)
         }
     }
@@ -222,6 +248,12 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                     rating = null
                 )
             cacheMovieAccountState(accountId = accountId, state = cached.copy(rating = rating))
+            updateMovieActivity(
+                accountId = accountId,
+                movieId = movieId,
+                listType = TmdbLibraryList.Rated,
+                isActive = true
+            )
             cachedMovieDao.invalidateAccountLists(accountId = accountId)
         }
     }
@@ -245,6 +277,12 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                     rating = null
                 )
             cacheMovieAccountState(accountId = accountId, state = cached.copy(rating = null))
+            updateMovieActivity(
+                accountId = accountId,
+                movieId = movieId,
+                listType = TmdbLibraryList.Rated,
+                isActive = false
+            )
             cachedMovieDao.invalidateAccountLists(accountId = accountId)
         }
     }
@@ -267,6 +305,30 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                 cachedAt = System.currentTimeMillis()
             )
         )
+    }
+
+    private suspend fun updateMovieActivity(
+        accountId: Int,
+        movieId: Int,
+        listType: TmdbLibraryList,
+        isActive: Boolean,
+    ) {
+        if (isActive) {
+            tmdbMovieActivityDao.upsertActivity(
+                TmdbMovieActivityEntity(
+                    accountId = accountId,
+                    listType = listType.name,
+                    movieId = movieId,
+                    occurredAtMillis = System.currentTimeMillis()
+                )
+            )
+        } else {
+            tmdbMovieActivityDao.deleteActivity(
+                accountId = accountId,
+                listType = listType.name,
+                movieId = movieId
+            )
+        }
     }
 
     private fun getAccountMovies(

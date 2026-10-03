@@ -33,6 +33,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
 internal fun TmdbAccountMovieCard(
     movie: MovieDataModel,
     listType: TmdbLibraryList,
+    activityAtMillis: Long?,
     isUpdating: Boolean,
     onClick: () -> Unit,
     onActionClick: () -> Unit,
@@ -102,14 +103,10 @@ internal fun TmdbAccountMovieCard(
             )
 
             Text(
-                text = movie.releaseDate.toReleaseYear()
-                    ?.let { releaseYear ->
-                        when (listType) {
-                            TmdbLibraryList.Watchlist -> releaseYear
-                            TmdbLibraryList.Rated -> "$releaseYear · Rated on TMDB"
-                        }
-                    }
-                    .orEmpty(),
+                text = listOfNotNull(
+                    movie.releaseDate.toReleaseYear(),
+                    activityAtMillis.toTmdbMovieActivityLabel(listType = listType)
+                ).joinToString(separator = " · "),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,

@@ -7,6 +7,7 @@
 
 package com.norbertotaveras.reels.presentation.features.movies.favorites
 
+import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 import com.norbertotaveras.reels.domain.model.favorite.FavoriteMovieDataModel
 import com.norbertotaveras.reels.domain.model.favorite.SavedPersonDataModel
 
@@ -18,6 +19,7 @@ data class FavoritesUiState(
     val removingMovieIds: Set<Int> = emptySet(),
     val removingPersonIds: Set<Int> = emptySet(),
     val updatingTmdbMovieIds: Set<Int> = emptySet(),
+    val tmdbActivityTimes: Map<TmdbLibraryList, Map<Int, Long>> = emptyMap(),
 )
 
 val FavoritesUiState.selectedItemCount: Int
