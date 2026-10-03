@@ -111,9 +111,6 @@ class MovieDetailsViewModel @Inject constructor(
                     _state.update { currentState ->
                         currentState.withContent(content = content)
                     }
-                    if (!content.isOfflineFavorite) {
-                        refreshMovieAccountState()
-                    }
                 },
                 onFailure = { error ->
                     _state.update { currentState ->
@@ -250,6 +247,15 @@ class MovieDetailsViewModel @Inject constructor(
                 _state.update { currentState ->
                     currentState.withTmdbAccountState(accountState = accountState)
                 }
+            }
+            .onFailure { error ->
+                _effect.emit(
+                    MovieDetailsEffect.ShowMessage(
+                        message = error.toUserMessage(
+                            fallback = "Unable to refresh your TMDB movie activity."
+                        )
+                    )
+                )
             }
     }
 
