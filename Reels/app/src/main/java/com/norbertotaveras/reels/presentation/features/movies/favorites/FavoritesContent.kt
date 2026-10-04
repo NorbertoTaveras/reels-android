@@ -27,7 +27,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.outlined.CloudOff
+import androidx.compose.material.icons.outlined.WifiOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -298,9 +298,10 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     CachedContentBanner(
                         message = when (listType) {
-                            TmdbLibraryList.Watchlist -> "Cached watchlist · Synced earlier"
-                            TmdbLibraryList.Rated -> "Cached ratings · Synced earlier"
+                            TmdbLibraryList.Watchlist -> "Cached watchlist"
+                            TmdbLibraryList.Rated -> "Cached ratings"
                         },
+                        supportingText = state.tmdbSyncedAtMillis[listType].toTmdbSyncLabel(),
                         onDismiss = onCachedNoticeDismiss
                     )
                 }
@@ -309,6 +310,7 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
             item(span = { GridItemSpan(maxLineSpan) }) {
                 LibrarySyncStatus(
                     listType = listType,
+                    syncedAtMillis = state.tmdbSyncedAtMillis[listType],
                     onRefresh = onRefresh
                 )
             }
@@ -412,6 +414,7 @@ private fun LibraryTabs(
 @Composable
 private fun LibrarySyncStatus(
     listType: TmdbLibraryList,
+    syncedAtMillis: Long?,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -445,9 +448,11 @@ private fun LibrarySyncStatus(
                 Text(
                     text = when (listType) {
                         TmdbLibraryList.Rated -> {
-                            "Your TMDB ratings · Synced just now"
+                            "Your TMDB ratings · ${syncedAtMillis.toTmdbSyncLabel()}"
                         }
-                        TmdbLibraryList.Watchlist -> "Synced via TMDB · just now"
+                        TmdbLibraryList.Watchlist -> {
+                            "Synced via TMDB · ${syncedAtMillis.toTmdbSyncLabel()}"
+                        }
                     },
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -485,7 +490,7 @@ private fun LibraryOfflineStatus(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = Icons.Outlined.CloudOff,
+                imageVector = Icons.Outlined.WifiOff,
                 contentDescription = null,
                 modifier = Modifier.size(ReelsDimensions.favoritesOfflineStatusIconSize)
             )

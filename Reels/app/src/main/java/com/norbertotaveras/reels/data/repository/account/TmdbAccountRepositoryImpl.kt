@@ -84,6 +84,26 @@ class TmdbAccountRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun observeLibraryLastSyncedAt(
+        list: TmdbLibraryList,
+        language: String,
+    ): Flow<Long?> {
+        return accountDataStore.accountState.flatMapLatest { accountState ->
+            val accountId = accountState.account?.accountId
+            if (!accountState.isConnected || accountId == null) {
+                flowOf(null)
+            } else {
+                cachedMovieDao.observeLastUpdatedAt(
+                    listKey = tmdbLibraryCacheKey(
+                        accountId = accountId,
+                        list = list,
+                        language = language
+                    )
+                )
+            }
+        }
+    }
+
     override suspend fun startAuthentication(): Result<String> {
         return accountResult {
             val requestToken = remoteDataSource.createRequestToken().requestToken

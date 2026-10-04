@@ -16,6 +16,7 @@ import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.domain.usecase.account.DeleteTmdbMovieRatingUseCase
 import com.norbertotaveras.reels.domain.usecase.account.GetTmdbLibraryMoviesUseCase
 import com.norbertotaveras.reels.domain.usecase.account.ObserveTmdbAccountUseCase
+import com.norbertotaveras.reels.domain.usecase.account.ObserveTmdbLibraryLastSyncedAtUseCase
 import com.norbertotaveras.reels.domain.usecase.account.ObserveTmdbMovieActivitiesUseCase
 import com.norbertotaveras.reels.domain.usecase.account.UpdateTmdbWatchlistUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveLibraryContentUseCase
@@ -48,6 +49,7 @@ class FavoritesViewModel @Inject constructor(
     private val removeFavoriteMovieUseCase: RemoveFavoriteMovieUseCase,
     private val removeSavedPersonUseCase: RemoveSavedPersonUseCase,
     private val observeTmdbAccountUseCase: ObserveTmdbAccountUseCase,
+    private val observeTmdbLibraryLastSyncedAtUseCase: ObserveTmdbLibraryLastSyncedAtUseCase,
     private val observeTmdbMovieActivitiesUseCase: ObserveTmdbMovieActivitiesUseCase,
     private val getTmdbLibraryMoviesUseCase: GetTmdbLibraryMoviesUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
@@ -93,6 +95,7 @@ class FavoritesViewModel @Inject constructor(
         observeLibraryContent()
         observeTmdbAccount()
         observeTmdbMovieActivities()
+        observeTmdbLibrarySyncTimes()
     }
 
     fun onEvent(event: FavoritesEvent) {
@@ -148,6 +151,36 @@ class FavoritesViewModel @Inject constructor(
                                 }
                             }
                     )
+                }
+            }
+        }
+    }
+
+    private fun observeTmdbLibrarySyncTimes() {
+        viewModelScope.launch {
+            language.flatMapLatest { language ->
+                combine(
+                    observeTmdbLibraryLastSyncedAtUseCase(
+                        list = TmdbLibraryList.Watchlist,
+                        language = language
+                    ),
+                    observeTmdbLibraryLastSyncedAtUseCase(
+                        list = TmdbLibraryList.Rated,
+                        language = language
+                    )
+                ) { watchlistSyncedAt, ratedSyncedAt ->
+                    buildMap {
+                        watchlistSyncedAt?.let { syncedAt ->
+                            put(TmdbLibraryList.Watchlist, syncedAt)
+                        }
+                        ratedSyncedAt?.let { syncedAt ->
+                            put(TmdbLibraryList.Rated, syncedAt)
+                        }
+                    }
+                }
+            }.collectLatest { syncTimes ->
+                _state.update { currentState ->
+                    currentState.copy(tmdbSyncedAtMillis = syncTimes)
                 }
             }
         }

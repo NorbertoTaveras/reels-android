@@ -16,6 +16,7 @@ import androidx.room.Upsert
 import com.norbertotaveras.reels.data.local.entity.CachedMovieEntity
 import com.norbertotaveras.reels.data.local.entity.CachedMovieListEntryEntity
 import com.norbertotaveras.reels.data.local.entity.MovieRemoteKeyEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CachedMovieDao {
@@ -68,6 +69,9 @@ interface CachedMovieDao {
 
     @Query("SELECT * FROM movie_remote_keys WHERE listKey = :listKey LIMIT 1")
     suspend fun getRemoteKey(listKey: String): MovieRemoteKeyEntity?
+
+    @Query("SELECT lastUpdatedAt FROM movie_remote_keys WHERE listKey = :listKey LIMIT 1")
+    fun observeLastUpdatedAt(listKey: String): Flow<Long?>
 
     @Upsert
     suspend fun upsertMovies(movies: List<CachedMovieEntity>)

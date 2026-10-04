@@ -9,13 +9,15 @@ package com.norbertotaveras.reels.presentation.ui.components.common
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.outlined.CloudOff
+import androidx.compose.material.icons.outlined.WifiOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +34,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 fun CachedContentBanner(
     message: String,
     modifier: Modifier = Modifier,
+    supportingText: String? = null,
     onDismiss: (() -> Unit)? = null,
 ) {
     Surface(
@@ -52,14 +55,24 @@ fun CachedContentBanner(
             horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Outlined.CloudOff,
-                contentDescription = null,
-                modifier = Modifier.size(18.dp)
-            )
+            Surface(
+                modifier = Modifier.size(ReelsDimensions.cachedContentIconContainerSize),
+                shape = RoundedCornerShape(ReelsDimensions.cachedContentIconCornerSize),
+                color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12f),
+                contentColor = MaterialTheme.colorScheme.secondary
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Outlined.WifiOff,
+                        contentDescription = null,
+                        modifier = Modifier.size(ReelsDimensions.cachedContentIconSize)
+                    )
+                }
+            }
 
             Text(
-                text = message,
+                text = listOfNotNull(message, supportingText)
+                    .joinToString(separator = " · "),
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.bodySmall
             )

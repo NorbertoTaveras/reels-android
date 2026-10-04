@@ -9,6 +9,7 @@ package com.norbertotaveras.reels.domain.repository.account
 
 import androidx.paging.PagingData
 import com.norbertotaveras.reels.domain.model.account.TmdbAccountStateDataModel
+import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 import com.norbertotaveras.reels.domain.model.account.TmdbMovieAccountStateDataModel
 import com.norbertotaveras.reels.domain.model.account.TmdbMovieActivityDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
@@ -18,6 +19,11 @@ interface TmdbAccountRepository {
     fun observeAccountState(): Flow<TmdbAccountStateDataModel>
 
     fun observeMovieActivities(): Flow<List<TmdbMovieActivityDataModel>>
+
+    fun observeLibraryLastSyncedAt(
+        list: TmdbLibraryList,
+        language: String,
+    ): Flow<Long?>
 
     suspend fun startAuthentication(): Result<String>
 

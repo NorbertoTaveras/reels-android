@@ -20,6 +20,7 @@ data class FavoritesUiState(
     val removingPersonIds: Set<Int> = emptySet(),
     val updatingTmdbMovieIds: Set<Int> = emptySet(),
     val tmdbActivityTimes: Map<TmdbLibraryList, Map<Int, Long>> = emptyMap(),
+    val tmdbSyncedAtMillis: Map<TmdbLibraryList, Long> = emptyMap(),
 )
 
 val FavoritesUiState.selectedItemCount: Int

@@ -11,6 +11,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 object ReelsDimensions {
+    val cachedContentIconContainerSize = 28.dp
+    val cachedContentIconSize = 14.dp
+    val cachedContentIconCornerSize = 8.dp
     val cachedContentDismissButtonSize = 24.dp
     val cachedContentDismissIconSize = 16.dp
 
