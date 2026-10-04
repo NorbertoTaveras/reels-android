@@ -7,6 +7,8 @@
 
 package com.norbertotaveras.reels.data.remote.error
 
+import com.google.gson.Gson
+import com.norbertotaveras.reels.data.remote.dto.TmdbErrorResponseDto
 import java.io.IOException
 import java.net.SocketTimeoutException
 import retrofit2.HttpException
@@ -30,7 +32,15 @@ fun Throwable.toTmdbNetworkException(): TmdbNetworkException {
 
 fun Throwable.isTmdbSessionExpiredError(): Boolean {
     return this is TmdbSessionExpiredException ||
-        this is HttpException && code() in TMDB_SESSION_ERROR_CODES
+        this is HttpException && tmdbStatusCode() in TMDB_SESSION_ERROR_CODES
+}
+
+private fun HttpException.tmdbStatusCode(): Int? {
+    return runCatching {
+        response()?.errorBody()?.charStream()?.use { errorBody ->
+            Gson().fromJson(errorBody, TmdbErrorResponseDto::class.java).statusCode
+        }
+    }.getOrNull()
 }
 
 private fun HttpException.toUserMessage(): String {
@@ -44,4 +54,4 @@ private fun HttpException.toUserMessage(): String {
     }
 }
 
-private val TMDB_SESSION_ERROR_CODES = setOf(401, 403)
+private val TMDB_SESSION_ERROR_CODES = setOf(17, 37)
