@@ -22,6 +22,12 @@ fun String?.toTmdbImageUrl(
         ?.let { path -> "${BuildConfig.BASE_IMAGE_URL}${imageType.sizePath(imageQuality)}$path" }
 }
 
+fun String?.toGravatarUrl(): String? {
+    return this
+        ?.takeIf { hash -> hash.isNotBlank() }
+        ?.let { hash -> "https://www.gravatar.com/avatar/$hash?s=160&d=404" }
+}
+
 private fun TmdbImageType.sizePath(imageQuality: ImageQuality): String {
     return when (this) {
         TmdbImageType.Poster -> when (imageQuality) {

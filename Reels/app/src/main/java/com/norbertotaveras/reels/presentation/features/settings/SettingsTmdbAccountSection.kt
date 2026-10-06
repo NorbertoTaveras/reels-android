@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
@@ -48,7 +46,11 @@ internal fun TmdbAccountSection(
         when {
             state.isTmdbAccountConnected -> {
                 ConnectedTmdbAccountCard(
-                    accountName = state.tmdbAccountName.ifBlank { "TMDB user" },
+                    accountName = state.tmdbAccountUsername.ifBlank {
+                        state.tmdbAccountName.ifBlank { "TMDB user" }
+                    },
+                    avatarPath = state.tmdbAccountAvatarPath,
+                    gravatarHash = state.tmdbAccountGravatarHash,
                     isLoading = state.isTmdbAccountLoading,
                     onDisconnectClick = onDisconnectClick
                 )

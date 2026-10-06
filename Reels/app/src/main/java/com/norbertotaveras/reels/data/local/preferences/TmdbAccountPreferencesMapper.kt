@@ -22,7 +22,9 @@ internal fun Preferences.toTmdbAccountState(): TmdbAccountStateDataModel {
             TmdbAccountDataModel(
                 accountId = accountId,
                 username = username,
-                displayName = this[TmdbAccountPreferenceKeys.DISPLAY_NAME]
+                displayName = this[TmdbAccountPreferenceKeys.DISPLAY_NAME],
+                avatarPath = this[TmdbAccountPreferenceKeys.AVATAR_PATH],
+                gravatarHash = this[TmdbAccountPreferenceKeys.GRAVATAR_HASH]
             )
         } else {
             null

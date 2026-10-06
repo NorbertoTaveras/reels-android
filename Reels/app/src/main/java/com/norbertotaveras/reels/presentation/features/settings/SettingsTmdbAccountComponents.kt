@@ -8,6 +8,7 @@
 package com.norbertotaveras.reels.presentation.features.settings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,28 +17,34 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsTmdbBlue
 
 @Composable
 internal fun TmdbAccountHeaderRow(
@@ -48,11 +55,7 @@ internal fun TmdbAccountHeaderRow(
 ) {
     Row(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(
-                horizontal = ReelsDimensions.settingsRowHorizontalPadding,
-                vertical = ReelsDimensions.settingsRowVerticalPadding
-            ),
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         TmdbLogoMark()
@@ -65,18 +68,26 @@ internal fun TmdbAccountHeaderRow(
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = ReelsDimensions.settingsTmdbConnectedTitleSize,
+                    lineHeight = ReelsDimensions.settingsTmdbConnectedTitleLineHeight,
+                    fontWeight = FontWeight.Normal,
+                    letterSpacing = 0.sp
+                ),
                 color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
             Text(
                 text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = ReelsDimensions.settingsTmdbConnectedBodySize,
+                    lineHeight = ReelsDimensions.settingsTmdbConnectedBodyLineHeight,
+                    fontWeight = FontWeight.Normal,
+                    letterSpacing = 0.sp
+                ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -90,18 +101,78 @@ internal fun TmdbAccountHeaderRow(
 }
 
 @Composable
+internal fun TmdbConnectedAccountHeaderRow(
+    accountName: String,
+    accountUrl: String,
+    avatarUrl: String?,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(ReelsDimensions.settingsTmdbConnectedRowPadding),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(
+            ReelsDimensions.settingsTmdbConnectedRowSpacing
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .size(ReelsDimensions.settingsTmdbConnectedAvatarSize)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .border(
+                    width = ReelsDimensions.settingsTmdbConnectedAvatarBorderWidth,
+                    color = ReelsTmdbBlue.copy(alpha = 0.40f),
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Person,
+                contentDescription = null,
+                modifier = Modifier.size(ReelsDimensions.settingsTmdbConnectedIconSize),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            if (avatarUrl != null) {
+                AsyncImage(
+                    model = avatarUrl,
+                    contentDescription = "$accountName avatar",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
+        }
+
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            TmdbConnectedText(
+                text = accountName,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            TmdbConnectedSupportingText(text = accountUrl)
+        }
+
+        ConnectedChip()
+    }
+}
+
+@Composable
 internal fun TmdbAccountStatusRow(
     icon: ImageVector,
     title: String,
     subtitle: String,
     modifier: Modifier = Modifier,
-    contentColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurface,
+    titleColor: Color = MaterialTheme.colorScheme.onSurface,
+    iconTint: Color = MaterialTheme.colorScheme.primary,
+    iconContainerColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     onClick: (() -> Unit)? = null,
     trailing: @Composable (() -> Unit)? = null,
 ) {
     val rowModifier = modifier
         .fillMaxWidth()
-        .heightIn(min = ReelsDimensions.settingsRowMinHeight)
         .then(
             if (onClick != null) {
                 Modifier.clickable(onClick = onClick)
@@ -111,54 +182,36 @@ internal fun TmdbAccountStatusRow(
         )
 
     Row(
-        modifier = rowModifier.padding(
-            horizontal = ReelsDimensions.settingsRowHorizontalPadding,
-            vertical = ReelsDimensions.settingsRowVerticalPadding
-        ),
-        verticalAlignment = Alignment.CenterVertically
+        modifier = rowModifier.padding(ReelsDimensions.settingsTmdbConnectedRowPadding),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(
+            ReelsDimensions.settingsTmdbConnectedRowSpacing
+        )
     ) {
         Box(
             modifier = Modifier
-                .size(ReelsDimensions.settingsRowIconContainerSize)
-                .clip(MaterialTheme.shapes.medium)
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .size(ReelsDimensions.settingsTmdbConnectedIconContainerSize)
+                .clip(RoundedCornerShape(ReelsDimensions.settingsTmdbConnectedIconCornerSize))
+                .background(iconContainerColor),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(ReelsDimensions.settingsRowIconSize),
-                tint = contentColor
+                modifier = Modifier.size(ReelsDimensions.settingsTmdbConnectedIconSize),
+                tint = iconTint
             )
         }
-
-        Spacer(modifier = Modifier.width(ReelsSpacing.large))
 
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleSmall,
-                color = contentColor,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            TmdbConnectedText(text = title, color = titleColor)
+            TmdbConnectedSupportingText(text = subtitle)
         }
 
         if (trailing != null) {
-            Spacer(modifier = Modifier.width(ReelsSpacing.medium))
             trailing()
         }
     }
@@ -176,9 +229,16 @@ internal fun ConnectedChip(
     ) {
         Text(
             text = "Connected",
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Bold
+            modifier = Modifier.padding(
+                horizontal = ReelsDimensions.settingsTmdbConnectedChipHorizontalPadding,
+                vertical = ReelsDimensions.settingsTmdbConnectedChipVerticalPadding
+            ),
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontSize = ReelsDimensions.settingsTmdbConnectedChipTextSize,
+                lineHeight = ReelsDimensions.settingsTmdbConnectedChipLineHeight,
+                fontWeight = FontWeight.Normal,
+                letterSpacing = 0.sp
+            )
         )
     }
 }
@@ -189,10 +249,13 @@ internal fun StaticSettingsSwitch(
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = modifier.size(width = 42.dp, height = 24.dp),
+        modifier = modifier.size(
+            width = ReelsDimensions.settingsTmdbConnectedSwitchWidth,
+            height = ReelsDimensions.settingsTmdbConnectedSwitchHeight
+        ),
         shape = MaterialTheme.shapes.large,
         color = if (checked) {
-            ReelsTeal.copy(alpha = 0.32f)
+            MaterialTheme.colorScheme.primary
         } else {
             MaterialTheme.colorScheme.surfaceVariant
         }
@@ -200,15 +263,60 @@ internal fun StaticSettingsSwitch(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(3.dp),
+                .padding(4.dp),
             contentAlignment = if (checked) Alignment.CenterEnd else Alignment.CenterStart
         ) {
             Box(
                 modifier = Modifier
-                    .size(18.dp)
+                    .size(ReelsDimensions.settingsTmdbConnectedSwitchThumbSize)
                     .clip(MaterialTheme.shapes.large)
-                    .background(if (checked) ReelsTeal else MaterialTheme.colorScheme.onSurfaceVariant)
+                    .background(if (checked) Color.White else MaterialTheme.colorScheme.onSurfaceVariant)
             )
         }
     }
+}
+
+@Composable
+internal fun TmdbSyncStatusChevron() {
+    Icon(
+        imageVector = Icons.Filled.ChevronRight,
+        contentDescription = null,
+        modifier = Modifier.size(20.dp),
+        tint = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+}
+
+@Composable
+private fun TmdbConnectedText(
+    text: String,
+    color: Color,
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyLarge.copy(
+            fontSize = ReelsDimensions.settingsTmdbConnectedTitleSize,
+            lineHeight = ReelsDimensions.settingsTmdbConnectedTitleLineHeight,
+            fontWeight = FontWeight.Normal,
+            letterSpacing = 0.sp
+        ),
+        color = color,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
+}
+
+@Composable
+private fun TmdbConnectedSupportingText(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium.copy(
+            fontSize = ReelsDimensions.settingsTmdbConnectedBodySize,
+            lineHeight = ReelsDimensions.settingsTmdbConnectedBodyLineHeight,
+            fontWeight = FontWeight.Normal,
+            letterSpacing = 0.sp
+        ),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
 }

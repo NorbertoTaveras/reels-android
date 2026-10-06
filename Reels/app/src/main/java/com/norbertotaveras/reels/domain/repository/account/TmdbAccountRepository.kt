@@ -29,6 +29,8 @@ interface TmdbAccountRepository {
 
     suspend fun finishAuthentication(): Result<TmdbAccountStateDataModel>
 
+    suspend fun refreshAccount(): Result<TmdbAccountStateDataModel>
+
     suspend fun disconnect(): Result<Unit>
 
     suspend fun getMovieAccountState(movieId: Int): Result<TmdbMovieAccountStateDataModel?>

@@ -48,6 +48,18 @@ class TmdbAccountDataStore @Inject constructor(
                     preferences[TmdbAccountPreferenceKeys.DISPLAY_NAME] = displayName
                 }
                 ?: preferences.remove(TmdbAccountPreferenceKeys.DISPLAY_NAME)
+            account.avatarPath
+                ?.takeIf { avatarPath -> avatarPath.isNotBlank() }
+                ?.let { avatarPath ->
+                    preferences[TmdbAccountPreferenceKeys.AVATAR_PATH] = avatarPath
+                }
+                ?: preferences.remove(TmdbAccountPreferenceKeys.AVATAR_PATH)
+            account.gravatarHash
+                ?.takeIf { gravatarHash -> gravatarHash.isNotBlank() }
+                ?.let { gravatarHash ->
+                    preferences[TmdbAccountPreferenceKeys.GRAVATAR_HASH] = gravatarHash
+                }
+                ?: preferences.remove(TmdbAccountPreferenceKeys.GRAVATAR_HASH)
             preferences.remove(TmdbAccountPreferenceKeys.PENDING_REQUEST_TOKEN)
         }
     }
@@ -59,6 +71,8 @@ class TmdbAccountDataStore @Inject constructor(
             preferences.remove(TmdbAccountPreferenceKeys.ACCOUNT_ID)
             preferences.remove(TmdbAccountPreferenceKeys.USERNAME)
             preferences.remove(TmdbAccountPreferenceKeys.DISPLAY_NAME)
+            preferences.remove(TmdbAccountPreferenceKeys.AVATAR_PATH)
+            preferences.remove(TmdbAccountPreferenceKeys.GRAVATAR_HASH)
         }
     }
 }

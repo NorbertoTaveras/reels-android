@@ -11,4 +11,6 @@ data class TmdbAccountDataModel(
     val accountId: Int,
     val username: String,
     val displayName: String?,
+    val avatarPath: String? = null,
+    val gravatarHash: String? = null,
 )

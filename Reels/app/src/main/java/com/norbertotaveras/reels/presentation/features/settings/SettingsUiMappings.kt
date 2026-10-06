@@ -47,6 +47,9 @@ internal fun SettingsUiState.withTmdbAccountState(
     return copy(
         isTmdbAccountConnected = accountState.isConnected,
         isTmdbAccountApprovalPending = accountState.isApprovalPending,
-        tmdbAccountName = accountName
+        tmdbAccountName = accountName,
+        tmdbAccountUsername = accountState.account?.username.orEmpty(),
+        tmdbAccountAvatarPath = accountState.account?.avatarPath,
+        tmdbAccountGravatarHash = accountState.account?.gravatarHash
     )
 }

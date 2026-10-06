@@ -17,7 +17,9 @@ fun TmdbAccountDto.toTmdbAccountDataModel(): TmdbAccountDataModel {
     return TmdbAccountDataModel(
         accountId = id,
         username = username,
-        displayName = name
+        displayName = name,
+        avatarPath = avatar?.tmdb?.avatarPath,
+        gravatarHash = avatar?.gravatar?.hash
     )
 }
 

@@ -16,4 +16,6 @@ internal object TmdbAccountPreferenceKeys {
     val ACCOUNT_ID = intPreferencesKey("account_id")
     val USERNAME = stringPreferencesKey("username")
     val DISPLAY_NAME = stringPreferencesKey("display_name")
+    val AVATAR_PATH = stringPreferencesKey("avatar_path")
+    val GRAVATAR_HASH = stringPreferencesKey("gravatar_hash")
 }

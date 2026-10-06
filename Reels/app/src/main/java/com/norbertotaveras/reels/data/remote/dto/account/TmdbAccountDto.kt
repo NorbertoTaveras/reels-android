@@ -16,4 +16,6 @@ data class TmdbAccountDto(
     val username: String,
     @SerializedName("name")
     val name: String?,
+    @SerializedName("avatar")
+    val avatar: TmdbAccountAvatarDto?,
 )

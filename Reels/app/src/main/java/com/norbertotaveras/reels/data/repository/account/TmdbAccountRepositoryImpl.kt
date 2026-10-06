@@ -146,6 +146,24 @@ class TmdbAccountRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun refreshAccount(): Result<TmdbAccountStateDataModel> {
+        return accountResult {
+            val currentAccountState = accountDataStore.accountState.first()
+            val sessionId = currentAccountState.sessionId
+                ?: return@accountResult currentAccountState
+            val account = remoteDataSource.getAccountDetails(
+                sessionId = sessionId
+            ).toTmdbAccountDataModel()
+
+            accountDataStore.saveConnectedAccount(
+                sessionId = sessionId,
+                account = account
+            )
+
+            currentAccountState.copy(account = account)
+        }
+    }
+
     override suspend fun disconnect(): Result<Unit> {
         return accountResult {
             val sessionId = accountDataStore.accountState.first().sessionId

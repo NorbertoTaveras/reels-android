@@ -15,6 +15,7 @@ import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 import com.norbertotaveras.reels.domain.usecase.account.DisconnectTmdbAccountUseCase
 import com.norbertotaveras.reels.domain.usecase.account.FinishTmdbAuthenticationUseCase
 import com.norbertotaveras.reels.domain.usecase.account.ObserveTmdbAccountUseCase
+import com.norbertotaveras.reels.domain.usecase.account.RefreshTmdbAccountUseCase
 import com.norbertotaveras.reels.domain.usecase.account.StartTmdbAuthenticationUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveLibraryContentUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
@@ -38,6 +39,7 @@ class SettingsViewModel @Inject constructor(
     private val observeSettingsUseCase: ObserveSettingsUseCase,
     private val observeLibraryContentUseCase: ObserveLibraryContentUseCase,
     private val observeTmdbAccountUseCase: ObserveTmdbAccountUseCase,
+    private val refreshTmdbAccountUseCase: RefreshTmdbAccountUseCase,
     private val startTmdbAuthenticationUseCase: StartTmdbAuthenticationUseCase,
     private val finishTmdbAuthenticationUseCase: FinishTmdbAuthenticationUseCase,
     private val disconnectTmdbAccountUseCase: DisconnectTmdbAccountUseCase,
@@ -60,6 +62,7 @@ class SettingsViewModel @Inject constructor(
         observeSettings()
         observeSavedLibrary()
         observeTmdbAccount()
+        refreshTmdbAccount()
     }
 
     fun onEvent(event: SettingsEvent) {
@@ -112,6 +115,12 @@ class SettingsViewModel @Inject constructor(
                     currentState.withTmdbAccountState(accountState = accountState)
                 }
             }
+        }
+    }
+
+    private fun refreshTmdbAccount() {
+        viewModelScope.launch {
+            refreshTmdbAccountUseCase()
         }
     }
 

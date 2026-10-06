@@ -11,50 +11,54 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
+import com.norbertotaveras.reels.presentation.ui.extensions.toGravatarUrl
+import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 
 @Composable
 internal fun ConnectedTmdbAccountCard(
     accountName: String,
+    avatarPath: String?,
+    gravatarHash: String?,
     isLoading: Boolean,
     onDisconnectClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val cardShape = RoundedCornerShape(ReelsDimensions.settingsTmdbCardCornerSize)
+    val avatarUrl = avatarPath.toTmdbImageUrl(
+        imageType = TmdbImageType.Profile
+    ) ?: gravatarHash.toGravatarUrl()
+
     Column(
         modifier = modifier
             .fillMaxWidth()
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.outline,
-                shape = MaterialTheme.shapes.extraLarge
+                shape = cardShape
             )
             .background(
                 color = MaterialTheme.colorScheme.surface,
-                shape = MaterialTheme.shapes.extraLarge
+                shape = cardShape
             )
-            .padding(vertical = ReelsSpacing.small),
     ) {
-        TmdbAccountHeaderRow(
-            title = accountName,
-            subtitle = "TMDB account connected",
-            trailing = {
-                ConnectedChip()
-            }
+        TmdbConnectedAccountHeaderRow(
+            accountName = accountName,
+            accountUrl = "tmdb.org/u/$accountName",
+            avatarUrl = avatarUrl
         )
 
         SettingsDivider()
@@ -62,15 +66,16 @@ internal fun ConnectedTmdbAccountCard(
         TmdbAccountStatusRow(
             icon = Icons.Filled.Sync,
             title = "Sync Status",
-            subtitle = "Ready to sync watchlist and ratings"
+            subtitle = "Last synced just now",
+            trailing = { TmdbSyncStatusChevron() }
         )
 
         SettingsDivider()
 
         TmdbAccountStatusRow(
-            icon = Icons.Filled.Download,
+            icon = Icons.Filled.Bookmark,
             title = "Watchlist Sync",
-            subtitle = "Enabled",
+            subtitle = "Sync with TMDB account",
             trailing = {
                 StaticSettingsSwitch(checked = true)
             }
@@ -81,7 +86,7 @@ internal fun ConnectedTmdbAccountCard(
         TmdbAccountStatusRow(
             icon = Icons.Filled.Star,
             title = "Ratings Sync",
-            subtitle = "Enabled",
+            subtitle = "Sync your movie ratings",
             trailing = {
                 StaticSettingsSwitch(checked = true)
             }
@@ -91,9 +96,11 @@ internal fun ConnectedTmdbAccountCard(
 
         TmdbAccountStatusRow(
             icon = Icons.AutoMirrored.Filled.Logout,
-            title = if (isLoading) "Disconnecting" else "Sign Out",
-            subtitle = "Remove TMDB session from this device",
-            contentColor = MaterialTheme.colorScheme.error,
+            title = if (isLoading) "Disconnecting" else "Sign out",
+            subtitle = "Remove TMDB connection",
+            titleColor = MaterialTheme.colorScheme.error,
+            iconTint = MaterialTheme.colorScheme.error,
+            iconContainerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.10f),
             onClick = if (isLoading) null else onDisconnectClick,
             trailing = {
                 if (isLoading) {

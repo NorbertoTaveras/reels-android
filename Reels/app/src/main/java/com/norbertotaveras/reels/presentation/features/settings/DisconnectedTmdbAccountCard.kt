@@ -14,12 +14,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Login
-import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.Link
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -27,12 +28,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTmdbBlue
@@ -44,17 +44,19 @@ internal fun DisconnectedTmdbAccountCard(
     onConnectClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val cardShape = RoundedCornerShape(ReelsDimensions.settingsTmdbCardCornerSize)
+
     Column(
         modifier = modifier
             .fillMaxWidth()
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.outline,
-                shape = MaterialTheme.shapes.extraLarge
+                shape = cardShape
             )
             .background(
                 color = MaterialTheme.colorScheme.surface,
-                shape = MaterialTheme.shapes.extraLarge
+                shape = cardShape
             )
             .padding(ReelsDimensions.settingsTmdbCardPadding),
         verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)
@@ -72,24 +74,35 @@ internal fun DisconnectedTmdbAccountCard(
             ) {
                 Text(
                     text = "Connect to TMDB",
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = ReelsDimensions.settingsTmdbConnectedTitleSize,
+                        lineHeight = ReelsDimensions.settingsTmdbConnectedTitleLineHeight,
+                        fontWeight = FontWeight.Normal,
+                        letterSpacing = 0.sp
+                    ),
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold
                 )
 
                 Text(
                     text = "Sync watchlist and ratings",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = ReelsDimensions.settingsTmdbConnectedBodySize,
+                        lineHeight = ReelsDimensions.settingsTmdbConnectedBodyLineHeight,
+                        fontWeight = FontWeight.Normal,
+                        letterSpacing = 0.sp
+                    ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontWeight = FontWeight.SemiBold
                 )
             }
         }
 
         Button(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(ReelsDimensions.settingsTmdbButtonHeight),
             enabled = !isLoading,
             onClick = onConnectClick,
+            shape = RoundedCornerShape(ReelsDimensions.settingsTmdbButtonCornerSize),
             colors = ButtonDefaults.buttonColors(
                 containerColor = ReelsTmdbBlue,
                 contentColor = ReelsTmdbOnBlue
@@ -103,9 +116,9 @@ internal fun DisconnectedTmdbAccountCard(
                 )
             } else {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Login,
+                    imageVector = Icons.Filled.Link,
                     contentDescription = null,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(ReelsDimensions.settingsTmdbButtonIconSize)
                 )
 
                 Spacer(modifier = Modifier.width(ReelsSpacing.small))
