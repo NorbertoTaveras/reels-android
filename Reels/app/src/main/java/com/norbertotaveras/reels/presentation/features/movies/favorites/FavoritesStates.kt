@@ -11,13 +11,15 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
@@ -111,33 +113,36 @@ internal fun DisconnectedTmdbLibraryState(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = ReelsSpacing.medium),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)
+            .padding(horizontal = ReelsDimensions.favoritesDisconnectedHorizontalPadding),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LibraryTmdbLogoMark()
+        Spacer(modifier = Modifier.height(ReelsDimensions.favoritesDisconnectedLogoSpacing))
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
-        ) {
-            Text(
-                text = "Connect to TMDB",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold
-            )
+        Text(
+            text = "Connect to TMDB",
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontSize = ReelsDimensions.favoritesDisconnectedTitleSize,
+                lineHeight = ReelsDimensions.favoritesDisconnectedTitleLineHeight,
+                fontWeight = FontWeight.Normal
+            ),
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(modifier = Modifier.height(ReelsDimensions.favoritesDisconnectedTitleSpacing))
 
-            Text(
-                text = "Sign in to your TMDB account to sync your watchlist and ratings across devices.",
-                modifier = Modifier.widthIn(
-                    max = ReelsDimensions.favoritesDisconnectedBodyMaxWidth
-                ),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
-            )
-        }
+        Text(
+            text = "Sign in to your TMDB account to sync your watchlist and ratings across devices.",
+            modifier = Modifier.widthIn(
+                max = ReelsDimensions.favoritesDisconnectedBodyMaxWidth
+            ),
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontSize = ReelsDimensions.favoritesDisconnectedBodySize,
+                lineHeight = ReelsDimensions.favoritesDisconnectedBodyLineHeight
+            ),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(ReelsDimensions.favoritesDisconnectedSectionSpacing))
 
         Surface(
             modifier = Modifier
@@ -171,23 +176,28 @@ internal fun DisconnectedTmdbLibraryState(
                 )
             }
         }
+        Spacer(modifier = Modifier.height(ReelsDimensions.favoritesDisconnectedSectionSpacing))
 
         Button(
             modifier = Modifier
-                .widthIn(max = ReelsDimensions.favoritesConnectButtonMaxWidth)
-                .fillMaxWidth(),
-            onClick = onConnectSettingsClick
+                .width(ReelsDimensions.favoritesConnectButtonWidth)
+                .height(ReelsDimensions.favoritesConnectButtonHeight),
+            onClick = onConnectSettingsClick,
+            shape = RoundedCornerShape(ReelsDimensions.favoritesConnectButtonCornerSize),
+            contentPadding = PaddingValues(
+                horizontal = ReelsDimensions.favoritesConnectButtonHorizontalPadding
+            )
         ) {
             Icon(
                 imageVector = Icons.Filled.Link,
                 contentDescription = null,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(ReelsDimensions.favoritesConnectButtonIconSize)
             )
 
             Text(
                 modifier = Modifier.padding(start = ReelsSpacing.small),
                 text = "Connect in Settings",
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.SemiBold
             )
         }
     }
@@ -199,7 +209,7 @@ private fun LibraryTmdbLogoMark(
 ) {
     Surface(
         modifier = modifier.size(ReelsDimensions.favoritesTmdbLogoSize),
-        shape = MaterialTheme.shapes.large,
+        shape = RoundedCornerShape(ReelsDimensions.favoritesTmdbLogoCornerSize),
         color = ReelsTmdbBlue,
         contentColor = ReelsTmdbOnBlue
     ) {
@@ -207,9 +217,7 @@ private fun LibraryTmdbLogoMark(
             Icon(
                 painter = painterResource(R.drawable.tmdb_logo),
                 contentDescription = "TMDB logo",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(ReelsSpacing.medium),
+                modifier = Modifier.width(ReelsDimensions.favoritesTmdbLogoMarkWidth),
                 tint = ReelsTmdbOnBlue
             )
         }
@@ -227,15 +235,15 @@ private fun TmdbFeatureRow(
         modifier = modifier
             .fillMaxWidth()
             .padding(
-                horizontal = ReelsSpacing.large,
-                vertical = ReelsSpacing.medium
+                horizontal = ReelsDimensions.favoritesFeatureRowHorizontalPadding,
+                vertical = ReelsDimensions.favoritesFeatureRowVerticalPadding
             ),
-        horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
+        horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesFeatureRowSpacing),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Surface(
             modifier = Modifier.size(ReelsDimensions.favoritesFeatureIconContainerSize),
-            shape = CircleShape,
+            shape = RoundedCornerShape(ReelsDimensions.favoritesFeatureIconCornerSize),
             color = MaterialTheme.colorScheme.surfaceVariant,
             contentColor = MaterialTheme.colorScheme.primary
         ) {
@@ -248,16 +256,23 @@ private fun TmdbFeatureRow(
             }
         }
 
-        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Column {
             Text(
                 text = title,
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.SemiBold
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontSize = ReelsDimensions.favoritesFeatureTitleSize,
+                    lineHeight = ReelsDimensions.favoritesFeatureTitleLineHeight,
+                    fontWeight = FontWeight.Normal
+                ),
+                color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = description,
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontSize = ReelsDimensions.favoritesFeatureDescriptionSize,
+                    lineHeight = ReelsDimensions.favoritesFeatureDescriptionLineHeight,
+                    fontWeight = FontWeight.Normal
+                ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
