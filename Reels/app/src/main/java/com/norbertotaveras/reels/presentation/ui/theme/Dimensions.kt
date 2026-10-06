@@ -118,6 +118,16 @@ object ReelsDimensions {
     val favoritesEmptyIconCornerSize = 24.dp
     val favoritesEmptyIconSize = 34.dp
     val favoritesEmptyContentSpacing = 12.dp
+    val favoritesLibraryEmptyHorizontalPadding = 16.dp
+    val favoritesLibraryEmptyIconContainerSize = 56.dp
+    val favoritesLibraryEmptyIconCornerSize = 16.dp
+    val favoritesLibraryEmptyIconSize = 22.dp
+    val favoritesLibraryEmptyIconToTitleSpacing = 12.dp
+    val favoritesLibraryEmptyTitleToBodySpacing = 4.dp
+    val favoritesLibraryEmptyTitleSize = 14.sp
+    val favoritesLibraryEmptyTitleLineHeight = 20.sp
+    val favoritesLibraryEmptyBodySize = 11.sp
+    val favoritesLibraryEmptyBodyLineHeight = 18.sp
     val favoritesTmdbLogoSize = 80.dp
     val favoritesTmdbLogoCornerSize = 24.dp
     val favoritesTmdbLogoMarkWidth = 36.dp

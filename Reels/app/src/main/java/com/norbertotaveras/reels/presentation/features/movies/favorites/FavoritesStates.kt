@@ -287,13 +287,12 @@ internal fun EmptyLibraryState(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = ReelsSpacing.xLarge),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesEmptyContentSpacing)
+            .padding(horizontal = ReelsDimensions.favoritesLibraryEmptyHorizontalPadding),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Surface(
-            modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconContainerSize),
-            shape = RoundedCornerShape(ReelsDimensions.favoritesEmptyIconCornerSize),
+            modifier = Modifier.size(ReelsDimensions.favoritesLibraryEmptyIconContainerSize),
+            shape = RoundedCornerShape(ReelsDimensions.favoritesLibraryEmptyIconCornerSize),
             color = MaterialTheme.colorScheme.surfaceVariant,
             contentColor = MaterialTheme.colorScheme.primary
         ) {
@@ -306,31 +305,43 @@ internal fun EmptyLibraryState(
                         LibraryTab.Rated -> Icons.Filled.Star
                     },
                     contentDescription = null,
-                    modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconSize)
+                    modifier = Modifier.size(ReelsDimensions.favoritesLibraryEmptyIconSize)
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(ReelsDimensions.favoritesLibraryEmptyIconToTitleSpacing))
 
         Text(
             text = when (selectedTab) {
                 LibraryTab.Movies -> "No saved movies yet"
                 LibraryTab.People -> "No saved people yet"
-                LibraryTab.Tmdb -> "Your watchlist is empty"
+                LibraryTab.Tmdb -> "Watchlist is empty"
                 LibraryTab.Rated -> "No rated movies yet"
             },
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.labelLarge.copy(
+                fontSize = ReelsDimensions.favoritesLibraryEmptyTitleSize,
+                lineHeight = ReelsDimensions.favoritesLibraryEmptyTitleLineHeight,
+                fontWeight = FontWeight.Medium
+            ),
             color = MaterialTheme.colorScheme.onSurface,
-            fontWeight = FontWeight.Bold
+            textAlign = TextAlign.Center
         )
+
+        Spacer(modifier = Modifier.height(ReelsDimensions.favoritesLibraryEmptyTitleToBodySpacing))
 
         Text(
             text = when (selectedTab) {
-                LibraryTab.Movies -> "Save movies from Movie Details to keep them available here and offline."
-                LibraryTab.People -> "Save people from Cast Details to keep their profiles close at hand."
-                LibraryTab.Tmdb -> "Add movies to your TMDB watchlist and they will appear here."
-                LibraryTab.Rated -> "Rate movies from Movie Details to sync them with TMDB."
+                LibraryTab.Movies -> "Tap the heart on any movie to save it here for offline access."
+                LibraryTab.People -> "Save cast members from any detail page."
+                LibraryTab.Tmdb -> "Add movies from any Movie Details page."
+                LibraryTab.Rated -> "Rate movies from any Movie Details page."
             },
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontSize = ReelsDimensions.favoritesLibraryEmptyBodySize,
+                lineHeight = ReelsDimensions.favoritesLibraryEmptyBodyLineHeight,
+                fontWeight = FontWeight.Normal
+            ),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
