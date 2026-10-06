@@ -28,6 +28,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTmdbBlue
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTmdbOnBlue
+import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
 
 @Composable
 internal fun PendingTmdbAccountCard(
@@ -42,7 +43,7 @@ internal fun PendingTmdbAccountCard(
             .fillMaxWidth()
             .border(
                 width = ReelsDimensions.settingsDividerThickness,
-                color = settingsBorderColor(),
+                color = reelsBorderColor(),
                 shape = cardShape
             )
             .background(

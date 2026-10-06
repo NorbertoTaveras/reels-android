@@ -35,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -43,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsAccent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
 
 @Composable
 internal fun SettingsSection(
@@ -61,7 +61,7 @@ internal fun SettingsSection(
                 .fillMaxWidth()
                 .border(
                     width = ReelsDimensions.settingsDividerThickness,
-                    color = settingsBorderColor(),
+                    color = reelsBorderColor(),
                     shape = RoundedCornerShape(
                         ReelsDimensions.settingsCardCornerSize
                     )
@@ -169,7 +169,7 @@ internal fun SettingsDivider(
     HorizontalDivider(
         modifier = modifier,
         thickness = ReelsDimensions.settingsDividerThickness,
-        color = settingsBorderColor()
+        color = reelsBorderColor()
     )
 }
 
@@ -192,8 +192,3 @@ internal fun SettingsSectionLabel(
         fontWeight = FontWeight.Normal
     )
 }
-
-@Composable
-internal fun settingsBorderColor() = MaterialTheme.colorScheme.onSurface.copy(
-    alpha = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) 0.08f else 0.12f
-)

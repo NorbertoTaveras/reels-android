@@ -27,6 +27,7 @@ import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
 import com.norbertotaveras.reels.presentation.ui.extensions.toGravatarUrl
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
+import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
 
 @Composable
 internal fun ConnectedTmdbAccountCard(
@@ -47,7 +48,7 @@ internal fun ConnectedTmdbAccountCard(
             .fillMaxWidth()
             .border(
                 width = ReelsDimensions.settingsDividerThickness,
-                color = settingsBorderColor(),
+                color = reelsBorderColor(),
                 shape = cardShape
             )
             .background(

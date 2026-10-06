@@ -11,6 +11,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 object ReelsDimensions {
+    val bottomNavigationContentHeight = 73.dp
+    val bottomNavigationHorizontalPadding = 8.dp
+    val bottomNavigationVerticalPadding = 8.dp
+    val bottomNavigationItemHorizontalPadding = 12.dp
+    val bottomNavigationItemVerticalPadding = 8.dp
+    val bottomNavigationItemCornerSize = 8.dp
+    val bottomNavigationItemSpacing = 4.dp
+    val bottomNavigationIconSize = 22.dp
+    val bottomNavigationLabelSize = 10.sp
+    val bottomNavigationLabelLineHeight = 15.sp
+    val bottomNavigationDividerThickness = 1.dp
+
     val cachedContentIconContainerSize = 28.dp
     val cachedContentIconSize = 14.dp
     val cachedContentIconCornerSize = 8.dp

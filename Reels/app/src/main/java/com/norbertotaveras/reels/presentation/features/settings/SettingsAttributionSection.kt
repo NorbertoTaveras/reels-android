@@ -39,6 +39,7 @@ import com.norbertotaveras.reels.R
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsAccent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
 
 @Composable
 internal fun TmdbAttributionSection(
@@ -66,7 +67,7 @@ private fun TmdbAttributionCard(
             .clickable(onClick = onClick)
             .border(
                 width = ReelsDimensions.settingsDividerThickness,
-                color = settingsBorderColor(),
+                color = reelsBorderColor(),
                 shape = RoundedCornerShape(
                     ReelsDimensions.settingsCardCornerSize
                 )
