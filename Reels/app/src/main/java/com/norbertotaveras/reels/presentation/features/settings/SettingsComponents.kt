@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.HorizontalDivider
@@ -34,10 +35,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsAccent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
@@ -53,28 +54,21 @@ internal fun SettingsSection(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(ReelsDimensions.settingsSectionContentSpacing)
     ) {
-        Text(
-            text = title,
-            modifier = Modifier.padding(
-                horizontal = ReelsDimensions.settingsSectionTitleHorizontalPadding
-            ),
-            style = MaterialTheme.typography.labelLarge.copy(
-                fontSize = ReelsDimensions.settingsSectionTitleSize,
-                letterSpacing = 0.sp
-            ),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.Bold
-        )
+        SettingsSectionLabel(text = title)
 
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
                 .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.outline,
-                    shape = MaterialTheme.shapes.extraLarge
+                    width = ReelsDimensions.settingsDividerThickness,
+                    color = settingsBorderColor(),
+                    shape = RoundedCornerShape(
+                        ReelsDimensions.settingsCardCornerSize
+                    )
                 ),
-            shape = MaterialTheme.shapes.extraLarge,
+            shape = RoundedCornerShape(
+                ReelsDimensions.settingsCardCornerSize
+            ),
             color = MaterialTheme.colorScheme.surface
         ) {
             Column(content = content)
@@ -128,23 +122,30 @@ internal fun SettingsRow(
         Spacer(modifier = Modifier.width(ReelsSpacing.large))
 
         Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            modifier = Modifier.weight(1f)
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = ReelsDimensions.settingsRowTitleSize,
+                    lineHeight = ReelsDimensions.settingsRowTitleLineHeight,
+                    letterSpacing = 0.sp
+                ),
                 color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
             Text(
                 text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = ReelsDimensions.settingsRowSubtitleSize,
+                    lineHeight = ReelsDimensions.settingsRowSubtitleLineHeight,
+                    letterSpacing = 0.sp
+                ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -168,6 +169,31 @@ internal fun SettingsDivider(
     HorizontalDivider(
         modifier = modifier,
         thickness = ReelsDimensions.settingsDividerThickness,
-        color = MaterialTheme.colorScheme.outline
+        color = settingsBorderColor()
     )
 }
+
+@Composable
+internal fun SettingsSectionLabel(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = text,
+        modifier = modifier.padding(
+            horizontal = ReelsDimensions.settingsSectionTitleHorizontalPadding
+        ),
+        style = MaterialTheme.typography.labelMedium.copy(
+            fontSize = ReelsDimensions.settingsSectionTitleSize,
+            lineHeight = ReelsDimensions.settingsSectionTitleLineHeight,
+            letterSpacing = ReelsDimensions.settingsSectionTitleLetterSpacing
+        ),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        fontWeight = FontWeight.Normal
+    )
+}
+
+@Composable
+internal fun settingsBorderColor() = MaterialTheme.colorScheme.onSurface.copy(
+    alpha = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) 0.08f else 0.12f
+)

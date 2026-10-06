@@ -33,14 +33,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.norbertotaveras.reels.R
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
@@ -58,7 +61,7 @@ internal fun TmdbAccountHeaderRow(
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TmdbLogoMark()
+        TmdbConnectionLogoMark()
 
         Spacer(modifier = Modifier.width(ReelsSpacing.large))
 
@@ -96,6 +99,30 @@ internal fun TmdbAccountHeaderRow(
         if (trailing != null) {
             Spacer(modifier = Modifier.width(ReelsSpacing.medium))
             trailing()
+        }
+    }
+}
+
+@Composable
+internal fun TmdbConnectionLogoMark(
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.size(ReelsDimensions.settingsTmdbLogoSize),
+        shape = RoundedCornerShape(ReelsDimensions.settingsTmdbConnectedIconCornerSize),
+        color = ReelsTmdbBlue
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            androidx.compose.foundation.Image(
+                painter = painterResource(id = R.drawable.tmdb_logo),
+                contentDescription = "TMDB logo",
+                modifier = Modifier.size(
+                    width = ReelsDimensions.settingsTmdbConnectionLogoWidth,
+                    height = ReelsDimensions.settingsTmdbConnectionLogoHeight
+                ),
+                colorFilter = ColorFilter.tint(Color.White),
+                contentScale = ContentScale.Fit
+            )
         }
     }
 }

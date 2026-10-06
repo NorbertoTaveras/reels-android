@@ -41,8 +41,8 @@ internal fun PendingTmdbAccountCard(
         modifier = modifier
             .fillMaxWidth()
             .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outline,
+                width = ReelsDimensions.settingsDividerThickness,
+                color = settingsBorderColor(),
                 shape = cardShape
             )
             .background(

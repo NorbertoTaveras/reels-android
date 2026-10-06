@@ -23,7 +23,7 @@ val ReelsTmdbOnBlue = Color.White
 
 val ReelsLightBackground = Color(0xFFF5F0E8)
 val ReelsLightSurface = Color(0xFFEDE8DC)
-val ReelsLightSurfaceHigh = Color(0xFFE8E0D4)
+val ReelsLightSurfaceHigh = Color(0xFFE4DDD2)
 val ReelsLightSurfacePressed = Color(0xFFDED4C5)
 val ReelsLightMuted = Color(0xFFE4DDD2)
 val ReelsLightText = Color(0xFF1C1710)
@@ -31,14 +31,14 @@ val ReelsLightTextSecondary = Color(0xFF6E6055)
 val ReelsLightBorder = Color(0xFFD8CFC1)
 val ReelsLightAccent = Color(0xFFC49040)
 
-val ReelsBackground = Color(0xFF0B0B0D)
-val ReelsSurface = Color(0xFF18181B)
-val ReelsSurfaceHigh = Color(0xFF1F1F23)
+val ReelsBackground = Color(0xFF0F0F11)
+val ReelsSurface = Color(0xFF1A1A1D)
+val ReelsSurfaceHigh = Color(0xFF2D2D30)
 val ReelsSurfacePressed = Color(0xFF27272A)
-val ReelsMuted = Color(0xFF242427)
+val ReelsMuted = Color(0xFF2D2D30)
 
-val ReelsTextPrimary = Color(0xFFF4F4F5)
-val ReelsTextSecondary = Color(0xFFA1A1AA)
+val ReelsTextPrimary = Color(0xFFF5F5F0)
+val ReelsTextSecondary = Color(0xFF9A9A9A)
 val ReelsTextTertiary = Color(0xFF71717A)
 
 val ReelsAccent = Color(0xFFD4A574)
@@ -48,7 +48,7 @@ val ReelsLightRatingContainer = Color(0x33C49040)
 val ReelsLightHeroRatingContainer = Color(0xFF3A2D24)
 val ReelsImageOverlayBackground = Color(0xFF0F0F11)
 
-val ReelsBorder = Color(0xFF2A2A2F)
+val ReelsBorder = Color(0xFF2D2D30)
 
 val ReelsGenreChipContainer = Color(0xFF2F3035)
 val ReelsLightGenreChipContainer = Color(0xFFE3DDD4)

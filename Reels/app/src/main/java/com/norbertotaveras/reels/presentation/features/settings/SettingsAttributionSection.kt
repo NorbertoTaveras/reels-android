@@ -19,25 +19,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.R
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsAccent
@@ -53,18 +49,7 @@ internal fun TmdbAttributionSection(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
     ) {
-        Text(
-            text = "TMDB ATTRIBUTION",
-            modifier = Modifier.padding(
-                horizontal = ReelsDimensions.settingsSectionTitleHorizontalPadding
-            ),
-            style = MaterialTheme.typography.labelLarge.copy(
-                fontSize = ReelsDimensions.settingsSectionTitleSize,
-                letterSpacing = 0.sp
-            ),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.Bold
-        )
+        SettingsSectionLabel(text = "TMDB ATTRIBUTION")
 
         TmdbAttributionCard(onClick = onClick)
     }
@@ -80,13 +65,17 @@ private fun TmdbAttributionCard(
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outline,
-                shape = MaterialTheme.shapes.extraLarge
+                width = ReelsDimensions.settingsDividerThickness,
+                color = settingsBorderColor(),
+                shape = RoundedCornerShape(
+                    ReelsDimensions.settingsCardCornerSize
+                )
             )
             .background(
                 color = MaterialTheme.colorScheme.surface,
-                shape = MaterialTheme.shapes.extraLarge
+                shape = RoundedCornerShape(
+                    ReelsDimensions.settingsCardCornerSize
+                )
             )
             .padding(ReelsDimensions.settingsTmdbCardPadding),
         verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)
@@ -99,40 +88,58 @@ private fun TmdbAttributionCard(
             Spacer(modifier = Modifier.width(ReelsSpacing.large))
 
             Column(
-                verticalArrangement = Arrangement.spacedBy(6.dp)
+                verticalArrangement = Arrangement.spacedBy(
+                    ReelsDimensions.settingsAttributionTextSpacing
+                )
             ) {
                 Text(
                     text = "The Movie Database",
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = ReelsDimensions.settingsRowTitleSize,
+                        lineHeight = ReelsDimensions.settingsRowTitleLineHeight,
+                        letterSpacing = 0.sp
+                    ),
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Normal
                 )
 
                 Text(
                     text = "Powered by TMDB API",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = ReelsDimensions.settingsRowSubtitleSize,
+                        lineHeight = ReelsDimensions.settingsRowSubtitleLineHeight,
+                        letterSpacing = 0.sp
+                    ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.Normal
                 )
             }
         }
 
         Text(
             text = "This product uses the TMDB API but is not endorsed or certified by TMDB.",
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontSize = ReelsDimensions.settingsRowSubtitleSize,
+                lineHeight = ReelsDimensions.settingsAttributionBodyLineHeight,
+                letterSpacing = 0.sp
+            ),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.Normal
         )
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
         ) {
             Text(
                 text = "Visit themoviedb.org",
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = ReelsDimensions.settingsRowSubtitleSize,
+                    lineHeight = ReelsDimensions.settingsRowSubtitleLineHeight,
+                    letterSpacing = 0.sp
+                ),
                 color = ReelsAccent,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Medium
             )
 
             Icon(

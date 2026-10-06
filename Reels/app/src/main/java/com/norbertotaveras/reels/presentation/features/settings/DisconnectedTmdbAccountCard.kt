@@ -50,8 +50,8 @@ internal fun DisconnectedTmdbAccountCard(
         modifier = modifier
             .fillMaxWidth()
             .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outline,
+                width = ReelsDimensions.settingsDividerThickness,
+                color = settingsBorderColor(),
                 shape = cardShape
             )
             .background(
@@ -64,7 +64,7 @@ internal fun DisconnectedTmdbAccountCard(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TmdbLogoMark()
+            TmdbConnectionLogoMark()
 
             Spacer(modifier = Modifier.width(ReelsSpacing.large))
 

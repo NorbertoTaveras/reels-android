@@ -33,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import com.norbertotaveras.reels.domain.model.settings.AppTheme
 import com.norbertotaveras.reels.domain.model.settings.ImageQuality
@@ -62,9 +63,13 @@ fun SettingsScreen(
     ) {
         Text(
             text = "Settings",
-            style = MaterialTheme.typography.headlineSmall,
+            style = MaterialTheme.typography.headlineSmall.copy(
+                fontSize = ReelsDimensions.settingsScreenTitleSize,
+                lineHeight = ReelsDimensions.settingsScreenTitleLineHeight,
+                letterSpacing = 0.sp
+            ),
             color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Medium
         )
 
         TmdbAccountSection(
