@@ -168,7 +168,7 @@ fun SettingsScreen(
                     when (option) {
                         ImageQuality.High -> "Sharp posters · Uses the most data"
                         ImageQuality.Standard -> "Balanced quality · Recommended"
-                        ImageQuality.Low -> "Reduced quality · Best on slow connections"
+                        ImageQuality.Low -> "Reduced quality · Best on slow\nconnections"
                     }
                 },
                 confirmLabel = "Save",

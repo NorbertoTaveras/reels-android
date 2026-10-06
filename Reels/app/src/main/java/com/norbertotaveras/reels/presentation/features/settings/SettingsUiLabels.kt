@@ -8,6 +8,7 @@
 package com.norbertotaveras.reels.presentation.features.settings
 
 import com.norbertotaveras.reels.BuildConfig
+import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 
 internal fun buildAppVersionLabel(): String {
     return "${BuildConfig.VERSION_NAME} (build ${BuildConfig.VERSION_CODE})"
@@ -37,6 +38,22 @@ internal fun buildSavedLibraryLabel(
     val personLabel = "$personCount ${if (personCount == 1) "person" else "people"}"
     return "$movieLabel · $personLabel"
 }
+
+internal val LanguageRegion.languageName: String
+    get() = when (this) {
+        LanguageRegion.EnglishUnitedStates -> "English"
+        LanguageRegion.SpanishSpain -> "Español"
+        LanguageRegion.FrenchFrance -> "Français"
+        LanguageRegion.JapaneseJapan -> "日本語"
+    }
+
+internal val LanguageRegion.regionName: String
+    get() = when (this) {
+        LanguageRegion.EnglishUnitedStates -> "United States"
+        LanguageRegion.SpanishSpain -> "España"
+        LanguageRegion.FrenchFrance -> "France"
+        LanguageRegion.JapaneseJapan -> "日本"
+    }
 
 private fun String.toDisplayLabel(): String {
     return replaceFirstChar { character ->

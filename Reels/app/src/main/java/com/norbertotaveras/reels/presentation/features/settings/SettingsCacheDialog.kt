@@ -7,29 +7,24 @@
 
 package com.norbertotaveras.reels.presentation.features.settings
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
 @Composable
@@ -38,85 +33,69 @@ internal fun ClearImageCacheDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    AlertDialog(
-        modifier = modifier.widthIn(max = 360.dp),
-        onDismissRequest = onDismiss,
-        icon = {
-            DialogIcon(
-                icon = Icons.Filled.DeleteOutline,
-                destructive = true
-            )
-        },
-        title = {
+    SettingsDialog(
+        icon = Icons.Filled.DeleteOutline,
+        title = "Clear Image Cache?",
+        onDismiss = onDismiss,
+        dismissLabel = "Cancel",
+        confirmLabel = "Clear cache",
+        onConfirm = onConfirm,
+        modifier = modifier,
+        destructive = true
+    ) {
+        Column {
             Text(
-                text = "Clear Image Cache?",
+                text = "This will remove 42 MB of cached poster images from your device. " +
+                    "They will be re-downloaded the next time you browse.",
                 modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = ReelsDimensions.settingsDialogBodySize,
+                    lineHeight = ReelsDimensions.settingsDialogBodyLineHeight
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)) {
-                Text(
-                    text = "This will remove 42 MB of cached poster images from your device. " +
-                        "They will be re-downloaded the next time you browse.",
-                    modifier = Modifier.fillMaxWidth(),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
-                )
 
-                Surface(
-                    shape = MaterialTheme.shapes.large,
-                    color = MaterialTheme.colorScheme.surfaceVariant
-                ) {
-                    Column(
-                        modifier = Modifier.padding(ReelsSpacing.large),
-                        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
-                    ) {
-                        CacheBreakdownRow(
-                            icon = Icons.Filled.Movie,
-                            label = "Movie posters",
-                            value = "28 MB"
-                        )
-                        CacheBreakdownRow(
-                            icon = Icons.Filled.Person,
-                            label = "Person portraits",
-                            value = "11 MB"
-                        )
-                        CacheBreakdownRow(
-                            icon = Icons.Filled.Image,
-                            label = "Backdrop images",
-                            value = "3 MB"
-                        )
-                    }
+            Spacer(modifier = Modifier.height(ReelsSpacing.large))
+
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(ReelsDimensions.settingsDialogOptionCornerSize),
+                color = MaterialTheme.colorScheme.surfaceVariant
+            ) {
+                Column {
+                    CacheBreakdownRow(
+                        icon = Icons.Filled.Movie,
+                        label = "Movie posters",
+                        value = "28 MB"
+                    )
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+                    CacheBreakdownRow(
+                        icon = Icons.Filled.Person,
+                        label = "Person portraits",
+                        value = "11 MB"
+                    )
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+                    CacheBreakdownRow(
+                        icon = Icons.Filled.Image,
+                        label = "Backdrop images",
+                        value = "3 MB"
+                    )
                 }
+            }
 
-                Text(
-                    text = "Saved offline content is not affected.",
-                    modifier = Modifier.fillMaxWidth(),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(
-                    text = "Clear cache",
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = "Cancel")
-            }
-        },
-        containerColor = MaterialTheme.colorScheme.surface,
-        titleContentColor = MaterialTheme.colorScheme.onSurface,
-        textContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-    )
+            Spacer(modifier = Modifier.height(ReelsSpacing.medium))
+
+            Text(
+                text = "Saved offline content is not affected.",
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontSize = ReelsDimensions.settingsDialogOptionBodySize,
+                    lineHeight = ReelsDimensions.settingsDialogOptionBodyLineHeight
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
 }
