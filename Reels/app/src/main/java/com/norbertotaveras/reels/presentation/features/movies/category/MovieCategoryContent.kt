@@ -21,9 +21,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.CachedContentBanner
-import com.norbertotaveras.reels.presentation.ui.components.common.EmptyState
 import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
-import com.norbertotaveras.reels.presentation.ui.extensions.displayLabel
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 
@@ -54,9 +52,6 @@ internal fun MovieCategoryContent(
             MovieCategoryErrorState(
                 modifier = modifier,
                 category = state.category,
-                message = refreshState.error.toUserMessage(
-                    fallback = "Unable to load ${state.category.displayLabel} movies."
-                ),
                 retryLabel = "Try Again",
                 onBackClick = {
                     onEvent(MovieCategoryEvent.BackClicked)
@@ -104,10 +99,7 @@ internal fun MovieCategoryContent(
 
         if (movies.itemCount == 0) {
             item(span = { GridItemSpan(maxLineSpan) }) {
-                EmptyState(
-                    title = "No movies found",
-                    message = "Try refreshing this section again in a moment."
-                )
+                MovieCategoryEmptyState(category = state.category)
             }
         } else {
             items(
@@ -147,13 +139,7 @@ internal fun MovieCategoryContent(
                 }
             }
 
-            is LoadState.NotLoading -> {
-                if (appendState.endOfPaginationReached && movies.itemCount > 0) {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        MovieCategoryEndCap(movieCount = movies.itemCount)
-                    }
-                }
-            }
+            is LoadState.NotLoading -> Unit
         }
     }
 }

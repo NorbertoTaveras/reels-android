@@ -8,21 +8,26 @@
 package com.norbertotaveras.reels.presentation.features.movies.category
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CloudOff
-import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.Movie
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -33,11 +38,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 import com.norbertotaveras.reels.presentation.ui.extensions.displayLabel
-import com.norbertotaveras.reels.presentation.ui.extensions.toErrorTitle
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
 @Composable
 internal fun MovieCategoryLoadingState(
@@ -60,10 +64,7 @@ internal fun MovieCategoryLoadingState(
         verticalArrangement = Arrangement.spacedBy(ReelsDimensions.categoryGridVerticalSpacing)
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
-            MovieCategoryHeader(
-                category = category,
-                onBackClick = onBackClick
-            )
+            MovieCategoryHeader(category = category, onBackClick = onBackClick)
         }
 
         items(CATEGORY_PLACEHOLDER_COUNT) {
@@ -75,7 +76,6 @@ internal fun MovieCategoryLoadingState(
 @Composable
 internal fun MovieCategoryErrorState(
     category: MovieCategory,
-    message: String,
     retryLabel: String,
     onBackClick: () -> Unit,
     onRetry: () -> Unit,
@@ -91,65 +91,135 @@ internal fun MovieCategoryErrorState(
                 end = ReelsDimensions.categoryScreenHorizontalPadding,
                 bottom = ReelsDimensions.categoryScreenBottomPadding
             ),
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.sectionSpacing)
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.categoryGridVerticalSpacing)
     ) {
-        MovieCategoryHeader(
-            category = category,
-            onBackClick = onBackClick
-        )
+        MovieCategoryHeader(category = category, onBackClick = onBackClick)
 
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.large,
-            color = MaterialTheme.colorScheme.surface,
-            border = androidx.compose.foundation.BorderStroke(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outline
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(ReelsDimensions.stateCardPadding),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(ReelsDimensions.stateCardContentSpacing)
-            ) {
-                Surface(
-                    modifier = Modifier.size(ReelsDimensions.stateIconContainerSize),
-                    shape = MaterialTheme.shapes.large,
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = MaterialTheme.colorScheme.primary
+        MovieCategoryStateContent(
+            icon = {
+                Icon(
+                    imageVector = Icons.Outlined.ErrorOutline,
+                    contentDescription = null,
+                    modifier = Modifier.size(ReelsDimensions.categoryStateIconSize)
+                )
+            },
+            title = "Couldn't load movies",
+            message = "Check your connection and try again.",
+            action = {
+                Button(
+                    modifier = Modifier.height(ReelsDimensions.categoryStateActionHeight),
+                    onClick = onRetry,
+                    shape = RoundedCornerShape(ReelsDimensions.categoryStateActionCornerSize),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    contentPadding = PaddingValues(
+                        horizontal = ReelsDimensions.categoryStateActionHorizontalPadding,
+                        vertical = ReelsDimensions.categoryStateActionVerticalPadding
+                    )
                 ) {
-                    Box(contentAlignment = Alignment.Center) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(
+                            ReelsDimensions.categoryStateActionContentSpacing
+                        ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Icon(
-                            imageVector = Icons.Outlined.CloudOff,
+                            imageVector = Icons.Outlined.Refresh,
                             contentDescription = null,
-                            modifier = Modifier.size(ReelsDimensions.stateIconSize)
+                            modifier = Modifier.size(ReelsDimensions.categoryStateActionIconSize)
+                        )
+                        Text(
+                            text = retryLabel,
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                fontSize = 14.sp,
+                                lineHeight = 20.sp
+                            ),
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
+            }
+        )
+    }
+}
 
-                Text(
-                    text = message.toErrorTitle(
-                        fallback = "Unable to load ${category.displayLabel.lowercase()}"
-                    ),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold
+@Composable
+internal fun MovieCategoryEmptyState(
+    category: MovieCategory,
+    modifier: Modifier = Modifier,
+) {
+    MovieCategoryStateContent(
+        modifier = modifier,
+        icon = {
+            Icon(
+                imageVector = Icons.Outlined.Movie,
+                contentDescription = null,
+                modifier = Modifier.size(ReelsDimensions.categoryStateIconSize)
+            )
+        },
+        title = "Nothing here yet",
+        message = "Check back soon — new ${category.displayLabel.lowercase()} titles will appear here."
+    )
+}
+
+@Composable
+private fun MovieCategoryStateContent(
+    icon: @Composable () -> Unit,
+    title: String,
+    message: String,
+    modifier: Modifier = Modifier,
+    action: (@Composable () -> Unit)? = null,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = ReelsDimensions.categoryStateHorizontalPadding,
+                vertical = ReelsDimensions.categoryStateVerticalPadding
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Surface(
+            modifier = Modifier.size(ReelsDimensions.categoryStateIconContainerSize),
+            shape = RoundedCornerShape(ReelsDimensions.categoryStateIconContainerCornerSize),
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+        ) {
+            Box(contentAlignment = Alignment.Center) { icon() }
+        }
+
+        Text(
+            modifier = Modifier.padding(top = ReelsDimensions.categoryStateIconToTitleSpacing),
+            text = title,
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontSize = 18.sp,
+                lineHeight = 28.sp
+            ),
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Normal
+        )
+
+        Text(
+            modifier = Modifier.padding(top = ReelsDimensions.categoryStateTitleToMessageSpacing),
+            text = message,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontSize = 14.sp,
+                lineHeight = 23.sp
+            ),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+
+        action?.let {
+            Box(
+                modifier = Modifier.padding(
+                    top = ReelsDimensions.categoryStateMessageToActionSpacing
                 )
-
-                Text(
-                    text = message,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
-                )
-
-                FilledTonalButton(
-                    modifier = Modifier.padding(top = ReelsSpacing.small),
-                    onClick = onRetry
-                ) {
-                    Text(text = retryLabel)
-                }
+            ) {
+                it()
             }
         }
     }

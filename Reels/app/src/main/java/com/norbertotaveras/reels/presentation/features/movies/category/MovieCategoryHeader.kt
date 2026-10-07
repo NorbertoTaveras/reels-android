@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 import com.norbertotaveras.reels.presentation.ui.extensions.displayLabel
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
 
 @Composable
 internal fun MovieCategoryHeader(
@@ -57,7 +57,7 @@ internal fun MovieCategoryHeader(
             shadowElevation = 0.dp,
             border = BorderStroke(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
+                color = reelsBorderColor()
             )
         ) {
             IconButton(onClick = onBackClick) {
@@ -80,7 +80,7 @@ internal fun MovieCategoryHeader(
                     lineHeight = 30.sp
                 ),
                 color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -88,8 +88,8 @@ internal fun MovieCategoryHeader(
             Text(
                 text = category.supportingText,
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 12.sp,
-                    lineHeight = 16.sp
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
@@ -120,7 +120,7 @@ private fun MovieCategoryCountChip(
         contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)
+            color = reelsBorderColor()
         )
     ) {
         Row(
@@ -128,7 +128,9 @@ private fun MovieCategoryCountChip(
                 horizontal = ReelsDimensions.categoryCountHorizontalPadding,
                 vertical = ReelsDimensions.categoryCountVerticalPadding
             ),
-            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
+            horizontalArrangement = Arrangement.spacedBy(
+                ReelsDimensions.categoryCountContentSpacing
+            ),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -140,9 +142,10 @@ private fun MovieCategoryCountChip(
             Text(
                 text = if (hasMoreMovies) "$movieCount+ movies" else "$movieCount movies",
                 style = MaterialTheme.typography.labelMedium.copy(
-                    fontSize = 10.sp,
-                    lineHeight = 14.sp
-                )
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
+                ),
+                fontWeight = FontWeight.Normal
             )
         }
     }

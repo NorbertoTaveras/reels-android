@@ -13,12 +13,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
@@ -40,7 +42,6 @@ import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContentColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPlaceholderColor
@@ -49,19 +50,18 @@ import com.norbertotaveras.reels.presentation.ui.theme.reelsPlaceholderColor
 internal fun MovieCategoryPlaceholderCard(
     modifier: Modifier = Modifier,
 ) {
-    androidx.compose.foundation.layout.Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.categoryPosterTextSpacing)
-    ) {
+    Column(modifier = modifier) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.poster)
-                .clip(MaterialTheme.shapes.medium)
+                .clip(RoundedCornerShape(ReelsDimensions.categoryPosterCornerSize))
                 .background(reelsPlaceholderColor())
         )
 
+        Spacer(modifier = Modifier.height(ReelsDimensions.categoryPosterToTitleSpacing))
         CategoryPlaceholderBar(widthFraction = 0.92f, height = 12.dp)
+        Spacer(modifier = Modifier.height(ReelsDimensions.categoryTitleToYearSpacing))
         CategoryPlaceholderBar(widthFraction = 0.45f, height = 10.dp)
     }
 }
@@ -87,15 +87,12 @@ internal fun MovieCategoryPosterCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    androidx.compose.foundation.layout.Column(
-        modifier = modifier.clickable(onClick = onClick),
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.categoryPosterTextSpacing)
-    ) {
+    Column(modifier = modifier.clickable(onClick = onClick)) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.poster)
-                .clip(MaterialTheme.shapes.medium)
+                .clip(RoundedCornerShape(ReelsDimensions.categoryPosterCornerSize))
         ) {
             AsyncImage(
                 model = movie.posterPath.toTmdbImageUrl(),
@@ -112,6 +109,8 @@ internal fun MovieCategoryPosterCard(
             )
         }
 
+        Spacer(modifier = Modifier.height(ReelsDimensions.categoryPosterToTitleSpacing))
+
         Text(
             text = movie.title,
             style = MaterialTheme.typography.labelMedium.copy(
@@ -125,11 +124,13 @@ internal fun MovieCategoryPosterCard(
         )
 
         movie.releaseDate.toReleaseYear()?.let { year ->
+            Spacer(modifier = Modifier.height(ReelsDimensions.categoryTitleToYearSpacing))
+
             Text(
                 text = year,
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontSize = 10.sp,
-                    lineHeight = 14.sp
+                    lineHeight = 15.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
@@ -146,7 +147,7 @@ private fun CategoryRatingBadge(
 ) {
     Surface(
         modifier = modifier,
-        shape = MaterialTheme.shapes.small,
+        shape = RoundedCornerShape(ReelsDimensions.categoryRatingCornerSize),
         color = reelsPosterRatingContainerColor(),
         contentColor = reelsImageRatingContentColor()
     ) {
@@ -155,7 +156,9 @@ private fun CategoryRatingBadge(
                 horizontal = ReelsDimensions.categoryRatingHorizontalPadding,
                 vertical = ReelsDimensions.categoryRatingVerticalPadding
             ),
-            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
+            horizontalArrangement = Arrangement.spacedBy(
+                ReelsDimensions.categoryRatingContentSpacing
+            ),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -170,34 +173,8 @@ private fun CategoryRatingBadge(
                     fontSize = 12.sp,
                     lineHeight = 16.sp
                 ),
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.Normal
             )
         }
-    }
-}
-
-@Composable
-internal fun MovieCategoryEndCap(
-    movieCount: Int,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = ReelsSpacing.large),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(width = 32.dp, height = 1.dp)
-                .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.55f))
-        )
-
-        Text(
-            text = "All $movieCount movies loaded",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }
