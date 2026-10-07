@@ -77,8 +77,6 @@ internal fun SearchContent(
                             trendingSearches = state.trendingSearches,
                             onEvent = onEvent
                         )
-                    } else {
-                        SearchPromptState()
                     }
                 }
                 return@LazyColumn
@@ -90,7 +88,7 @@ internal fun SearchContent(
 
             when {
                 refreshState is LoadState.Loading && !hasCachedMovies -> {
-                    item { SearchResultLoadingState() }
+                    Unit
                 }
 
                 refreshState is LoadState.Error && !hasCachedMovies -> {

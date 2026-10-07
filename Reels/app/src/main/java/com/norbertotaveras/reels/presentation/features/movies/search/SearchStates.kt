@@ -7,37 +7,33 @@
 
 package com.norbertotaveras.reels.presentation.features.movies.search
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
@@ -50,9 +46,12 @@ internal fun SearchResultsHeader(
     modifier: Modifier = Modifier,
 ) {
     Text(
-        modifier = modifier.padding(bottom = ReelsSpacing.xSmall),
+        modifier = modifier.padding(bottom = ReelsSpacing.small),
         text = "$count ${if (count == 1) "result" else "results"} for \"$query\"",
-        style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, lineHeight = 16.sp),
+        style = MaterialTheme.typography.bodySmall.copy(
+            fontSize = 12.sp,
+            lineHeight = 16.sp
+        ),
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
 }
@@ -100,22 +99,6 @@ private fun SearchEmptyState(modifier: Modifier = Modifier) {
 }
 
 @Composable
-internal fun SearchPromptState(modifier: Modifier = Modifier) {
-    SearchCenteredState(
-        modifier = modifier,
-        icon = {
-            Icon(
-                imageVector = Icons.Filled.Search,
-                contentDescription = null,
-                modifier = Modifier.size(ReelsDimensions.searchStateIconSize)
-            )
-        },
-        title = "Keep typing",
-        message = "Enter at least two characters to search."
-    )
-}
-
-@Composable
 internal fun SearchNoResultsState(
     query: String,
     suggestions: List<String>,
@@ -123,22 +106,32 @@ internal fun SearchNoResultsState(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.searchSectionGroupSpacing)
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = ReelsDimensions.searchStateHorizontalPadding,
+                vertical = ReelsDimensions.searchStateVerticalPadding
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        SearchCenteredState(
-            icon = {
-                Icon(
-                    imageVector = Icons.Filled.Search,
-                    contentDescription = null,
-                    modifier = Modifier.size(ReelsDimensions.searchStateIconSize)
-                )
-            },
+        SearchStateIcon {
+            Icon(
+                imageVector = Icons.Outlined.Movie,
+                contentDescription = null,
+                modifier = Modifier.size(ReelsDimensions.searchStateIconSize)
+            )
+        }
+
+        SearchStateText(
             title = "No results found",
             message = "No movies match \"$query\". Try a different title or keyword."
         )
+
         if (suggestions.isNotEmpty()) {
             SearchSuggestionsSection(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = ReelsDimensions.searchStateMessageToActionSpacing),
                 title = "TRY INSTEAD",
                 suggestions = suggestions,
                 onEvent = onEvent
@@ -156,9 +149,11 @@ internal fun SearchErrorState(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = ReelsDimensions.searchStateTopPadding),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
+            .padding(
+                horizontal = ReelsDimensions.searchStateHorizontalPadding,
+                vertical = ReelsDimensions.searchStateVerticalPadding
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         SearchStateIcon {
             Icon(
@@ -167,27 +162,47 @@ internal fun SearchErrorState(
                 modifier = Modifier.size(ReelsDimensions.searchStateIconSize)
             )
         }
-        Text(
-            text = "Search unavailable",
-            style = MaterialTheme.typography.titleMedium.copy(fontSize = 16.sp, lineHeight = 20.sp),
-            color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.SemiBold
+
+        SearchStateText(
+            title = "Search unavailable",
+            message = message
         )
-        Text(
-            modifier = Modifier.padding(horizontal = ReelsSpacing.xLarge),
-            text = message,
-            style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, lineHeight = 17.sp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-        Button(onClick = onRetry) {
-            Icon(
-                imageVector = Icons.Outlined.Refresh,
-                contentDescription = null,
-                modifier = Modifier.size(16.dp)
+
+        Button(
+            modifier = Modifier
+                .padding(top = ReelsDimensions.searchStateMessageToActionSpacing)
+                .height(ReelsDimensions.searchStateActionHeight),
+            onClick = onRetry,
+            shape = RoundedCornerShape(ReelsDimensions.searchStateActionCornerSize),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+            contentPadding = PaddingValues(
+                horizontal = ReelsDimensions.searchStateActionHorizontalPadding,
+                vertical = ReelsDimensions.searchStateActionVerticalPadding
             )
-            Spacer(modifier = Modifier.width(ReelsSpacing.small))
-            Text(text = "Try again")
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(
+                    ReelsDimensions.searchStateActionContentSpacing
+                ),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Refresh,
+                    contentDescription = null,
+                    modifier = Modifier.size(ReelsDimensions.searchStateActionIconSize)
+                )
+                Text(
+                    text = "Try again",
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontSize = 14.sp,
+                        lineHeight = 20.sp
+                    ),
+                    fontWeight = FontWeight.Medium
+                )
+            }
         }
     }
 }
@@ -202,22 +217,44 @@ private fun SearchCenteredState(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = ReelsDimensions.searchStateTopPadding),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
+            .padding(
+                horizontal = ReelsDimensions.searchStateHorizontalPadding,
+                vertical = ReelsDimensions.searchStateVerticalPadding
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         SearchStateIcon(content = icon)
-        Spacer(modifier = Modifier.height(ReelsSpacing.xSmall))
+        SearchStateText(title = title, message = message)
+    }
+}
+
+@Composable
+private fun SearchStateText(
+    title: String,
+    message: String,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.padding(top = ReelsDimensions.searchStateIconToTitleSpacing),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleMedium.copy(fontSize = 16.sp, lineHeight = 20.sp),
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontSize = 18.sp,
+                lineHeight = 28.sp
+            ),
             color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.Normal,
             textAlign = TextAlign.Center
         )
         Text(
+            modifier = Modifier.padding(top = ReelsDimensions.searchStateTitleToMessageSpacing),
             text = message,
-            style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, lineHeight = 17.sp),
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontSize = 14.sp,
+                lineHeight = 23.sp
+            ),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
@@ -231,78 +268,12 @@ private fun SearchStateIcon(
 ) {
     Surface(
         modifier = modifier.size(ReelsDimensions.searchStateIconContainerSize),
-        shape = MaterialTheme.shapes.large,
+        shape = RoundedCornerShape(ReelsDimensions.searchStateIconContainerCornerSize),
         color = MaterialTheme.colorScheme.surfaceVariant,
         contentColor = MaterialTheme.colorScheme.onSurfaceVariant
     ) {
         Box(contentAlignment = Alignment.Center) { content() }
     }
-}
-
-@Composable
-internal fun SearchResultLoadingState(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.searchResultSpacing)
-    ) {
-        PlaceholderBar(width = 132.dp, height = 12.dp)
-        repeat(4) { SearchResultPlaceholderRow() }
-    }
-}
-
-@Composable
-private fun SearchResultPlaceholderRow(modifier: Modifier = Modifier) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.50f)
-        )
-    ) {
-        Row(
-            modifier = Modifier.padding(ReelsDimensions.searchResultCardPadding),
-            horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.searchResultCardPadding),
-            verticalAlignment = Alignment.Top
-        ) {
-            Spacer(
-                modifier = Modifier
-                    .width(ReelsDimensions.searchResultPosterWidth)
-                    .height(ReelsDimensions.searchResultPosterHeight)
-                    .clip(MaterialTheme.shapes.medium)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-            )
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
-            ) {
-                PlaceholderBar(width = 150.dp, height = 14.dp)
-                PlaceholderBar(width = 128.dp, height = 11.dp)
-                PlaceholderBar(width = 48.dp, height = 22.dp)
-                Row(horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)) {
-                    PlaceholderBar(width = 52.dp, height = 20.dp)
-                    PlaceholderBar(width = 62.dp, height = 20.dp)
-                    PlaceholderBar(width = 56.dp, height = 20.dp)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun PlaceholderBar(
-    width: Dp,
-    height: Dp,
-    modifier: Modifier = Modifier,
-) {
-    Spacer(
-        modifier = modifier
-            .width(width)
-            .height(height)
-            .clip(MaterialTheme.shapes.medium)
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-    )
 }
 
 @Composable

@@ -10,9 +10,9 @@ package com.norbertotaveras.reels.presentation.features.movies.search
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,7 +25,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -40,7 +39,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsMutedContainerColor
 
 @Composable
 internal fun SearchField(
@@ -60,8 +60,8 @@ internal fun SearchField(
         singleLine = true,
         textStyle = MaterialTheme.typography.bodyMedium.copy(
             color = MaterialTheme.colorScheme.onSurface,
-            fontSize = 14.sp,
-            lineHeight = 18.sp
+            fontSize = 16.sp,
+            lineHeight = 24.sp
         ),
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         interactionSource = interactionSource,
@@ -70,14 +70,14 @@ internal fun SearchField(
         decorationBox = { innerTextField ->
             Surface(
                 modifier = Modifier.fillMaxSize(),
-                shape = MaterialTheme.shapes.medium,
+                shape = MaterialTheme.shapes.large,
                 color = MaterialTheme.colorScheme.surface,
                 border = BorderStroke(
-                    width = 1.dp,
+                    width = if (isFocused) 2.dp else 1.dp,
                     color = if (isFocused) {
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.58f)
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.60f)
                     } else {
-                        MaterialTheme.colorScheme.outline.copy(alpha = 0.52f)
+                        reelsBorderColor()
                     }
                 )
             ) {
@@ -87,10 +87,9 @@ internal fun SearchField(
                         end = if (query.isBlank()) {
                             ReelsDimensions.searchFieldHorizontalPadding
                         } else {
-                            ReelsSpacing.xSmall
+                            ReelsDimensions.searchFieldClearEndPadding
                         }
                     ),
-                    horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
@@ -100,6 +99,8 @@ internal fun SearchField(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
+                    Spacer(modifier = Modifier.width(ReelsDimensions.searchFieldIconToTextSpacing))
+
                     Box(
                         modifier = Modifier.weight(1f),
                         contentAlignment = Alignment.CenterStart
@@ -108,8 +109,8 @@ internal fun SearchField(
                             Text(
                                 text = "Search movies, directors...",
                                 style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontSize = 14.sp,
-                                    lineHeight = 18.sp
+                                    fontSize = 16.sp,
+                                    lineHeight = 24.sp
                                 ),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -118,16 +119,22 @@ internal fun SearchField(
                     }
 
                     if (query.isNotBlank()) {
-                        IconButton(
-                            modifier = Modifier.size(36.dp),
-                            onClick = onClearClick
+                        Surface(
+                            modifier = Modifier.size(ReelsDimensions.searchFieldClearButtonSize),
+                            onClick = onClearClick,
+                            shape = androidx.compose.foundation.shape.CircleShape,
+                            color = reelsMutedContainerColor(),
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.Close,
-                                contentDescription = "Clear search",
-                                modifier = Modifier.size(18.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = Icons.Filled.Close,
+                                    contentDescription = "Clear search",
+                                    modifier = Modifier.size(
+                                        ReelsDimensions.searchFieldClearIconSize
+                                    )
+                                )
+                            }
                         }
                     }
                 }

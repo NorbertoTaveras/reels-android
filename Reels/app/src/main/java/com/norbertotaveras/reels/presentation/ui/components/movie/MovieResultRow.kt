@@ -14,8 +14,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,13 +42,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsGenreChipContainer
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightGenreChipContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
-import com.norbertotaveras.reels.presentation.ui.theme.isReelsLightTheme
-import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsMutedContainerColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContentColor
 
 @Composable
@@ -70,14 +70,16 @@ fun MovieResultRow(
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.18f)
+            color = reelsBorderColor()
         )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(ReelsDimensions.searchResultCardPadding),
-            horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.searchResultCardPadding),
+            horizontalArrangement = Arrangement.spacedBy(
+                ReelsDimensions.searchResultCardContentSpacing
+            ),
             verticalAlignment = Alignment.Top
         ) {
             AsyncImage(
@@ -92,34 +94,49 @@ fun MovieResultRow(
             )
 
             Column(
-                modifier = Modifier
-                    .weight(1f),
-                verticalArrangement = Arrangement.spacedBy(ReelsDimensions.searchResultContentSpacing),
+                modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleSmall.copy(
-                        fontSize = 14.sp,
-                        lineHeight = 18.sp
+                        fontSize = 16.sp,
+                        lineHeight = 22.sp
                     ),
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Medium,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
 
-                MovieResultMetadataRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    releaseYear = releaseYear,
-                    secondaryMetadata = secondaryMetadata
-                )
+                if (!releaseYear.isNullOrBlank() || !secondaryMetadata.isNullOrBlank()) {
+                    Spacer(
+                        modifier = Modifier.height(
+                            ReelsDimensions.searchResultTitleToMetadataSpacing
+                        )
+                    )
+                    MovieResultMetadataRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        releaseYear = releaseYear,
+                        secondaryMetadata = secondaryMetadata
+                    )
+                }
 
                 if (!rating.isNullOrBlank()) {
+                    Spacer(
+                        modifier = Modifier.height(
+                            ReelsDimensions.searchResultMetadataToRatingSpacing
+                        )
+                    )
                     RatingPill(rating = rating)
                 }
 
                 if (genres.isNotEmpty()) {
+                    Spacer(
+                        modifier = Modifier.height(
+                            ReelsDimensions.searchResultRatingToGenresSpacing
+                        )
+                    )
                     GenrePillRow(genres = genres)
                 }
             }
@@ -140,15 +157,17 @@ private fun MovieResultMetadataRow(
 
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
+        horizontalArrangement = Arrangement.spacedBy(
+            ReelsDimensions.searchResultMetadataContentSpacing
+        ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (hasYear) {
             Text(
                 text = releaseYear.orEmpty(),
                 style = MaterialTheme.typography.bodySmall.copy(
-                    fontSize = 11.sp,
-                    lineHeight = 14.sp
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1
@@ -157,10 +176,10 @@ private fun MovieResultMetadataRow(
 
         if (hasYear && hasSecondaryMetadata) {
             Text(
-                text = "•",
+                text = "·",
                 style = MaterialTheme.typography.bodySmall.copy(
-                    fontSize = 11.sp,
-                    lineHeight = 14.sp
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -170,15 +189,15 @@ private fun MovieResultMetadataRow(
             Icon(
                 imageVector = Icons.Outlined.Schedule,
                 contentDescription = null,
-                modifier = Modifier.size(12.dp),
+                modifier = Modifier.size(ReelsDimensions.searchResultMetadataIconSize),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Text(
                 text = secondaryMetadata.orEmpty(),
                 style = MaterialTheme.typography.bodySmall.copy(
-                    fontSize = 11.sp,
-                    lineHeight = 14.sp
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1
@@ -195,10 +214,10 @@ private fun RatingPill(
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.medium,
-        color = reelsRatingContainerColor(),
+        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
         border = BorderStroke(
             width = 1.dp,
-            color = reelsRatingContentColor().copy(alpha = 0.18f)
+            color = reelsRatingContentColor().copy(alpha = 0.20f)
         ),
         contentColor = reelsRatingContentColor()
     ) {
@@ -207,7 +226,9 @@ private fun RatingPill(
                 horizontal = 8.dp,
                 vertical = 4.dp
             ),
-            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            horizontalArrangement = Arrangement.spacedBy(
+                ReelsDimensions.searchResultRatingContentSpacing
+            ),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -219,8 +240,8 @@ private fun RatingPill(
             Text(
                 text = rating,
                 style = MaterialTheme.typography.labelMedium.copy(
-                    fontSize = 11.sp,
-                    lineHeight = 13.sp
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
                 ),
                 fontWeight = FontWeight.SemiBold
             )
@@ -235,27 +256,23 @@ private fun GenrePillRow(
 ) {
     FlowRow(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
+        horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.searchResultGenreSpacing),
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.searchResultGenreSpacing)
     ) {
         genres.take(3).forEach { genre ->
             Surface(
                 shape = MaterialTheme.shapes.extraLarge,
-                color = if (isReelsLightTheme()) {
-                    ReelsLightGenreChipContainer
-                } else {
-                    ReelsGenreChipContainer
-                },
+                color = reelsMutedContainerColor(),
                 border = BorderStroke(
                     width = 1.dp,
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
+                    color = reelsBorderColor()
                 ),
                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant
             ) {
                 Text(
                     modifier = Modifier.padding(
-                        horizontal = 10.dp,
-                        vertical = 4.dp
+                        horizontal = ReelsDimensions.searchResultGenreHorizontalPadding,
+                        vertical = ReelsDimensions.searchResultGenreVerticalPadding
                     ),
                     text = genre,
                     style = MaterialTheme.typography.labelSmall.copy(
