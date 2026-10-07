@@ -15,12 +15,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
@@ -37,7 +39,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -79,8 +80,8 @@ internal fun FeaturedMovieCarousel(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = ReelsSpacing.screenHorizontal)
-            .aspectRatio(ReelsDimensions.heroCardAspectRatio)
-            .clip(MaterialTheme.shapes.extraLarge),
+            .height(ReelsDimensions.heroCardHeight)
+            .clip(RoundedCornerShape(ReelsDimensions.heroCardCornerSize)),
         animationSpec = tween(durationMillis = HERO_CROSSFADE_DURATION_MS),
         label = "Featured movie crossfade"
     ) { index ->
@@ -105,6 +106,8 @@ private fun FeaturedMovieHero(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val backgroundColor = MaterialTheme.colorScheme.background
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -126,9 +129,9 @@ private fun FeaturedMovieHero(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            Color.Transparent,
-                            Color.Black.copy(alpha = 0.18f),
-                            Color.Black.copy(alpha = 0.82f)
+                            backgroundColor.copy(alpha = 0f),
+                            backgroundColor.copy(alpha = 0.5f),
+                            backgroundColor
                         )
                     )
                 )
@@ -138,10 +141,10 @@ private fun FeaturedMovieHero(
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .padding(
-                    horizontal = ReelsDimensions.heroContentHorizontalPadding,
-                    vertical = ReelsDimensions.heroContentVerticalPadding
-                ),
-            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.heroContentSpacing)
+                    start = ReelsDimensions.heroContentHorizontalPadding,
+                    end = ReelsDimensions.heroContentHorizontalPadding,
+                    bottom = ReelsDimensions.heroContentBottomPadding
+                )
         ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
@@ -153,23 +156,26 @@ private fun FeaturedMovieHero(
                     Text(
                         text = year,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = Color.White.copy(alpha = 0.76f),
-                        fontWeight = FontWeight.SemiBold
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
 
+            Spacer(modifier = Modifier.height(ReelsDimensions.heroMetadataToTitleSpacing))
+
             Text(
                 text = movie.title,
                 style = MaterialTheme.typography.titleMedium.copy(
-                    fontSize = 18.sp,
-                    lineHeight = 22.sp
+                    fontSize = 20.sp,
+                    lineHeight = 30.sp
                 ),
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Medium,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
+
+            Spacer(modifier = Modifier.height(ReelsDimensions.heroTitleToOverviewSpacing))
 
             Text(
                 text = movie.overview.ifBlank { "No overview available yet." },
@@ -177,16 +183,19 @@ private fun FeaturedMovieHero(
                     fontSize = 14.sp,
                     lineHeight = 20.sp
                 ),
-                color = Color.White.copy(alpha = 0.72f),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
-
-            HeroPagerDots(
-                activePage = activePage,
-                pageCount = pageCount
-            )
         }
+
+        HeroPagerDots(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = ReelsDimensions.heroPagerBottomPadding),
+            activePage = activePage,
+            pageCount = pageCount
+        )
     }
 }
 
@@ -198,7 +207,11 @@ internal fun RatingBadge(
 ) {
     Surface(
         modifier = modifier,
-        shape = MaterialTheme.shapes.extraLarge,
+        shape = if (compact) {
+            RoundedCornerShape(ReelsDimensions.compactRatingBadgeCornerSize)
+        } else {
+            MaterialTheme.shapes.extraLarge
+        },
         color = if (compact) {
             reelsPosterRatingContainerColor()
         } else {
@@ -233,14 +246,14 @@ internal fun RatingBadge(
             Text(
                 text = String.format("%.1f", rating),
                 style = if (compact) {
-                    MaterialTheme.typography.labelLarge.copy(
-                        fontSize = 13.sp,
-                        lineHeight = 18.sp
+                    MaterialTheme.typography.labelMedium.copy(
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp
                     )
                 } else {
                     MaterialTheme.typography.bodyLarge
                 },
-                fontWeight = if (compact) FontWeight.Bold else FontWeight.Normal
+                fontWeight = FontWeight.Normal
             )
         }
     }
@@ -253,14 +266,13 @@ private fun HeroPagerDots(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.heroPagerSpacing),
         verticalAlignment = Alignment.CenterVertically
     ) {
         repeat(pageCount) { index ->
             Surface(
                 modifier = Modifier
-                    .padding(horizontal = 4.dp)
                     .size(
                         width = if (index == activePage) {
                             ReelsDimensions.heroActiveDotWidth

@@ -15,11 +15,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -71,18 +73,19 @@ internal fun HomeLoadingState(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = ReelsSpacing.screenHorizontal)
-                    .aspectRatio(ReelsDimensions.heroCardAspectRatio)
-                    .clip(MaterialTheme.shapes.extraLarge)
+                    .height(ReelsDimensions.heroCardHeight)
+                    .clip(RoundedCornerShape(ReelsDimensions.heroCardCornerSize))
                     .background(reelsPlaceholderColor())
             ) {
                 Column(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .padding(
-                            horizontal = ReelsDimensions.heroContentHorizontalPadding,
-                            vertical = ReelsDimensions.heroContentVerticalPadding
+                            start = ReelsDimensions.heroContentHorizontalPadding,
+                            end = ReelsDimensions.heroContentHorizontalPadding,
+                            bottom = ReelsDimensions.heroContentBottomPadding
                         ),
-                    verticalArrangement = Arrangement.spacedBy(ReelsDimensions.heroContentSpacing)
+                    verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
                 ) {
                     PlaceholderBar(width = 92.dp, height = 34.dp)
                     PlaceholderBar(width = 226.dp, height = 24.dp)
@@ -118,13 +121,13 @@ private fun PosterPlaceholderCard(
 ) {
     Column(
         modifier = modifier.width(ReelsDimensions.posterCardWidth),
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.posterTextSpacing)
+        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.poster)
-                .clip(MaterialTheme.shapes.large)
+                .clip(RoundedCornerShape(ReelsDimensions.posterCornerSize))
                 .background(reelsPlaceholderColor())
         )
 

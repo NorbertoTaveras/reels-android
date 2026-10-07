@@ -12,13 +12,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -116,14 +119,13 @@ private fun HomePosterCard(
     Column(
         modifier = modifier
             .width(ReelsDimensions.posterCardWidth)
-            .clickable(onClick = onClick),
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.posterTextSpacing)
+            .clickable(onClick = onClick)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.poster)
-                .clip(MaterialTheme.shapes.large)
+                .clip(RoundedCornerShape(ReelsDimensions.posterCornerSize))
         ) {
             AsyncImage(
                 model = movie.posterPath.toTmdbImageUrl(),
@@ -141,24 +143,28 @@ private fun HomePosterCard(
             )
         }
 
+        Spacer(modifier = Modifier.height(ReelsDimensions.posterImageToTitleSpacing))
+
         Text(
             text = movie.title,
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontSize = 16.sp,
-                lineHeight = 21.sp
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontSize = 14.sp,
+                lineHeight = 20.sp
             ),
             color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.Normal,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
 
         movie.releaseDate.toReleaseYear()?.let { year ->
+            Spacer(modifier = Modifier.height(ReelsDimensions.posterTitleToYearSpacing))
+
             Text(
                 text = year,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 15.sp,
-                    lineHeight = 20.sp
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,

@@ -143,18 +143,18 @@ internal fun HomeHeader(
         Text(
             text = "Reels",
             style = MaterialTheme.typography.titleLarge.copy(
-                fontSize = 22.sp,
-                lineHeight = 28.sp
+                fontSize = 24.sp,
+                lineHeight = 36.sp
             ),
             color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Medium
         )
 
         Text(
             text = "Movies worth opening tonight",
             style = MaterialTheme.typography.bodyLarge.copy(
                 fontSize = 16.sp,
-                lineHeight = 22.sp
+                lineHeight = 24.sp
             ),
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

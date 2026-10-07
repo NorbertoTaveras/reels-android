@@ -31,25 +31,32 @@ object ReelsDimensions {
 
     val topPadding = 16.dp
     val homeScreenBottomPadding = 72.dp
-    val sectionSpacing = 34.dp
-    val headerTextSpacing = 6.dp
-    val sectionHeaderToRowSpacing = 20.dp
+    val sectionSpacing = 32.dp
+    val headerTextSpacing = 4.dp
+    val sectionHeaderToRowSpacing = 16.dp
 
-    val heroCardAspectRatio = 1.16f
-    val heroContentHorizontalPadding = 18.dp
-    val heroContentVerticalPadding = 18.dp
-    val heroContentSpacing = 7.dp
-    val heroActiveDotWidth = 22.dp
+    val heroCardHeight = 420.dp
+    val heroCardCornerSize = 16.dp
+    val heroContentHorizontalPadding = 24.dp
+    val heroContentBottomPadding = 48.dp
+    val heroMetadataToTitleSpacing = 12.dp
+    val heroTitleToOverviewSpacing = 8.dp
+    val heroPagerBottomPadding = 20.dp
+    val heroPagerSpacing = 8.dp
+    val heroActiveDotWidth = 24.dp
     val heroInactiveDotSize = 8.dp
 
-    val posterCardWidth = 126.dp
-    val posterRowSpacing = 22.dp
-    val posterTextSpacing = 9.dp
+    val posterCardWidth = 120.dp
+    val posterRowSpacing = 12.dp
+    val posterCornerSize = 14.dp
+    val posterImageToTitleSpacing = 8.dp
+    val posterTitleToYearSpacing = 4.dp
 
-    val compactRatingBadgeHorizontalPadding = 9.dp
-    val compactRatingBadgeVerticalPadding = 5.dp
+    val compactRatingBadgeCornerSize = 10.dp
+    val compactRatingBadgeHorizontalPadding = 8.dp
+    val compactRatingBadgeVerticalPadding = 4.dp
     val compactRatingBadgeEdgePadding = 8.dp
-    val compactRatingBadgeIconSize = 13.dp
+    val compactRatingBadgeIconSize = 12.dp
 
     val categoryScreenHorizontalPadding = 20.dp
     val categoryScreenTopPadding = 16.dp

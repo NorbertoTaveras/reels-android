@@ -117,11 +117,11 @@ internal fun HomeSectionHeader(
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium.copy(
-                fontSize = 20.sp,
-                lineHeight = 26.sp
+                fontSize = 18.sp,
+                lineHeight = 27.sp
             ),
             color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Medium
         )
 
         Row(
@@ -136,7 +136,7 @@ internal fun HomeSectionHeader(
                     lineHeight = 20.sp
                 ),
                 color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.Normal
             )
 
             Icon(
