@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -94,7 +95,7 @@ internal fun UserRatingBadge(
 ) {
     Surface(
         modifier = modifier,
-        shape = MaterialTheme.shapes.extraLarge,
+        shape = RoundedCornerShape(ReelsDimensions.favoritesRatingCornerSize),
         color = ReelsAccent.copy(alpha = 0.96f),
         contentColor = Color.White
     ) {
@@ -118,7 +119,7 @@ internal fun UserRatingBadge(
                     fontSize = 12.sp,
                     lineHeight = 16.sp
                 ),
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.Bold,
                 maxLines = 1
             )
         }
@@ -134,6 +135,7 @@ internal fun LibraryOverlayIconBadge(
     isLoading: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    iconSize: Dp = ReelsDimensions.favoritesHeartIconSize,
 ) {
     Surface(
         modifier = modifier
@@ -144,7 +146,7 @@ internal fun LibraryOverlayIconBadge(
                 onClickLabel = contentDescription,
                 onClick = onClick
             ),
-        shape = RoundedCornerShape(50),
+        shape = RoundedCornerShape(ReelsDimensions.favoritesHeartButtonCornerSize),
         color = containerColor,
         contentColor = contentColor,
         shadowElevation = 1.dp
@@ -152,7 +154,7 @@ internal fun LibraryOverlayIconBadge(
         Box(contentAlignment = Alignment.Center) {
             if (isLoading) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(ReelsDimensions.favoritesHeartIconSize),
+                    modifier = Modifier.size(iconSize),
                     color = contentColor,
                     strokeWidth = 2.dp
                 )
@@ -160,7 +162,7 @@ internal fun LibraryOverlayIconBadge(
                 Icon(
                     imageVector = imageVector,
                     contentDescription = null,
-                    modifier = Modifier.size(ReelsDimensions.favoritesHeartIconSize)
+                    modifier = Modifier.size(iconSize)
                 )
             }
         }
@@ -253,7 +255,7 @@ internal fun TmdbBadge(
 ) {
     Surface(
         modifier = modifier.size(ReelsDimensions.favoritesOfflineBadgeSize),
-        shape = MaterialTheme.shapes.medium,
+        shape = RoundedCornerShape(ReelsDimensions.favoritesOfflineBadgeCornerSize),
         color = ReelsTeal.copy(alpha = 0.92f),
         contentColor = Color.White
     ) {
@@ -274,7 +276,7 @@ internal fun OfflineBadge(
 ) {
     Surface(
         modifier = modifier.size(ReelsDimensions.favoritesOfflineBadgeSize),
-        shape = MaterialTheme.shapes.medium,
+        shape = RoundedCornerShape(ReelsDimensions.favoritesOfflineBadgeCornerSize),
         color = ReelsTeal.copy(alpha = 0.88f),
         contentColor = Color.White
     ) {
@@ -295,7 +297,7 @@ internal fun RatingBadge(
 ) {
     Surface(
         modifier = modifier,
-        shape = MaterialTheme.shapes.extraLarge,
+        shape = RoundedCornerShape(ReelsDimensions.favoritesRatingCornerSize),
         color = reelsPosterRatingContainerColor(),
         contentColor = reelsRatingContentColor()
     ) {
@@ -341,7 +343,7 @@ internal fun LibraryRemoveButton(
                 onClickLabel = contentDescription,
                 onClick = onClick
             ),
-        shape = MaterialTheme.shapes.medium,
+        shape = RoundedCornerShape(ReelsDimensions.favoritesHeartButtonCornerSize),
         color = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.primary,
         border = BorderStroke(

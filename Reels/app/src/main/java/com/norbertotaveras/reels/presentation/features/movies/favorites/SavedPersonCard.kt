@@ -97,8 +97,10 @@ internal fun SavedPersonCard(
 
             Column(
                 modifier = Modifier.padding(
-                    horizontal = ReelsSpacing.medium,
-                    vertical = ReelsSpacing.small
+                    start = ReelsDimensions.favoritesPersonCardHorizontalPadding,
+                    top = ReelsDimensions.favoritesPersonCardTopPadding,
+                    end = ReelsDimensions.favoritesPersonCardHorizontalPadding,
+                    bottom = ReelsDimensions.favoritesPersonCardBottomPadding
                 ),
                 verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
             ) {
@@ -109,7 +111,7 @@ internal fun SavedPersonCard(
                         lineHeight = 18.sp
                     ),
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Medium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )

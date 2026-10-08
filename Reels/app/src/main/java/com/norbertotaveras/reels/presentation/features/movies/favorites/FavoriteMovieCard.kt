@@ -21,7 +21,6 @@ import com.norbertotaveras.reels.domain.model.favorite.FavoriteMovieDataModel
 import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
 @Composable
 internal fun FavoriteMovieCard(
@@ -57,7 +56,9 @@ internal fun FavoriteMovieCard(
 
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
+            verticalArrangement = Arrangement.spacedBy(
+                ReelsDimensions.favoritesMetadataTextSpacing
+            )
         ) {
             Text(
                 text = movie.title,
@@ -66,7 +67,7 @@ internal fun FavoriteMovieCard(
                     lineHeight = 18.sp
                 ),
                 color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.Medium,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )

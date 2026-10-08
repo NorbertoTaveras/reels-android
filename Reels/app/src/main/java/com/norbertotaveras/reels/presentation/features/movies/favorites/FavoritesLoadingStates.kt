@@ -47,21 +47,23 @@ internal fun LibraryPosterPlaceholder(
                 .background(reelsPlaceholderColor(alpha = 0.72f))
         )
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(0.82f)
-                .height(14.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .background(reelsPlaceholderColor(alpha = 0.72f))
-        )
+        Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.82f)
+                    .height(14.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(reelsPlaceholderColor(alpha = 0.72f))
+            )
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(0.36f)
-                .height(11.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .background(reelsPlaceholderColor(alpha = 0.72f))
-        )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.36f)
+                    .height(11.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(reelsPlaceholderColor(alpha = 0.72f))
+            )
+        }
     }
 }
 

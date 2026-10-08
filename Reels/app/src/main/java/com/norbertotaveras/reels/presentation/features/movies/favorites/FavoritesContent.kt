@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.WifiOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SecondaryTabRow
@@ -45,6 +47,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -55,9 +58,11 @@ import androidx.paging.compose.LazyPagingItems
 import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.CachedContentBanner
+import com.norbertotaveras.reels.presentation.ui.extensions.fullBleedHorizontal
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
+import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
 
 @Composable
 internal fun FavoritesContent(
@@ -101,7 +106,8 @@ internal fun FavoritesContent(
                 isOffline = isUsingCachedTmdbContent,
                 onTabSelected = { tab ->
                     onEvent(FavoritesEvent.TabSelected(tab = tab))
-                }
+                },
+                modifier = Modifier.padding(bottom = ReelsSpacing.xSmall)
             )
         }
 
@@ -217,10 +223,10 @@ private fun LibraryHeader(
                 text = "Library",
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontSize = 24.sp,
-                    lineHeight = 30.sp
+                    lineHeight = 36.sp
                 ),
                 color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Medium
             )
 
             if (isOffline) LibraryOfflineStatus()
@@ -229,8 +235,8 @@ private fun LibraryHeader(
         Text(
             text = state.librarySubtitle,
             style = MaterialTheme.typography.bodySmall.copy(
-                fontSize = 12.sp,
-                lineHeight = 16.sp
+                fontSize = 14.sp,
+                lineHeight = 20.sp
             ),
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -277,8 +283,7 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
         movies.loadState.refresh is LoadState.Error && movies.itemCount == 0 -> {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 LibraryErrorState(
-                    onRetry = onRefresh,
-                    modifier = Modifier.padding(top = ReelsDimensions.favoritesEmptyTopPadding)
+                    onRetry = onRefresh
                 )
             }
         }
@@ -367,46 +372,56 @@ private fun LibraryTabs(
 ) {
     val selectedTabIndex = LibraryTab.entries.indexOf(selectedTab)
 
-    SecondaryTabRow(
-        modifier = modifier,
-        selectedTabIndex = selectedTabIndex,
-        containerColor = MaterialTheme.colorScheme.background,
-        contentColor = MaterialTheme.colorScheme.onBackground,
-        divider = {},
-        indicator = {
-            TabRowDefaults.SecondaryIndicator(
-                modifier = Modifier.tabIndicatorOffset(
-                    selectedTabIndex = selectedTabIndex,
-                    matchContentSize = true
-                ),
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
+    Box(
+        modifier = modifier.fullBleedHorizontal(ReelsSpacing.screenHorizontal),
+        contentAlignment = Alignment.BottomCenter
     ) {
-        LibraryTab.entries.forEach { tab ->
-            val selected = selectedTab == tab
+        HorizontalDivider(color = reelsBorderColor())
 
-            Tab(
-                selected = selected,
-                onClick = { onTabSelected(tab) },
-                selectedContentColor = MaterialTheme.colorScheme.primary,
-                unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                text = {
-                    Text(
-                        text = tab.title,
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            fontSize = 12.sp,
-                            lineHeight = 16.sp
-                        ),
-                        fontWeight = if (selected) {
-                            FontWeight.Bold
-                        } else {
-                            FontWeight.SemiBold
-                        },
-                        maxLines = 1
-                    )
-                }
-            )
+        SecondaryTabRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = ReelsDimensions.favoritesTabHorizontalPadding),
+            selectedTabIndex = selectedTabIndex,
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.onBackground,
+            divider = {},
+            indicator = {
+                TabRowDefaults.SecondaryIndicator(
+                    modifier = Modifier
+                        .tabIndicatorOffset(
+                            selectedTabIndex = selectedTabIndex,
+                            matchContentSize = false
+                        )
+                        .padding(
+                            horizontal = ReelsDimensions.favoritesTabIndicatorHorizontalPadding
+                        )
+                        .height(ReelsDimensions.favoritesTabIndicatorHeight),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        ) {
+            LibraryTab.entries.forEach { tab ->
+                val selected = selectedTab == tab
+
+                Tab(
+                    selected = selected,
+                    onClick = { onTabSelected(tab) },
+                    selectedContentColor = MaterialTheme.colorScheme.primary,
+                    unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    text = {
+                        Text(
+                            text = tab.title,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontSize = 13.sp,
+                                lineHeight = 18.sp
+                            ),
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1
+                        )
+                    }
+                )
+            }
         }
     }
 }
@@ -428,8 +443,8 @@ private fun LibrarySyncStatus(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = ReelsSpacing.medium,
-                    vertical = ReelsSpacing.small
+                    horizontal = ReelsSpacing.large,
+                    vertical = ReelsSpacing.medium
                 ),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
@@ -459,14 +474,19 @@ private fun LibrarySyncStatus(
                 )
             }
 
-            Icon(
-                imageVector = Icons.Filled.Refresh,
-                contentDescription = "Refresh TMDB library",
+            Box(
                 modifier = Modifier
-                    .size(ReelsDimensions.favoritesSyncStatusIconSize)
+                    .size(22.dp)
                     .clickable(role = Role.Button, onClick = onRefresh),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Refresh,
+                    contentDescription = "Refresh TMDB library",
+                    modifier = Modifier.size(ReelsDimensions.favoritesSyncStatusIconSize),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }

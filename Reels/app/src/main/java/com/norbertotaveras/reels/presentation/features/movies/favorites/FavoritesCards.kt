@@ -18,18 +18,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
 
 @Composable
@@ -73,6 +69,7 @@ internal fun TmdbAccountMovieCard(
                         containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.94f),
                         contentColor = ReelsTeal,
                         isLoading = isUpdating,
+                        iconSize = ReelsDimensions.favoritesTmdbActionIconSize,
                         onClick = onActionClick
                     )
 
@@ -82,6 +79,7 @@ internal fun TmdbAccountMovieCard(
                         containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.94f),
                         contentColor = MaterialTheme.colorScheme.onSurface,
                         isLoading = isUpdating,
+                        iconSize = ReelsDimensions.favoritesTmdbActionIconSize,
                         onClick = onActionClick
                     )
                 }
@@ -91,7 +89,9 @@ internal fun TmdbAccountMovieCard(
 
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
+            verticalArrangement = Arrangement.spacedBy(
+                ReelsDimensions.favoritesMetadataTextSpacing
+            )
         ) {
             Text(
                 text = movie.title,
@@ -100,7 +100,7 @@ internal fun TmdbAccountMovieCard(
                     lineHeight = 18.sp
                 ),
                 color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.Medium,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -108,14 +108,12 @@ internal fun TmdbAccountMovieCard(
             val releaseYear = movie.releaseDate.toReleaseYear()
             val activityLabel = activityAtMillis.toTmdbMovieActivityLabel(listType = listType)
             Text(
-                text = buildAnnotatedString {
+                text = buildString {
                     releaseYear?.let { year ->
                         append(year)
                         append(" · ")
                     }
-                    withStyle(SpanStyle(color = ReelsTeal)) {
-                        append(activityLabel)
-                    }
+                    append(activityLabel)
                 },
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,

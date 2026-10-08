@@ -44,6 +44,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.R
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
@@ -58,15 +59,17 @@ internal fun LibraryErrorState(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = ReelsSpacing.xLarge),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesEmptyContentSpacing)
+            .padding(
+                horizontal = ReelsSpacing.xxLarge,
+                vertical = 80.dp
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Surface(
             modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconContainerSize),
             shape = RoundedCornerShape(ReelsDimensions.favoritesEmptyIconCornerSize),
             color = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.primary
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
@@ -76,13 +79,18 @@ internal fun LibraryErrorState(
                 )
             }
         }
+        Spacer(modifier = Modifier.height(20.dp))
 
         Text(
             text = "Something went wrong",
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontSize = 18.sp,
+                lineHeight = 28.sp
+            ),
             color = MaterialTheme.colorScheme.onSurface,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Normal
         )
+        Spacer(modifier = Modifier.height(ReelsSpacing.small))
 
         Text(
             text = "Unable to load your library. Check your connection and try again.",
@@ -90,12 +98,20 @@ internal fun LibraryErrorState(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
+        Spacer(modifier = Modifier.height(28.dp))
 
-        Button(onClick = onRetry) {
+        Button(
+            onClick = onRetry,
+            shape = RoundedCornerShape(16.dp),
+            contentPadding = PaddingValues(
+                horizontal = ReelsSpacing.xLarge,
+                vertical = ReelsSpacing.medium
+            )
+        ) {
             Icon(
                 imageVector = Icons.Filled.Refresh,
                 contentDescription = null,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(15.dp)
             )
             Text(
                 modifier = Modifier.padding(start = ReelsSpacing.small),
