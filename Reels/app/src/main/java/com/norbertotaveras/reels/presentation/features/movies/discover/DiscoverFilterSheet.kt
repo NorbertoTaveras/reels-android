@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -31,7 +32,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.norbertotaveras.reels.domain.model.discover.hasActiveFilters
 import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,6 +46,10 @@ internal fun DiscoverFilterSheet(
     ModalBottomSheet(
         modifier = modifier,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        shape = RoundedCornerShape(
+            topStart = ReelsDimensions.discoverFilterSheetCornerSize,
+            topEnd = ReelsDimensions.discoverFilterSheetCornerSize
+        ),
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface,
         dragHandle = {
@@ -61,7 +68,7 @@ internal fun DiscoverFilterSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.78f)
+                .fillMaxHeight(ReelsDimensions.discoverFilterSheetHeightFraction)
         ) {
             DiscoverFilterSheetHeader(
                 onResetClick = {
@@ -70,7 +77,7 @@ internal fun DiscoverFilterSheet(
             )
 
             HorizontalDivider(
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.28f),
+                color = reelsBorderColor(),
                 thickness = 1.dp
             )
 
@@ -83,7 +90,9 @@ internal fun DiscoverFilterSheet(
                         horizontal = ReelsSpacing.screenHorizontal,
                         vertical = ReelsSpacing.large
                     ),
-                verticalArrangement = Arrangement.spacedBy(ReelsSpacing.large)
+                verticalArrangement = Arrangement.spacedBy(
+                    ReelsDimensions.discoverFilterSheetSectionSpacing
+                )
             ) {
                 if (state.filterSheetFilters.hasActiveFilters) {
                     DiscoverActiveFiltersRow(
@@ -158,17 +167,12 @@ internal fun DiscoverFilterSheet(
                     }
                 }
 
-                DiscoverChipSection(title = "Minimum Rating") {
-                    DISCOVER_RATINGS.forEach { rating ->
-                        DiscoverFilterChip(
-                            label = rating?.let { "$it+" } ?: "Any",
-                            selected = state.filterSheetFilters.minimumRating == rating,
-                            onClick = {
-                                onEvent(DiscoverEvent.RatingSelected(minimumRating = rating))
-                            }
-                        )
+                DiscoverRatingSection(
+                    selectedRating = state.filterSheetFilters.minimumRating,
+                    onRatingSelected = { rating ->
+                        onEvent(DiscoverEvent.RatingSelected(minimumRating = rating))
                     }
-                }
+                )
 
                 DiscoverSortSection(
                     selectedSort = state.filterSheetFilters.sort,

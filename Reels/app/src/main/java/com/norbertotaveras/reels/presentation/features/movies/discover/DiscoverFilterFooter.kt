@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -27,7 +28,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,7 +48,7 @@ internal fun DiscoverFilterSheetFooter(
             modifier = Modifier.fillMaxWidth()
         ) {
             HorizontalDivider(
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.28f),
+                color = reelsBorderColor(),
                 thickness = 1.dp
             )
 
@@ -56,13 +59,15 @@ internal fun DiscoverFilterSheetFooter(
                         horizontal = ReelsSpacing.screenHorizontal,
                         vertical = ReelsSpacing.large
                     )
-                    .height(48.dp),
+                    .height(ReelsDimensions.discoverFilterFooterButtonHeight),
                 onClick = onApplyClick,
                 enabled = !isLoading,
-                shape = MaterialTheme.shapes.large,
+                shape = RoundedCornerShape(ReelsDimensions.discoverFilterControlCornerSize),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.60f),
+                    disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.60f)
                 )
             ) {
                 if (isLoading) {
@@ -76,7 +81,7 @@ internal fun DiscoverFilterSheetFooter(
 
                 Text(
                     text = if (isLoading) {
-                        "Checking movies…"
+                        "Loading filters…"
                     } else {
                         movieCount?.let { count ->
                             "Show ${count.toMovieCountLabel(capitalize = true)}"
@@ -84,7 +89,7 @@ internal fun DiscoverFilterSheetFooter(
                     },
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontSize = 14.sp,
-                        lineHeight = 18.sp
+                        lineHeight = 20.sp
                     ),
                     fontWeight = FontWeight.Medium
                 )

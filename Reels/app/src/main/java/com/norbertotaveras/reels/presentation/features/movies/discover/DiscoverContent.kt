@@ -24,13 +24,19 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,6 +52,7 @@ import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetrySt
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
 
 @Composable
 internal fun DiscoverContent(
@@ -55,132 +62,155 @@ internal fun DiscoverContent(
     modifier: Modifier = Modifier,
 ) {
     val refreshState = movies.loadState.refresh
+    val hasCachedMovies = movies.itemCount > 0
+    val isUsingCachedContent = refreshState is LoadState.Error && hasCachedMovies
+    var isCachedNoticeDismissed by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(isUsingCachedContent) {
+        if (!isUsingCachedContent) isCachedNoticeDismissed = false
+    }
 
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-    LazyVerticalGrid(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        columns = GridCells.Fixed(3),
-        contentPadding = PaddingValues(
-            start = ReelsSpacing.screenHorizontal,
-            top = ReelsDimensions.discoverScreenTopPadding,
-            end = ReelsSpacing.screenHorizontal,
-            bottom = ReelsDimensions.discoverScreenBottomPadding
-        ),
-        horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.discoverGridHorizontalSpacing),
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.discoverGridVerticalSpacing)
-    ) {
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            DiscoverHeader(
-                hasActiveFilters = state.hasActiveFilters,
-                activeFilterCount = state.activeFilterCount,
-                subtitle = if (refreshState is LoadState.NotLoading && movies.itemCount > 0) {
-                    movies.itemCount.toMovieCountLabel()
-                } else {
-                    "Browse & filter"
-                },
-                showSort = refreshState is LoadState.NotLoading && movies.itemCount > 0,
-                sortLabel = state.filters.sort.displayLabel,
-                onFilterClick = {
-                    onEvent(DiscoverEvent.FiltersClicked)
-                }
-            )
-        }
-
-        if (state.hasActiveFilters) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                DiscoverAppliedFiltersRow(
-                    state = state,
-                    onEvent = onEvent
+        Column(modifier = Modifier.fillMaxSize()) {
+            if (isUsingCachedContent && !isCachedNoticeDismissed) {
+                DiscoverCachedResultsBanner(
+                    onDismiss = { isCachedNoticeDismissed = true }
                 )
             }
-        }
 
-        when (refreshState) {
-            is LoadState.Loading -> {
-                items(DISCOVER_PLACEHOLDER_COUNT) {
-                    DiscoverPlaceholderCard()
-                }
-            }
-
-            is LoadState.Error -> {
+            LazyVerticalGrid(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.background),
+                columns = GridCells.Fixed(3),
+                contentPadding = PaddingValues(
+                    start = ReelsSpacing.screenHorizontal,
+                    top = ReelsDimensions.discoverScreenTopPadding,
+                    end = ReelsSpacing.screenHorizontal,
+                    bottom = ReelsDimensions.discoverScreenBottomPadding
+                ),
+                horizontalArrangement = Arrangement.spacedBy(
+                    ReelsDimensions.discoverGridHorizontalSpacing
+                ),
+                verticalArrangement = Arrangement.spacedBy(
+                    ReelsDimensions.discoverGridVerticalSpacing
+                )
+            ) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
-                    DiscoverErrorState(
-                        message = refreshState.error.toUserMessage(
-                            fallback = "Unable to discover movies."
-                        ),
-                        onRetry = movies::retry
-                    )
-                }
-            }
-
-            is LoadState.NotLoading -> {
-                if (movies.itemCount == 0) {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        DiscoverEmptyState(
-                            hasActiveFilters = state.hasActiveFilters,
-                            onAdjustFilters = {
-                                onEvent(DiscoverEvent.FiltersClicked)
-                            },
-                            onClearFilters = {
-                                onEvent(DiscoverEvent.ClearFiltersClicked)
+                    DiscoverHeader(
+                        hasActiveFilters = state.hasActiveFilters,
+                        activeFilterCount = state.activeFilterCount,
+                        subtitle = when {
+                            refreshState is LoadState.Loading && !hasCachedMovies -> {
+                                "Loading movies…"
                             }
-                        )
-                    }
-                } else {
-                    items(
-                        count = movies.itemCount,
-                        key = { index ->
-                            val movie = movies.peek(index)
-                            "${movie?.id ?: "placeholder"}-$index"
+
+                            hasCachedMovies -> movies.itemCount.toMovieCountLabel()
+                            else -> "Browse & filter"
+                        },
+                        showSort = hasCachedMovies && refreshState !is LoadState.Loading,
+                        sortLabel = state.filters.sort.displayLabel,
+                        onFilterClick = {
+                            onEvent(DiscoverEvent.FiltersClicked)
                         }
-                    ) { index ->
-                        val movie = movies[index] ?: return@items
+                    )
+                }
 
-                        DiscoverPosterCard(
-                            movie = movie,
-                            onClick = {
-                                onEvent(DiscoverEvent.MovieClicked(movieId = movie.id))
-                            }
+                if (state.hasActiveFilters) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        DiscoverAppliedFiltersRow(
+                            state = state,
+                            onEvent = onEvent
                         )
                     }
                 }
-            }
-        }
 
-        when (val appendState = movies.loadState.append) {
-            is LoadState.Loading -> {
-                items(DISCOVER_APPEND_PLACEHOLDER_COUNT) {
-                    DiscoverPlaceholderCard()
+                when {
+                    refreshState is LoadState.Loading && !hasCachedMovies -> {
+                        items(DISCOVER_PLACEHOLDER_COUNT) {
+                            DiscoverPlaceholderCard()
+                        }
+                    }
+
+                    refreshState is LoadState.Error && !hasCachedMovies -> {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            DiscoverErrorState(
+                                message = refreshState.error.toUserMessage(
+                                    fallback = "Unable to discover movies."
+                                ),
+                                onRetry = movies::retry
+                            )
+                        }
+                    }
+
+                    !hasCachedMovies -> {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            DiscoverEmptyState(
+                                hasActiveFilters = state.hasActiveFilters,
+                                onAdjustFilters = {
+                                    onEvent(DiscoverEvent.FiltersClicked)
+                                },
+                                onClearFilters = {
+                                    onEvent(DiscoverEvent.ClearFiltersClicked)
+                                }
+                            )
+                        }
+                    }
+
+                    else -> {
+                        items(
+                            count = movies.itemCount,
+                            key = { index ->
+                                val movie = movies.peek(index)
+                                "${movie?.id ?: "placeholder"}-$index"
+                            }
+                        ) { index ->
+                            val movie = movies[index] ?: return@items
+
+                            DiscoverPosterCard(
+                                movie = movie,
+                                onClick = {
+                                    onEvent(DiscoverEvent.MovieClicked(movieId = movie.id))
+                                }
+                            )
+                        }
+                    }
                 }
-            }
 
-            is LoadState.Error -> {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    InlineRetryState(
-                        message = appendState.error.toUserMessage(
-                            fallback = "Unable to load more movies."
-                        ),
-                        retryLabel = "Retry",
-                        onRetry = movies::retry
-                    )
-                }
-            }
+                when (val appendState = movies.loadState.append) {
+                    is LoadState.Loading -> {
+                        items(DISCOVER_APPEND_PLACEHOLDER_COUNT) {
+                            DiscoverPlaceholderCard()
+                        }
+                    }
 
-            is LoadState.NotLoading -> {
-                if (appendState.endOfPaginationReached && movies.itemCount > 0) {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        DiscoverEndOfList(movieCount = movies.itemCount)
+                    is LoadState.Error -> {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            InlineRetryState(
+                                message = appendState.error.toUserMessage(
+                                    fallback = "Unable to load more movies."
+                                ),
+                                retryLabel = "Retry",
+                                onRetry = movies::retry
+                            )
+                        }
+                    }
+
+                    is LoadState.NotLoading -> {
+                        if (appendState.endOfPaginationReached && movies.itemCount > 0) {
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                DiscoverEndOfList(movieCount = movies.itemCount)
+                            }
+                        }
                     }
                 }
             }
         }
-    }
 
         if (state.isFilterSheetVisible) {
             DiscoverFilterSheet(
@@ -217,17 +247,17 @@ private fun DiscoverHeader(
                     text = "Discover",
                     style = MaterialTheme.typography.headlineLarge.copy(
                         fontSize = 24.sp,
-                        lineHeight = 30.sp
+                        lineHeight = 36.sp
                     ),
                     color = MaterialTheme.colorScheme.onBackground,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Medium
                 )
 
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontSize = 12.sp,
-                        lineHeight = 16.sp
+                        lineHeight = 18.sp
                     ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
@@ -250,35 +280,35 @@ private fun DiscoverHeader(
                 contentColor = MaterialTheme.colorScheme.onSurface,
                 border = BorderStroke(
                     width = 1.dp,
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.22f)
+                    color = reelsBorderColor()
                 )
             ) {
                 Row(
                     modifier = Modifier.padding(
-                        horizontal = ReelsSpacing.medium,
-                        vertical = ReelsSpacing.small
+                        horizontal = ReelsDimensions.discoverSortHorizontalPadding,
+                        vertical = ReelsDimensions.discoverSortVerticalPadding
                     ),
-                    horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "Sort:",
                         style = MaterialTheme.typography.labelMedium.copy(
-                            fontSize = 13.sp,
-                            lineHeight = 16.sp
+                            fontSize = 14.sp,
+                            lineHeight = 20.sp
                         ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.Normal
                     )
 
                     Text(
                         text = sortLabel,
                         style = MaterialTheme.typography.labelMedium.copy(
-                            fontSize = 13.sp,
-                            lineHeight = 16.sp
+                            fontSize = 14.sp,
+                            lineHeight = 20.sp
                         ),
                         color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }
@@ -295,9 +325,9 @@ private fun DiscoverFilterButton(
 ) {
     Surface(
         modifier = modifier
-            .size(44.dp)
+            .size(ReelsDimensions.discoverFilterButtonSize)
             .clickable(onClick = onClick),
-        shape = MaterialTheme.shapes.large,
+        shape = RoundedCornerShape(ReelsDimensions.discoverFilterButtonCornerSize),
         color = if (hasActiveFilters) {
             MaterialTheme.colorScheme.primary
         } else {
@@ -313,15 +343,15 @@ private fun DiscoverFilterButton(
             color = if (hasActiveFilters) {
                 Color.Transparent
             } else {
-                MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
+                reelsBorderColor()
             }
         )
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(
-                imageVector = Icons.Filled.FilterList,
+                imageVector = Icons.Outlined.Tune,
                 contentDescription = "Open discover filters",
-                modifier = Modifier.size(22.dp)
+                modifier = Modifier.size(ReelsDimensions.discoverFilterButtonIconSize)
             )
 
             if (hasActiveFilters) {

@@ -48,10 +48,10 @@ internal fun DiscoverFilterSheetHeader(
                 text = "Filters",
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = 18.sp,
-                    lineHeight = 24.sp
+                    lineHeight = 27.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Medium
             )
         }
 
@@ -59,11 +59,11 @@ internal fun DiscoverFilterSheetHeader(
             Text(
                 text = "Reset all",
                 style = MaterialTheme.typography.labelSmall.copy(
-                    fontSize = 13.sp,
-                    lineHeight = 17.sp
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp
                 ),
                 color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.Medium
             )
         }
     }

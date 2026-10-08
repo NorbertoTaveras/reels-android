@@ -9,16 +9,15 @@ package com.norbertotaveras.reels.presentation.features.movies.discover
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,13 +40,15 @@ internal fun DiscoverLanguageRow(
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
+        verticalArrangement = Arrangement.spacedBy(
+            ReelsDimensions.discoverFilterSectionContentSpacing
+        )
     ) {
         DiscoverSectionTitle(title = "Language & Region")
 
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.large,
+            shape = RoundedCornerShape(ReelsDimensions.discoverFilterControlCornerSize),
             color = discoverFilterControlColor(),
             border = BorderStroke(
                 width = 1.dp,
@@ -55,26 +57,18 @@ internal fun DiscoverLanguageRow(
         ) {
             Row(
                 modifier = Modifier.padding(
-                    horizontal = ReelsSpacing.medium,
-                    vertical = ReelsSpacing.small
+                    horizontal = ReelsDimensions.discoverLanguageRowHorizontalPadding,
+                    vertical = ReelsDimensions.discoverLanguageRowVerticalPadding
                 ),
                 horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Surface(
-                    modifier = Modifier.size(24.dp),
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
-                    contentColor = MaterialTheme.colorScheme.primary
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = Icons.Filled.Language,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp)
-                        )
-                    }
-                }
+                Icon(
+                    imageVector = Icons.Filled.Language,
+                    contentDescription = null,
+                    modifier = Modifier.size(ReelsDimensions.discoverLanguageIconSize),
+                    tint = MaterialTheme.colorScheme.primary
+                )
 
                 Text(
                     modifier = Modifier.weight(1f),
@@ -84,7 +78,14 @@ internal fun DiscoverLanguageRow(
                         lineHeight = 18.sp
                     ),
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.Medium
+                )
+
+                Icon(
+                    imageVector = Icons.Outlined.KeyboardArrowDown,
+                    contentDescription = null,
+                    modifier = Modifier.size(ReelsDimensions.discoverLanguageChevronSize),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

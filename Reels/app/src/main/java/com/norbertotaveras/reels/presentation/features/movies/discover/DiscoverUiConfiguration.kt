@@ -47,7 +47,7 @@ internal val DiscoverSort.displayLabel: String
         DiscoverSort.Popularity -> "Popularity"
         DiscoverSort.HighestRated -> "Rating"
         DiscoverSort.Newest -> "Release Date"
-        DiscoverSort.Alphabetical -> "A - Z"
+        DiscoverSort.Alphabetical -> "A – Z"
         DiscoverSort.Revenue -> "Box Office"
     }
 

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.domain.model.discover.DiscoverSort
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,7 +46,9 @@ internal fun DiscoverSortSection(
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
+        verticalArrangement = Arrangement.spacedBy(
+            ReelsDimensions.discoverFilterSectionContentSpacing
+        )
     ) {
         DiscoverSectionTitle(title = "Sort By")
 
@@ -75,9 +79,9 @@ private fun DiscoverSortRow(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = MaterialTheme.shapes.large,
+        shape = RoundedCornerShape(ReelsDimensions.discoverFilterControlCornerSize),
         color = if (selected) {
-            MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
         } else {
             discoverFilterControlColor()
         },
@@ -85,7 +89,7 @@ private fun DiscoverSortRow(
         border = BorderStroke(
             width = 1.dp,
             color = if (selected) {
-                MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
+                MaterialTheme.colorScheme.primary
             } else {
                 MaterialTheme.colorScheme.outline.copy(alpha = 0.18f)
             }
@@ -93,21 +97,29 @@ private fun DiscoverSortRow(
     ) {
         Row(
             modifier = Modifier.padding(
-                horizontal = ReelsSpacing.medium,
-                vertical = ReelsSpacing.small
+                horizontal = ReelsDimensions.discoverSortRowHorizontalPadding,
+                vertical = ReelsDimensions.discoverSortRowVerticalPadding
             ),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(
+                    ReelsDimensions.discoverSortRowTextSpacing
+                )
+            ) {
                 Text(
                     text = label,
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontSize = 14.sp,
-                        lineHeight = 18.sp
+                        lineHeight = 20.sp
                     ),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.SemiBold
+                    color = if (selected) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    },
+                    fontWeight = FontWeight.Medium
                 )
 
                 Text(
