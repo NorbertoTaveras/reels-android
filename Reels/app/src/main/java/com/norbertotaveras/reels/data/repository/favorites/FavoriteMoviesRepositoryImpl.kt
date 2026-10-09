@@ -7,14 +7,15 @@
 
 package com.norbertotaveras.reels.data.repository.favorites
 
-import com.norbertotaveras.reels.domain.model.favorite.FavoriteMovieDataModel
-import com.norbertotaveras.reels.domain.model.movie.MovieDetailsDataModel
 import com.norbertotaveras.reels.data.local.dao.FavoriteMovieDao
 import com.norbertotaveras.reels.data.local.mapper.toFavoriteMovieDataModel
 import com.norbertotaveras.reels.data.local.mapper.toFavoriteMovieEntity
 import com.norbertotaveras.reels.data.local.mapper.toMovieDetailsDataModel
 import com.norbertotaveras.reels.data.repository.repositoryResult
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
+import com.norbertotaveras.reels.domain.model.favorite.FavoriteMovieDataModel
+import com.norbertotaveras.reels.domain.model.movie.CachedMovieDetailsDataModel
+import com.norbertotaveras.reels.domain.model.movie.MovieDetailsDataModel
 import com.norbertotaveras.reels.domain.repository.favorites.FavoriteMoviesRepository
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -50,9 +51,14 @@ class FavoriteMoviesRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getFavoriteMovieDetails(movieId: Int): MovieDetailsDataModel? {
+    override suspend fun getFavoriteMovieDetails(movieId: Int): CachedMovieDetailsDataModel? {
         return withContext(ioDispatcher) {
-            favoriteMovieDao.getFavoriteMovie(movieId = movieId)?.toMovieDetailsDataModel()
+            favoriteMovieDao.getFavoriteMovie(movieId = movieId)?.let { favorite ->
+                CachedMovieDetailsDataModel(
+                    movie = favorite.toMovieDetailsDataModel(),
+                    cachedAt = favorite.favoritedAt
+                )
+            }
         }
     }
 }

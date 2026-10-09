@@ -64,11 +64,20 @@ fun MovieHeroHeader(
     isWatchlisted: Boolean = false,
     tmdbRating: Double? = null,
     isAccountActionLoading: Boolean = false,
+    statusContent: (@Composable () -> Unit)? = null,
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(ReelsDimensions.detailsHeaderHeight)
+            .height(
+                ReelsDimensions.detailsHeaderHeight +
+                    if (statusContent != null) {
+                        ReelsDimensions.detailsOfflineNoticeHeight +
+                            ReelsDimensions.detailsPosterRowToChipsSpacing
+                    } else {
+                        0.dp
+                    }
+            )
     ) {
         Box {
             AsyncImage(
@@ -179,6 +188,8 @@ fun MovieHeroHeader(
                     )
                 }
             }
+
+            statusContent?.invoke()
 
             GenreChipRow(genres = genres)
         }

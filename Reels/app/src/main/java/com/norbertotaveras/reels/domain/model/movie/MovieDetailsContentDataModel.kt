@@ -14,5 +14,6 @@ data class MovieDetailsContentDataModel(
     val cast: List<CastMemberDataModel>,
     val trailers: List<MovieVideoDataModel>,
     val similarMovies: List<MovieDataModel>,
-    val isOfflineFavorite: Boolean,
+    val isOfflineContent: Boolean,
+    val cachedAt: Long? = null,
 )

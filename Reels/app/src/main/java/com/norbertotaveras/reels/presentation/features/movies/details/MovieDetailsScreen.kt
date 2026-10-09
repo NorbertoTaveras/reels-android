@@ -50,7 +50,8 @@ fun MovieDetailsScreen(
                 similarMovies = state.toSimilarMovieCarouselItems(),
                 isFavorite = state.isFavorite,
                 isFavoriteLoading = state.isFavoriteLoading,
-                isOfflineFavorite = state.isOfflineFavorite,
+                isOfflineContent = state.isOfflineContent,
+                cachedAt = state.cachedAt,
                 savedPersonIds = state.savedPersonIds,
                 savingPersonIds = state.savingPersonIds,
                 isTmdbAccountConnected = state.isTmdbAccountConnected,
@@ -68,6 +69,9 @@ fun MovieDetailsScreen(
                 },
                 onRatingClick = {
                     onEvent(MovieDetailsEvent.RatingClicked)
+                },
+                onOfflineRefreshClick = {
+                    onEvent(MovieDetailsEvent.RetryClicked)
                 },
                 onCastClick = { personId ->
                     onEvent(MovieDetailsEvent.CastClicked(personId = personId))

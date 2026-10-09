@@ -8,6 +8,7 @@
 package com.norbertotaveras.reels.presentation.features.movies.details
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,13 +16,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.WifiOff
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -36,6 +38,7 @@ import com.norbertotaveras.reels.extensions.toDisplayTmdbDate
 import com.norbertotaveras.reels.extensions.toDisplayLanguageName
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
 
 @Composable
 internal fun MovieDetailsInlineNotice(
@@ -234,109 +237,57 @@ private fun MovieInfoIcon(
 }
 
 @Composable
-internal fun OfflineExtrasUnavailableNotice(
+internal fun CachedVersionNotice(
+    cachedAt: Long?,
+    onRefreshClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = ReelsSpacing.screenHorizontal),
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface,
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(ReelsDimensions.detailsOfflineNoticeCornerSize),
+        color = ReelsTeal.copy(alpha = 0.10f),
+        contentColor = ReelsTeal,
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.outline
+            color = ReelsTeal.copy(alpha = 0.25f)
         )
     ) {
         Row(
-            modifier = Modifier.padding(ReelsSpacing.medium),
-            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
+            modifier = Modifier.padding(
+                horizontal = ReelsDimensions.detailsOfflineNoticeHorizontalPadding,
+                vertical = ReelsDimensions.detailsOfflineNoticeVerticalPadding
+            ),
+            horizontalArrangement = Arrangement.spacedBy(
+                ReelsDimensions.detailsOfflineNoticeContentSpacing
+            ),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Surface(
-                modifier = Modifier.size(ReelsDimensions.detailsOfflineIconContainerSize),
-                shape = MaterialTheme.shapes.medium,
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                contentColor = MaterialTheme.colorScheme.primary
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Filled.WifiOff,
-                        contentDescription = null,
-                        modifier = Modifier.size(ReelsDimensions.detailsOfflineIconSize)
-                    )
-                }
-            }
+            Icon(
+                imageVector = Icons.Filled.WifiOff,
+                contentDescription = null,
+                modifier = Modifier.size(ReelsDimensions.detailsOfflineNoticeIconSize)
+            )
 
-            Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)) {
-                Text(
-                    text = "Extras unavailable offline",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold
-                )
+            Text(
+                modifier = Modifier.weight(1f),
+                text = cachedAt.toCachedVersionLabel(),
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
+                ),
+                color = ReelsTeal,
+                fontWeight = FontWeight.Medium
+            )
 
-                Text(
-                    text = "Cast, trailers, and similar movies need a network refresh.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-    }
-}
-
-@Composable
-internal fun OfflineFavoriteNotice(
-    modifier: Modifier = Modifier,
-) {
-    Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = ReelsSpacing.screenHorizontal),
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface,
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outline
-        )
-    ) {
-        Row(
-            modifier = Modifier.padding(ReelsSpacing.medium),
-            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Surface(
-                modifier = Modifier.size(ReelsDimensions.detailsOfflineIconContainerSize),
-                shape = MaterialTheme.shapes.medium,
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                contentColor = MaterialTheme.colorScheme.secondary
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Filled.DownloadDone,
-                        contentDescription = null,
-                        modifier = Modifier.size(ReelsDimensions.detailsOfflineIconSize)
-                    )
-                }
-            }
-
-            Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)) {
-                Text(
-                    text = "Available offline",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Text(
-                    text = "Showing saved details. Cast, trailers, and similar movies will refresh when you reconnect.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+            Icon(
+                imageVector = Icons.Filled.Refresh,
+                contentDescription = "Refresh movie details",
+                modifier = Modifier
+                    .size(ReelsDimensions.detailsOfflineNoticeRefreshIconSize)
+                    .clickable(onClick = onRefreshClick),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

@@ -26,7 +26,8 @@ class LoadMovieDetailsContentUseCase @Inject constructor(
             movieId = movieId,
             language = language
         )
-        val movie = movieResult.getOrNull()
+        val movieSource = movieResult.getOrNull()
+        val movie = movieSource?.movie
 
         if (movie == null) {
             val offlineFavorite = favoriteMoviesRepository.getFavoriteMovieDetails(
@@ -35,11 +36,12 @@ class LoadMovieDetailsContentUseCase @Inject constructor(
             return if (offlineFavorite != null) {
                 Result.success(
                     MovieDetailsContentDataModel(
-                        movie = offlineFavorite,
+                        movie = offlineFavorite.movie,
                         cast = emptyList(),
                         trailers = emptyList(),
                         similarMovies = emptyList(),
-                        isOfflineFavorite = true
+                        isOfflineContent = true,
+                        cachedAt = offlineFavorite.cachedAt
                     )
                 )
             } else {
@@ -88,7 +90,8 @@ class LoadMovieDetailsContentUseCase @Inject constructor(
                         .getOrNull()
                         ?.take(DETAILS_SECTION_LIMIT)
                         .orEmpty(),
-                    isOfflineFavorite = false
+                    isOfflineContent = movieSource.cachedAt != null,
+                    cachedAt = movieSource.cachedAt
                 )
             )
         }

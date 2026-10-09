@@ -40,7 +40,8 @@ fun MovieDetailsContent(
     modifier: Modifier = Modifier,
     isFavorite: Boolean = false,
     isFavoriteLoading: Boolean = false,
-    isOfflineFavorite: Boolean = false,
+    isOfflineContent: Boolean = false,
+    cachedAt: Long? = null,
     savedPersonIds: Set<Int> = emptySet(),
     savingPersonIds: Set<Int> = emptySet(),
     isTmdbAccountConnected: Boolean = false,
@@ -54,6 +55,7 @@ fun MovieDetailsContent(
     onFavoriteClick: () -> Unit,
     onWatchlistClick: () -> Unit,
     onRatingClick: () -> Unit,
+    onOfflineRefreshClick: () -> Unit,
     onCastClick: (Int) -> Unit,
     onCastSaveClick: (Int) -> Unit,
     onCastSeeAllClick: () -> Unit,
@@ -88,24 +90,18 @@ fun MovieDetailsContent(
                 onBackClick = onBackClick,
                 onFavoriteClick = onFavoriteClick,
                 onWatchlistClick = onWatchlistClick,
-                onRatingClick = onRatingClick
-            )
-        }
-
-        if (isOfflineFavorite) {
-            item {
-                OfflineFavoriteNotice(
-                    modifier = Modifier.padding(top = ReelsDimensions.detailsOverviewTopSpacing)
-                )
-            }
-
-            if (cast.isEmpty() && trailers.isEmpty() && similarMovies.isEmpty()) {
-                item {
-                    OfflineExtrasUnavailableNotice(
-                        modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing)
-                    )
+                onRatingClick = onRatingClick,
+                statusContent = if (isOfflineContent) {
+                    {
+                        CachedVersionNotice(
+                            cachedAt = cachedAt,
+                            onRefreshClick = onOfflineRefreshClick
+                        )
+                    }
+                } else {
+                    null
                 }
-            }
+            )
         }
 
         item {
@@ -124,9 +120,9 @@ fun MovieDetailsContent(
             )
         }
 
-        val hasMissingOnlineExtras = !isOfflineFavorite &&
+        val hasMissingOnlineExtras = !isOfflineContent &&
             (cast.isEmpty() || trailers.isEmpty() || similarMovies.isEmpty())
-        val areAllOnlineExtrasMissing = !isOfflineFavorite &&
+        val areAllOnlineExtrasMissing = !isOfflineContent &&
             cast.isEmpty() &&
             trailers.isEmpty() &&
             similarMovies.isEmpty()
@@ -161,7 +157,7 @@ fun MovieDetailsContent(
             }
         }
 
-        if (!areAllOnlineExtrasMissing && !isOfflineFavorite && trailers.isEmpty()) {
+        if (!areAllOnlineExtrasMissing && !isOfflineContent && trailers.isEmpty()) {
             item {
                 MovieDetailsInlineNotice(
                     modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
@@ -179,7 +175,7 @@ fun MovieDetailsContent(
             }
         }
 
-        if (!areAllOnlineExtrasMissing && !isOfflineFavorite && similarMovies.isEmpty()) {
+        if (!areAllOnlineExtrasMissing && !isOfflineContent && similarMovies.isEmpty()) {
             item {
                 MovieDetailsInlineNotice(
                     modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
@@ -232,6 +228,7 @@ private fun MovieDetailsContentPreview() {
             onFavoriteClick = {},
             onWatchlistClick = {},
             onRatingClick = {},
+            onOfflineRefreshClick = {},
             onCastClick = {},
             onCastSaveClick = {},
             onCastSeeAllClick = {},

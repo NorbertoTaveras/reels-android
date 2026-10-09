@@ -321,8 +321,13 @@ object ReelsDimensions {
     val detailsTrailerPlayButtonSize = 56.dp
     val detailsTrailerPlayIconSize = 24.dp
     val detailsSimilarMoviePosterWidth = 120.dp
-    val detailsOfflineIconContainerSize = 42.dp
-    val detailsOfflineIconSize = 20.dp
+    val detailsOfflineNoticeCornerSize = 14.dp
+    val detailsOfflineNoticeHeight = 42.dp
+    val detailsOfflineNoticeHorizontalPadding = 16.dp
+    val detailsOfflineNoticeVerticalPadding = 12.dp
+    val detailsOfflineNoticeContentSpacing = 12.dp
+    val detailsOfflineNoticeIconSize = 15.dp
+    val detailsOfflineNoticeRefreshIconSize = 14.dp
     val detailsLoadingHeroHeight = 360.dp
 
     val fullCastScreenTopPadding = 0.dp
@@ -481,10 +486,20 @@ object ReelsDimensions {
     val settingsDialogInfoLineHeight = 20.sp
     val settingsDialogContentMaxHeight = 560.dp
 
-    val stateCardPadding = 24.dp
-    val stateCardContentSpacing = 14.dp
-    val stateIconContainerSize = 58.dp
-    val stateIconSize = 28.dp
+    val stateHorizontalPadding = 32.dp
+    val stateVerticalPadding = 96.dp
+    val stateIconContainerSize = 80.dp
+    val stateIconContainerCornerSize = 24.dp
+    val stateIconSize = 34.dp
+    val stateIconToTitleSpacing = 20.dp
+    val stateTitleToMessageSpacing = 8.dp
+    val stateMessageToActionSpacing = 28.dp
+    val stateActionCornerSize = 16.dp
+    val stateActionHeight = 44.dp
+    val stateActionHorizontalPadding = 24.dp
+    val stateActionVerticalPadding = 12.dp
+    val stateActionContentSpacing = 8.dp
+    val stateActionIconSize = 15.dp
     val inlineStateCardPadding = 18.dp
     val inlineStateContentSpacing = 10.dp
     val inlineStateIconContainerSize = 44.dp

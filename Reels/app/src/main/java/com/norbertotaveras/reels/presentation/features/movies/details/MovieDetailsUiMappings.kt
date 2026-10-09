@@ -56,7 +56,8 @@ internal fun MovieDetailsUiState.withContent(
         cast = content.cast,
         trailers = content.trailers,
         similarMovies = content.similarMovies,
-        isOfflineFavorite = content.isOfflineFavorite,
+        isOfflineContent = content.isOfflineContent,
+        cachedAt = content.cachedAt,
         errorMessage = null,
         isLoading = false
     )

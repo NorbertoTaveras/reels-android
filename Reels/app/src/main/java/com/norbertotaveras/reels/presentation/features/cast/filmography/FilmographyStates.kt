@@ -11,7 +11,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,19 +22,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Movie
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.norbertotaveras.reels.presentation.ui.components.common.MessageState
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
@@ -107,12 +101,14 @@ internal fun FilmographyErrorState(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    FilmographyMessageState(
+    MessageState(
         modifier = modifier,
         icon = Icons.Outlined.ErrorOutline,
         title = "Couldn't load credits",
         message = "Check your connection and try again.",
-        onRetry = onRetry
+        actionLabel = "Retry",
+        actionIcon = Icons.Filled.Refresh,
+        onAction = onRetry
     )
 }
 
@@ -121,78 +117,10 @@ internal fun FilmographyEmptyState(
     personName: String,
     modifier: Modifier = Modifier,
 ) {
-    FilmographyMessageState(
+    MessageState(
         modifier = modifier,
         icon = Icons.Outlined.Movie,
         title = "No credits found",
         message = "$personName doesn't have any movie credits yet."
     )
-}
-
-@Composable
-private fun FilmographyMessageState(
-    icon: ImageVector,
-    title: String,
-    message: String,
-    modifier: Modifier = Modifier,
-    onRetry: (() -> Unit)? = null,
-) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(320.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.stateCardContentSpacing)
-        ) {
-            Surface(
-                modifier = Modifier.size(ReelsDimensions.stateIconContainerSize),
-                shape = MaterialTheme.shapes.large,
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        modifier = Modifier.size(ReelsDimensions.stateIconSize)
-                    )
-                }
-            }
-
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Medium
-            )
-
-            Text(
-                text = message,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
-            )
-
-            onRetry?.let { retry ->
-                Button(
-                    modifier = Modifier.padding(top = ReelsSpacing.small),
-                    onClick = retry
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Refresh,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp)
-                    )
-
-                    Spacer(modifier = Modifier.width(ReelsSpacing.small))
-
-                    Text(text = "Retry")
-                }
-            }
-        }
-    }
 }

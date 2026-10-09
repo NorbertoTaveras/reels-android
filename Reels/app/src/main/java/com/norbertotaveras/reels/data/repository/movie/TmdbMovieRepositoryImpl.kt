@@ -31,6 +31,7 @@ import com.norbertotaveras.reels.data.local.mapper.toMovieVideosDataModel as toC
 import com.norbertotaveras.reels.data.mapper.movie.toCachedMovieDataModel
 import com.norbertotaveras.reels.data.mapper.movie.toCachedMovieEntity
 import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
+import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
 import com.norbertotaveras.reels.data.remote.mapper.genre.toGenreDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toDiscoverMovieRequestParameters
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieCreditsDataModel
@@ -53,16 +54,18 @@ import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
 import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
+import com.norbertotaveras.reels.domain.model.movie.CachedMovieDetailsDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieCreditsDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
-import com.norbertotaveras.reels.domain.model.movie.MovieDetailsDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieVideosDataModel
 import com.norbertotaveras.reels.domain.repository.movie.MovieRepository
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 @Singleton
 @OptIn(ExperimentalPagingApi::class)
@@ -184,29 +187,55 @@ class TmdbMovieRepositoryImpl @Inject constructor(
     override suspend fun getMovieDetails(
         movieId: Int,
         language: String,
-    ): Result<MovieDetailsDataModel> {
+    ): Result<CachedMovieDetailsDataModel> {
         val cacheKey = movieDetailsCacheKey(movieId = movieId, language = language)
-        return cachedTmdbResult(
-            dispatcher = ioDispatcher,
-            loadRemote = {
-                remoteDataSource.getMovieDetails(
+        return withContext(ioDispatcher) {
+            try {
+                val movie = remoteDataSource.getMovieDetails(
                     movieId = movieId,
                     language = language
                 ).toMovieDetailsDataModel()
-            },
-            saveRemote = { movie ->
-                cachedContentDao.upsertMovieDetails(
-                    movie.toCachedMovieDetailsEntity(
-                        cacheKey = cacheKey,
-                        cachedAt = System.currentTimeMillis()
+
+                try {
+                    cachedContentDao.upsertMovieDetails(
+                        movie.toCachedMovieDetailsEntity(
+                            cacheKey = cacheKey,
+                            cachedAt = System.currentTimeMillis()
+                        )
+                    )
+                } catch (error: CancellationException) {
+                    throw error
+                } catch (_: Exception) {
+                    // A cache write must not hide a successful network response.
+                }
+
+                Result.success(
+                    CachedMovieDetailsDataModel(
+                        movie = movie,
+                        cachedAt = null
                     )
                 )
-            },
-            loadCached = {
-                cachedContentDao.getMovieDetails(cacheKey = cacheKey)
-                    ?.toCachedMovieDetailsDataModel()
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                val cached = try {
+                    cachedContentDao.getMovieDetails(cacheKey = cacheKey)
+                } catch (_: Exception) {
+                    null
+                }
+
+                if (cached != null) {
+                    Result.success(
+                        CachedMovieDetailsDataModel(
+                            movie = cached.toCachedMovieDetailsDataModel(),
+                            cachedAt = cached.cachedAt
+                        )
+                    )
+                } else {
+                    Result.failure(error.toTmdbNetworkException())
+                }
             }
-        )
+        }
     }
 
     override suspend fun getMovieCredits(

@@ -8,6 +8,7 @@
 package com.norbertotaveras.reels.domain.repository.favorites
 
 import com.norbertotaveras.reels.domain.model.favorite.FavoriteMovieDataModel
+import com.norbertotaveras.reels.domain.model.movie.CachedMovieDetailsDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDetailsDataModel
 import kotlinx.coroutines.flow.Flow
 
@@ -16,5 +17,5 @@ interface FavoriteMoviesRepository {
     fun observeIsFavorite(movieId: Int): Flow<Boolean>
     suspend fun toggleFavoriteMovie(movie: MovieDetailsDataModel): Result<Unit>
     suspend fun removeFavoriteMovie(movieId: Int): Result<Unit>
-    suspend fun getFavoriteMovieDetails(movieId: Int): MovieDetailsDataModel?
+    suspend fun getFavoriteMovieDetails(movieId: Int): CachedMovieDetailsDataModel?
 }

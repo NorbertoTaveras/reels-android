@@ -11,6 +11,7 @@ import androidx.paging.PagingData
 import com.norbertotaveras.reels.domain.model.constant.MovieCategory
 import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
 import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
+import com.norbertotaveras.reels.domain.model.movie.CachedMovieDetailsDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieCreditsDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDetailsDataModel
@@ -46,7 +47,7 @@ interface MovieRepository {
     suspend fun getMovieDetails(
         movieId: Int,
         language: String,
-    ): Result<MovieDetailsDataModel>
+    ): Result<CachedMovieDetailsDataModel>
 
     suspend fun getMovieCredits(
         movieId: Int,
