@@ -76,7 +76,7 @@ fun MovieDetailsContent(
                 posterUrl = movie.posterPath.toTmdbImageUrl(),
                 metadata = listOfNotNull(
                     movie.releaseDate.toReleaseYear(),
-                    movie.runtime?.let { "$it min" }
+                    movie.runtime?.takeIf { it > 0 }?.let { "$it min" }
                 ),
                 rating = String.format("%.1f", movie.voteAverage),
                 genres = movie.genres.map { it.name },

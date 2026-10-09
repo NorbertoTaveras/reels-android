@@ -8,6 +8,7 @@
 package com.norbertotaveras.reels.presentation.ui.components.movie
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsGenreChipContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 import com.norbertotaveras.reels.presentation.ui.theme.isReelsLightTheme
+import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
 
 @Composable
 fun GenreChipRow(
@@ -51,7 +53,8 @@ fun GenreChipRow(
                 } else {
                     ReelsGenreChipContainer
                 },
-                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                contentColor = MaterialTheme.colorScheme.onBackground,
+                border = BorderStroke(width = 1.dp, color = reelsBorderColor())
             ) {
                 Text(
                     modifier = Modifier.padding(
@@ -59,9 +62,9 @@ fun GenreChipRow(
                         vertical = ReelsDimensions.detailsGenreChipVerticalPadding
                     ),
                     text = genre,
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        fontSize = 12.sp,
-                        lineHeight = 16.sp
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = 14.sp,
+                        lineHeight = 20.sp
                     )
                 )
             }

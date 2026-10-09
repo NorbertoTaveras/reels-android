@@ -143,7 +143,7 @@ private fun CastSaveButton(
 ) {
     Surface(
         modifier = modifier
-            .size(28.dp)
+            .size(ReelsDimensions.detailsCastSaveButtonSize)
             .clickable(
                 enabled = !isSaving,
                 role = Role.Button,
@@ -165,7 +165,7 @@ private fun CastSaveButton(
         Box(contentAlignment = Alignment.Center) {
             if (isSaving) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(14.dp),
+                    modifier = Modifier.size(ReelsDimensions.detailsCastSaveIconSize),
                     strokeWidth = 2.dp,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -177,7 +177,7 @@ private fun CastSaveButton(
                         Icons.Outlined.FavoriteBorder
                     },
                     contentDescription = null,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(ReelsDimensions.detailsCastSaveIconSize)
                 )
             }
         }

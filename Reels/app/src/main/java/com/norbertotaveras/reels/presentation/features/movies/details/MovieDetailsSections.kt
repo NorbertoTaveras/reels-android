@@ -172,7 +172,7 @@ private fun MovieInfoRow(
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Top
     ) {
         Surface(
             color = MaterialTheme.colorScheme.surfaceVariant,
@@ -196,9 +196,9 @@ private fun MovieInfoRow(
         ) {
             Text(
                 text = row.label,
-                style = MaterialTheme.typography.labelMedium.copy(
-                    fontSize = 12.sp,
-                    lineHeight = 16.sp
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -206,8 +206,8 @@ private fun MovieInfoRow(
             Text(
                 text = row.value,
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 13.sp,
-                    lineHeight = 18.sp
+                    fontSize = 16.sp,
+                    lineHeight = 24.sp
                 ),
                 color = MaterialTheme.colorScheme.onBackground
             )

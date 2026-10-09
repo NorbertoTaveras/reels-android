@@ -8,14 +8,18 @@
 package com.norbertotaveras.reels.presentation.features.movies.details
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
@@ -29,10 +33,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
@@ -65,17 +67,39 @@ fun MovieRatingSheet(
         ),
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface,
+        dragHandle = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        top = ReelsDimensions.ratingSheetDragHandleTopPadding,
+                        bottom = ReelsDimensions.ratingSheetDragHandleBottomPadding
+                    ),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(ReelsDimensions.ratingSheetDragHandleWidth)
+                        .height(ReelsDimensions.ratingSheetDragHandleHeight)
+                        .background(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.30f),
+                            shape = RoundedCornerShape(50)
+                        )
+                )
+            }
+        },
         onDismissRequest = onDismiss
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = ReelsSpacing.screenHorizontal)
-                .padding(bottom = ReelsDimensions.ratingSheetBottomPadding),
-            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.ratingSheetSectionSpacing)
+            modifier = Modifier.fillMaxWidth()
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = ReelsSpacing.screenHorizontal,
+                        vertical = ReelsDimensions.ratingSheetHeaderVerticalPadding
+                    ),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -85,11 +109,11 @@ fun MovieRatingSheet(
                     Text(
                         text = "Rate this movie",
                         style = MaterialTheme.typography.titleMedium.copy(
-                            fontSize = 17.sp,
-                            lineHeight = 21.sp
+                            fontSize = 16.sp,
+                            lineHeight = 24.sp
                         ),
                         color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Medium
                     )
 
                     Text(
@@ -103,16 +127,19 @@ fun MovieRatingSheet(
                 }
 
                 if (selectedRating != null) {
-                    TextButton(
-                        enabled = !isLoading,
-                        onClick = onClearClick
-                    ) {
-                        Text(
-                            text = "Clear",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    Text(
+                        text = "Clear",
+                        modifier = Modifier.clickable(
+                            enabled = !isLoading,
+                            role = Role.Button,
+                            onClick = onClearClick
+                        ),
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp
+                        ),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
 
@@ -120,40 +147,64 @@ fun MovieRatingSheet(
                 color = MaterialTheme.colorScheme.outlineVariant
             )
 
-            selectedRating?.let { rating ->
-                SelectedRatingSummary(rating = rating)
-            }
-
-            RatingChoiceGrid(
-                selectedRating = selectedRating,
-                enabled = !isLoading,
-                onRatingSelected = onRatingSelected
-            )
-
-            Button(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(ReelsDimensions.ratingSheetSubmitButtonHeight),
-                enabled = selectedRating != null && !isLoading,
-                onClick = onSubmitClick,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = Color.White
-                )
+                    .padding(horizontal = ReelsSpacing.screenHorizontal)
+                    .padding(
+                        top = ReelsDimensions.ratingSheetBodyTopPadding,
+                        bottom = ReelsDimensions.ratingSheetBottomPadding
+                    )
             ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(ReelsDimensions.ratingSheetProgressSize),
-                        strokeWidth = 2.dp,
-                        color = Color.White
+                selectedRating?.let { rating ->
+                    SelectedRatingSummary(rating = rating)
+                    Spacer(
+                        modifier = Modifier.height(
+                            ReelsDimensions.ratingSheetSummaryBottomSpacing
+                        )
                     )
-                } else {
-                    Text(
-                        text = selectedRating?.let { rating ->
-                            "Submit ${rating.toRatingText()}/10 Rating"
-                        } ?: "Tap a number to rate",
-                        fontWeight = FontWeight.Bold
+                }
+
+                RatingChoiceGrid(
+                    selectedRating = selectedRating,
+                    enabled = !isLoading,
+                    onRatingSelected = onRatingSelected
+                )
+
+                Spacer(modifier = Modifier.height(ReelsDimensions.ratingSheetGridBottomSpacing))
+
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(ReelsDimensions.ratingSheetSubmitButtonHeight),
+                    enabled = selectedRating != null && !isLoading,
+                    onClick = onSubmitClick,
+                    shape = RoundedCornerShape(ReelsDimensions.ratingSheetChoiceCornerSize),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(ReelsDimensions.ratingSheetProgressSize),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else {
+                        Text(
+                            text = selectedRating?.let { rating ->
+                                "Submit ${rating.toRatingText()}/10 Rating"
+                            } ?: "Tap a number to rate",
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontSize = 14.sp,
+                                lineHeight = 20.sp
+                            ),
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
             }
         }
@@ -179,13 +230,19 @@ private fun SelectedRatingSummary(
         Text(
             text = rating.toRatingText(),
             modifier = Modifier.padding(start = ReelsSpacing.xSmall),
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.headlineSmall.copy(
+                fontSize = 24.sp,
+                lineHeight = 32.sp
+            ),
             color = MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.SemiBold
         )
         Text(
             text = " / 10",
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontSize = 18.sp,
+                lineHeight = 28.sp
+            ),
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
@@ -286,9 +343,9 @@ private fun RatingChoice(
             Text(
                 text = rating.toString(),
                 style = MaterialTheme.typography.titleSmall.copy(
-                    fontSize = 15.sp,
-                    lineHeight = 18.sp,
-                    fontWeight = FontWeight.Bold
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
+                    fontWeight = FontWeight.Medium
                 ),
                 textAlign = TextAlign.Center
             )
@@ -315,7 +372,7 @@ private fun ratingChoiceContentColor(
     selectedRating: Double?,
     selected: Boolean,
 ) = when {
-    selected -> Color.White
+    selected -> MaterialTheme.colorScheme.onPrimary
     selectedRating != null && rating.toDouble() < selectedRating -> MaterialTheme.colorScheme.primary
     else -> MaterialTheme.colorScheme.onSurfaceVariant
 }

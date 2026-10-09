@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Favorite
@@ -35,7 +36,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
@@ -96,13 +99,13 @@ private fun HeroRatingButton(
 ) {
     Surface(
         modifier = modifier.height(ReelsDimensions.detailsActionButtonHeight),
-        shape = MaterialTheme.shapes.large,
+        shape = RoundedCornerShape(8.dp),
         color = reelsRatingContainerColor(),
         contentColor = reelsRatingContentColor()
     ) {
         Row(
             modifier = Modifier.padding(horizontal = ReelsSpacing.medium),
-            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
+            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -139,8 +142,12 @@ private fun HeroFavoriteButton(
                 },
                 onClick = onClick
             ),
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(8.dp),
+        color = if (isFavorite) {
+            reelsRatingContainerColor()
+        } else {
+            MaterialTheme.colorScheme.surface
+        },
         contentColor = if (isFavorite) {
             MaterialTheme.colorScheme.primary
         } else {
@@ -148,7 +155,11 @@ private fun HeroFavoriteButton(
         },
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
+            color = if (isFavorite) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
+            }
         )
     ) {
         Box(contentAlignment = Alignment.Center) {
@@ -166,7 +177,7 @@ private fun HeroFavoriteButton(
                         Icons.Outlined.FavoriteBorder
                     },
                     contentDescription = null,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(ReelsDimensions.detailsHeroActionIconSize)
                 )
             }
         }
@@ -198,8 +209,12 @@ private fun HeroToggleActionButton(
                 },
                 onClick = onClick
             ),
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(8.dp),
+        color = if (selected) {
+            selectedColor.copy(alpha = 0.20f)
+        } else {
+            MaterialTheme.colorScheme.surface
+        },
         contentColor = if (selected) {
             selectedColor
         } else {
@@ -207,7 +222,11 @@ private fun HeroToggleActionButton(
         },
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
+            color = if (selected) {
+                selectedColor.copy(alpha = 0.60f)
+            } else {
+                MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
+            }
         )
     ) {
         Box(contentAlignment = Alignment.Center) {
@@ -221,7 +240,7 @@ private fun HeroToggleActionButton(
                 Icon(
                     imageVector = if (selected) selectedIcon else unselectedIcon,
                     contentDescription = null,
-                    modifier = Modifier.size(22.dp)
+                    modifier = Modifier.size(ReelsDimensions.detailsHeroActionIconSize)
                 )
             }
         }
@@ -244,7 +263,7 @@ private fun HeroRateButton(
                 onClickLabel = if (rating == null) "Rate on TMDB" else "Update TMDB rating",
                 onClick = onClick
             ),
-        shape = MaterialTheme.shapes.large,
+        shape = RoundedCornerShape(8.dp),
         color = if (rating == null) {
             MaterialTheme.colorScheme.surface
         } else {
@@ -257,7 +276,11 @@ private fun HeroRateButton(
         },
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
+            color = if (rating == null) {
+                MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
+            } else {
+                MaterialTheme.colorScheme.primary
+            }
         )
     ) {
         Box(contentAlignment = Alignment.Center) {
@@ -268,15 +291,26 @@ private fun HeroRateButton(
                     color = MaterialTheme.colorScheme.primary
                 )
             } else {
-                Icon(
-                    imageVector = if (rating == null) {
-                        Icons.Outlined.StarBorder
-                    } else {
-                        Icons.Filled.Star
-                    },
-                    contentDescription = null,
-                    modifier = Modifier.size(22.dp)
-                )
+                if (rating == null) {
+                    Icon(
+                        imageVector = Icons.Outlined.StarBorder,
+                        contentDescription = null,
+                        modifier = Modifier.size(ReelsDimensions.detailsHeroActionIconSize)
+                    )
+                } else {
+                    Text(
+                        text = if (rating % 1.0 == 0.0) {
+                            rating.toInt().toString()
+                        } else {
+                            String.format(java.util.Locale.ROOT, "%.1f", rating)
+                        },
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp
+                        ),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }
