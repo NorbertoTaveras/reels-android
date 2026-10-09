@@ -24,7 +24,6 @@ import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -273,17 +272,5 @@ private fun SearchStateIcon(
         contentColor = MaterialTheme.colorScheme.onSurfaceVariant
     ) {
         Box(contentAlignment = Alignment.Center) { content() }
-    }
-}
-
-@Composable
-internal fun SearchAppendLoadingState(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = ReelsSpacing.medium),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
     }
 }

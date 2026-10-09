@@ -8,3 +8,4 @@
 package com.norbertotaveras.reels.presentation.features.movies.search
 
 internal const val SEARCH_DEBOUNCE_MILLIS = 400L
+internal const val SEARCH_LOADING_PLACEHOLDER_COUNT = 4

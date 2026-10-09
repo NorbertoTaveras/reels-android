@@ -88,7 +88,15 @@ internal fun SearchContent(
 
             when {
                 refreshState is LoadState.Loading && !hasCachedMovies -> {
-                    Unit
+                    item {
+                        SearchLoadingHeader()
+                    }
+                    items(
+                        count = SEARCH_LOADING_PLACEHOLDER_COUNT,
+                        key = { index -> "search-loading-$index" }
+                    ) {
+                        SearchResultPlaceholder()
+                    }
                 }
 
                 refreshState is LoadState.Error && !hasCachedMovies -> {
@@ -154,7 +162,7 @@ internal fun SearchContent(
                     }
 
                     when (val appendState = movies.loadState.append) {
-                        is LoadState.Loading -> item { SearchAppendLoadingState() }
+                        is LoadState.Loading -> item { SearchResultPlaceholder() }
                         is LoadState.Error -> {
                             item {
                                 InlineRetryState(

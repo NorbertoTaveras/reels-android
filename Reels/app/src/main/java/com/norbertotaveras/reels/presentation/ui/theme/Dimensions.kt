@@ -135,6 +135,7 @@ object ReelsDimensions {
     val searchStateActionIconSize = 15.dp
     val searchResultPosterWidth = 72.dp
     val searchResultPosterHeight = 108.dp
+    val searchResultBorderWidth = 1.dp
     val searchResultCardPadding = 12.dp
     val searchResultCardContentSpacing = 12.dp
     val searchResultTitleToMetadataSpacing = 6.dp
@@ -147,6 +148,16 @@ object ReelsDimensions {
     val searchResultGenreHorizontalPadding = 8.dp
     val searchResultGenreVerticalPadding = 2.dp
     val searchResultGenreSpacing = 6.dp
+    val searchLoadingHeaderWidth = 132.dp
+    val searchLoadingHeaderHeight = 12.dp
+    val searchLoadingTitleWidth = 168.dp
+    val searchLoadingTitleHeight = 16.dp
+    val searchLoadingMetadataWidth = 136.dp
+    val searchLoadingMetadataHeight = 12.dp
+    val searchLoadingRatingWidth = 54.dp
+    val searchLoadingRatingHeight = 24.dp
+    val searchLoadingGenreWidth = 48.dp
+    val searchLoadingGenreHeight = 18.dp
 
     val discoverScreenTopPadding = 0.dp
     val discoverScreenBottomPadding = 32.dp
