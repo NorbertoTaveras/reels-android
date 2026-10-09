@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -32,7 +31,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
 @Composable
 internal fun FilmographyHeader(
@@ -53,7 +51,7 @@ internal fun FilmographyHeader(
             color = MaterialTheme.colorScheme.surface,
             border = BorderStroke(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                color = MaterialTheme.colorScheme.outline
             )
         ) {
             IconButton(onClick = onBackClick) {
@@ -74,7 +72,7 @@ internal fun FilmographyHeader(
                     lineHeight = 30.sp
                 ),
                 color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -82,8 +80,8 @@ internal fun FilmographyHeader(
             Text(
                 text = personName,
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 12.sp,
-                    lineHeight = 16.sp
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
@@ -112,7 +110,7 @@ private fun FilmographyCountChip(
         contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+            color = MaterialTheme.colorScheme.outline
         )
     ) {
         Row(
@@ -120,7 +118,7 @@ private fun FilmographyCountChip(
                 horizontal = ReelsDimensions.filmographyCountHorizontalPadding,
                 vertical = ReelsDimensions.filmographyCountVerticalPadding
             ),
-            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
+            horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.filmographyCountContentSpacing),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -132,9 +130,10 @@ private fun FilmographyCountChip(
             Text(
                 text = "$creditCount credits",
                 style = MaterialTheme.typography.labelMedium.copy(
-                    fontSize = 10.sp,
-                    lineHeight = 14.sp
-                )
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
+                ),
+                fontWeight = FontWeight.Normal
             )
         }
     }

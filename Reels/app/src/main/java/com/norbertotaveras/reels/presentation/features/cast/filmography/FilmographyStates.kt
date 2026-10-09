@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.ErrorOutline
@@ -45,19 +46,19 @@ internal fun FilmographyPlaceholderCard(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.filmographyPosterTextSpacing)
+        modifier = modifier
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.poster)
-                .clip(MaterialTheme.shapes.medium)
+                .clip(RoundedCornerShape(ReelsDimensions.filmographyPosterCornerRadius))
                 .background(reelsPlaceholderColor())
         )
 
         Box(
             modifier = Modifier
+                .padding(top = ReelsDimensions.filmographyPosterToTitleSpacing)
                 .fillMaxWidth(0.82f)
                 .height(12.dp)
                 .clip(MaterialTheme.shapes.small)
@@ -66,6 +67,7 @@ internal fun FilmographyPlaceholderCard(
 
         Box(
             modifier = Modifier
+                .padding(top = ReelsDimensions.filmographyTitleToYearSpacing)
                 .width(36.dp)
                 .height(10.dp)
                 .clip(MaterialTheme.shapes.small)

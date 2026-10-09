@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
@@ -33,13 +34,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.domain.model.person.PersonMovieCreditDataModel
+import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsAccent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
-import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContentColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
 
 @Composable
@@ -49,14 +50,13 @@ internal fun FilmographyPosterCard(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.clickable(onClick = onClick),
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.filmographyPosterTextSpacing)
+        modifier = modifier.clickable(onClick = onClick)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.poster)
-                .clip(MaterialTheme.shapes.medium)
+                .clip(RoundedCornerShape(ReelsDimensions.filmographyPosterCornerRadius))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
             AsyncImage(
@@ -77,6 +77,7 @@ internal fun FilmographyPosterCard(
         }
 
         Text(
+            modifier = Modifier.padding(top = ReelsDimensions.filmographyPosterToTitleSpacing),
             text = movie.title,
             style = MaterialTheme.typography.labelMedium.copy(
                 fontSize = 12.sp,
@@ -90,10 +91,11 @@ internal fun FilmographyPosterCard(
 
         movie.releaseDate.toReleaseYear()?.let { year ->
             Text(
+                modifier = Modifier.padding(top = ReelsDimensions.filmographyTitleToYearSpacing),
                 text = year,
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontSize = 10.sp,
-                    lineHeight = 14.sp
+                    lineHeight = 15.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
@@ -110,9 +112,9 @@ private fun FilmographyRatingBadge(
 ) {
     Surface(
         modifier = modifier,
-        shape = MaterialTheme.shapes.small,
+        shape = RoundedCornerShape(ReelsDimensions.filmographyRatingCornerRadius),
         color = reelsPosterRatingContainerColor(),
-        contentColor = reelsImageRatingContentColor()
+        contentColor = ReelsAccent
     ) {
         Row(
             modifier = Modifier.padding(
@@ -134,7 +136,7 @@ private fun FilmographyRatingBadge(
                     fontSize = 12.sp,
                     lineHeight = 16.sp
                 ),
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.Normal
             )
         }
     }

@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.domain.model.person.FilmographySort
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsAccent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
@@ -67,21 +68,21 @@ private fun FilmographyFilterChip(
         modifier = modifier.clickable(onClick = onClick),
         shape = MaterialTheme.shapes.extraLarge,
         color = if (selected) {
-            MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+            ReelsAccent.copy(alpha = 0.15f)
         } else {
             MaterialTheme.colorScheme.surface
         },
         contentColor = if (selected) {
-            MaterialTheme.colorScheme.primary
+            ReelsAccent
         } else {
             MaterialTheme.colorScheme.onSurfaceVariant
         },
         border = BorderStroke(
             width = 1.dp,
             color = if (selected) {
-                MaterialTheme.colorScheme.primary
+                ReelsAccent
             } else {
-                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                MaterialTheme.colorScheme.outline
             }
         )
     ) {
