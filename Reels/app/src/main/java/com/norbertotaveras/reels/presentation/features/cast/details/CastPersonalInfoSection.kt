@@ -51,7 +51,7 @@ internal fun PersonalInfoSection(
             color = MaterialTheme.colorScheme.surface,
             border = BorderStroke(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                color = MaterialTheme.colorScheme.outline
             )
         ) {
             Column {
@@ -112,6 +112,6 @@ private fun PersonalInfoRow(
 @Composable
 private fun PersonalInfoDivider() {
     HorizontalDivider(
-        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+        color = MaterialTheme.colorScheme.outline
     )
 }

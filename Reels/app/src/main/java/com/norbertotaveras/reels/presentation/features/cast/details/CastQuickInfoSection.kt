@@ -81,7 +81,7 @@ private fun CastInfoRow(
             contentColor = MaterialTheme.colorScheme.primary,
             border = BorderStroke(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                color = MaterialTheme.colorScheme.outline
             )
         ) {
             Box(contentAlignment = Alignment.Center) {

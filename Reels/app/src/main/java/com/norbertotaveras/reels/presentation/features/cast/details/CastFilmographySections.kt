@@ -94,7 +94,7 @@ internal fun FullFilmographySection(
         contentColor = MaterialTheme.colorScheme.onSurface,
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+            color = MaterialTheme.colorScheme.outline
         )
     ) {
         Row(

@@ -8,6 +8,7 @@
 package com.norbertotaveras.reels.presentation.features.cast.details
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,9 +18,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -40,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsAccent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
@@ -50,7 +52,6 @@ internal fun CastHeroHeader(
     knownForDepartment: String?,
     isFavorite: Boolean,
     isFavoriteLoading: Boolean,
-    isOfflineSavedPerson: Boolean,
     onBackClick: () -> Unit,
     onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -109,13 +110,28 @@ internal fun CastHeroHeader(
                     end = ReelsSpacing.screenHorizontal,
                     top = ReelsDimensions.castDetailsHeroActionTopPadding
                 )
-                .size(ReelsDimensions.castDetailsHeroActionButtonSize),
+                .size(ReelsDimensions.castDetailsHeroActionButtonSize)
+                .then(
+                    if (isFavorite) {
+                        Modifier.border(
+                            width = 1.dp,
+                            color = ReelsAccent.copy(alpha = 0.40f),
+                            shape = CircleShape
+                        )
+                    } else {
+                        Modifier
+                    }
+                ),
             enabled = !isFavoriteLoading,
             onClick = onFavoriteClick,
             colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.82f),
+                containerColor = if (isFavorite) {
+                    ReelsAccent.copy(alpha = 0.20f)
+                } else {
+                    MaterialTheme.colorScheme.surface.copy(alpha = 0.82f)
+                },
                 contentColor = if (isFavorite) {
-                    MaterialTheme.colorScheme.primary
+                    ReelsAccent
                 } else {
                     MaterialTheme.colorScheme.onSurface
                 }
@@ -181,25 +197,6 @@ internal fun CastHeroHeader(
                 }
             }
 
-            if (isOfflineSavedPerson) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.DownloadDone,
-                        contentDescription = null,
-                        modifier = Modifier.size(ReelsDimensions.castDetailsDepartmentIconSize),
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
-
-                    Text(
-                        text = "Available offline",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                }
-            }
         }
     }
 }

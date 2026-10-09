@@ -40,6 +40,7 @@ import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.cast.CastMemberDataModel
 import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsAccent
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.reelsMutedContainerColor
 
@@ -60,7 +61,7 @@ internal fun MovieCastRow(
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(
             width = ReelsDimensions.fullCastBorderWidth,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+            color = MaterialTheme.colorScheme.outline
         )
     ) {
         Row(
@@ -134,15 +135,23 @@ internal fun MovieCastRow(
                         onClick = onSaveClick
                     ),
                 shape = RoundedCornerShape(ReelsDimensions.fullCastSaveButtonCornerRadius),
-                color = reelsMutedContainerColor(),
+                color = if (isSaved) {
+                    ReelsAccent.copy(alpha = 0.20f)
+                } else {
+                    reelsMutedContainerColor()
+                },
                 contentColor = if (isSaved) {
-                    MaterialTheme.colorScheme.primary
+                    ReelsAccent
                 } else {
                     MaterialTheme.colorScheme.onSurfaceVariant
                 },
                 border = BorderStroke(
                     width = ReelsDimensions.fullCastBorderWidth,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                    color = if (isSaved) {
+                        ReelsAccent
+                    } else {
+                        MaterialTheme.colorScheme.outline
+                    }
                 )
             ) {
                 Box(contentAlignment = Alignment.Center) {
