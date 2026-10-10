@@ -163,11 +163,11 @@ object ReelsDimensions {
     val discoverScreenBottomPadding = 32.dp
     val discoverHeaderSpacing = 6.dp
     val discoverSectionSpacing = 22.dp
-    val discoverFilterButtonContainerSize = 47.dp
+    val discoverFilterButtonContainerSize = 50.dp
     val discoverFilterButtonSize = 44.dp
     val discoverFilterButtonCornerSize = 14.dp
     val discoverFilterButtonIconSize = 20.dp
-    val discoverFilterBadgeSize = 16.dp
+    val discoverFilterBadgeSize = 20.dp
     val discoverSortHorizontalPadding = 12.dp
     val discoverSortVerticalPadding = 6.dp
     val discoverAppliedFilterSpacing = 6.dp

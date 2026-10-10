@@ -290,7 +290,7 @@ private fun DiscoverFilterButton(
                 .clickable(onClick = onClick),
             shape = RoundedCornerShape(ReelsDimensions.discoverFilterButtonCornerSize),
             color = if (hasActiveFilters) {
-                MaterialTheme.colorScheme.primary.copy(alpha = 0.14f)
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.20f)
             } else {
                 MaterialTheme.colorScheme.surface
             },
@@ -302,7 +302,7 @@ private fun DiscoverFilterButton(
             border = BorderStroke(
                 width = 1.dp,
                 color = if (hasActiveFilters) {
-                    MaterialTheme.colorScheme.primary.copy(alpha = 0.32f)
+                    MaterialTheme.colorScheme.primary
                 } else {
                     reelsBorderColor()
                 }
@@ -324,7 +324,7 @@ private fun DiscoverFilterButton(
                     .size(ReelsDimensions.discoverFilterBadgeSize),
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
+                contentColor = MaterialTheme.colorScheme.background
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Text(
