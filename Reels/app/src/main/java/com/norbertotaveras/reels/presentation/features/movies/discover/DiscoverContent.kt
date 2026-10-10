@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -283,10 +282,11 @@ private fun DiscoverFilterButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier.size(ReelsDimensions.discoverFilterButtonSize)) {
+    Box(modifier = modifier.size(ReelsDimensions.discoverFilterButtonContainerSize)) {
         Surface(
             modifier = Modifier
-                .matchParentSize()
+                .align(Alignment.BottomStart)
+                .size(ReelsDimensions.discoverFilterButtonSize)
                 .clickable(onClick = onClick),
             shape = RoundedCornerShape(ReelsDimensions.discoverFilterButtonCornerSize),
             color = if (hasActiveFilters) {
@@ -321,10 +321,6 @@ private fun DiscoverFilterButton(
             Surface(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .offset(
-                        x = ReelsDimensions.discoverFilterBadgeOffset,
-                        y = -ReelsDimensions.discoverFilterBadgeOffset
-                    )
                     .size(ReelsDimensions.discoverFilterBadgeSize),
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.primary,
