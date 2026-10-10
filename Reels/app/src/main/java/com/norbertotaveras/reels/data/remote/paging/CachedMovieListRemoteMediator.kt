@@ -19,7 +19,9 @@ import com.norbertotaveras.reels.data.local.entity.CachedMovieListEntryEntity
 import com.norbertotaveras.reels.data.local.entity.MovieRemoteKeyEntity
 import com.norbertotaveras.reels.data.mapper.movie.toCachedMovieEntity
 import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
+import com.norbertotaveras.reels.data.remote.error.NoNetworkConnectionException
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
+import com.norbertotaveras.reels.domain.network.NetworkMonitor
 import kotlinx.coroutines.CancellationException
 
 @OptIn(ExperimentalPagingApi::class)
@@ -27,6 +29,7 @@ internal class CachedMovieListRemoteMediator(
     private val database: ReelsDatabase,
     private val cachedMovieDao: CachedMovieDao,
     private val listKey: String,
+    private val networkMonitor: NetworkMonitor,
     private val loadPage: suspend (page: Int) -> MoviesResponseDto,
     private val transformError: suspend (Exception) -> Throwable = { error ->
         error.toTmdbNetworkException()
@@ -38,6 +41,10 @@ internal class CachedMovieListRemoteMediator(
         loadType: LoadType,
         state: PagingState<Int, CachedMovieEntity>,
     ): MediatorResult {
+        if (!networkMonitor.isOnline()) {
+            return MediatorResult.Error(transformError(NoNetworkConnectionException()))
+        }
+
         return try {
             val page = pageFor(loadType = loadType)
                 ?: return MediatorResult.Success(endOfPaginationReached = true)

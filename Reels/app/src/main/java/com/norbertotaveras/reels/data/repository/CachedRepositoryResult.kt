@@ -7,34 +7,34 @@
 
 package com.norbertotaveras.reels.data.repository
 
+import com.norbertotaveras.reels.data.remote.error.NoNetworkConnectionException
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
+import com.norbertotaveras.reels.domain.network.NetworkMonitor
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 internal suspend fun <T> cachedTmdbResult(
     dispatcher: CoroutineDispatcher,
+    networkMonitor: NetworkMonitor,
     loadRemote: suspend () -> T,
     saveRemote: suspend (T) -> Unit,
     loadCached: suspend () -> T?,
 ): Result<T> {
     return withContext(dispatcher) {
+        if (!networkMonitor.isOnline()) {
+            return@withContext cachedResultOrFailure(
+                loadCached = loadCached,
+                error = NoNetworkConnectionException()
+            )
+        }
+
         val remote = try {
             loadRemote()
         } catch (error: CancellationException) {
             throw error
         } catch (error: Exception) {
-            val cached = try {
-                loadCached()
-            } catch (_: Exception) {
-                null
-            }
-
-            return@withContext if (cached != null) {
-                Result.success(cached)
-            } else {
-                Result.failure(error.toTmdbNetworkException())
-            }
+            return@withContext cachedResultOrFailure(loadCached = loadCached, error = error)
         }
 
         try {
@@ -47,4 +47,18 @@ internal suspend fun <T> cachedTmdbResult(
 
         Result.success(remote)
     }
+}
+
+private suspend fun <T> cachedResultOrFailure(
+    loadCached: suspend () -> T?,
+    error: Exception,
+): Result<T> {
+    val cached = try {
+        loadCached()
+    } catch (_: Exception) {
+        null
+    }
+
+    return cached?.let(Result.Companion::success)
+        ?: Result.failure(error.toTmdbNetworkException())
 }

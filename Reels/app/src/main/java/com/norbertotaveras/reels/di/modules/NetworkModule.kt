@@ -7,12 +7,14 @@
 
 package com.norbertotaveras.reels.di.modules
 
+import com.norbertotaveras.reels.data.network.AndroidNetworkMonitor
 import com.norbertotaveras.reels.data.remote.account.TmdbAccountRemoteDataSource
 import com.norbertotaveras.reels.data.remote.account.TmdbAccountRemoteDataSourceImpl
 import com.norbertotaveras.reels.data.remote.movie.TmdbMovieRemoteDataSource
 import com.norbertotaveras.reels.data.remote.movie.TmdbMovieRemoteDataSourceImpl
 import com.norbertotaveras.reels.data.remote.person.TmdbPersonRemoteDataSource
 import com.norbertotaveras.reels.data.remote.person.TmdbPersonRemoteDataSourceImpl
+import com.norbertotaveras.reels.domain.network.NetworkMonitor
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -22,6 +24,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class NetworkModule {
+    @Binds
+    @Singleton
+    abstract fun bindNetworkMonitor(
+        implementation: AndroidNetworkMonitor,
+    ): NetworkMonitor
+
     @Binds
     @Singleton
     abstract fun bindTmdbMovieRemoteDataSource(

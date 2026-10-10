@@ -31,6 +31,7 @@ import com.norbertotaveras.reels.data.local.mapper.toMovieVideosDataModel as toC
 import com.norbertotaveras.reels.data.mapper.movie.toCachedMovieDataModel
 import com.norbertotaveras.reels.data.mapper.movie.toCachedMovieEntity
 import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
+import com.norbertotaveras.reels.data.remote.error.NoNetworkConnectionException
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
 import com.norbertotaveras.reels.data.remote.mapper.genre.toGenreDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toDiscoverMovieRequestParameters
@@ -57,6 +58,7 @@ import com.norbertotaveras.reels.domain.model.movie.CachedMovieDetailsDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieCreditsDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieVideosDataModel
+import com.norbertotaveras.reels.domain.network.NetworkMonitor
 import com.norbertotaveras.reels.domain.repository.movie.MovieRepository
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -73,6 +75,7 @@ class TmdbMovieRepositoryImpl @Inject constructor(
     private val database: ReelsDatabase,
     private val cachedMovieDao: CachedMovieDao,
     private val cachedContentDao: CachedContentDao,
+    private val networkMonitor: NetworkMonitor,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : MovieRepository {
     override fun getMovies(
@@ -139,6 +142,7 @@ class TmdbMovieRepositoryImpl @Inject constructor(
         val listKey = discoverCacheKey(filters = filters, language = language)
         return cachedTmdbResult(
             dispatcher = ioDispatcher,
+            networkMonitor = networkMonitor,
             loadRemote = {
                 remoteDataSource.discoverMovies(
                     language = language,
@@ -186,6 +190,13 @@ class TmdbMovieRepositoryImpl @Inject constructor(
     ): Result<CachedMovieDetailsDataModel> {
         val cacheKey = movieDetailsCacheKey(movieId = movieId, language = language)
         return withContext(ioDispatcher) {
+            if (!networkMonitor.isOnline()) {
+                return@withContext cachedMovieDetailsResult(
+                    cacheKey = cacheKey,
+                    error = NoNetworkConnectionException()
+                )
+            }
+
             try {
                 val movie = remoteDataSource.getMovieDetails(
                     movieId = movieId,
@@ -214,22 +225,7 @@ class TmdbMovieRepositoryImpl @Inject constructor(
             } catch (error: CancellationException) {
                 throw error
             } catch (error: Exception) {
-                val cached = try {
-                    cachedContentDao.getMovieDetails(cacheKey = cacheKey)
-                } catch (_: Exception) {
-                    null
-                }
-
-                if (cached != null) {
-                    Result.success(
-                        CachedMovieDetailsDataModel(
-                            movie = cached.toCachedMovieDetailsDataModel(),
-                            cachedAt = cached.cachedAt
-                        )
-                    )
-                } else {
-                    Result.failure(error.toTmdbNetworkException())
-                }
+                cachedMovieDetailsResult(cacheKey = cacheKey, error = error)
             }
         }
     }
@@ -241,6 +237,7 @@ class TmdbMovieRepositoryImpl @Inject constructor(
         val cacheKey = movieDetailsCacheKey(movieId = movieId, language = language)
         return cachedTmdbResult(
             dispatcher = ioDispatcher,
+            networkMonitor = networkMonitor,
             loadRemote = {
                 remoteDataSource.getMovieCredits(
                     movieId = movieId,
@@ -284,6 +281,7 @@ class TmdbMovieRepositoryImpl @Inject constructor(
         val cacheKey = movieDetailsCacheKey(movieId = movieId, language = language)
         return cachedTmdbResult(
             dispatcher = ioDispatcher,
+            networkMonitor = networkMonitor,
             loadRemote = {
                 remoteDataSource.getMovieVideos(
                     movieId = movieId,
@@ -343,6 +341,7 @@ class TmdbMovieRepositoryImpl @Inject constructor(
     ): Result<List<GenreDataModel>> {
         return cachedTmdbResult(
             dispatcher = ioDispatcher,
+            networkMonitor = networkMonitor,
             loadRemote = {
                 remoteDataSource.getMovieGenres(language = language)
                     .genres
@@ -380,6 +379,7 @@ class TmdbMovieRepositoryImpl @Inject constructor(
                 database = database,
                 cachedMovieDao = cachedMovieDao,
                 listKey = listKey,
+                networkMonitor = networkMonitor,
                 loadPage = loadPage
             ),
             pagingSourceFactory = {
@@ -396,6 +396,7 @@ class TmdbMovieRepositoryImpl @Inject constructor(
     ): Result<List<MovieDataModel>> {
         return cachedTmdbResult(
             dispatcher = ioDispatcher,
+            networkMonitor = networkMonitor,
             loadRemote = loadRemote,
             saveRemote = { movies ->
                 val now = System.currentTimeMillis()
@@ -431,6 +432,28 @@ class TmdbMovieRepositoryImpl @Inject constructor(
                 }
             }
         )
+    }
+
+    private suspend fun cachedMovieDetailsResult(
+        cacheKey: String,
+        error: Exception,
+    ): Result<CachedMovieDetailsDataModel> {
+        val cached = try {
+            cachedContentDao.getMovieDetails(cacheKey = cacheKey)
+        } catch (_: Exception) {
+            null
+        }
+
+        return if (cached != null) {
+            Result.success(
+                CachedMovieDetailsDataModel(
+                    movie = cached.toCachedMovieDetailsDataModel(),
+                    cachedAt = cached.cachedAt
+                )
+            )
+        } else {
+            Result.failure(error.toTmdbNetworkException())
+        }
     }
 
     private companion object {

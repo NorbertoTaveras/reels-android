@@ -24,6 +24,7 @@ import com.norbertotaveras.reels.data.repository.cachedTmdbResult
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.person.PersonDetailsDataModel
 import com.norbertotaveras.reels.domain.model.person.PersonMovieCreditsDataModel
+import com.norbertotaveras.reels.domain.network.NetworkMonitor
 import com.norbertotaveras.reels.domain.repository.person.PersonRepository
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -34,6 +35,7 @@ class TmdbPersonRepositoryImpl @Inject constructor(
     private val remoteDataSource: TmdbPersonRemoteDataSource,
     private val database: ReelsDatabase,
     private val cachedContentDao: CachedContentDao,
+    private val networkMonitor: NetworkMonitor,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : PersonRepository {
     override suspend fun getPersonDetails(
@@ -43,6 +45,7 @@ class TmdbPersonRepositoryImpl @Inject constructor(
         val cacheKey = personDetailsCacheKey(personId = personId, language = language)
         return cachedTmdbResult(
             dispatcher = ioDispatcher,
+            networkMonitor = networkMonitor,
             loadRemote = {
                 remoteDataSource.getPersonDetails(
                     personId = personId,
@@ -71,6 +74,7 @@ class TmdbPersonRepositoryImpl @Inject constructor(
         val cacheKey = personDetailsCacheKey(personId = personId, language = language)
         return cachedTmdbResult(
             dispatcher = ioDispatcher,
+            networkMonitor = networkMonitor,
             loadRemote = {
                 remoteDataSource.getPersonMovieCredits(
                     personId = personId,

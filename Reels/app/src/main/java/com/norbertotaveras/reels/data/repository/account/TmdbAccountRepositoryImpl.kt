@@ -23,6 +23,7 @@ import com.norbertotaveras.reels.data.local.preferences.TmdbAccountDataStore
 import com.norbertotaveras.reels.data.mapper.movie.toCachedMovieDataModel
 import com.norbertotaveras.reels.data.remote.account.TmdbAccountRemoteDataSource
 import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
+import com.norbertotaveras.reels.data.remote.error.NoNetworkConnectionException
 import com.norbertotaveras.reels.data.remote.error.TmdbSessionExpiredException
 import com.norbertotaveras.reels.data.remote.error.isTmdbSessionExpiredError
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
@@ -39,6 +40,7 @@ import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 import com.norbertotaveras.reels.domain.model.account.TmdbMovieAccountStateDataModel
 import com.norbertotaveras.reels.domain.model.account.TmdbMovieActivityDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
+import com.norbertotaveras.reels.domain.network.NetworkMonitor
 import com.norbertotaveras.reels.domain.repository.account.TmdbAccountRepository
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -62,6 +64,7 @@ class TmdbAccountRepositoryImpl @Inject constructor(
     private val cachedMovieDao: CachedMovieDao,
     private val cachedContentDao: CachedContentDao,
     private val tmdbMovieActivityDao: TmdbMovieActivityDao,
+    private val networkMonitor: NetworkMonitor,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : TmdbAccountRepository {
     override fun observeAccountState(): Flow<TmdbAccountStateDataModel> {
@@ -164,7 +167,7 @@ class TmdbAccountRepositoryImpl @Inject constructor(
     }
 
     override suspend fun disconnect(): Result<Unit> {
-        return accountResult {
+        return accountResult(requireNetwork = false) {
             val sessionId = accountDataStore.accountState.first().sessionId
             try {
                 if (!sessionId.isNullOrBlank()) {
@@ -412,6 +415,7 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                         database = database,
                         cachedMovieDao = cachedMovieDao,
                         listKey = listKey,
+                        networkMonitor = networkMonitor,
                         loadPage = { page -> loadPage(accountId, sessionId, page) },
                         transformError = { error ->
                             if (error.isTmdbSessionExpiredError()) {
@@ -434,8 +438,13 @@ class TmdbAccountRepositoryImpl @Inject constructor(
 
     private suspend fun <T> accountResult(
         clearAccountOnExpiredSession: Boolean = false,
+        requireNetwork: Boolean = true,
         block: suspend () -> T,
     ): Result<T> {
+        if (requireNetwork && !networkMonitor.isOnline()) {
+            return Result.failure(NoNetworkConnectionException().toTmdbNetworkException())
+        }
+
         return repositoryResult(
             dispatcher = ioDispatcher,
             transformError = { error ->
