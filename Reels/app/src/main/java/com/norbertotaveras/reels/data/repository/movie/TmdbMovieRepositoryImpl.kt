@@ -41,7 +41,6 @@ import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieVideosDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toTmdbPathSegment
 import com.norbertotaveras.reels.data.remote.movie.TmdbMovieRemoteDataSource
 import com.norbertotaveras.reels.data.remote.paging.CachedMovieListRemoteMediator
-import com.norbertotaveras.reels.data.remote.paging.MovieCachePolicy
 import com.norbertotaveras.reels.data.remote.paging.TMDB_FIRST_PAGE
 import com.norbertotaveras.reels.data.remote.paging.cacheKey
 import com.norbertotaveras.reels.data.remote.paging.discoverCacheKey
@@ -83,7 +82,6 @@ class TmdbMovieRepositoryImpl @Inject constructor(
         val listKey = category.cacheKey(language = language)
         return cachedMovies(
             listKey = listKey,
-            cacheTimeoutMillis = MovieCachePolicy.CATEGORY_CACHE_TIMEOUT_MILLIS,
             loadPage = { page ->
                 remoteDataSource.getMovies(
                     category = category.toTmdbPathSegment(),
@@ -106,7 +104,6 @@ class TmdbMovieRepositoryImpl @Inject constructor(
         )
         return cachedMovies(
             listKey = listKey,
-            cacheTimeoutMillis = MovieCachePolicy.SEARCH_CACHE_TIMEOUT_MILLIS,
             loadPage = { page ->
                 remoteDataSource.searchMovies(
                     query = query,
@@ -125,7 +122,6 @@ class TmdbMovieRepositoryImpl @Inject constructor(
         val parameters = filters.toDiscoverMovieRequestParameters()
         return cachedMovies(
             listKey = discoverCacheKey(filters = filters, language = language),
-            cacheTimeoutMillis = MovieCachePolicy.DISCOVER_CACHE_TIMEOUT_MILLIS,
             loadPage = { page ->
                 remoteDataSource.discoverMovies(
                     language = language,
@@ -376,7 +372,6 @@ class TmdbMovieRepositoryImpl @Inject constructor(
 
     private fun cachedMovies(
         listKey: String,
-        cacheTimeoutMillis: Long,
         loadPage: suspend (page: Int) -> MoviesResponseDto,
     ): Flow<PagingData<MovieDataModel>> {
         return Pager(
@@ -385,7 +380,6 @@ class TmdbMovieRepositoryImpl @Inject constructor(
                 database = database,
                 cachedMovieDao = cachedMovieDao,
                 listKey = listKey,
-                cacheTimeoutMillis = cacheTimeoutMillis,
                 loadPage = loadPage
             ),
             pagingSourceFactory = {

@@ -29,7 +29,6 @@ import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
 import com.norbertotaveras.reels.data.remote.mapper.account.toTmdbAccountDataModel
 import com.norbertotaveras.reels.data.remote.mapper.account.toTmdbMovieAccountStateDataModel
 import com.norbertotaveras.reels.data.remote.paging.CachedMovieListRemoteMediator
-import com.norbertotaveras.reels.data.remote.paging.MovieCachePolicy
 import com.norbertotaveras.reels.data.remote.paging.tmdbPagingConfig
 import com.norbertotaveras.reels.data.remote.paging.tmdbLibraryCacheKey
 import com.norbertotaveras.reels.data.repository.repositoryResult
@@ -413,7 +412,6 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                         database = database,
                         cachedMovieDao = cachedMovieDao,
                         listKey = listKey,
-                        cacheTimeoutMillis = MovieCachePolicy.ACCOUNT_CACHE_TIMEOUT_MILLIS,
                         loadPage = { page -> loadPage(accountId, sessionId, page) },
                         transformError = { error ->
                             if (error.isTmdbSessionExpiredError()) {

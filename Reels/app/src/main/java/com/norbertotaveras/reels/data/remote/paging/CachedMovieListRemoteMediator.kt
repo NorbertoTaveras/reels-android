@@ -27,30 +27,12 @@ internal class CachedMovieListRemoteMediator(
     private val database: ReelsDatabase,
     private val cachedMovieDao: CachedMovieDao,
     private val listKey: String,
-    private val cacheTimeoutMillis: Long,
     private val loadPage: suspend (page: Int) -> MoviesResponseDto,
     private val transformError: suspend (Exception) -> Throwable = { error ->
         error.toTmdbNetworkException()
     },
 ) : RemoteMediator<Int, CachedMovieEntity>() {
-    override suspend fun initialize(): InitializeAction {
-        if (cachedMovieDao.getListEntryCount(listKey = listKey) == 0) {
-            return InitializeAction.LAUNCH_INITIAL_REFRESH
-        }
-        val lastUpdatedAt = cachedMovieDao.getRemoteKey(listKey = listKey)?.lastUpdatedAt
-            ?: return InitializeAction.LAUNCH_INITIAL_REFRESH
-        val isCacheFresh = MovieCachePolicy.isFresh(
-            lastUpdatedAt = lastUpdatedAt,
-            now = System.currentTimeMillis(),
-            timeoutMillis = cacheTimeoutMillis
-        )
-
-        return if (isCacheFresh) {
-            InitializeAction.SKIP_INITIAL_REFRESH
-        } else {
-            InitializeAction.LAUNCH_INITIAL_REFRESH
-        }
-    }
+    override suspend fun initialize(): InitializeAction = InitializeAction.LAUNCH_INITIAL_REFRESH
 
     override suspend fun load(
         loadType: LoadType,
