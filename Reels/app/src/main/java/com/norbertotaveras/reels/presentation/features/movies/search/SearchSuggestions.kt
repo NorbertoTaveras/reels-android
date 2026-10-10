@@ -37,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -268,8 +269,10 @@ private fun SearchSuggestionChip(
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = modifier,
-        onClick = onClick,
+        modifier = modifier.clickable(
+            role = Role.Button,
+            onClick = onClick
+        ),
         shape = MaterialTheme.shapes.extraLarge,
         color = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface,
