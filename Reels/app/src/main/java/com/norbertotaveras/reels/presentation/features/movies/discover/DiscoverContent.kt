@@ -17,9 +17,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -39,7 +39,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -103,6 +102,7 @@ internal fun DiscoverContent(
             ) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     DiscoverHeader(
+                        state = state,
                         hasActiveFilters = state.hasActiveFilters,
                         activeFilterCount = state.activeFilterCount,
                         subtitle = when {
@@ -117,17 +117,9 @@ internal fun DiscoverContent(
                         sortLabel = state.filters.sort.displayLabel,
                         onFilterClick = {
                             onEvent(DiscoverEvent.FiltersClicked)
-                        }
+                        },
+                        onEvent = onEvent
                     )
-                }
-
-                if (state.hasActiveFilters) {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        DiscoverAppliedFiltersRow(
-                            state = state,
-                            onEvent = onEvent
-                        )
-                    }
                 }
 
                 when {
@@ -222,12 +214,14 @@ internal fun DiscoverContent(
 }
 @Composable
 private fun DiscoverHeader(
+    state: DiscoverUiState,
     hasActiveFilters: Boolean,
     activeFilterCount: Int,
     subtitle: String,
     showSort: Boolean,
     sortLabel: String,
     onFilterClick: () -> Unit,
+    onEvent: (DiscoverEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -273,45 +267,11 @@ private fun DiscoverHeader(
         }
 
         if (showSort) {
-            Surface(
-                modifier = Modifier.clickable(onClick = onFilterClick),
-                shape = MaterialTheme.shapes.extraLarge,
-                color = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.onSurface,
-                border = BorderStroke(
-                    width = 1.dp,
-                    color = reelsBorderColor()
-                )
-            ) {
-                Row(
-                    modifier = Modifier.padding(
-                        horizontal = ReelsDimensions.discoverSortHorizontalPadding,
-                        vertical = ReelsDimensions.discoverSortVerticalPadding
-                    ),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Sort:",
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            fontSize = 14.sp,
-                            lineHeight = 20.sp
-                        ),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontWeight = FontWeight.Normal
-                    )
-
-                    Text(
-                        text = sortLabel,
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            fontSize = 14.sp,
-                            lineHeight = 20.sp
-                        ),
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
+            DiscoverAppliedFiltersRow(
+                state = state,
+                sortLabel = sortLabel,
+                onEvent = onEvent
+            )
         }
     }
 }
@@ -323,56 +283,62 @@ private fun DiscoverFilterButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = modifier
-            .size(ReelsDimensions.discoverFilterButtonSize)
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(ReelsDimensions.discoverFilterButtonCornerSize),
-        color = if (hasActiveFilters) {
-            MaterialTheme.colorScheme.primary
-        } else {
-            MaterialTheme.colorScheme.surface
-        },
-        contentColor = if (hasActiveFilters) {
-            MaterialTheme.colorScheme.onPrimary
-        } else {
-            MaterialTheme.colorScheme.onSurface
-        },
-        border = BorderStroke(
-            width = 1.dp,
+    Box(modifier = modifier.size(ReelsDimensions.discoverFilterButtonSize)) {
+        Surface(
+            modifier = Modifier
+                .matchParentSize()
+                .clickable(onClick = onClick),
+            shape = RoundedCornerShape(ReelsDimensions.discoverFilterButtonCornerSize),
             color = if (hasActiveFilters) {
-                Color.Transparent
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.14f)
             } else {
-                reelsBorderColor()
-            }
-        )
-    ) {
-        Box(contentAlignment = Alignment.Center) {
-            Icon(
-                imageVector = Icons.Outlined.Tune,
-                contentDescription = "Open discover filters",
-                modifier = Modifier.size(ReelsDimensions.discoverFilterButtonIconSize)
+                MaterialTheme.colorScheme.surface
+            },
+            contentColor = if (hasActiveFilters) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            },
+            border = BorderStroke(
+                width = 1.dp,
+                color = if (hasActiveFilters) {
+                    MaterialTheme.colorScheme.primary.copy(alpha = 0.32f)
+                } else {
+                    reelsBorderColor()
+                }
             )
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = Icons.Outlined.Tune,
+                    contentDescription = "Open discover filters",
+                    modifier = Modifier.size(ReelsDimensions.discoverFilterButtonIconSize)
+                )
+            }
+        }
 
-            if (hasActiveFilters) {
-                Surface(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(17.dp),
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    contentColor = MaterialTheme.colorScheme.primary
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(
-                            text = activeFilterCount.toString(),
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontSize = 9.sp,
-                                lineHeight = 10.sp
-                            ),
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+        if (hasActiveFilters) {
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(
+                        x = ReelsDimensions.discoverFilterBadgeOffset,
+                        y = -ReelsDimensions.discoverFilterBadgeOffset
+                    )
+                    .size(ReelsDimensions.discoverFilterBadgeSize),
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        text = activeFilterCount.toString(),
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = 9.sp,
+                            lineHeight = 10.sp
+                        ),
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }

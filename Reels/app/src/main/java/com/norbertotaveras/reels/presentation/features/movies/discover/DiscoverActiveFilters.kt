@@ -13,15 +13,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -30,91 +28,159 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.domain.model.discover.DiscoverSort
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun DiscoverAppliedFiltersRow(
     state: DiscoverUiState,
+    sortLabel: String,
     onEvent: (DiscoverEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val filters = state.filters
 
-    LazyRow(
+    Column(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
-        verticalAlignment = Alignment.CenterVertically
+        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)
     ) {
-        state.genreLabel(filters = filters)?.let { genreName ->
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(
+                ReelsDimensions.discoverAppliedFilterSpacing
+            ),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             item {
-                DiscoverRemovableFilterChip(
-                    label = genreName,
-                    onRemoveClick = {
-                        onEvent(DiscoverEvent.GenreSelected(genreId = null))
-                    }
+                DiscoverSortSummaryChip(
+                    sortLabel = sortLabel,
+                    onClick = { onEvent(DiscoverEvent.FiltersClicked) }
                 )
             }
-        }
 
-        filters.releasePeriodDisplayLabel?.let { releasePeriodLabel ->
-            item {
-                DiscoverRemovableFilterChip(
-                    label = releasePeriodLabel,
-                    onRemoveClick = {
-                        onEvent(
-                            DiscoverEvent.ReleasePeriodSelected(
-                                yearFrom = null,
-                                yearTo = null
-                            )
-                        )
-                    }
-                )
-            }
-        }
-
-        filters.minimumRating?.let { rating ->
-            item {
-                DiscoverRemovableFilterChip(
-                    label = "$rating+ rating",
-                    onRemoveClick = {
-                        onEvent(DiscoverEvent.RatingSelected(null))
-                    }
-                )
-            }
-        }
-
-        if (filters.sort != DiscoverSort.Popularity) {
-            item {
-                DiscoverRemovableFilterChip(
-                    label = filters.sort.displayLabel,
-                    onRemoveClick = {
-                        onEvent(DiscoverEvent.SortSelected(DiscoverSort.Popularity))
-                    }
-                )
-            }
-        }
-
-        item {
-            TextButton(
-                onClick = {
-                    onEvent(DiscoverEvent.ClearFiltersClicked)
+            state.genreLabel(filters = filters)?.let { genreName ->
+                item {
+                    DiscoverRemovableFilterChip(
+                        label = genreName,
+                        onRemoveClick = {
+                            onEvent(DiscoverEvent.GenreSelected(genreId = null))
+                        }
+                    )
                 }
+            }
+
+            filters.minimumRating?.let { rating ->
+                item {
+                    DiscoverRemovableFilterChip(
+                        label = "$rating+",
+                        showRatingIcon = true,
+                        onRemoveClick = {
+                            onEvent(DiscoverEvent.RatingSelected(null))
+                        }
+                    )
+                }
+            }
+
+            filters.releasePeriodDisplayLabel?.let { releasePeriodLabel ->
+                item {
+                    DiscoverRemovableFilterChip(
+                        label = releasePeriodLabel,
+                        onRemoveClick = {
+                            onEvent(
+                                DiscoverEvent.ReleasePeriodSelected(
+                                    yearFrom = null,
+                                    yearTo = null
+                                )
+                            )
+                        }
+                    )
+                }
+            }
+        }
+
+        if (state.hasActiveFilters) {
+            Row(
+                modifier = Modifier
+                    .clickable(
+                        role = Role.Button,
+                        onClick = { onEvent(DiscoverEvent.ClearFiltersClicked) }
+                    )
+                    .padding(
+                        horizontal = ReelsSpacing.xSmall,
+                        vertical = ReelsDimensions.discoverClearFiltersVerticalPadding
+                    ),
+                horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     imageVector = Icons.Filled.Close,
                     contentDescription = null,
-                    modifier = Modifier.size(14.dp)
+                    modifier = Modifier.size(ReelsDimensions.discoverClearFiltersIconSize),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Spacer(modifier = Modifier.width(ReelsSpacing.xSmall))
                 Text(
                     text = "Clear all filters",
-                    style = MaterialTheme.typography.labelMedium
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontSize = 11.sp,
+                        lineHeight = 16.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Normal
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun DiscoverSortSummaryChip(
+    sortLabel: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.clickable(
+            role = Role.Button,
+            onClick = onClick
+        ),
+        shape = MaterialTheme.shapes.extraLarge,
+        color = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        border = BorderStroke(
+            width = 1.dp,
+            color = reelsBorderColor()
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(
+                horizontal = ReelsDimensions.discoverSortHorizontalPadding,
+                vertical = ReelsDimensions.discoverSortVerticalPadding
+            ),
+            horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Sort:",
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.Normal
+            )
+            Text(
+                text = sortLabel,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
+                ),
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 }
@@ -202,9 +268,13 @@ private fun DiscoverRemovableFilterChip(
     label: String,
     onRemoveClick: () -> Unit,
     modifier: Modifier = Modifier,
+    showRatingIcon: Boolean = false,
 ) {
     Surface(
-        modifier = modifier.clickable(onClick = onRemoveClick),
+        modifier = modifier.clickable(
+            role = Role.Button,
+            onClick = onRemoveClick
+        ),
         shape = MaterialTheme.shapes.extraLarge,
         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.14f),
         contentColor = MaterialTheme.colorScheme.primary,
@@ -215,22 +285,33 @@ private fun DiscoverRemovableFilterChip(
     ) {
         Row(
             modifier = Modifier.padding(
-                horizontal = ReelsSpacing.medium,
-                vertical = ReelsSpacing.small
+                horizontal = ReelsDimensions.discoverFilterChipHorizontalPadding,
+                vertical = ReelsDimensions.discoverFilterChipVerticalPadding
             ),
             horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            if (showRatingIcon) {
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    contentDescription = null,
+                    modifier = Modifier.size(ReelsDimensions.discoverAppliedFilterIconSize)
+                )
+            }
+
             Text(
                 text = label,
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.SemiBold
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
+                ),
+                fontWeight = FontWeight.Medium
             )
 
             Icon(
                 imageVector = Icons.Filled.Close,
                 contentDescription = null,
-                modifier = Modifier.size(14.dp)
+                modifier = Modifier.size(ReelsDimensions.discoverAppliedFilterIconSize)
             )
         }
     }
