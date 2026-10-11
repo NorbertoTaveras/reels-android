@@ -64,12 +64,15 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 @Singleton
-@OptIn(ExperimentalPagingApi::class)
+@OptIn(ExperimentalPagingApi::class, ExperimentalCoroutinesApi::class)
 class TmdbMovieRepositoryImpl @Inject constructor(
     private val remoteDataSource: TmdbMovieRemoteDataSource,
     private val database: ReelsDatabase,
@@ -83,7 +86,7 @@ class TmdbMovieRepositoryImpl @Inject constructor(
         language: String,
     ): Flow<PagingData<MovieDataModel>> {
         val listKey = category.cacheKey(language = language)
-        return cachedMovies(
+        return networkAwareCachedMovies(
             listKey = listKey,
             loadPage = { page ->
                 remoteDataSource.getMovies(
@@ -105,7 +108,7 @@ class TmdbMovieRepositoryImpl @Inject constructor(
             language = language,
             includeAdult = includeAdult
         )
-        return cachedMovies(
+        return networkAwareCachedMovies(
             listKey = listKey,
             loadPage = { page ->
                 remoteDataSource.searchMovies(
@@ -123,7 +126,7 @@ class TmdbMovieRepositoryImpl @Inject constructor(
         language: String,
     ): Flow<PagingData<MovieDataModel>> {
         val parameters = filters.toDiscoverMovieRequestParameters()
-        return cachedMovies(
+        return networkAwareCachedMovies(
             listKey = discoverCacheKey(filters = filters, language = language),
             loadPage = { page ->
                 remoteDataSource.discoverMovies(
@@ -367,6 +370,17 @@ class TmdbMovieRepositoryImpl @Inject constructor(
                     ?.map { genre -> genre.toCachedGenreDataModel() }
             }
         )
+    }
+
+    private fun networkAwareCachedMovies(
+        listKey: String,
+        loadPage: suspend (page: Int) -> MoviesResponseDto,
+    ): Flow<PagingData<MovieDataModel>> {
+        return networkMonitor.connectivity
+            .distinctUntilChanged()
+            .flatMapLatest {
+                cachedMovies(listKey = listKey, loadPage = loadPage)
+            }
     }
 
     private fun cachedMovies(

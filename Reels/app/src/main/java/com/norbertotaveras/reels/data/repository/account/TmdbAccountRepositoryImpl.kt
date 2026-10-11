@@ -50,6 +50,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -397,7 +398,12 @@ class TmdbAccountRepositoryImpl @Inject constructor(
             page: Int,
         ) -> MoviesResponseDto,
     ): Flow<PagingData<MovieDataModel>> {
-        return accountDataStore.accountState.flatMapLatest { accountState ->
+        return combine(
+            accountDataStore.accountState,
+            networkMonitor.connectivity,
+        ) { accountState, _ ->
+            accountState
+        }.flatMapLatest { accountState ->
             val accountId = accountState.account?.accountId
             val sessionId = accountState.sessionId
 

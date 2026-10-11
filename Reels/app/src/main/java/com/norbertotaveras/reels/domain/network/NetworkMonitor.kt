@@ -7,6 +7,10 @@
 
 package com.norbertotaveras.reels.domain.network
 
+import kotlinx.coroutines.flow.Flow
+
 interface NetworkMonitor {
+    val connectivity: Flow<Boolean>
+
     fun isOnline(): Boolean
 }
