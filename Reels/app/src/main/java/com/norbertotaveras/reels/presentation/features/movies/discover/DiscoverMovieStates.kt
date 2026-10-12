@@ -371,6 +371,7 @@ internal fun DiscoverErrorState(
 
 @Composable
 internal fun DiscoverCachedResultsBanner(
+    isOffline: Boolean,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -402,7 +403,11 @@ internal fun DiscoverCachedResultsBanner(
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
-                            imageVector = Icons.Outlined.WifiOff,
+                            imageVector = if (isOffline) {
+                                Icons.Outlined.WifiOff
+                            } else {
+                                Icons.Outlined.CloudOff
+                            },
                             contentDescription = null,
                             modifier = Modifier.size(
                                 ReelsDimensions.discoverOfflineBannerIconSize
@@ -413,7 +418,11 @@ internal fun DiscoverCachedResultsBanner(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Offline · Cached results",
+                        text = if (isOffline) {
+                            "Offline · Cached results"
+                        } else {
+                            "TMDB unavailable · Cached results"
+                        },
                         style = MaterialTheme.typography.labelMedium.copy(
                             fontSize = 12.sp,
                             lineHeight = 16.sp
@@ -422,7 +431,11 @@ internal fun DiscoverCachedResultsBanner(
                         fontWeight = FontWeight.Medium
                     )
                     Text(
-                        text = "Reconnect to refresh",
+                        text = if (isOffline) {
+                            "Reconnect to refresh"
+                        } else {
+                            "Try again shortly"
+                        },
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontSize = 10.sp,
                             lineHeight = 15.sp
@@ -442,7 +455,7 @@ internal fun DiscoverCachedResultsBanner(
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = "Dismiss offline notice",
+                            contentDescription = "Dismiss cached results notice",
                             modifier = Modifier.size(
                                 ReelsDimensions.discoverOfflineBannerDismissIconSize
                             )

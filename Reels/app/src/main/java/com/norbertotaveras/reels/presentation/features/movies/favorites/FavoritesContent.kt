@@ -28,6 +28,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.outlined.WifiOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
@@ -229,7 +230,9 @@ private fun LibraryHeader(
                 fontWeight = FontWeight.Medium
             )
 
-            if (isOffline) LibraryOfflineStatus()
+            if (isOffline) {
+                LibraryConnectionStatus(isOffline = !state.isOnline)
+            }
         }
 
         Text(
@@ -492,7 +495,8 @@ private fun LibrarySyncStatus(
 }
 
 @Composable
-private fun LibraryOfflineStatus(
+private fun LibraryConnectionStatus(
+    isOffline: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -510,12 +514,16 @@ private fun LibraryOfflineStatus(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = Icons.Outlined.WifiOff,
+                imageVector = if (isOffline) {
+                    Icons.Outlined.WifiOff
+                } else {
+                    Icons.Outlined.CloudOff
+                },
                 contentDescription = null,
                 modifier = Modifier.size(ReelsDimensions.favoritesOfflineStatusIconSize)
             )
             Text(
-                text = "Offline",
+                text = if (isOffline) "Offline" else "TMDB unavailable",
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Medium
             )

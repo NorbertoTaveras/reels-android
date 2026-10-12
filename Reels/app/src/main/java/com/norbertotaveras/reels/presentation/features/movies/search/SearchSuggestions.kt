@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.WifiOff
 import androidx.compose.material3.Icon
@@ -298,6 +299,7 @@ private fun SearchSuggestionChip(
 
 @Composable
 internal fun SearchCachedResultsBanner(
+    isOffline: Boolean,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -326,7 +328,11 @@ internal fun SearchCachedResultsBanner(
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
-                        imageVector = Icons.Outlined.WifiOff,
+                        imageVector = if (isOffline) {
+                            Icons.Outlined.WifiOff
+                        } else {
+                            Icons.Outlined.CloudOff
+                        },
                         contentDescription = null,
                         modifier = Modifier.size(15.dp)
                     )
@@ -343,7 +349,11 @@ internal fun SearchCachedResultsBanner(
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = "Reconnect to refresh",
+                    text = if (isOffline) {
+                        "Reconnect to refresh"
+                    } else {
+                        "TMDB is temporarily unavailable"
+                    },
                     style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.sp, lineHeight = 13.sp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

@@ -125,6 +125,7 @@ internal fun SearchContent(
                     if (hasRefreshError && dismissedCachedQuery != trimmedQuery) {
                         item {
                             SearchCachedResultsBanner(
+                                isOffline = !state.isOnline,
                                 onDismiss = { dismissedCachedQuery = trimmedQuery }
                             )
                         }

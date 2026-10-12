@@ -76,6 +76,7 @@ internal fun DiscoverContent(
         Column(modifier = Modifier.fillMaxSize()) {
             if (isUsingCachedContent && !isCachedNoticeDismissed) {
                 DiscoverCachedResultsBanner(
+                    isOffline = !state.isOnline,
                     onDismiss = { isCachedNoticeDismissed = true }
                 )
             }

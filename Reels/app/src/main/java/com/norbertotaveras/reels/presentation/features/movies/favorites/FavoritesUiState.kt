@@ -16,6 +16,7 @@ data class FavoritesUiState(
     val people: List<SavedPersonDataModel> = emptyList(),
     val selectedTab: LibraryTab = LibraryTab.Movies,
     val isTmdbAccountConnected: Boolean = false,
+    val isOnline: Boolean = true,
     val removingMovieIds: Set<Int> = emptySet(),
     val removingPersonIds: Set<Int> = emptySet(),
     val updatingTmdbMovieIds: Set<Int> = emptySet(),

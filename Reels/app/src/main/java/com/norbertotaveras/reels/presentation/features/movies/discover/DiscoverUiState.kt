@@ -16,6 +16,7 @@ data class DiscoverUiState(
     val filters: DiscoverFilterDataModel = DiscoverFilterDataModel(),
     val draftFilters: DiscoverFilterDataModel? = null,
     val language: String = LanguageRegion.Default.languageCode,
+    val isOnline: Boolean = true,
     val genres: List<GenreDataModel> = emptyList(),
     val isLoadingFilters: Boolean = true,
     val filterResultCount: Int? = null,

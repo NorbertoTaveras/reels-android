@@ -14,6 +14,7 @@ import androidx.paging.cachedIn
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.domain.model.search.SearchQueryPolicy
 import com.norbertotaveras.reels.domain.usecase.movie.SearchMoviesUseCase
+import com.norbertotaveras.reels.domain.usecase.network.ObserveNetworkConnectivityUseCase
 import com.norbertotaveras.reels.domain.usecase.search.ClearRecentSearchesUseCase
 import com.norbertotaveras.reels.domain.usecase.search.LoadSearchMetadataUseCase
 import com.norbertotaveras.reels.domain.usecase.search.RemoveRecentSearchUseCase
@@ -46,6 +47,7 @@ import kotlinx.coroutines.launch
 class SearchViewModel @Inject constructor(
     private val searchMoviesUseCase: SearchMoviesUseCase,
     private val loadSearchMetadataUseCase: LoadSearchMetadataUseCase,
+    private val observeNetworkConnectivityUseCase: ObserveNetworkConnectivityUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
     private val saveRecentSearchUseCase: SaveRecentSearchUseCase,
     private val removeRecentSearchUseCase: RemoveRecentSearchUseCase,
@@ -82,8 +84,19 @@ class SearchViewModel @Inject constructor(
         .cachedIn(viewModelScope)
 
     init {
+        observeConnectivity()
         observeSettings()
         observeSearchMetadata()
+    }
+
+    private fun observeConnectivity() {
+        viewModelScope.launch {
+            observeNetworkConnectivityUseCase().collectLatest { isOnline ->
+                _state.update { currentState ->
+                    currentState.copy(isOnline = isOnline)
+                }
+            }
+        }
     }
 
     fun onEvent(event: SearchEvent) {

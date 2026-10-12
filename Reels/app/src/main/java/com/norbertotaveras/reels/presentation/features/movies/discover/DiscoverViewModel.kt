@@ -15,6 +15,7 @@ import com.norbertotaveras.reels.domain.model.discover.DiscoverSort
 import com.norbertotaveras.reels.domain.usecase.movie.DiscoverMoviesUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.GetDiscoverMovieCountUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.GetMovieGenresUseCase
+import com.norbertotaveras.reels.domain.usecase.network.ObserveNetworkConnectivityUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateDiscoverFiltersUseCase
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
@@ -41,6 +42,7 @@ class DiscoverViewModel @Inject constructor(
     private val discoverMoviesUseCase: DiscoverMoviesUseCase,
     private val getDiscoverMovieCountUseCase: GetDiscoverMovieCountUseCase,
     private val getMovieGenresUseCase: GetMovieGenresUseCase,
+    private val observeNetworkConnectivityUseCase: ObserveNetworkConnectivityUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
     private val updateDiscoverFiltersUseCase: UpdateDiscoverFiltersUseCase,
 ) : ViewModel() {
@@ -65,7 +67,18 @@ class DiscoverViewModel @Inject constructor(
         .cachedIn(viewModelScope)
 
     init {
+        observeConnectivity()
         observeSettings()
+    }
+
+    private fun observeConnectivity() {
+        viewModelScope.launch {
+            observeNetworkConnectivityUseCase().collect { isOnline ->
+                _state.update { currentState ->
+                    currentState.copy(isOnline = isOnline)
+                }
+            }
+        }
     }
 
     fun onEvent(event: DiscoverEvent) {

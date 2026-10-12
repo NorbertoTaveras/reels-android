@@ -22,6 +22,7 @@ import com.norbertotaveras.reels.domain.usecase.account.UpdateTmdbWatchlistUseCa
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveLibraryContentUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.RemoveFavoriteMovieUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.RemoveSavedPersonUseCase
+import com.norbertotaveras.reels.domain.usecase.network.ObserveNetworkConnectivityUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -53,6 +54,7 @@ class FavoritesViewModel @Inject constructor(
     private val observeTmdbMovieActivitiesUseCase: ObserveTmdbMovieActivitiesUseCase,
     private val getTmdbLibraryMoviesUseCase: GetTmdbLibraryMoviesUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
+    private val observeNetworkConnectivityUseCase: ObserveNetworkConnectivityUseCase,
     private val updateTmdbWatchlistUseCase: UpdateTmdbWatchlistUseCase,
     private val deleteTmdbMovieRatingUseCase: DeleteTmdbMovieRatingUseCase,
 ) : ViewModel() {
@@ -92,10 +94,21 @@ class FavoritesViewModel @Inject constructor(
         .cachedIn(viewModelScope)
 
     init {
+        observeConnectivity()
         observeLibraryContent()
         observeTmdbAccount()
         observeTmdbMovieActivities()
         observeTmdbLibrarySyncTimes()
+    }
+
+    private fun observeConnectivity() {
+        viewModelScope.launch {
+            observeNetworkConnectivityUseCase().collectLatest { isOnline ->
+                _state.update { currentState ->
+                    currentState.copy(isOnline = isOnline)
+                }
+            }
+        }
     }
 
     fun onEvent(event: FavoritesEvent) {
