@@ -98,6 +98,7 @@ object ReelsDimensions {
     val categoryStateActionIconSize = 15.dp
 
     val searchScreenTopPadding = 16.dp
+    val searchScreenHorizontalPadding = 24.dp
     val searchFieldHeight = 54.dp
     val searchFieldHorizontalPadding = 16.dp
     val searchFieldIconSize = 19.dp

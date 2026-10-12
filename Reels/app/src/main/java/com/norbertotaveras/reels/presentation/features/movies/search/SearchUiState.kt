@@ -13,6 +13,7 @@ data class SearchUiState(
     val query: String = "",
     val language: String = LanguageRegion.Default.languageCode,
     val isOnline: Boolean = true,
+    val cachedAt: Long? = null,
     val recentSearches: List<String> = emptyList(),
     val trendingSearches: List<String> = emptyList(),
     val genreNamesById: Map<Int, String> = emptyMap()

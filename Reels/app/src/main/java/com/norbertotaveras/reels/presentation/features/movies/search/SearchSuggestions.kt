@@ -300,6 +300,7 @@ private fun SearchSuggestionChip(
 @Composable
 internal fun SearchCachedResultsBanner(
     isOffline: Boolean,
+    cachedAt: Long?,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -349,11 +350,7 @@ internal fun SearchCachedResultsBanner(
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = if (isOffline) {
-                        "Reconnect to refresh"
-                    } else {
-                        "TMDB is temporarily unavailable"
-                    },
+                    text = cachedAt.toSearchCacheStatusLabel(isOffline = isOffline),
                     style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.sp, lineHeight = 13.sp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

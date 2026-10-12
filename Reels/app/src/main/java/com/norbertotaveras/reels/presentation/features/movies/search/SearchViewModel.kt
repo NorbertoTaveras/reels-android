@@ -14,6 +14,7 @@ import androidx.paging.cachedIn
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.domain.model.search.SearchQueryPolicy
 import com.norbertotaveras.reels.domain.usecase.movie.SearchMoviesUseCase
+import com.norbertotaveras.reels.domain.usecase.movie.ObserveSearchCacheTimestampUseCase
 import com.norbertotaveras.reels.domain.usecase.network.ObserveNetworkConnectivityUseCase
 import com.norbertotaveras.reels.domain.usecase.search.ClearRecentSearchesUseCase
 import com.norbertotaveras.reels.domain.usecase.search.LoadSearchMetadataUseCase
@@ -46,6 +47,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalCoroutinesApi::class)
 class SearchViewModel @Inject constructor(
     private val searchMoviesUseCase: SearchMoviesUseCase,
+    private val observeSearchCacheTimestampUseCase: ObserveSearchCacheTimestampUseCase,
     private val loadSearchMetadataUseCase: LoadSearchMetadataUseCase,
     private val observeNetworkConnectivityUseCase: ObserveNetworkConnectivityUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
@@ -87,6 +89,7 @@ class SearchViewModel @Inject constructor(
         observeConnectivity()
         observeSettings()
         observeSearchMetadata()
+        observeSearchCacheTimestamp()
     }
 
     private fun observeConnectivity() {
@@ -197,6 +200,29 @@ class SearchViewModel @Inject constructor(
                     val metadata = loadSearchMetadataUseCase(language = language)
                     _state.update { currentState ->
                         currentState.withMetadata(metadata = metadata)
+                    }
+                }
+        }
+    }
+
+    private fun observeSearchCacheTimestamp() {
+        viewModelScope.launch {
+            state
+                .map { uiState -> uiState.query.trim() to uiState.language }
+                .distinctUntilChanged()
+                .flatMapLatest { (query, language) ->
+                    if (SearchQueryPolicy.isValid(query = query)) {
+                        observeSearchCacheTimestampUseCase(
+                            query = query,
+                            language = language
+                        )
+                    } else {
+                        flowOf(null)
+                    }
+                }
+                .collectLatest { cachedAt ->
+                    _state.update { currentState ->
+                        currentState.copy(cachedAt = cachedAt)
                     }
                 }
         }

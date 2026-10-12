@@ -30,6 +30,12 @@ interface MovieRepository {
         includeAdult: Boolean = false,
     ): Flow<PagingData<MovieDataModel>>
 
+    fun observeSearchCacheTimestamp(
+        query: String,
+        language: String,
+        includeAdult: Boolean = false,
+    ): Flow<Long?>
+
     fun discoverMovies(
         filters: DiscoverFilterDataModel,
         language: String,

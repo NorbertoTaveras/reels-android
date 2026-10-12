@@ -50,7 +50,7 @@ internal fun SearchContent(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = ReelsSpacing.screenHorizontal)
+            .padding(horizontal = ReelsDimensions.searchScreenHorizontalPadding)
     ) {
         SearchField(
             modifier = Modifier
@@ -126,6 +126,7 @@ internal fun SearchContent(
                         item {
                             SearchCachedResultsBanner(
                                 isOffline = !state.isOnline,
+                                cachedAt = state.cachedAt,
                                 onDismiss = { dismissedCachedQuery = trimmedQuery }
                             )
                         }

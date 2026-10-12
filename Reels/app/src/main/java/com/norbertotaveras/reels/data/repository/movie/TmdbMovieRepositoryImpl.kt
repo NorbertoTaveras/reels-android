@@ -121,6 +121,20 @@ class TmdbMovieRepositoryImpl @Inject constructor(
         )
     }
 
+    override fun observeSearchCacheTimestamp(
+        query: String,
+        language: String,
+        includeAdult: Boolean,
+    ): Flow<Long?> {
+        return cachedMovieDao.observeLastUpdatedAt(
+            listKey = searchCacheKey(
+                query = query,
+                language = language,
+                includeAdult = includeAdult
+            )
+        )
+    }
+
     override fun discoverMovies(
         filters: DiscoverFilterDataModel,
         language: String,
