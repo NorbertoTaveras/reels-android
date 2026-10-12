@@ -51,9 +51,9 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
-import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContainerColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContentColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
+import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
@@ -215,7 +215,7 @@ internal fun RatingBadge(
         color = if (compact) {
             reelsPosterRatingContainerColor()
         } else {
-            reelsImageRatingContainerColor()
+            reelsRatingContainerColor()
         },
         contentColor = reelsImageRatingContentColor()
     ) {

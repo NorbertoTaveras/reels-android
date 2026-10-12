@@ -99,12 +99,12 @@ fun reelsBorderColor(): androidx.compose.ui.graphics.Color {
 
 @Composable
 fun reelsPosterRatingContainerColor(): androidx.compose.ui.graphics.Color {
-    return ReelsImageOverlayBackground.copy(alpha = 0.80f)
-}
-
-@Composable
-fun reelsImageRatingContainerColor(): androidx.compose.ui.graphics.Color {
-    return ReelsImageOverlayBackground.copy(alpha = 0.80f)
+    val overlayColor = if (isReelsLightTheme()) {
+        ReelsBone
+    } else {
+        ReelsImageOverlayBackground
+    }
+    return overlayColor.copy(alpha = 0.80f)
 }
 
 @Composable
