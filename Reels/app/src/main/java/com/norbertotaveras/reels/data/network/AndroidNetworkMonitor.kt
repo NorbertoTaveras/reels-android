@@ -26,7 +26,7 @@ class AndroidNetworkMonitor @Inject constructor(
     @ApplicationContext context: Context,
 ) : NetworkMonitor {
     private val connectivityManager = context.getSystemService(ConnectivityManager::class.java)
-    private val validatedNetworks = ConcurrentHashMap.newKeySet<Network>()
+    private val internetNetworks = ConcurrentHashMap.newKeySet<Network>()
     private val onlineState = MutableStateFlow(currentConnectivity())
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
@@ -37,7 +37,7 @@ class AndroidNetworkMonitor @Inject constructor(
         }
 
         override fun onLost(network: Network) {
-            validatedNetworks.remove(network)
+            internetNetworks.remove(network)
             updateConnectivity()
         }
 
@@ -66,20 +66,20 @@ class AndroidNetworkMonitor @Inject constructor(
         network: Network,
         capabilities: NetworkCapabilities?,
     ) {
-        if (NetworkCapabilitiesHelper.hasValidatedInternet(capabilities)) {
-            validatedNetworks.add(network)
+        if (NetworkCapabilitiesHelper.hasUsableInternet(capabilities)) {
+            internetNetworks.add(network)
         } else {
-            validatedNetworks.remove(network)
+            internetNetworks.remove(network)
         }
         updateConnectivity()
     }
 
     private fun updateConnectivity() {
-        onlineState.value = validatedNetworks.isNotEmpty()
+        onlineState.value = internetNetworks.isNotEmpty()
     }
 
     private fun currentConnectivity(): Boolean {
-        return NetworkCapabilitiesHelper.hasValidatedInternet(
+        return NetworkCapabilitiesHelper.hasUsableInternet(
             connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
         )
     }

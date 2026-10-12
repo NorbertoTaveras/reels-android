@@ -10,10 +10,10 @@ package com.norbertotaveras.reels.data.network
 import android.net.NetworkCapabilities
 
 internal object NetworkCapabilitiesHelper {
-    fun hasValidatedInternet(capabilities: NetworkCapabilities?): Boolean {
+    fun hasUsableInternet(capabilities: NetworkCapabilities?): Boolean {
         return capabilities?.run {
             hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
-                hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+                hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED)
         } == true
     }
 }
