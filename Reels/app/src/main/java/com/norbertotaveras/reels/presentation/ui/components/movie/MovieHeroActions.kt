@@ -36,9 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
@@ -291,26 +289,15 @@ private fun HeroRateButton(
                     color = MaterialTheme.colorScheme.primary
                 )
             } else {
-                if (rating == null) {
-                    Icon(
-                        imageVector = Icons.Outlined.StarBorder,
-                        contentDescription = null,
-                        modifier = Modifier.size(ReelsDimensions.detailsHeroActionIconSize)
-                    )
-                } else {
-                    Text(
-                        text = if (rating % 1.0 == 0.0) {
-                            rating.toInt().toString()
-                        } else {
-                            String.format(java.util.Locale.ROOT, "%.1f", rating)
-                        },
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            fontSize = 12.sp,
-                            lineHeight = 16.sp
-                        ),
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                Icon(
+                    imageVector = if (rating == null) {
+                        Icons.Outlined.StarBorder
+                    } else {
+                        Icons.Filled.Star
+                    },
+                    contentDescription = null,
+                    modifier = Modifier.size(ReelsDimensions.detailsHeroActionIconSize)
+                )
             }
         }
     }
