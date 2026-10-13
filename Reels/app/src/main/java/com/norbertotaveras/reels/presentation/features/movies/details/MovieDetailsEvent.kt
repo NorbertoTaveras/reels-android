@@ -10,6 +10,7 @@ package com.norbertotaveras.reels.presentation.features.movies.details
 sealed interface MovieDetailsEvent {
     data object BackClicked : MovieDetailsEvent
     data object RetryClicked : MovieDetailsEvent
+    data object AccountStateRetryClicked : MovieDetailsEvent
     data object FavoriteClicked : MovieDetailsEvent
     data object WatchlistClicked : MovieDetailsEvent
     data object RatingClicked : MovieDetailsEvent

@@ -78,6 +78,9 @@ class MovieDetailsViewModel @Inject constructor(
         when (event) {
             MovieDetailsEvent.BackClicked -> onBackClicked()
             MovieDetailsEvent.RetryClicked -> loadMovie(language = currentLanguage)
+            MovieDetailsEvent.AccountStateRetryClicked -> {
+                viewModelScope.launch { refreshMovieAccountState() }
+            }
             MovieDetailsEvent.FavoriteClicked -> onFavoriteClick()
             MovieDetailsEvent.WatchlistClicked -> onWatchlistClicked()
             MovieDetailsEvent.RatingClicked -> onRatingClicked()
@@ -248,12 +251,12 @@ class MovieDetailsViewModel @Inject constructor(
                     currentState.withTmdbAccountState(accountState = accountState)
                 }
             }
-            .onFailure { error ->
+            .onFailure {
                 _effect.emit(
                     MovieDetailsEffect.ShowMessage(
-                        message = error.toUserMessage(
-                            fallback = "Unable to refresh your TMDB movie activity."
-                        )
+                        title = "Sync failed",
+                        message = "Couldn't connect to TMDB",
+                        retryEvent = MovieDetailsEvent.AccountStateRetryClicked
                     )
                 )
             }
@@ -297,15 +300,15 @@ class MovieDetailsViewModel @Inject constructor(
                         )
                     )
                 },
-                onFailure = { error ->
+                onFailure = {
                     _state.update { currentState ->
                         currentState.copy(isAccountActionLoading = false)
                     }
                     _effect.emit(
                         MovieDetailsEffect.ShowMessage(
-                            message = error.toUserMessage(
-                                fallback = "Unable to update TMDB watchlist."
-                            )
+                            title = "Sync failed",
+                            message = "Couldn't update your TMDB watchlist",
+                            retryEvent = MovieDetailsEvent.WatchlistClicked
                         )
                     )
                 }
@@ -383,15 +386,15 @@ class MovieDetailsViewModel @Inject constructor(
                         )
                     )
                 },
-                onFailure = { error ->
+                onFailure = {
                     _state.update { currentState ->
                         currentState.copy(isAccountActionLoading = false)
                     }
                     _effect.emit(
                         MovieDetailsEffect.ShowMessage(
-                            message = error.toUserMessage(
-                                fallback = "Unable to rate this movie."
-                            )
+                            title = "Sync failed",
+                            message = "Couldn't save your TMDB rating",
+                            retryEvent = MovieDetailsEvent.RatingSubmitted
                         )
                     )
                 }
@@ -436,15 +439,15 @@ class MovieDetailsViewModel @Inject constructor(
                         )
                     )
                 },
-                onFailure = { error ->
+                onFailure = {
                     _state.update { currentState ->
                         currentState.copy(isAccountActionLoading = false)
                     }
                     _effect.emit(
                         MovieDetailsEffect.ShowMessage(
-                            message = error.toUserMessage(
-                                fallback = "Unable to remove this rating."
-                            )
+                            title = "Sync failed",
+                            message = "Couldn't remove your TMDB rating",
+                            retryEvent = MovieDetailsEvent.RatingCleared
                         )
                     )
                 }

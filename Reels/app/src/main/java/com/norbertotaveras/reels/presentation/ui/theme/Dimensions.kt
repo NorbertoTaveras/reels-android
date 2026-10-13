@@ -522,4 +522,8 @@ object ReelsDimensions {
     val inlineStateContentSpacing = 10.dp
     val inlineStateIconContainerSize = 44.dp
     val inlineStateIconSize = 22.dp
+
+    val snackbarIconContainerSize = 32.dp
+    val snackbarIconContainerCornerSize = 8.dp
+    val snackbarIconSize = 18.dp
 }

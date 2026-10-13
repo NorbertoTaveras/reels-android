@@ -10,6 +10,7 @@ package com.norbertotaveras.reels.presentation.features.movies.details
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarHost
+import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarVisuals
 
 @Composable
 fun MovieDetailsRoute(
@@ -52,7 +54,16 @@ fun MovieDetailsRoute(
                     onSimilarMovieClick(effect.movieId)
                 }
                 is MovieDetailsEffect.ShowMessage -> {
-                    snackbarHostState.showSnackbar(message = effect.message)
+                    val result = snackbarHostState.showSnackbar(
+                        visuals = ReelsSnackbarVisuals(
+                            title = effect.title,
+                            message = effect.message,
+                            actionLabel = effect.retryEvent?.let { "Retry" }
+                        )
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        effect.retryEvent?.let(viewModel::onEvent)
+                    }
                 }
             }
         }
