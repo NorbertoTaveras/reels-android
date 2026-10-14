@@ -29,6 +29,8 @@ data class SettingsUiState(
     val isTmdbAccountApprovalPending: Boolean = false,
     val isTmdbWatchlistSyncEnabled: Boolean = true,
     val isTmdbRatingsSyncEnabled: Boolean = true,
+    val tmdbLastSyncedAtMillis: Long? = null,
+    val isOnline: Boolean = true,
     val appVersionLabel: String = "1.0.0 (build 1)",
     val appConfigurationLabel: String = "Production Debug · Token configured",
     val privacyLabel: String = "How we handle your data",

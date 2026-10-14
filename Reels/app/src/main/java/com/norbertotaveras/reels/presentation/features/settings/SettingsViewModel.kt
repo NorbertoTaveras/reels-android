@@ -9,17 +9,20 @@ package com.norbertotaveras.reels.presentation.features.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 import com.norbertotaveras.reels.domain.model.settings.AppTheme
 import com.norbertotaveras.reels.domain.model.settings.ImageQuality
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 import com.norbertotaveras.reels.domain.usecase.account.DisconnectTmdbAccountUseCase
 import com.norbertotaveras.reels.domain.usecase.account.FinishTmdbAuthenticationUseCase
 import com.norbertotaveras.reels.domain.usecase.account.ObserveTmdbAccountUseCase
+import com.norbertotaveras.reels.domain.usecase.account.ObserveTmdbLibraryLastSyncedAtUseCase
 import com.norbertotaveras.reels.domain.usecase.account.RefreshTmdbAccountUseCase
 import com.norbertotaveras.reels.domain.usecase.account.StartTmdbAuthenticationUseCase
 import com.norbertotaveras.reels.domain.usecase.account.UpdateTmdbRatingsSyncUseCase
 import com.norbertotaveras.reels.domain.usecase.account.UpdateTmdbWatchlistSyncUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveLibraryContentUseCase
+import com.norbertotaveras.reels.domain.usecase.network.ObserveNetworkConnectivityUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateImageQualityUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateLanguageRegionUseCase
@@ -27,20 +30,28 @@ import com.norbertotaveras.reels.domain.usecase.settings.UpdateThemeUseCase
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
+@OptIn(ExperimentalCoroutinesApi::class)
 class SettingsViewModel @Inject constructor(
     private val observeSettingsUseCase: ObserveSettingsUseCase,
     private val observeLibraryContentUseCase: ObserveLibraryContentUseCase,
     private val observeTmdbAccountUseCase: ObserveTmdbAccountUseCase,
+    private val observeTmdbLibraryLastSyncedAtUseCase: ObserveTmdbLibraryLastSyncedAtUseCase,
+    private val observeNetworkConnectivityUseCase: ObserveNetworkConnectivityUseCase,
     private val refreshTmdbAccountUseCase: RefreshTmdbAccountUseCase,
     private val startTmdbAuthenticationUseCase: StartTmdbAuthenticationUseCase,
     private val finishTmdbAuthenticationUseCase: FinishTmdbAuthenticationUseCase,
@@ -66,6 +77,7 @@ class SettingsViewModel @Inject constructor(
         observeSettings()
         observeSavedLibrary()
         observeTmdbAccount()
+        observeTmdbSyncStatus()
         refreshTmdbAccount()
     }
 
@@ -123,6 +135,42 @@ class SettingsViewModel @Inject constructor(
             observeTmdbAccountUseCase().collect { accountState ->
                 _state.update { currentState ->
                     currentState.withTmdbAccountState(accountState = accountState)
+                }
+            }
+        }
+    }
+
+    private fun observeTmdbSyncStatus() {
+        viewModelScope.launch {
+            val lastSyncedAt = observeSettingsUseCase()
+                .map { settings -> settings.languageRegion.languageCode }
+                .distinctUntilChanged()
+                .flatMapLatest { language ->
+                    combine(
+                        observeTmdbLibraryLastSyncedAtUseCase(
+                            list = TmdbLibraryList.Watchlist,
+                            language = language
+                        ),
+                        observeTmdbLibraryLastSyncedAtUseCase(
+                            list = TmdbLibraryList.Rated,
+                            language = language
+                        )
+                    ) { watchlistSyncedAt, ratingsSyncedAt ->
+                        listOfNotNull(watchlistSyncedAt, ratingsSyncedAt).maxOrNull()
+                    }
+                }
+
+            combine(
+                lastSyncedAt,
+                observeNetworkConnectivityUseCase()
+            ) { syncedAtMillis, isOnline ->
+                syncedAtMillis to isOnline
+            }.collect { (syncedAtMillis, isOnline) ->
+                _state.update { currentState ->
+                    currentState.copy(
+                        tmdbLastSyncedAtMillis = syncedAtMillis,
+                        isOnline = isOnline
+                    )
                 }
             }
         }

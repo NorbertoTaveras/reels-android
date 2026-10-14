@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
 import com.norbertotaveras.reels.presentation.ui.extensions.toGravatarUrl
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
+import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbSyncLabel
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
 
@@ -37,6 +38,8 @@ internal fun ConnectedTmdbAccountCard(
     isLoading: Boolean,
     isWatchlistSyncEnabled: Boolean,
     isRatingsSyncEnabled: Boolean,
+    lastSyncedAtMillis: Long?,
+    isOnline: Boolean,
     onDisconnectClick: () -> Unit,
     onWatchlistSyncChanged: (Boolean) -> Unit,
     onRatingsSyncChanged: (Boolean) -> Unit,
@@ -46,6 +49,12 @@ internal fun ConnectedTmdbAccountCard(
     val avatarUrl = avatarPath.toTmdbImageUrl(
         imageType = TmdbImageType.Profile
     ) ?: gravatarHash.toGravatarUrl()
+    val syncStatusLabel = lastSyncedAtMillis.toTmdbSyncLabel(
+        prefix = "Last synced",
+        missingLabel = "Not synced yet"
+    ).let { label ->
+        if (isOnline) label else "Offline · $label"
+    }
 
     Column(
         modifier = modifier
@@ -71,7 +80,7 @@ internal fun ConnectedTmdbAccountCard(
         TmdbAccountStatusRow(
             icon = Icons.Filled.Sync,
             title = "Sync Status",
-            subtitle = "Last synced just now",
+            subtitle = syncStatusLabel,
             trailing = { TmdbSyncStatusChevron() }
         )
 

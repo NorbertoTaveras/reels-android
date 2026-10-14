@@ -60,6 +60,7 @@ import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.CachedContentBanner
 import com.norbertotaveras.reels.presentation.ui.extensions.fullBleedHorizontal
+import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbSyncLabel
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal

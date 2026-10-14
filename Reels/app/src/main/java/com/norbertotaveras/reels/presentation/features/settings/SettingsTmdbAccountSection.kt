@@ -40,6 +40,8 @@ internal fun TmdbAccountSection(
                     isLoading = state.isTmdbAccountLoading,
                     isWatchlistSyncEnabled = state.isTmdbWatchlistSyncEnabled,
                     isRatingsSyncEnabled = state.isTmdbRatingsSyncEnabled,
+                    lastSyncedAtMillis = state.tmdbLastSyncedAtMillis,
+                    isOnline = state.isOnline,
                     onDisconnectClick = onDisconnectClick,
                     onWatchlistSyncChanged = onWatchlistSyncChanged,
                     onRatingsSyncChanged = onRatingsSyncChanged
