@@ -80,6 +80,10 @@ internal fun FavoritesContent(
             tmdbRatedMovies.itemCount > 0
         else -> false
     }
+    val isTmdbLibraryTab = state.selectedTab == LibraryTab.Tmdb ||
+        state.selectedTab == LibraryTab.Rated
+    val showConnectionStatus = isTmdbLibraryTab &&
+        (!state.isOnline || isUsingCachedTmdbContent)
     var dismissedCachedNoticeTab by rememberSaveable {
         mutableStateOf<LibraryTab?>(null)
     }
@@ -104,7 +108,7 @@ internal fun FavoritesContent(
         item(span = { GridItemSpan(maxLineSpan) }) {
             LibraryHeader(
                 state = state,
-                isOffline = isUsingCachedTmdbContent,
+                showConnectionStatus = showConnectionStatus,
                 onTabSelected = { tab ->
                     onEvent(FavoritesEvent.TabSelected(tab = tab))
                 },
@@ -207,7 +211,7 @@ internal fun FavoritesContent(
 @Composable
 private fun LibraryHeader(
     state: FavoritesUiState,
-    isOffline: Boolean,
+    showConnectionStatus: Boolean,
     onTabSelected: (LibraryTab) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -230,7 +234,7 @@ private fun LibraryHeader(
                 fontWeight = FontWeight.Medium
             )
 
-            if (isOffline) {
+            if (showConnectionStatus) {
                 LibraryConnectionStatus(isOffline = !state.isOnline)
             }
         }
