@@ -23,10 +23,13 @@ import com.norbertotaveras.reels.domain.usecase.account.UpdateTmdbRatingsSyncUse
 import com.norbertotaveras.reels.domain.usecase.account.UpdateTmdbWatchlistSyncUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveLibraryContentUseCase
 import com.norbertotaveras.reels.domain.usecase.network.ObserveNetworkConnectivityUseCase
+import com.norbertotaveras.reels.domain.usecase.settings.ClearImageCacheUseCase
+import com.norbertotaveras.reels.domain.usecase.settings.GetImageCacheSizeUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateImageQualityUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateLanguageRegionUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateThemeUseCase
+import com.norbertotaveras.reels.presentation.ui.extensions.toStorageSizeLabel
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -58,6 +61,8 @@ class SettingsViewModel @Inject constructor(
     private val disconnectTmdbAccountUseCase: DisconnectTmdbAccountUseCase,
     private val updateTmdbWatchlistSyncUseCase: UpdateTmdbWatchlistSyncUseCase,
     private val updateTmdbRatingsSyncUseCase: UpdateTmdbRatingsSyncUseCase,
+    private val getImageCacheSizeUseCase: GetImageCacheSizeUseCase,
+    private val clearImageCacheUseCase: ClearImageCacheUseCase,
     private val updateImageQualityUseCase: UpdateImageQualityUseCase,
     private val updateLanguageRegionUseCase: UpdateLanguageRegionUseCase,
     private val updateThemeUseCase: UpdateThemeUseCase,
@@ -78,6 +83,7 @@ class SettingsViewModel @Inject constructor(
         observeSavedLibrary()
         observeTmdbAccount()
         observeTmdbSyncStatus()
+        loadImageCacheSize()
         refreshTmdbAccount()
     }
 
@@ -251,13 +257,45 @@ class SettingsViewModel @Inject constructor(
             _state.update { currentState ->
                 currentState.copy(isClearImageCacheDialogVisible = false)
             }
-            _effect.emit(SettingsEffect.ClearImageCache)
+
+            runCatching { clearImageCacheUseCase() }
+                .onSuccess { clearedBytes ->
+                    updateImageCacheLabel(sizeBytes = 0L)
+                    _effect.emit(
+                        SettingsEffect.ShowMessage(
+                            message = "Image cache cleared · " +
+                                "${clearedBytes.toStorageSizeLabel()} freed"
+                        )
+                    )
+                }
+                .onFailure {
+                    _effect.emit(
+                        SettingsEffect.ShowMessage(message = "Unable to clear image cache.")
+                    )
+                }
         }
     }
 
     private fun onClearImageCacheDismissed() {
         _state.update { currentState ->
             currentState.copy(isClearImageCacheDialogVisible = false)
+        }
+    }
+
+    private fun loadImageCacheSize() {
+        viewModelScope.launch {
+            runCatching { getImageCacheSizeUseCase() }
+                .onSuccess { sizeBytes -> updateImageCacheLabel(sizeBytes = sizeBytes) }
+        }
+    }
+
+    private fun updateImageCacheLabel(sizeBytes: Long) {
+        _state.update { currentState ->
+            currentState.copy(
+                imageCacheSizeLabel = sizeBytes.toStorageSizeLabel(),
+                clearImageCacheLabel =
+                    "${sizeBytes.toStorageSizeLabel()} · Frees cached poster images"
+            )
         }
     }
 

@@ -29,13 +29,14 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
 @Composable
 internal fun ClearImageCacheDialog(
+    cacheSizeLabel: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SettingsDialog(
         icon = Icons.Filled.DeleteOutline,
-        title = "Clear Image Cache?",
+        title = "Clear Image Cache",
         onDismiss = onDismiss,
         dismissLabel = "Cancel",
         confirmLabel = "Clear cache",
@@ -45,7 +46,7 @@ internal fun ClearImageCacheDialog(
     ) {
         Column {
             Text(
-                text = "This will remove 42 MB of cached poster images from your device. " +
+                text = "This will remove $cacheSizeLabel of cached poster images from your device. " +
                     "They will be re-downloaded the next time you browse.",
                 modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.bodyMedium.copy(
@@ -67,19 +68,19 @@ internal fun ClearImageCacheDialog(
                     CacheBreakdownRow(
                         icon = Icons.Filled.Movie,
                         label = "Movie posters",
-                        value = "28 MB"
+                        value = "Included"
                     )
                     HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                     CacheBreakdownRow(
                         icon = Icons.Filled.Person,
                         label = "Person portraits",
-                        value = "11 MB"
+                        value = "Included"
                     )
                     HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                     CacheBreakdownRow(
                         icon = Icons.Filled.Image,
                         label = "Backdrop images",
-                        value = "3 MB"
+                        value = "Included"
                     )
                 }
             }

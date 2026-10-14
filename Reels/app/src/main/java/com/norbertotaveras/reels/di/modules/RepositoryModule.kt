@@ -12,12 +12,14 @@ import com.norbertotaveras.reels.data.repository.favorites.FavoriteMoviesReposit
 import com.norbertotaveras.reels.data.repository.favorites.SavedPeopleRepositoryImpl
 import com.norbertotaveras.reels.data.repository.movie.TmdbMovieRepositoryImpl
 import com.norbertotaveras.reels.data.repository.person.TmdbPersonRepositoryImpl
+import com.norbertotaveras.reels.data.repository.settings.CoilImageCacheRepository
 import com.norbertotaveras.reels.data.repository.settings.SettingsRepositoryImpl
 import com.norbertotaveras.reels.domain.repository.account.TmdbAccountRepository
 import com.norbertotaveras.reels.domain.repository.favorites.FavoriteMoviesRepository
 import com.norbertotaveras.reels.domain.repository.favorites.SavedPeopleRepository
 import com.norbertotaveras.reels.domain.repository.movie.MovieRepository
 import com.norbertotaveras.reels.domain.repository.person.PersonRepository
+import com.norbertotaveras.reels.domain.repository.settings.ImageCacheRepository
 import com.norbertotaveras.reels.domain.repository.settings.SettingsRepository
 import dagger.Binds
 import dagger.Module
@@ -51,6 +53,12 @@ abstract class RepositoryModule {
     abstract fun bindPersonRepository(
         implementation: TmdbPersonRepositoryImpl
     ): PersonRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindImageCacheRepository(
+        implementation: CoilImageCacheRepository
+    ): ImageCacheRepository
 
     @Binds
     @Singleton

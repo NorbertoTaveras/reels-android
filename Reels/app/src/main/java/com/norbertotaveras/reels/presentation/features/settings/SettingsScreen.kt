@@ -161,6 +161,7 @@ fun SettingsScreen(
 
     if (state.isClearImageCacheDialogVisible) {
         ClearImageCacheDialog(
+            cacheSizeLabel = state.imageCacheSizeLabel,
             onConfirm = { onEvent(SettingsEvent.ClearImageCacheConfirmed) },
             onDismiss = { onEvent(SettingsEvent.ClearImageCacheDismissed) }
         )

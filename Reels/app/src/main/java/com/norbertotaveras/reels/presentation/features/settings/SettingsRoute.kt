@@ -16,13 +16,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.SingletonImageLoader
 import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarHost
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Composable
 fun SettingsRoute(
@@ -33,7 +29,6 @@ fun SettingsRoute(
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
-    val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -44,20 +39,11 @@ fun SettingsRoute(
         }
     }
 
-    LaunchedEffect(viewModel, context, snackbarHostState) {
+    LaunchedEffect(viewModel, snackbarHostState) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 SettingsEffect.NavigateToLibrary -> {
                     onNavigateToLibrary()
-                }
-
-                SettingsEffect.ClearImageCache -> {
-                    val imageLoader = SingletonImageLoader.get(context)
-                    imageLoader.memoryCache?.clear()
-                    withContext(Dispatchers.IO) {
-                        imageLoader.diskCache?.clear()
-                    }
-                    snackbarHostState.showSnackbar(message = "Image cache cleared · 42 MB freed")
                 }
 
                 is SettingsEffect.OpenExternalUrl -> {
