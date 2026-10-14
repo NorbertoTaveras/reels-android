@@ -19,6 +19,8 @@ internal fun TmdbAccountSection(
     onConnectClick: () -> Unit,
     onFinishClick: () -> Unit,
     onDisconnectClick: () -> Unit,
+    onWatchlistSyncChanged: (Boolean) -> Unit,
+    onRatingsSyncChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -36,7 +38,11 @@ internal fun TmdbAccountSection(
                     avatarPath = state.tmdbAccountAvatarPath,
                     gravatarHash = state.tmdbAccountGravatarHash,
                     isLoading = state.isTmdbAccountLoading,
-                    onDisconnectClick = onDisconnectClick
+                    isWatchlistSyncEnabled = state.isTmdbWatchlistSyncEnabled,
+                    isRatingsSyncEnabled = state.isTmdbRatingsSyncEnabled,
+                    onDisconnectClick = onDisconnectClick,
+                    onWatchlistSyncChanged = onWatchlistSyncChanged,
+                    onRatingsSyncChanged = onRatingsSyncChanged
                 )
             }
 

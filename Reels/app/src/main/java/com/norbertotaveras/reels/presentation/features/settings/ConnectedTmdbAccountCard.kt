@@ -35,7 +35,11 @@ internal fun ConnectedTmdbAccountCard(
     avatarPath: String?,
     gravatarHash: String?,
     isLoading: Boolean,
+    isWatchlistSyncEnabled: Boolean,
+    isRatingsSyncEnabled: Boolean,
     onDisconnectClick: () -> Unit,
+    onWatchlistSyncChanged: (Boolean) -> Unit,
+    onRatingsSyncChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val cardShape = RoundedCornerShape(ReelsDimensions.settingsTmdbCardCornerSize)
@@ -78,7 +82,11 @@ internal fun ConnectedTmdbAccountCard(
             title = "Watchlist Sync",
             subtitle = "Sync with TMDB account",
             trailing = {
-                StaticSettingsSwitch(checked = true)
+                SettingsSyncSwitch(
+                    checked = isWatchlistSyncEnabled,
+                    label = "Watchlist Sync",
+                    onCheckedChange = onWatchlistSyncChanged
+                )
             }
         )
 
@@ -89,7 +97,11 @@ internal fun ConnectedTmdbAccountCard(
             title = "Ratings Sync",
             subtitle = "Sync your movie ratings",
             trailing = {
-                StaticSettingsSwitch(checked = true)
+                SettingsSyncSwitch(
+                    checked = isRatingsSyncEnabled,
+                    label = "Ratings Sync",
+                    onCheckedChange = onRatingsSyncChanged
+                )
             }
         )
 

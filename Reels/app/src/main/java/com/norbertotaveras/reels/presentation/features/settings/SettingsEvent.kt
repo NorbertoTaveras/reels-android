@@ -27,6 +27,8 @@ sealed interface SettingsEvent {
     data object TmdbAccountCallbackReceived : SettingsEvent
     data object TmdbAccountFinishClicked : SettingsEvent
     data object TmdbAccountDisconnectClicked : SettingsEvent
+    data class TmdbWatchlistSyncChanged(val enabled: Boolean) : SettingsEvent
+    data class TmdbRatingsSyncChanged(val enabled: Boolean) : SettingsEvent
     data object PrivacyClicked : SettingsEvent
     data object PrivacyNoticeDismissed : SettingsEvent
     data object TmdbAttributionClicked : SettingsEvent

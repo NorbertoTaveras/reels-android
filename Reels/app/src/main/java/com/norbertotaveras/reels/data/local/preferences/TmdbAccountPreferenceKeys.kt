@@ -7,6 +7,7 @@
 
 package com.norbertotaveras.reels.data.local.preferences
 
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 
@@ -18,4 +19,6 @@ internal object TmdbAccountPreferenceKeys {
     val DISPLAY_NAME = stringPreferencesKey("display_name")
     val AVATAR_PATH = stringPreferencesKey("avatar_path")
     val GRAVATAR_HASH = stringPreferencesKey("gravatar_hash")
+    val WATCHLIST_SYNC_ENABLED = booleanPreferencesKey("watchlist_sync_enabled")
+    val RATINGS_SYNC_ENABLED = booleanPreferencesKey("ratings_sync_enabled")
 }

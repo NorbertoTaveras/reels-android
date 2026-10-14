@@ -76,7 +76,13 @@ fun SettingsScreen(
             state = state,
             onConnectClick = { onEvent(SettingsEvent.TmdbAccountClicked) },
             onFinishClick = { onEvent(SettingsEvent.TmdbAccountFinishClicked) },
-            onDisconnectClick = { onEvent(SettingsEvent.TmdbAccountDisconnectClicked) }
+            onDisconnectClick = { onEvent(SettingsEvent.TmdbAccountDisconnectClicked) },
+            onWatchlistSyncChanged = { enabled ->
+                onEvent(SettingsEvent.TmdbWatchlistSyncChanged(enabled = enabled))
+            },
+            onRatingsSyncChanged = { enabled ->
+                onEvent(SettingsEvent.TmdbRatingsSyncChanged(enabled = enabled))
+            }
         )
 
         SettingsSection(title = "APP PREFERENCES") {

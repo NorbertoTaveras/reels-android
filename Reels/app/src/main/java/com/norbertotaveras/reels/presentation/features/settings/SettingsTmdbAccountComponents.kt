@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -33,11 +34,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -272,20 +276,29 @@ internal fun ConnectedChip(
 }
 
 @Composable
-internal fun StaticSettingsSwitch(
+internal fun SettingsSyncSwitch(
     checked: Boolean,
+    label: String,
+    onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = modifier.size(
-            width = ReelsDimensions.settingsTmdbConnectedSwitchWidth,
-            height = ReelsDimensions.settingsTmdbConnectedSwitchHeight
-        ),
+        modifier = modifier
+            .size(
+                width = ReelsDimensions.settingsTmdbConnectedSwitchWidth,
+                height = ReelsDimensions.settingsTmdbConnectedSwitchHeight
+            )
+            .toggleable(
+                value = checked,
+                role = Role.Switch,
+                onValueChange = onCheckedChange
+            )
+            .semantics { contentDescription = label },
         shape = MaterialTheme.shapes.large,
         color = if (checked) {
             MaterialTheme.colorScheme.primary
         } else {
-            MaterialTheme.colorScheme.surfaceVariant
+            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.32f)
         }
     ) {
         Box(
@@ -298,7 +311,7 @@ internal fun StaticSettingsSwitch(
                 modifier = Modifier
                     .size(ReelsDimensions.settingsTmdbConnectedSwitchThumbSize)
                     .clip(MaterialTheme.shapes.large)
-                    .background(if (checked) Color.White else MaterialTheme.colorScheme.onSurfaceVariant)
+                    .background(Color.White)
             )
         }
     }

@@ -18,6 +18,8 @@ internal fun Preferences.toTmdbAccountState(): TmdbAccountStateDataModel {
     return TmdbAccountStateDataModel(
         sessionId = this[TmdbAccountPreferenceKeys.SESSION_ID],
         pendingRequestToken = this[TmdbAccountPreferenceKeys.PENDING_REQUEST_TOKEN],
+        isWatchlistSyncEnabled = this[TmdbAccountPreferenceKeys.WATCHLIST_SYNC_ENABLED] ?: true,
+        isRatingsSyncEnabled = this[TmdbAccountPreferenceKeys.RATINGS_SYNC_ENABLED] ?: true,
         account = if (accountId != null && !username.isNullOrBlank()) {
             TmdbAccountDataModel(
                 accountId = accountId,

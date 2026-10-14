@@ -11,6 +11,8 @@ data class TmdbAccountStateDataModel(
     val sessionId: String? = null,
     val pendingRequestToken: String? = null,
     val account: TmdbAccountDataModel? = null,
+    val isWatchlistSyncEnabled: Boolean = true,
+    val isRatingsSyncEnabled: Boolean = true,
 ) {
     val isConnected: Boolean
         get() = !sessionId.isNullOrBlank() && account != null

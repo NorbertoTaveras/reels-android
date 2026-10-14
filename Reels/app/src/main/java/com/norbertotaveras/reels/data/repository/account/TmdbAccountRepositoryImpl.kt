@@ -184,6 +184,14 @@ class TmdbAccountRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun updateWatchlistSyncEnabled(enabled: Boolean) {
+        accountDataStore.updateWatchlistSyncEnabled(enabled = enabled)
+    }
+
+    override suspend fun updateRatingsSyncEnabled(enabled: Boolean) {
+        accountDataStore.updateRatingsSyncEnabled(enabled = enabled)
+    }
+
     override suspend fun getMovieAccountState(
         movieId: Int
     ): Result<TmdbMovieAccountStateDataModel?> {
@@ -410,6 +418,10 @@ class TmdbAccountRepositoryImpl @Inject constructor(
             if (!accountState.isConnected || accountId == null || sessionId == null) {
                 flowOf(PagingData.empty())
             } else {
+                val isSyncEnabled = when (list) {
+                    TmdbLibraryList.Watchlist -> accountState.isWatchlistSyncEnabled
+                    TmdbLibraryList.Rated -> accountState.isRatingsSyncEnabled
+                }
                 val listKey = tmdbLibraryCacheKey(
                     accountId = accountId,
                     list = list,
@@ -417,21 +429,25 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                 )
                 Pager(
                     config = tmdbPagingConfig(),
-                    remoteMediator = CachedMovieListRemoteMediator(
-                        database = database,
-                        cachedMovieDao = cachedMovieDao,
-                        listKey = listKey,
-                        networkMonitor = networkMonitor,
-                        loadPage = { page -> loadPage(accountId, sessionId, page) },
-                        transformError = { error ->
-                            if (error.isTmdbSessionExpiredError()) {
-                                accountDataStore.clearAccount()
-                                TmdbSessionExpiredException()
-                            } else {
-                                error.toTmdbNetworkException()
+                    remoteMediator = if (isSyncEnabled) {
+                        CachedMovieListRemoteMediator(
+                            database = database,
+                            cachedMovieDao = cachedMovieDao,
+                            listKey = listKey,
+                            networkMonitor = networkMonitor,
+                            loadPage = { page -> loadPage(accountId, sessionId, page) },
+                            transformError = { error ->
+                                if (error.isTmdbSessionExpiredError()) {
+                                    accountDataStore.clearAccount()
+                                    TmdbSessionExpiredException()
+                                } else {
+                                    error.toTmdbNetworkException()
+                                }
                             }
-                        }
-                    ),
+                        )
+                    } else {
+                        null
+                    },
                     pagingSourceFactory = {
                         cachedMovieDao.pagingSource(listKey = listKey)
                     }

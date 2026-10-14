@@ -33,6 +33,10 @@ interface TmdbAccountRepository {
 
     suspend fun disconnect(): Result<Unit>
 
+    suspend fun updateWatchlistSyncEnabled(enabled: Boolean)
+
+    suspend fun updateRatingsSyncEnabled(enabled: Boolean)
+
     suspend fun getMovieAccountState(movieId: Int): Result<TmdbMovieAccountStateDataModel?>
 
     fun getWatchlistMovies(

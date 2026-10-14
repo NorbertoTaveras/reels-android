@@ -64,6 +64,18 @@ class TmdbAccountDataStore @Inject constructor(
         }
     }
 
+    suspend fun updateWatchlistSyncEnabled(enabled: Boolean) {
+        context.tmdbAccountDataStore.edit { preferences ->
+            preferences[TmdbAccountPreferenceKeys.WATCHLIST_SYNC_ENABLED] = enabled
+        }
+    }
+
+    suspend fun updateRatingsSyncEnabled(enabled: Boolean) {
+        context.tmdbAccountDataStore.edit { preferences ->
+            preferences[TmdbAccountPreferenceKeys.RATINGS_SYNC_ENABLED] = enabled
+        }
+    }
+
     suspend fun clearAccount() {
         context.tmdbAccountDataStore.edit { preferences ->
             preferences.remove(TmdbAccountPreferenceKeys.SESSION_ID)
@@ -73,6 +85,8 @@ class TmdbAccountDataStore @Inject constructor(
             preferences.remove(TmdbAccountPreferenceKeys.DISPLAY_NAME)
             preferences.remove(TmdbAccountPreferenceKeys.AVATAR_PATH)
             preferences.remove(TmdbAccountPreferenceKeys.GRAVATAR_HASH)
+            preferences.remove(TmdbAccountPreferenceKeys.WATCHLIST_SYNC_ENABLED)
+            preferences.remove(TmdbAccountPreferenceKeys.RATINGS_SYNC_ENABLED)
         }
     }
 }

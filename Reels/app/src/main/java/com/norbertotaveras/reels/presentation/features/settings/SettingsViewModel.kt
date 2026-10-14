@@ -17,6 +17,8 @@ import com.norbertotaveras.reels.domain.usecase.account.FinishTmdbAuthentication
 import com.norbertotaveras.reels.domain.usecase.account.ObserveTmdbAccountUseCase
 import com.norbertotaveras.reels.domain.usecase.account.RefreshTmdbAccountUseCase
 import com.norbertotaveras.reels.domain.usecase.account.StartTmdbAuthenticationUseCase
+import com.norbertotaveras.reels.domain.usecase.account.UpdateTmdbRatingsSyncUseCase
+import com.norbertotaveras.reels.domain.usecase.account.UpdateTmdbWatchlistSyncUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveLibraryContentUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateImageQualityUseCase
@@ -43,6 +45,8 @@ class SettingsViewModel @Inject constructor(
     private val startTmdbAuthenticationUseCase: StartTmdbAuthenticationUseCase,
     private val finishTmdbAuthenticationUseCase: FinishTmdbAuthenticationUseCase,
     private val disconnectTmdbAccountUseCase: DisconnectTmdbAccountUseCase,
+    private val updateTmdbWatchlistSyncUseCase: UpdateTmdbWatchlistSyncUseCase,
+    private val updateTmdbRatingsSyncUseCase: UpdateTmdbRatingsSyncUseCase,
     private val updateImageQualityUseCase: UpdateImageQualityUseCase,
     private val updateLanguageRegionUseCase: UpdateLanguageRegionUseCase,
     private val updateThemeUseCase: UpdateThemeUseCase,
@@ -82,6 +86,12 @@ class SettingsViewModel @Inject constructor(
             SettingsEvent.TmdbAccountCallbackReceived -> onTmdbAccountCallbackReceived()
             SettingsEvent.TmdbAccountFinishClicked -> onTmdbAccountFinishClicked()
             SettingsEvent.TmdbAccountDisconnectClicked -> onTmdbAccountDisconnectClicked()
+            is SettingsEvent.TmdbWatchlistSyncChanged -> {
+                onTmdbWatchlistSyncChanged(enabled = event.enabled)
+            }
+            is SettingsEvent.TmdbRatingsSyncChanged -> {
+                onTmdbRatingsSyncChanged(enabled = event.enabled)
+            }
             SettingsEvent.PrivacyClicked -> onPrivacyClicked()
             SettingsEvent.PrivacyNoticeDismissed -> onPrivacyNoticeDismissed()
             SettingsEvent.TmdbAttributionClicked -> onTmdbAttributionClicked()
@@ -264,6 +274,18 @@ class SettingsViewModel @Inject constructor(
                         )
                     )
                 }
+        }
+    }
+
+    private fun onTmdbWatchlistSyncChanged(enabled: Boolean) {
+        viewModelScope.launch {
+            updateTmdbWatchlistSyncUseCase(enabled = enabled)
+        }
+    }
+
+    private fun onTmdbRatingsSyncChanged(enabled: Boolean) {
+        viewModelScope.launch {
+            updateTmdbRatingsSyncUseCase(enabled = enabled)
         }
     }
 
