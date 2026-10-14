@@ -55,7 +55,8 @@ internal fun PendingTmdbAccountCard(
     ) {
         TmdbAccountHeaderRow(
             title = "Approval pending",
-            subtitle = "Approve Reels on themoviedb.org, then finish here."
+            subtitle = "Approve Reels on themoviedb.org, then finish here.",
+            subtitleMaxLines = 2
         )
 
         Button(

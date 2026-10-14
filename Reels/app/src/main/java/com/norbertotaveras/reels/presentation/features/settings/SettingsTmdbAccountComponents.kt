@@ -54,6 +54,7 @@ internal fun TmdbAccountHeaderRow(
     title: String,
     subtitle: String,
     modifier: Modifier = Modifier,
+    subtitleMaxLines: Int = 1,
     trailing: @Composable (() -> Unit)? = null,
 ) {
     Row(
@@ -91,7 +92,7 @@ internal fun TmdbAccountHeaderRow(
                     letterSpacing = 0.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
+                maxLines = subtitleMaxLines,
                 overflow = TextOverflow.Ellipsis
             )
         }
