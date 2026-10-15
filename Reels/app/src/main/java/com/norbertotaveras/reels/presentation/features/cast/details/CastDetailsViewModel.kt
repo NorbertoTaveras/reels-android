@@ -13,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 import com.norbertotaveras.reels.domain.usecase.favorites.ObserveIsPersonSavedUseCase
 import com.norbertotaveras.reels.domain.usecase.favorites.ToggleSavedPersonUseCase
+import com.norbertotaveras.reels.domain.usecase.network.ObserveNetworkConnectivityUseCase
 import com.norbertotaveras.reels.domain.usecase.person.LoadPersonDetailsContentUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.presentation.navigation.ReelsDestinations
@@ -38,6 +39,7 @@ class CastDetailsViewModel @Inject constructor(
     private val observeSettingsUseCase: ObserveSettingsUseCase,
     private val observeIsPersonSavedUseCase: ObserveIsPersonSavedUseCase,
     private val toggleSavedPersonUseCase: ToggleSavedPersonUseCase,
+    private val observeNetworkConnectivityUseCase: ObserveNetworkConnectivityUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(CastDetailsUiState())
     val state: StateFlow<CastDetailsUiState> = _state.asStateFlow()
@@ -52,8 +54,22 @@ class CastDetailsViewModel @Inject constructor(
     private var loadPersonJob: Job? = null
 
     init {
+        observeConnectivity()
         observeSettings()
         observeSavedStatus()
+    }
+
+    private fun observeConnectivity() {
+        viewModelScope.launch {
+            observeNetworkConnectivityUseCase().collect { isOnline ->
+                _state.update { currentState ->
+                    currentState.copy(
+                        isOnline = isOnline,
+                        isOfflineSavedPerson = currentState.isSaved && !isOnline
+                    )
+                }
+            }
+        }
     }
 
     fun onEvent(event: CastDetailsEvent) {
@@ -104,7 +120,10 @@ class CastDetailsViewModel @Inject constructor(
         viewModelScope.launch {
             observeIsPersonSavedUseCase(personId = personId).collect { isSaved ->
                 _state.update { currentState ->
-                    currentState.copy(isSaved = isSaved)
+                    currentState.copy(
+                        isSaved = isSaved,
+                        isOfflineSavedPerson = isSaved && !currentState.isOnline
+                    )
                 }
             }
         }

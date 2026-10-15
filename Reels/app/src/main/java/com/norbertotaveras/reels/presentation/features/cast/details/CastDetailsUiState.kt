@@ -14,6 +14,7 @@ data class CastDetailsUiState(
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
+    val isOnline: Boolean = true,
     val isOfflineSavedPerson: Boolean = false,
     val errorMessage: String? = null,
     val person: PersonDetailsDataModel? = null,

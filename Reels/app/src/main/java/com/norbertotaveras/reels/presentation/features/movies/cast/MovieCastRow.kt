@@ -61,7 +61,11 @@ internal fun MovieCastRow(
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(
             width = ReelsDimensions.fullCastBorderWidth,
-            color = MaterialTheme.colorScheme.outline
+            color = if (isSaved) {
+                ReelsAccent.copy(alpha = 0.55f)
+            } else {
+                MaterialTheme.colorScheme.outline
+            }
         )
     ) {
         Row(

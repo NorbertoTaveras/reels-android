@@ -372,6 +372,11 @@ object ReelsDimensions {
     val castDetailsHeroActionButtonSize = 40.dp
     val castDetailsHeroActionIconSize = 20.dp
     val castDetailsDepartmentIconSize = 14.dp
+    val castDetailsOfflineBadgeCornerSize = 10.dp
+    val castDetailsOfflineBadgeHorizontalPadding = 10.dp
+    val castDetailsOfflineBadgeVerticalPadding = 5.dp
+    val castDetailsOfflineBadgeContentSpacing = 6.dp
+    val castDetailsOfflineBadgeIconSize = 12.dp
     val castDetailsQuickInfoSpacing = 16.dp
     val castDetailsInfoIconContainerSize = 40.dp
     val castDetailsInfoIconSize = 18.dp

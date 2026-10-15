@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,6 +53,7 @@ internal fun CastHeroHeader(
     knownForDepartment: String?,
     isFavorite: Boolean,
     isFavoriteLoading: Boolean,
+    isOfflineSavedPerson: Boolean,
     onBackClick: () -> Unit,
     onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -167,6 +169,10 @@ internal fun CastHeroHeader(
                 .padding(bottom = 0.dp),
             verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
         ) {
+            if (isOfflineSavedPerson) {
+                CastOfflineStatusBadge()
+            }
+
             Text(
                 text = name,
                 style = MaterialTheme.typography.headlineSmall.copy(
@@ -194,6 +200,18 @@ internal fun CastHeroHeader(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+
+                    if (isOfflineSavedPerson) {
+                        Text(
+                            text = "Latest details unavailable offline",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontSize = 11.sp,
+                                lineHeight = 16.sp,
+                                fontStyle = FontStyle.Italic
+                            ),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
 

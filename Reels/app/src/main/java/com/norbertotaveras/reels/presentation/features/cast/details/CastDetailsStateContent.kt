@@ -58,6 +58,7 @@ internal fun CastDetailsStateContent(
                 placeOfBirth = person.placeOfBirth,
                 isFavorite = state.isSaved,
                 isFavoriteLoading = state.isSaving,
+                isOfflineSavedPerson = state.isOfflineSavedPerson,
                 onBackClick = {
                     onEvent(CastDetailsEvent.BackClicked)
                 },

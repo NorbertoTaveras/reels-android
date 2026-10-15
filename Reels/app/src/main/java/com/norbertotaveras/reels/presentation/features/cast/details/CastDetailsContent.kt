@@ -39,6 +39,7 @@ fun CastDetailsContent(
     modifier: Modifier = Modifier,
     isFavorite: Boolean = false,
     isFavoriteLoading: Boolean = false,
+    isOfflineSavedPerson: Boolean = false,
     onFavoriteClick: () -> Unit = {},
 ) {
     LazyColumn(
@@ -55,6 +56,7 @@ fun CastDetailsContent(
                 knownForDepartment = knownForDepartment,
                 isFavorite = isFavorite,
                 isFavoriteLoading = isFavoriteLoading,
+                isOfflineSavedPerson = isOfflineSavedPerson,
                 onBackClick = onBackClick,
                 onFavoriteClick = onFavoriteClick
             )

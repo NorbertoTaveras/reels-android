@@ -15,7 +15,7 @@ internal fun CastDetailsUiState.withContent(
     return copy(
         person = content.person,
         knownFor = content.knownFor,
-        isOfflineSavedPerson = content.isOfflineSavedPerson,
+        isOfflineSavedPerson = isSaved && !isOnline,
         errorMessage = null,
         isLoading = false
     )
