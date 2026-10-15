@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.extensions.toReleaseYear
+import com.norbertotaveras.reels.presentation.ui.extensions.toRatingText
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
@@ -51,14 +52,14 @@ internal fun TmdbAccountMovieCard(
                     TmdbLibraryList.Watchlist -> TmdbBadge()
                     TmdbLibraryList.Rated -> UserRatingBadge(
                         rating = movie.accountRating?.let { rating ->
-                            String.format("%.1f", rating)
+                            rating.toRatingText()
                         }.orEmpty()
                     )
                 }
             },
             topEndBadge = {
                 RatingBadge(
-                    rating = String.format("%.1f", movie.voteAverage)
+                    rating = movie.voteAverage.toRatingText()
                 )
             },
             bottomEndBadge = {

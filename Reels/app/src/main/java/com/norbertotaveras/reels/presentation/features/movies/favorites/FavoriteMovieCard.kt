@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.domain.model.favorite.FavoriteMovieDataModel
 import com.norbertotaveras.reels.extensions.toReleaseYear
+import com.norbertotaveras.reels.presentation.ui.extensions.toRatingText
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 
@@ -42,7 +43,7 @@ internal fun FavoriteMovieCard(
                 OfflineBadge()
             },
             topEndBadge = {
-                RatingBadge(rating = String.format("%.1f", movie.voteAverage))
+                RatingBadge(rating = movie.voteAverage.toRatingText())
             },
             bottomEndBadge = {
                 LibraryRemoveButton(

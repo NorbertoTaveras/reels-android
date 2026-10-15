@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.DownloadDone
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
@@ -271,7 +271,7 @@ internal fun TmdbBadge(
 
 @Composable
 internal fun OfflineBadge(
-    imageVector: ImageVector = Icons.Filled.DownloadDone,
+    imageVector: ImageVector = Icons.Filled.Download,
     modifier: Modifier = Modifier,
 ) {
     Surface(
