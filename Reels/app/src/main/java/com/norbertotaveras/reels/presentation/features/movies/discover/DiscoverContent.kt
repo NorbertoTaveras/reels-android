@@ -46,8 +46,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.norbertotaveras.reels.domain.model.discover.hasActiveFilters
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
-import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
-import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
+import com.norbertotaveras.reels.presentation.ui.components.common.LoadMoreErrorState
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
@@ -132,9 +131,7 @@ internal fun DiscoverContent(
                     refreshState is LoadState.Error && !hasCachedMovies -> {
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             DiscoverErrorState(
-                                message = refreshState.error.toUserMessage(
-                                    fallback = "Unable to discover movies."
-                                ),
+                                message = "Check your connection and try again.",
                                 onRetry = movies::retry
                             )
                         }
@@ -183,13 +180,7 @@ internal fun DiscoverContent(
 
                     is LoadState.Error -> {
                         item(span = { GridItemSpan(maxLineSpan) }) {
-                            InlineRetryState(
-                                message = appendState.error.toUserMessage(
-                                    fallback = "Unable to load more movies."
-                                ),
-                                retryLabel = "Retry",
-                                onRetry = movies::retry
-                            )
+                            LoadMoreErrorState(onRetry = movies::retry)
                         }
                     }
 

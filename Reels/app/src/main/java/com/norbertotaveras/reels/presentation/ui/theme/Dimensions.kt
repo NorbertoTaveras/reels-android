@@ -527,6 +527,26 @@ object ReelsDimensions {
     val inlineStateContentSpacing = 10.dp
     val inlineStateIconContainerSize = 44.dp
     val inlineStateIconSize = 22.dp
+    val loadMoreErrorVerticalPadding = 12.dp
+    val loadMoreErrorContentSpacing = 8.dp
+    val loadMoreErrorIconSize = 15.dp
+    val loadMoreErrorActionHeight = 36.dp
+    val loadMoreErrorActionCornerSize = 12.dp
+    val loadMoreErrorActionIconSize = 13.dp
+    val genreErrorCornerSize = 14.dp
+    val genreErrorHorizontalPadding = 14.dp
+    val genreErrorVerticalPadding = 12.dp
+    val genreErrorContentSpacing = 12.dp
+    val genreErrorIconSize = 18.dp
+    val genreErrorTextSpacing = 2.dp
+    val genreErrorActionHeight = 36.dp
+    val genreErrorActionCornerSize = 12.dp
+    val genreErrorActionIconSize = 13.dp
+    val inlineNetworkNoticeCornerSize = 14.dp
+    val inlineNetworkNoticeHorizontalPadding = 14.dp
+    val inlineNetworkNoticeVerticalPadding = 10.dp
+    val inlineNetworkNoticeContentSpacing = 10.dp
+    val inlineNetworkNoticeIconSize = 16.dp
 
     val snackbarIconContainerSize = 32.dp
     val snackbarIconContainerCornerSize = 8.dp

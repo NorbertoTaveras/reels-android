@@ -28,6 +28,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.CloudOff
+import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.MovieFilter
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Tune
@@ -319,7 +320,7 @@ internal fun DiscoverErrorState(
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
-                    imageVector = Icons.Outlined.CloudOff,
+                    imageVector = Icons.Outlined.ErrorOutline,
                     contentDescription = null,
                     modifier = Modifier.size(ReelsDimensions.discoverStateIconSize)
                 )

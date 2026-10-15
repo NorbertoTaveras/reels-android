@@ -31,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.norbertotaveras.reels.domain.model.discover.hasActiveFilters
-import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
@@ -112,7 +111,13 @@ internal fun DiscoverFilterSheet(
                             }
                         }
 
-                        state.filterErrorMessage != null -> Unit
+                        state.filterErrorMessage != null -> {
+                            DiscoverGenreErrorState(
+                                onRetry = {
+                                    onEvent(DiscoverEvent.RetryFiltersClicked)
+                                }
+                            )
+                        }
 
                         else -> {
                             state.genres.forEach { genre ->
@@ -136,16 +141,6 @@ internal fun DiscoverFilterSheet(
                             }
                         }
                     }
-                }
-
-                if (state.filterErrorMessage != null) {
-                    InlineRetryState(
-                        message = state.filterErrorMessage,
-                        retryLabel = "Reload genres",
-                        onRetry = {
-                            onEvent(DiscoverEvent.RetryFiltersClicked)
-                        }
-                    )
                 }
 
                 DiscoverChipSection(title = "Release Year") {

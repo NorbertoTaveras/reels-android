@@ -20,9 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
-import com.norbertotaveras.reels.presentation.ui.components.common.CachedContentBanner
-import com.norbertotaveras.reels.presentation.ui.components.common.InlineRetryState
-import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
+import com.norbertotaveras.reels.presentation.ui.components.common.InlineNetworkNotice
+import com.norbertotaveras.reels.presentation.ui.components.common.LoadMoreErrorState
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 
 @Composable
@@ -52,7 +51,7 @@ internal fun MovieCategoryContent(
             MovieCategoryErrorState(
                 modifier = modifier,
                 category = state.category,
-                retryLabel = "Try Again",
+                retryLabel = "Retry",
                 onBackClick = {
                     onEvent(MovieCategoryEvent.BackClicked)
                 },
@@ -91,9 +90,7 @@ internal fun MovieCategoryContent(
 
         if (cachedRefreshError != null || refreshState is LoadState.Error) {
             item(span = { GridItemSpan(maxLineSpan) }) {
-                CachedContentBanner(
-                    message = "Showing saved movies. New results will load when the connection improves."
-                )
+                InlineNetworkNotice(onRetry = movies::retry)
             }
         }
 
@@ -129,13 +126,7 @@ internal fun MovieCategoryContent(
 
             is LoadState.Error -> {
                 item(span = { GridItemSpan(maxLineSpan) }) {
-                    InlineRetryState(
-                        message = appendState.error.toUserMessage(
-                            fallback = "Unable to load more movies."
-                        ),
-                        retryLabel = "Retry",
-                        onRetry = movies::retry
-                    )
+                    LoadMoreErrorState(onRetry = movies::retry)
                 }
             }
 
