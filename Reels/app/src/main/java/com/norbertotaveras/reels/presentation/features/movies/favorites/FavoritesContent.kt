@@ -83,13 +83,15 @@ internal fun FavoritesContent(
     }
     val isTmdbLibraryTab = state.selectedTab == LibraryTab.Tmdb ||
         state.selectedTab == LibraryTab.Rated
-    val showConnectionStatus = isTmdbLibraryTab &&
-        (!state.isOnline || isUsingCachedTmdbContent)
+    val isLocalLibraryTab = state.selectedTab == LibraryTab.Movies ||
+        state.selectedTab == LibraryTab.People
+    val showConnectionStatus = !state.isOnline ||
+        (isTmdbLibraryTab && isUsingCachedTmdbContent)
     var dismissedCachedNoticeTab by rememberSaveable {
         mutableStateOf<LibraryTab?>(null)
     }
-    LaunchedEffect(isUsingCachedTmdbContent) {
-        if (!isUsingCachedTmdbContent) dismissedCachedNoticeTab = null
+    LaunchedEffect(state.isOnline, isUsingCachedTmdbContent) {
+        if (state.isOnline && !isUsingCachedTmdbContent) dismissedCachedNoticeTab = null
     }
 
     LazyVerticalGrid(
@@ -117,15 +119,50 @@ internal fun FavoritesContent(
             )
         }
 
-        if (!state.hasSelectedTabItems) {
+        if (isLocalLibraryTab && !state.isOnline &&
+            dismissedCachedNoticeTab != state.selectedTab
+        ) {
             item(span = { GridItemSpan(maxLineSpan) }) {
-                EmptyLibraryState(
-                    selectedTab = state.selectedTab,
-                    modifier = Modifier.padding(top = ReelsDimensions.favoritesEmptyTopPadding)
+                CachedContentBanner(
+                    message = "Saved library",
+                    supportingText = "Available offline",
+                    onDismiss = { dismissedCachedNoticeTab = state.selectedTab }
                 )
             }
-        } else {
-            when (state.selectedTab) {
+        }
+
+        when {
+            isLocalLibraryTab && state.isLibraryContentLoading -> {
+                repeat(LIBRARY_LOADING_PLACEHOLDER_COUNT) { index ->
+                    item(key = "${state.selectedTab.name}-loading-$index") {
+                        when (state.selectedTab) {
+                            LibraryTab.People -> LibraryPersonPlaceholder()
+                            else -> LibraryPosterPlaceholder()
+                        }
+                    }
+                }
+            }
+
+            isLocalLibraryTab && state.hasLibraryContentError -> {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    LibraryErrorState(
+                        onRetry = {
+                            onEvent(FavoritesEvent.RetryLibraryClicked)
+                        }
+                    )
+                }
+            }
+
+            !state.hasSelectedTabItems -> {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    EmptyLibraryState(
+                        selectedTab = state.selectedTab,
+                        modifier = Modifier.padding(top = ReelsDimensions.favoritesEmptyTopPadding)
+                    )
+                }
+            }
+
+            else -> when (state.selectedTab) {
                 LibraryTab.Movies -> {
                     items(
                         items = state.movies,

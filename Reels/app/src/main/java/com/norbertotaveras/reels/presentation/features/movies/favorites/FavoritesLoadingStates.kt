@@ -68,6 +68,42 @@ internal fun LibraryPosterPlaceholder(
 }
 
 @Composable
+internal fun LibraryPersonPlaceholder(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesTextSpacing)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(ReelsRatios.castPortrait)
+                .clip(RoundedCornerShape(ReelsDimensions.favoritesPosterCornerSize))
+                .background(reelsPlaceholderColor(alpha = 0.72f))
+        )
+
+        Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.82f)
+                    .height(14.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(reelsPlaceholderColor(alpha = 0.72f))
+            )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.42f)
+                    .height(11.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(reelsPlaceholderColor(alpha = 0.72f))
+            )
+        }
+    }
+}
+
+@Composable
 internal fun LibraryAppendError(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,

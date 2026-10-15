@@ -17,7 +17,13 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.norbertotaveras.reels.presentation.ui.components.common.CachedContentBanner
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
@@ -27,6 +33,12 @@ internal fun FilmographyContent(
     onEvent: (FilmographyEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var isOfflineNoticeDismissed by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(state.isOnline) {
+        if (state.isOnline) isOfflineNoticeDismissed = false
+    }
+
     LazyVerticalGrid(
         modifier = modifier
             .fillMaxSize()
@@ -55,6 +67,16 @@ internal fun FilmographyContent(
                     onEvent(FilmographyEvent.BackClicked)
                 }
             )
+        }
+
+        if (!state.isOnline && !isOfflineNoticeDismissed) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                CachedContentBanner(
+                    message = "Viewing cached credits",
+                    supportingText = "Latest unavailable offline",
+                    onDismiss = { isOfflineNoticeDismissed = true }
+                )
+            }
         }
 
         if (state.errorMessage == null) {

@@ -14,6 +14,7 @@ import com.norbertotaveras.reels.domain.model.person.FilmographySort
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 import com.norbertotaveras.reels.domain.usecase.person.LoadFilmographyContentUseCase
 import com.norbertotaveras.reels.domain.usecase.person.SortPersonMovieCreditsUseCase
+import com.norbertotaveras.reels.domain.usecase.network.ObserveNetworkConnectivityUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.presentation.navigation.ReelsDestinations
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
@@ -37,6 +38,7 @@ class FilmographyViewModel @Inject constructor(
     private val loadFilmographyContentUseCase: LoadFilmographyContentUseCase,
     private val sortPersonMovieCreditsUseCase: SortPersonMovieCreditsUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
+    private val observeNetworkConnectivityUseCase: ObserveNetworkConnectivityUseCase,
 ) : ViewModel() {
     private val personId: Int = checkNotNull(
         savedStateHandle.get<Int>(ReelsDestinations.PERSON_ID_ARG)
@@ -52,7 +54,18 @@ class FilmographyViewModel @Inject constructor(
     private var loadFilmographyJob: Job? = null
 
     init {
+        observeConnectivity()
         observeSettings()
+    }
+
+    private fun observeConnectivity() {
+        viewModelScope.launch {
+            observeNetworkConnectivityUseCase().collect { isOnline ->
+                _state.update { currentState ->
+                    currentState.copy(isOnline = isOnline)
+                }
+            }
+        }
     }
 
     fun onEvent(event: FilmographyEvent) {

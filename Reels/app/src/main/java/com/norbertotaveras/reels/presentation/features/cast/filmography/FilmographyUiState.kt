@@ -15,5 +15,6 @@ data class FilmographyUiState(
     val movies: List<PersonMovieCreditDataModel> = emptyList(),
     val sort: FilmographySort = FilmographySort.Popular,
     val isLoading: Boolean = true,
+    val isOnline: Boolean = true,
     val errorMessage: String? = null,
 )

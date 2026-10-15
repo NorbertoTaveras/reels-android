@@ -28,6 +28,7 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -40,6 +41,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -65,6 +68,7 @@ class FavoritesViewModel @Inject constructor(
     val effect: SharedFlow<FavoritesEffect> = _effect.asSharedFlow()
 
     private val tmdbRefreshRequests = MutableStateFlow(0)
+    private var libraryContentJob: Job? = null
     private val language = observeSettingsUseCase()
         .map { settings -> settings.languageRegion.languageCode }
         .distinctUntilChanged()
@@ -123,19 +127,40 @@ class FavoritesViewModel @Inject constructor(
             )
             is FavoritesEvent.RatedMovieRemoved -> removeTmdbRating(movieId = event.movieId)
             FavoritesEvent.ConnectSettingsClicked -> onConnectSettingsClicked()
+            FavoritesEvent.RetryLibraryClicked -> observeLibraryContent()
         }
     }
 
     private fun observeLibraryContent() {
-        viewModelScope.launch {
-            observeLibraryContentUseCase().collectLatest { content ->
-                _state.update { currentState ->
-                    currentState.copy(
-                        movies = content.movies,
-                        people = content.people
-                    )
+        libraryContentJob?.cancel()
+        libraryContentJob = viewModelScope.launch {
+            observeLibraryContentUseCase()
+                .onStart {
+                    _state.update { currentState ->
+                        currentState.copy(
+                            isLibraryContentLoading = true,
+                            hasLibraryContentError = false
+                        )
+                    }
                 }
-            }
+                .catch {
+                    _state.update { currentState ->
+                        currentState.copy(
+                            isLibraryContentLoading = false,
+                            hasLibraryContentError = true
+                        )
+                    }
+                }
+                .collectLatest { content ->
+                    _state.update { currentState ->
+                        currentState.copy(
+                            movies = content.movies,
+                            people = content.people,
+                            isLibraryContentLoading = false,
+                            hasLibraryContentError = false
+                        )
+                    }
+                }
         }
     }
 

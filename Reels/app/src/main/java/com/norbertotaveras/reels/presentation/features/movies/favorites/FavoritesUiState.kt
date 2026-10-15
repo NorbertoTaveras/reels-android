@@ -17,6 +17,8 @@ data class FavoritesUiState(
     val selectedTab: LibraryTab = LibraryTab.Movies,
     val isTmdbAccountConnected: Boolean = false,
     val isOnline: Boolean = true,
+    val isLibraryContentLoading: Boolean = true,
+    val hasLibraryContentError: Boolean = false,
     val removingMovieIds: Set<Int> = emptySet(),
     val removingPersonIds: Set<Int> = emptySet(),
     val updatingTmdbMovieIds: Set<Int> = emptySet(),
