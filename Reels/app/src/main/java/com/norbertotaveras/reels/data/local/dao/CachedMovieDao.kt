@@ -94,6 +94,19 @@ interface CachedMovieDao {
     @Query(
         """
         DELETE FROM cached_movie_list_entries
+        WHERE movieId = :movieId
+            AND listKey LIKE 'account:' || :accountId || ':' || :listType || ':%'
+        """
+    )
+    suspend fun removeAccountListMovie(
+        accountId: Int,
+        listType: String,
+        movieId: Int,
+    )
+
+    @Query(
+        """
+        DELETE FROM cached_movie_list_entries
         WHERE listKey IN (
             SELECT listKey FROM movie_remote_keys
             WHERE lastUpdatedAt < :cutoffMillis

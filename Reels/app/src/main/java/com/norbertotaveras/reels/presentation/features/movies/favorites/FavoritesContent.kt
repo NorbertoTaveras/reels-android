@@ -474,7 +474,11 @@ private fun LibrarySyncStatus(
                             "Your TMDB ratings · ${syncedAtMillis.toTmdbSyncLabel()}"
                         }
                         TmdbLibraryList.Watchlist -> {
-                            "Synced via TMDB · ${syncedAtMillis.toTmdbSyncLabel()}"
+                            val syncLabel = syncedAtMillis.toTmdbSyncLabel(
+                                prefix = "",
+                                missingLabel = "earlier"
+                            )
+                            "Synced via TMDB · $syncLabel"
                         }
                     },
                     style = MaterialTheme.typography.labelMedium,

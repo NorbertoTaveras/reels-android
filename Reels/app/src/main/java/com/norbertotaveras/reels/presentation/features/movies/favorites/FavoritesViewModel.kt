@@ -332,7 +332,6 @@ class FavoritesViewModel @Inject constructor(
 
             try {
                 update().onSuccess {
-                    refreshTmdbLists()
                     _effect.emit(FavoritesEffect.ShowMessage(message = successMessage))
                 }.onFailure { error ->
                     _effect.emit(

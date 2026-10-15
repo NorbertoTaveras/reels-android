@@ -18,12 +18,17 @@ internal fun Long?.toTmdbSyncLabel(
     val elapsedHours = elapsedMillis / MILLIS_PER_HOUR
     val elapsedDays = elapsedMillis / MILLIS_PER_DAY
 
-    return when {
-        elapsedMinutes < 1 -> "$prefix just now"
-        elapsedHours < 1 -> "$prefix $elapsedMinutes min ago"
-        elapsedDays < 1 -> "$prefix $elapsedHours h ago"
-        else -> "$prefix $elapsedDays d ago"
+    val elapsedLabel = when {
+        elapsedMinutes < 1 -> "just now"
+        elapsedHours < 1 -> "$elapsedMinutes min ago"
+        elapsedDays < 1 -> "$elapsedHours h ago"
+        else -> "$elapsedDays d ago"
     }
+
+    return prefix
+        .takeIf(String::isNotBlank)
+        ?.let { "$it $elapsedLabel" }
+        ?: elapsedLabel
 }
 
 private const val MILLIS_PER_MINUTE = 60_000L

@@ -280,7 +280,15 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                 listType = TmdbLibraryList.Watchlist,
                 isActive = watchlist
             )
-            cachedMovieDao.invalidateAccountLists(accountId = accountId)
+            if (!watchlist) {
+                removeCachedAccountListMovie(
+                    accountId = accountId,
+                    listType = TmdbLibraryList.Watchlist,
+                    movieId = movieId
+                )
+            } else {
+                cachedMovieDao.invalidateAccountLists(accountId = accountId)
+            }
             updatedState
         }
     }
@@ -348,7 +356,11 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                 listType = TmdbLibraryList.Rated,
                 isActive = false
             )
-            cachedMovieDao.invalidateAccountLists(accountId = accountId)
+            removeCachedAccountListMovie(
+                accountId = accountId,
+                listType = TmdbLibraryList.Rated,
+                movieId = movieId
+            )
             updatedState
         }
     }
@@ -395,6 +407,18 @@ class TmdbAccountRepositoryImpl @Inject constructor(
                 movieId = movieId
             )
         }
+    }
+
+    private suspend fun removeCachedAccountListMovie(
+        accountId: Int,
+        listType: TmdbLibraryList,
+        movieId: Int,
+    ) {
+        cachedMovieDao.removeAccountListMovie(
+            accountId = accountId,
+            listType = listType.name.lowercase(),
+            movieId = movieId
+        )
     }
 
     private fun getAccountMovies(
