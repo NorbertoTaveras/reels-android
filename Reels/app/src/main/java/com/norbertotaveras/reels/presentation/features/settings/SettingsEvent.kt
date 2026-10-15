@@ -12,6 +12,7 @@ import com.norbertotaveras.reels.domain.model.settings.ImageQuality
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
 
 sealed interface SettingsEvent {
+    data object ScreenResumed : SettingsEvent
     data object ImageQualityClicked : SettingsEvent
     data class ImageQualitySelected(val imageQuality: ImageQuality) : SettingsEvent
     data object LanguageRegionClicked : SettingsEvent

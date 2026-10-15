@@ -83,12 +83,12 @@ class SettingsViewModel @Inject constructor(
         observeSavedLibrary()
         observeTmdbAccount()
         observeTmdbSyncStatus()
-        loadImageCacheSize()
         refreshTmdbAccount()
     }
 
     fun onEvent(event: SettingsEvent) {
         when (event) {
+            SettingsEvent.ScreenResumed -> loadImageCacheSize()
             SettingsEvent.ImageQualityClicked -> onImageQualityClicked()
             is SettingsEvent.ImageQualitySelected -> onImageQualitySelected(event.imageQuality)
             SettingsEvent.LanguageRegionClicked -> onLanguageRegionClicked()
