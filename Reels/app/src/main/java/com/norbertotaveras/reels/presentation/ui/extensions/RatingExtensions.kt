@@ -5,7 +5,7 @@
  * modification, distribution, or use is prohibited.
  */
 
-package com.norbertotaveras.reels.presentation.features.movies.details
+package com.norbertotaveras.reels.presentation.ui.extensions
 
 import java.util.Locale
 

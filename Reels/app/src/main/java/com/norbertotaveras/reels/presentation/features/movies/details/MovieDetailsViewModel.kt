@@ -11,7 +11,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
-import com.norbertotaveras.reels.presentation.navigation.ReelsDestinations
 import com.norbertotaveras.reels.domain.usecase.account.DeleteTmdbMovieRatingUseCase
 import com.norbertotaveras.reels.domain.usecase.account.GetTmdbMovieAccountStateUseCase
 import com.norbertotaveras.reels.domain.usecase.account.ObserveTmdbAccountUseCase
@@ -23,6 +22,8 @@ import com.norbertotaveras.reels.domain.usecase.favorites.ToggleSavedCastMemberU
 import com.norbertotaveras.reels.domain.usecase.favorites.ToggleFavoriteMovieUseCase
 import com.norbertotaveras.reels.domain.usecase.movie.LoadMovieDetailsContentUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
+import com.norbertotaveras.reels.presentation.navigation.ReelsDestinations
+import com.norbertotaveras.reels.presentation.ui.extensions.toRatingText
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
