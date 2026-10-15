@@ -268,7 +268,7 @@ class FavoritesViewModel @Inject constructor(
 
             try {
                 removeFavoriteMovieUseCase(movieId = movieId).onSuccess {
-                    _effect.emit(FavoritesEffect.ShowMessage(message = "Removed from favorites."))
+                    _effect.emit(FavoritesEffect.ShowMessage(message = "Removed from library"))
                 }.onFailure { error ->
                     _effect.emit(
                         FavoritesEffect.ShowMessage(
@@ -300,7 +300,7 @@ class FavoritesViewModel @Inject constructor(
 
             try {
                 removeSavedPersonUseCase(personId = personId).onSuccess {
-                    _effect.emit(FavoritesEffect.ShowMessage(message = "Removed from library."))
+                    _effect.emit(FavoritesEffect.ShowMessage(message = "Removed from library"))
                 }.onFailure { error ->
                     _effect.emit(
                         FavoritesEffect.ShowMessage(
