@@ -25,25 +25,22 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.MovieFilter
 import androidx.compose.material.icons.outlined.Refresh
-import androidx.compose.material.icons.outlined.Tune
-import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,6 +48,7 @@ import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.presentation.ui.components.common.CachedContentBanner
+import com.norbertotaveras.reels.presentation.ui.components.common.MessageState
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
@@ -222,65 +220,21 @@ internal fun DiscoverPlaceholderCard(
 
 @Composable
 internal fun DiscoverEmptyState(
-    hasActiveFilters: Boolean,
-    onAdjustFilters: () -> Unit,
     onClearFilters: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(top = 48.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
-    ) {
-        Surface(
-            modifier = Modifier.size(80.dp),
-            shape = MaterialTheme.shapes.extraLarge,
-            color = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.primary
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = Icons.Outlined.Tune,
-                    contentDescription = null,
-                    modifier = Modifier.size(34.dp)
-                )
-            }
-        }
-
-        Text(
-            text = if (hasActiveFilters) "No matches found" else "No movies found",
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
-        )
-
-        Text(
-            text = if (hasActiveFilters) {
-                "Try adjusting or clearing your filters to see more movies."
-            } else {
-                "Discover is empty right now. Try again in a moment."
-            },
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-
-        Button(
-            onClick = onAdjustFilters,
-            shape = MaterialTheme.shapes.large
-        ) {
-            Text(text = "Adjust filters")
-        }
-
-        if (hasActiveFilters) {
-            TextButton(onClick = onClearFilters) {
-                Text(text = "Clear all filters")
-            }
-        }
-    }
+    MessageState(
+        modifier = modifier,
+        icon = Icons.Filled.Search,
+        title = "No results found",
+        message = "Try a different title or keyword.",
+        actionLabel = "Clear filters",
+        onAction = onClearFilters,
+        verticalPadding = ReelsDimensions.stateNoResultsVerticalPadding,
+        actionHeight = ReelsDimensions.stateCompactActionHeight,
+        actionHorizontalPadding = ReelsDimensions.stateCompactActionHorizontalPadding,
+        actionVerticalPadding = ReelsDimensions.stateCompactActionVerticalPadding
+    )
 }
 
 @Composable
@@ -309,75 +263,18 @@ internal fun DiscoverEndOfList(
 
 @Composable
 internal fun DiscoverErrorState(
-    message: String,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(
-                horizontal = ReelsDimensions.discoverStateHorizontalPadding,
-                vertical = ReelsDimensions.discoverStateVerticalPadding
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Surface(
-            modifier = Modifier.size(ReelsDimensions.discoverStateIconContainerSize),
-            shape = RoundedCornerShape(ReelsDimensions.discoverStateIconCornerSize),
-            color = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.primary
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = Icons.Outlined.ErrorOutline,
-                    contentDescription = null,
-                    modifier = Modifier.size(ReelsDimensions.discoverStateIconSize)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(ReelsDimensions.discoverStateIconToTitleSpacing))
-
-        Text(
-            text = "Couldn't load movies",
-            style = MaterialTheme.typography.titleMedium.copy(
-                fontSize = 18.sp,
-                lineHeight = 28.sp
-            ),
-            color = MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.Normal
-        )
-
-        Spacer(modifier = Modifier.height(ReelsDimensions.discoverStateTitleToMessageSpacing))
-
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyMedium.copy(
-                fontSize = 14.sp,
-                lineHeight = 23.sp
-            ),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(ReelsDimensions.discoverStateMessageToActionSpacing))
-
-        Button(
-            onClick = onRetry,
-            shape = MaterialTheme.shapes.large,
-            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Refresh,
-                contentDescription = null,
-                modifier = Modifier.size(ReelsDimensions.discoverStateActionIconSize)
-            )
-            Spacer(modifier = Modifier.width(ReelsSpacing.small))
-            Text(text = "Retry")
-        }
-    }
+    MessageState(
+        modifier = modifier,
+        icon = Icons.Outlined.ErrorOutline,
+        title = "Couldn't load movies",
+        message = "Check your connection and try again.",
+        actionLabel = "Retry",
+        actionIcon = Icons.Outlined.Refresh,
+        onAction = onRetry
+    )
 }
 
 @Composable

@@ -24,12 +24,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.DownloadDone
-import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Link
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Bookmark
+import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.Movie
+import androidx.compose.material.icons.outlined.People
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -46,6 +47,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.R
+import com.norbertotaveras.reels.presentation.ui.components.common.MessageState
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTmdbBlue
@@ -56,69 +58,15 @@ internal fun LibraryErrorState(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(
-                horizontal = ReelsSpacing.xxLarge,
-                vertical = 80.dp
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Surface(
-            modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconContainerSize),
-            shape = RoundedCornerShape(ReelsDimensions.favoritesEmptyIconCornerSize),
-            color = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = Icons.Filled.ErrorOutline,
-                    contentDescription = null,
-                    modifier = Modifier.size(ReelsDimensions.favoritesEmptyIconSize)
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            text = "Something went wrong",
-            style = MaterialTheme.typography.titleMedium.copy(
-                fontSize = 18.sp,
-                lineHeight = 28.sp
-            ),
-            color = MaterialTheme.colorScheme.onSurface,
-            fontWeight = FontWeight.Normal
-        )
-        Spacer(modifier = Modifier.height(ReelsSpacing.small))
-
-        Text(
-            text = "Unable to load your library. Check your connection and try again.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(28.dp))
-
-        Button(
-            onClick = onRetry,
-            shape = RoundedCornerShape(16.dp),
-            contentPadding = PaddingValues(
-                horizontal = ReelsSpacing.xLarge,
-                vertical = ReelsSpacing.medium
-            )
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Refresh,
-                contentDescription = null,
-                modifier = Modifier.size(15.dp)
-            )
-            Text(
-                modifier = Modifier.padding(start = ReelsSpacing.small),
-                text = "Retry"
-            )
-        }
-    }
+    MessageState(
+        modifier = modifier,
+        icon = Icons.Outlined.ErrorOutline,
+        title = "Couldn't load movies",
+        message = "Check your connection and try again.",
+        actionLabel = "Retry",
+        actionIcon = Icons.Outlined.Refresh,
+        onAction = onRetry
+    )
 }
 
 @Composable
@@ -315,9 +263,9 @@ internal fun EmptyLibraryState(
             Box(contentAlignment = Alignment.Center) {
                 Icon(
                     imageVector = when (selectedTab) {
-                        LibraryTab.Movies -> Icons.Outlined.FavoriteBorder
-                        LibraryTab.People -> Icons.Filled.Person
-                        LibraryTab.Tmdb -> Icons.Filled.Bookmark
+                        LibraryTab.Movies -> Icons.Outlined.Movie
+                        LibraryTab.People -> Icons.Outlined.People
+                        LibraryTab.Tmdb -> Icons.Outlined.Bookmark
                         LibraryTab.Rated -> Icons.Filled.Star
                     },
                     contentDescription = null,

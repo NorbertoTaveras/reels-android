@@ -102,9 +102,6 @@ internal fun SearchContent(
                 refreshState is LoadState.Error && !hasCachedMovies -> {
                     item {
                         SearchErrorState(
-                            message = refreshState.error.toUserMessage(
-                                fallback = "Couldn't connect to the search service. Check your connection and try again."
-                            ),
                             onRetry = movies::retry
                         )
                     }
@@ -113,9 +110,7 @@ internal fun SearchContent(
                 !hasCachedMovies -> {
                     item {
                         SearchNoResultsState(
-                            query = trimmedQuery,
-                            suggestions = state.trendingSearches,
-                            onEvent = onEvent
+                            onClearQuery = { onEvent(SearchEvent.ClearQueryClicked) }
                         )
                     }
                 }

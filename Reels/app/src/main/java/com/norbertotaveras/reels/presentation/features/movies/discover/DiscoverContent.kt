@@ -131,7 +131,6 @@ internal fun DiscoverContent(
                     refreshState is LoadState.Error && !hasCachedMovies -> {
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             DiscoverErrorState(
-                                message = "Check your connection and try again.",
                                 onRetry = movies::retry
                             )
                         }
@@ -140,10 +139,6 @@ internal fun DiscoverContent(
                     !hasCachedMovies -> {
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             DiscoverEmptyState(
-                                hasActiveFilters = state.hasActiveFilters,
-                                onAdjustFilters = {
-                                    onEvent(DiscoverEvent.FiltersClicked)
-                                },
                                 onClearFilters = {
                                     onEvent(DiscoverEvent.ClearFiltersClicked)
                                 }

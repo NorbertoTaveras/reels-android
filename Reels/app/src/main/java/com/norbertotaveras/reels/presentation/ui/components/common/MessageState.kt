@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.Dp
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 
 @Composable
@@ -41,13 +41,17 @@ fun MessageState(
     actionLabel: String? = null,
     actionIcon: ImageVector? = null,
     onAction: (() -> Unit)? = null,
+    verticalPadding: Dp = ReelsDimensions.stateVerticalPadding,
+    actionHeight: Dp = ReelsDimensions.stateActionHeight,
+    actionHorizontalPadding: Dp = ReelsDimensions.stateActionHorizontalPadding,
+    actionVerticalPadding: Dp = ReelsDimensions.stateActionVerticalPadding,
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
             .padding(
                 horizontal = ReelsDimensions.stateHorizontalPadding,
-                vertical = ReelsDimensions.stateVerticalPadding
+                vertical = verticalPadding
             ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -70,11 +74,11 @@ fun MessageState(
             modifier = Modifier.padding(top = ReelsDimensions.stateIconToTitleSpacing),
             text = title,
             style = MaterialTheme.typography.titleMedium.copy(
-                fontSize = 18.sp,
-                lineHeight = 28.sp
+                fontSize = ReelsDimensions.stateTitleSize,
+                lineHeight = ReelsDimensions.stateTitleLineHeight
             ),
             color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.Normal,
+            fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center
         )
 
@@ -82,8 +86,8 @@ fun MessageState(
             modifier = Modifier.padding(top = ReelsDimensions.stateTitleToMessageSpacing),
             text = message,
             style = MaterialTheme.typography.bodyMedium.copy(
-                fontSize = 14.sp,
-                lineHeight = 23.sp
+                fontSize = ReelsDimensions.stateMessageSize,
+                lineHeight = ReelsDimensions.stateMessageLineHeight
             ),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -93,7 +97,7 @@ fun MessageState(
             Button(
                 modifier = Modifier
                     .padding(top = ReelsDimensions.stateMessageToActionSpacing)
-                    .height(ReelsDimensions.stateActionHeight),
+                    .height(actionHeight),
                 onClick = onAction,
                 shape = RoundedCornerShape(ReelsDimensions.stateActionCornerSize),
                 colors = ButtonDefaults.buttonColors(
@@ -101,8 +105,8 @@ fun MessageState(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 contentPadding = PaddingValues(
-                    horizontal = ReelsDimensions.stateActionHorizontalPadding,
-                    vertical = ReelsDimensions.stateActionVerticalPadding
+                    horizontal = actionHorizontalPadding,
+                    vertical = actionVerticalPadding
                 )
             ) {
                 Row(
@@ -121,8 +125,8 @@ fun MessageState(
                     Text(
                         text = actionLabel,
                         style = MaterialTheme.typography.labelLarge.copy(
-                            fontSize = 14.sp,
-                            lineHeight = 20.sp
+                            fontSize = ReelsDimensions.stateActionTextSize,
+                            lineHeight = ReelsDimensions.stateActionTextLineHeight
                         ),
                         fontWeight = FontWeight.Medium
                     )

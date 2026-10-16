@@ -107,7 +107,7 @@ internal fun FilmographyErrorState(
     MessageState(
         modifier = modifier,
         icon = Icons.Outlined.ErrorOutline,
-        title = "Couldn't load credits",
+        title = "Couldn't load movies",
         message = "Check your connection and try again.",
         actionLabel = "Retry",
         actionIcon = Icons.Filled.Refresh,
