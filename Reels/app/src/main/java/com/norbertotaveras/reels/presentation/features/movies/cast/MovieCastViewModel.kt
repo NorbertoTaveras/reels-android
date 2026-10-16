@@ -159,9 +159,9 @@ class MovieCastViewModel @Inject constructor(
                         _effect.emit(
                             MovieCastEffect.ShowMessage(
                                 message = if (saved) {
-                                    "Saved to library."
+                                    "Saved offline"
                                 } else {
-                                    "Removed from library."
+                                    "Removed from library"
                                 }
                             )
                         )

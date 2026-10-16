@@ -224,9 +224,9 @@ class MovieDetailsViewModel @Inject constructor(
                     _effect.emit(
                         MovieDetailsEffect.ShowMessage(
                             message = if (wasFavorite) {
-                                "Removed from favorites"
+                                "Removed from library"
                             } else {
-                                "Added to favorites"
+                                "Saved offline"
                             }
                         )
                     )
@@ -255,7 +255,6 @@ class MovieDetailsViewModel @Inject constructor(
             .onFailure {
                 _effect.emit(
                     MovieDetailsEffect.ShowMessage(
-                        title = "Sync failed",
                         message = "Couldn't connect to TMDB",
                         retryEvent = MovieDetailsEvent.AccountStateRetryClicked
                     )
@@ -294,9 +293,9 @@ class MovieDetailsViewModel @Inject constructor(
                     _effect.emit(
                         MovieDetailsEffect.ShowMessage(
                             message = if (shouldWatchlist) {
-                                "Added to TMDB watchlist"
+                                "Added to Watchlist"
                             } else {
-                                "Removed from TMDB watchlist"
+                                "Removed from Watchlist"
                             }
                         )
                     )
@@ -307,8 +306,7 @@ class MovieDetailsViewModel @Inject constructor(
                     }
                     _effect.emit(
                         MovieDetailsEffect.ShowMessage(
-                            title = "Sync failed",
-                            message = "Couldn't update your TMDB watchlist",
+                            message = "Couldn't sync watchlist",
                             retryEvent = MovieDetailsEvent.WatchlistClicked
                         )
                     )
@@ -383,7 +381,7 @@ class MovieDetailsViewModel @Inject constructor(
                     }
                     _effect.emit(
                         MovieDetailsEffect.ShowMessage(
-                            message = "Rated ${rating.toRatingText()} on TMDB"
+                            message = "Rated ${rating.toRatingText()}/10"
                         )
                     )
                 },
@@ -393,8 +391,7 @@ class MovieDetailsViewModel @Inject constructor(
                     }
                     _effect.emit(
                         MovieDetailsEffect.ShowMessage(
-                            title = "Sync failed",
-                            message = "Couldn't save your TMDB rating",
+                            message = "Couldn't sync rating",
                             retryEvent = MovieDetailsEvent.RatingSubmitted
                         )
                     )
@@ -446,7 +443,6 @@ class MovieDetailsViewModel @Inject constructor(
                     }
                     _effect.emit(
                         MovieDetailsEffect.ShowMessage(
-                            title = "Sync failed",
                             message = "Couldn't remove your TMDB rating",
                             retryEvent = MovieDetailsEvent.RatingCleared
                         )
@@ -482,9 +478,9 @@ class MovieDetailsViewModel @Inject constructor(
                         _effect.emit(
                             MovieDetailsEffect.ShowMessage(
                                 message = if (saved) {
-                                    "Saved to library."
+                                    "Saved offline"
                                 } else {
-                                    "Removed from library."
+                                    "Removed from library"
                                 }
                             )
                         )

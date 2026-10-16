@@ -177,9 +177,9 @@ class CastDetailsViewModel @Inject constructor(
                     _effect.emit(
                         CastDetailsEffect.ShowMessage(
                             message = if (isSaved) {
-                                "Saved to library."
+                                "Saved offline"
                             } else {
-                                "Removed from library."
+                                "Removed from library"
                             }
                         )
                     )

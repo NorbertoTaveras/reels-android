@@ -56,7 +56,6 @@ fun MovieDetailsRoute(
                 is MovieDetailsEffect.ShowMessage -> {
                     val result = snackbarHostState.showSnackbar(
                         visuals = ReelsSnackbarVisuals(
-                            title = effect.title,
                             message = effect.message,
                             actionLabel = effect.retryEvent?.let { "Retry" }
                         )

@@ -12,7 +12,6 @@ import androidx.compose.material3.SnackbarVisuals
 
 data class ReelsSnackbarVisuals(
     override val message: String,
-    val title: String? = null,
     override val actionLabel: String? = null,
     override val withDismissAction: Boolean = true,
     override val duration: SnackbarDuration = SnackbarDuration.Long,

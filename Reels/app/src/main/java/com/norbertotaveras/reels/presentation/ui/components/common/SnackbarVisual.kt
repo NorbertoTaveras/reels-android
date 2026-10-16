@@ -15,12 +15,13 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsAccent
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsError
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
 
 internal data class SnackbarVisual(
     val icon: ImageVector,
     val tint: Color,
     val isLoading: Boolean = false,
+    val usesContainer: Boolean = true,
 )
 
 internal fun snackbarVisualFor(message: String): SnackbarVisual {
@@ -30,7 +31,8 @@ internal fun snackbarVisualFor(message: String): SnackbarVisual {
         normalizedMessage.contains("syncing") -> SnackbarVisual(
             icon = Icons.Filled.CloudSync,
             tint = ReelsAccent,
-            isLoading = true
+            isLoading = true,
+            usesContainer = false
         )
 
         normalizedMessage.contains("rated") -> SnackbarVisual(
@@ -39,16 +41,18 @@ internal fun snackbarVisualFor(message: String): SnackbarVisual {
         )
 
         normalizedMessage.contains("unable") ||
+            normalizedMessage.contains("couldn't") ||
             normalizedMessage.contains("error") ||
             normalizedMessage.contains("failed") ||
             normalizedMessage.contains("retry") -> SnackbarVisual(
                 icon = Icons.Filled.ErrorOutline,
-                tint = ReelsError
+                tint = ReelsAccent,
+                usesContainer = false
             )
 
         else -> SnackbarVisual(
             icon = Icons.Filled.CheckCircle,
-            tint = ReelsAccent
+            tint = ReelsTeal
         )
     }
 }

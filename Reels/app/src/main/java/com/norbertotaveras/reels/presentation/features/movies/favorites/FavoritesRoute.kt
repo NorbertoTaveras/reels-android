@@ -10,6 +10,7 @@ package com.norbertotaveras.reels.presentation.features.movies.favorites
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -24,6 +25,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.Modifier
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarHost
+import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarVisuals
 
 @Composable
 fun FavoritesRoute(
@@ -77,7 +79,15 @@ fun FavoritesRoute(
                     onNavigateToSettings()
                 }
                 is FavoritesEffect.ShowMessage -> {
-                    snackbarHostState.showSnackbar(message = effect.message)
+                    val result = snackbarHostState.showSnackbar(
+                        visuals = ReelsSnackbarVisuals(
+                            message = effect.message,
+                            actionLabel = effect.retryEvent?.let { "Retry" }
+                        )
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        effect.retryEvent?.let(viewModel::onEvent)
+                    }
                 }
             }
         }

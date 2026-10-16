@@ -551,4 +551,10 @@ object ReelsDimensions {
     val snackbarIconContainerSize = 32.dp
     val snackbarIconContainerCornerSize = 8.dp
     val snackbarIconSize = 18.dp
+    val snackbarStandaloneIconSize = 20.dp
+    val snackbarProgressSize = 20.dp
+    val snackbarProgressStrokeWidth = 2.dp
+    val snackbarCloseButtonSize = 32.dp
+    val snackbarCloseIconSize = 18.dp
+    val snackbarTextTopPadding = 2.dp
 }

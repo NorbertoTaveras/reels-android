@@ -323,8 +323,9 @@ class FavoritesViewModel @Inject constructor(
     private fun removeFromTmdbWatchlist(movieId: Int) {
         updateTmdbMovie(
             movieId = movieId,
-            successMessage = "Removed from TMDB watchlist.",
-            failureMessage = "Unable to update TMDB watchlist."
+            successMessage = "Removed from Watchlist",
+            failureMessage = "Couldn't sync watchlist",
+            retryEvent = FavoritesEvent.WatchlistMovieRemoved(movieId = movieId)
         ) {
             updateTmdbWatchlistUseCase(movieId = movieId, watchlist = false)
         }
@@ -333,8 +334,9 @@ class FavoritesViewModel @Inject constructor(
     private fun removeTmdbRating(movieId: Int) {
         updateTmdbMovie(
             movieId = movieId,
-            successMessage = "Removed TMDB rating.",
-            failureMessage = "Unable to remove TMDB rating."
+            successMessage = "Rating removed",
+            failureMessage = "Couldn't sync rating",
+            retryEvent = FavoritesEvent.RatedMovieRemoved(movieId = movieId)
         ) {
             deleteTmdbMovieRatingUseCase(movieId = movieId)
         }
@@ -344,6 +346,7 @@ class FavoritesViewModel @Inject constructor(
         movieId: Int,
         successMessage: String,
         failureMessage: String,
+        retryEvent: FavoritesEvent,
         update: suspend () -> Result<*>,
     ) {
         viewModelScope.launch {
@@ -358,10 +361,11 @@ class FavoritesViewModel @Inject constructor(
             try {
                 update().onSuccess {
                     _effect.emit(FavoritesEffect.ShowMessage(message = successMessage))
-                }.onFailure { error ->
+                }.onFailure {
                     _effect.emit(
                         FavoritesEffect.ShowMessage(
-                            message = error.toUserMessage(fallback = failureMessage)
+                            message = failureMessage,
+                            retryEvent = retryEvent
                         )
                     )
                 }

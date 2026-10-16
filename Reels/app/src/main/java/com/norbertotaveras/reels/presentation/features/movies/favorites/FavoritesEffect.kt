@@ -11,5 +11,8 @@ sealed interface FavoritesEffect {
     data class NavigateToMovieDetails(val movieId: Int) : FavoritesEffect
     data class NavigateToCastDetails(val personId: Int) : FavoritesEffect
     data object NavigateToSettings : FavoritesEffect
-    data class ShowMessage(val message: String) : FavoritesEffect
+    data class ShowMessage(
+        val message: String,
+        val retryEvent: FavoritesEvent? = null,
+    ) : FavoritesEffect
 }

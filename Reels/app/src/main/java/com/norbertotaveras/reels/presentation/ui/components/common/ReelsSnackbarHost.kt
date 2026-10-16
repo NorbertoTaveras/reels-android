@@ -48,7 +48,10 @@ fun ReelsSnackbarHost(
         val reelsVisuals = snackbarData.visuals as? ReelsSnackbarVisuals
         val message = snackbarData.visuals.message
         val visual = snackbarVisualFor(
-            message = listOfNotNull(reelsVisuals?.title, message).joinToString(separator = " ")
+            message = listOfNotNull(
+                message,
+                snackbarData.visuals.actionLabel
+            ).joinToString(separator = " ")
         )
 
         Surface(
@@ -78,32 +81,14 @@ fun ReelsSnackbarHost(
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(top = 2.dp),
-                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                        .padding(top = ReelsDimensions.snackbarTextTopPadding),
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    reelsVisuals?.title?.let { title ->
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-
                     Text(
                         text = message,
-                        style = if (reelsVisuals?.title == null) {
-                            MaterialTheme.typography.bodyMedium
-                        } else {
-                            MaterialTheme.typography.bodySmall
-                        },
-                        color = if (reelsVisuals?.title == null) {
-                            MaterialTheme.colorScheme.onSurface
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        },
-                        maxLines = if (reelsVisuals?.title == null) 2 else 1,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
@@ -121,15 +106,15 @@ fun ReelsSnackbarHost(
                     }
                 }
 
-                if (reelsVisuals?.withDismissAction != false) {
+                if (reelsVisuals?.withDismissAction ?: !visual.isLoading) {
                     IconButton(
                         onClick = snackbarData::dismiss,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(ReelsDimensions.snackbarCloseButtonSize)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Close,
                             contentDescription = "Dismiss",
-                            modifier = Modifier.size(18.dp),
+                            modifier = Modifier.size(ReelsDimensions.snackbarCloseIconSize),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -146,11 +131,11 @@ private fun SnackbarLeadingVisual(
 ) {
     if (visual.isLoading) {
         CircularProgressIndicator(
-            modifier = Modifier.size(20.dp),
-            color = visual.tint,
-            strokeWidth = 2.dp
+            modifier = Modifier.size(ReelsDimensions.snackbarProgressSize),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            strokeWidth = ReelsDimensions.snackbarProgressStrokeWidth
         )
-    } else {
+    } else if (visual.usesContainer) {
         Surface(
             modifier = Modifier.size(ReelsDimensions.snackbarIconContainerSize),
             shape = RoundedCornerShape(ReelsDimensions.snackbarIconContainerCornerSize),
@@ -166,5 +151,12 @@ private fun SnackbarLeadingVisual(
                 )
             }
         }
+    } else {
+        Icon(
+            imageVector = visual.icon,
+            contentDescription = contentDescription,
+            modifier = Modifier.size(ReelsDimensions.snackbarStandaloneIconSize),
+            tint = visual.tint
+        )
     }
 }
