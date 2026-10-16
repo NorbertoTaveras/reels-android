@@ -34,6 +34,15 @@ object ReelsDimensions {
     val cachedContentDismissButtonSize = 24.dp
     val cachedContentDismissIconSize = 16.dp
 
+    val posterGridPlaceholderCornerSize = 12.dp
+    val posterGridPlaceholderBarCornerSize = 4.dp
+    val posterGridPlaceholderPosterToTitleSpacing = 6.dp
+    val posterGridPlaceholderTitleToYearSpacing = 4.dp
+    val posterGridPlaceholderTitleHeight = 10.dp
+    val posterGridPlaceholderYearHeight = 8.dp
+    const val posterGridPlaceholderTitleWidthFraction = 0.8f
+    const val posterGridPlaceholderYearWidthFraction = 0.5f
+
     val topPadding = 16.dp
     val homeScreenBottomPadding = 72.dp
     val sectionSpacing = 32.dp
@@ -154,16 +163,23 @@ object ReelsDimensions {
     val searchResultGenreHorizontalPadding = 8.dp
     val searchResultGenreVerticalPadding = 2.dp
     val searchResultGenreSpacing = 6.dp
-    val searchLoadingHeaderWidth = 132.dp
+    const val searchLoadingHeaderWidthFraction = 0.4f
     val searchLoadingHeaderHeight = 12.dp
-    val searchLoadingTitleWidth = 168.dp
-    val searchLoadingTitleHeight = 16.dp
-    val searchLoadingMetadataWidth = 136.dp
-    val searchLoadingMetadataHeight = 12.dp
-    val searchLoadingRatingWidth = 54.dp
-    val searchLoadingRatingHeight = 24.dp
-    val searchLoadingGenreWidth = 48.dp
-    val searchLoadingGenreHeight = 18.dp
+    const val searchLoadingTitleWidthFraction = 0.8f
+    val searchLoadingTitleHeight = 14.dp
+    const val searchLoadingMetadataWidthFraction = 0.4f
+    val searchLoadingMetadataHeight = 10.dp
+    val searchLoadingRatingWidth = 48.dp
+    val searchLoadingRatingHeight = 20.dp
+    val searchLoadingPrimaryGenreWidth = 48.dp
+    val searchLoadingSecondaryGenreWidth = 56.dp
+    val searchLoadingGenreHeight = 16.dp
+    val searchLoadingPosterWidth = 56.dp
+    val searchLoadingPosterHeight = 84.dp
+    val searchLoadingPosterCornerSize = 12.dp
+    val searchLoadingCardCornerSize = 16.dp
+    val searchLoadingCardPadding = 10.dp
+    val searchLoadingContentVerticalPadding = 2.dp
 
     val discoverScreenTopPadding = 0.dp
     val discoverScreenBottomPadding = 32.dp
@@ -344,6 +360,14 @@ object ReelsDimensions {
     val detailsOfflineNoticeIconSize = 15.dp
     val detailsOfflineNoticeRefreshIconSize = 14.dp
     val detailsLoadingHeroHeight = 360.dp
+    val detailsLoadingCastHeaderWidth = 120.dp
+    val detailsLoadingCastHeaderHeight = 12.dp
+    val detailsLoadingCastAvatarSize = 56.dp
+    val detailsLoadingCastNameWidth = 48.dp
+    val detailsLoadingCastRoleWidth = 32.dp
+    val detailsLoadingCastTextHeight = 8.dp
+    val detailsLoadingCastAvatarToNameSpacing = 6.dp
+    val detailsLoadingCastNameToRoleSpacing = 4.dp
 
     val fullCastScreenTopPadding = 0.dp
     val fullCastScreenBottomPadding = 32.dp

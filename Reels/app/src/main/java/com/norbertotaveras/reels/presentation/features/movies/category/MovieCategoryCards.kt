@@ -55,14 +55,20 @@ internal fun MovieCategoryPlaceholderCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.poster)
-                .clip(RoundedCornerShape(ReelsDimensions.categoryPosterCornerSize))
+                .clip(RoundedCornerShape(ReelsDimensions.posterGridPlaceholderCornerSize))
                 .background(reelsPlaceholderColor())
         )
 
-        Spacer(modifier = Modifier.height(ReelsDimensions.categoryPosterToTitleSpacing))
-        CategoryPlaceholderBar(widthFraction = 0.92f, height = 12.dp)
-        Spacer(modifier = Modifier.height(ReelsDimensions.categoryTitleToYearSpacing))
-        CategoryPlaceholderBar(widthFraction = 0.45f, height = 10.dp)
+        Spacer(modifier = Modifier.height(ReelsDimensions.posterGridPlaceholderPosterToTitleSpacing))
+        CategoryPlaceholderBar(
+            widthFraction = ReelsDimensions.posterGridPlaceholderTitleWidthFraction,
+            height = ReelsDimensions.posterGridPlaceholderTitleHeight
+        )
+        Spacer(modifier = Modifier.height(ReelsDimensions.posterGridPlaceholderTitleToYearSpacing))
+        CategoryPlaceholderBar(
+            widthFraction = ReelsDimensions.posterGridPlaceholderYearWidthFraction,
+            height = ReelsDimensions.posterGridPlaceholderYearHeight
+        )
     }
 }
 
@@ -76,7 +82,7 @@ private fun CategoryPlaceholderBar(
         modifier = modifier
             .fillMaxWidth(widthFraction)
             .height(height)
-            .clip(MaterialTheme.shapes.medium)
+            .clip(RoundedCornerShape(ReelsDimensions.posterGridPlaceholderBarCornerSize))
             .background(reelsPlaceholderColor())
     )
 }

@@ -37,31 +37,41 @@ internal fun LibraryPosterPlaceholder(
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.favoritesTextSpacing)
+        verticalArrangement = Arrangement.spacedBy(
+            ReelsDimensions.posterGridPlaceholderPosterToTitleSpacing
+        )
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.poster)
-                .clip(RoundedCornerShape(ReelsDimensions.favoritesPosterCornerSize))
-                .background(reelsPlaceholderColor(alpha = 0.72f))
+                .clip(RoundedCornerShape(ReelsDimensions.posterGridPlaceholderCornerSize))
+                .background(reelsPlaceholderColor())
         )
 
-        Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(
+                ReelsDimensions.posterGridPlaceholderTitleToYearSpacing
+            )
+        ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.82f)
-                    .height(14.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(reelsPlaceholderColor(alpha = 0.72f))
+                    .fillMaxWidth(ReelsDimensions.posterGridPlaceholderTitleWidthFraction)
+                    .height(ReelsDimensions.posterGridPlaceholderTitleHeight)
+                    .clip(
+                        RoundedCornerShape(ReelsDimensions.posterGridPlaceholderBarCornerSize)
+                    )
+                    .background(reelsPlaceholderColor())
             )
 
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.36f)
-                    .height(11.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(reelsPlaceholderColor(alpha = 0.72f))
+                    .fillMaxWidth(ReelsDimensions.posterGridPlaceholderYearWidthFraction)
+                    .height(ReelsDimensions.posterGridPlaceholderYearHeight)
+                    .clip(
+                        RoundedCornerShape(ReelsDimensions.posterGridPlaceholderBarCornerSize)
+                    )
+                    .background(reelsPlaceholderColor())
             )
         }
     }
@@ -80,7 +90,7 @@ internal fun LibraryPersonPlaceholder(
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.castPortrait)
                 .clip(RoundedCornerShape(ReelsDimensions.favoritesPosterCornerSize))
-                .background(reelsPlaceholderColor(alpha = 0.72f))
+                .background(reelsPlaceholderColor())
         )
 
         Column(verticalArrangement = Arrangement.spacedBy(ReelsSpacing.xSmall)) {
@@ -89,7 +99,7 @@ internal fun LibraryPersonPlaceholder(
                     .fillMaxWidth(0.82f)
                     .height(14.dp)
                     .clip(RoundedCornerShape(4.dp))
-                    .background(reelsPlaceholderColor(alpha = 0.72f))
+                    .background(reelsPlaceholderColor())
             )
 
             Box(
@@ -97,7 +107,7 @@ internal fun LibraryPersonPlaceholder(
                     .fillMaxWidth(0.42f)
                     .height(11.dp)
                     .clip(RoundedCornerShape(4.dp))
-                    .background(reelsPlaceholderColor(alpha = 0.72f))
+                    .background(reelsPlaceholderColor())
             )
         }
     }

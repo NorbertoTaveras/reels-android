@@ -155,17 +155,45 @@ internal fun MovieDetailsLoadingState(
         }
 
         item {
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = ReelsSpacing.screenHorizontal),
-                horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
+            Column(
+                verticalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
             ) {
-                items(5) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
-                    ) {
-                        PlaceholderBox(modifier = Modifier.size(70.dp))
-                        PlaceholderBar(width = 68.dp, height = 12.dp)
+                PlaceholderBar(
+                    modifier = Modifier.padding(horizontal = ReelsSpacing.screenHorizontal),
+                    width = ReelsDimensions.detailsLoadingCastHeaderWidth,
+                    height = ReelsDimensions.detailsLoadingCastHeaderHeight
+                )
+
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = ReelsSpacing.screenHorizontal),
+                    horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.medium)
+                ) {
+                    items(5) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(ReelsDimensions.detailsLoadingCastAvatarSize)
+                                    .clip(CircleShape)
+                                    .background(reelsPlaceholderColor())
+                            )
+                            PlaceholderBar(
+                                modifier = Modifier.padding(
+                                    top = ReelsDimensions
+                                        .detailsLoadingCastAvatarToNameSpacing
+                                ),
+                                width = ReelsDimensions.detailsLoadingCastNameWidth,
+                                height = ReelsDimensions.detailsLoadingCastTextHeight
+                            )
+                            PlaceholderBar(
+                                modifier = Modifier.padding(
+                                    top = ReelsDimensions.detailsLoadingCastNameToRoleSpacing
+                                ),
+                                width = ReelsDimensions.detailsLoadingCastRoleWidth,
+                                height = ReelsDimensions.detailsLoadingCastTextHeight
+                            )
+                        }
                     }
                 }
             }

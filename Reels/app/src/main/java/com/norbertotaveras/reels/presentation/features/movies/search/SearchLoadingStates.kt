@@ -37,7 +37,7 @@ internal fun SearchLoadingHeader(
 ) {
     SearchPlaceholder(
         modifier = modifier.padding(bottom = ReelsSpacing.small),
-        width = ReelsDimensions.searchLoadingHeaderWidth,
+        widthFraction = ReelsDimensions.searchLoadingHeaderWidthFraction,
         height = ReelsDimensions.searchLoadingHeaderHeight
     )
 }
@@ -48,7 +48,7 @@ internal fun SearchResultPlaceholder(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
+        shape = RoundedCornerShape(ReelsDimensions.searchLoadingCardCornerSize),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
@@ -60,7 +60,7 @@ internal fun SearchResultPlaceholder(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(ReelsDimensions.searchResultCardPadding),
+                .padding(ReelsDimensions.searchLoadingCardPadding),
             horizontalArrangement = Arrangement.spacedBy(
                 ReelsDimensions.searchResultCardContentSpacing
             ),
@@ -69,23 +69,25 @@ internal fun SearchResultPlaceholder(
             Box(
                 modifier = Modifier
                     .size(
-                        width = ReelsDimensions.searchResultPosterWidth,
-                        height = ReelsDimensions.searchResultPosterHeight
+                        width = ReelsDimensions.searchLoadingPosterWidth,
+                        height = ReelsDimensions.searchLoadingPosterHeight
                     )
-                    .clip(MaterialTheme.shapes.medium)
+                    .clip(RoundedCornerShape(ReelsDimensions.searchLoadingPosterCornerSize))
                     .background(reelsPlaceholderColor())
             )
 
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = ReelsDimensions.searchLoadingContentVerticalPadding),
                 verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
             ) {
                 SearchPlaceholder(
-                    width = ReelsDimensions.searchLoadingTitleWidth,
+                    widthFraction = ReelsDimensions.searchLoadingTitleWidthFraction,
                     height = ReelsDimensions.searchLoadingTitleHeight
                 )
                 SearchPlaceholder(
-                    width = ReelsDimensions.searchLoadingMetadataWidth,
+                    widthFraction = ReelsDimensions.searchLoadingMetadataWidthFraction,
                     height = ReelsDimensions.searchLoadingMetadataHeight
                 )
                 SearchPlaceholder(
@@ -98,13 +100,16 @@ internal fun SearchResultPlaceholder(
                         ReelsDimensions.searchResultGenreSpacing
                     )
                 ) {
-                    repeat(3) {
-                        SearchPlaceholder(
-                            width = ReelsDimensions.searchLoadingGenreWidth,
-                            height = ReelsDimensions.searchLoadingGenreHeight,
-                            cornerRadius = ReelsSpacing.medium
-                        )
-                    }
+                    SearchPlaceholder(
+                        width = ReelsDimensions.searchLoadingPrimaryGenreWidth,
+                        height = ReelsDimensions.searchLoadingGenreHeight,
+                        cornerRadius = ReelsSpacing.medium
+                    )
+                    SearchPlaceholder(
+                        width = ReelsDimensions.searchLoadingSecondaryGenreWidth,
+                        height = ReelsDimensions.searchLoadingGenreHeight,
+                        cornerRadius = ReelsSpacing.medium
+                    )
                 }
             }
         }
@@ -113,14 +118,21 @@ internal fun SearchResultPlaceholder(
 
 @Composable
 private fun SearchPlaceholder(
-    width: androidx.compose.ui.unit.Dp,
     height: androidx.compose.ui.unit.Dp,
     modifier: Modifier = Modifier,
+    width: androidx.compose.ui.unit.Dp? = null,
+    widthFraction: Float? = null,
     cornerRadius: androidx.compose.ui.unit.Dp = ReelsSpacing.xSmall,
 ) {
     Box(
         modifier = modifier
-            .width(width)
+            .then(
+                when {
+                    width != null -> Modifier.width(width)
+                    widthFraction != null -> Modifier.fillMaxWidth(widthFraction)
+                    else -> Modifier.fillMaxWidth()
+                }
+            )
             .height(height)
             .clip(RoundedCornerShape(cornerRadius))
             .background(reelsPlaceholderColor())

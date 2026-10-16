@@ -19,7 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 
 @Composable
-fun reelsPlaceholderColor(alpha: Float = 0.52f): Color {
+fun reelsPlaceholderColor(alpha: Float = 1f): Color {
     val transition = rememberInfiniteTransition(label = "reels-placeholder")
     val pulseAlpha by transition.animateFloat(
         initialValue = alpha,

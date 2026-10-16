@@ -182,27 +182,39 @@ internal fun DiscoverPlaceholderCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.poster)
-                .clip(RoundedCornerShape(ReelsDimensions.discoverPosterCornerSize))
+                .clip(RoundedCornerShape(ReelsDimensions.posterGridPlaceholderCornerSize))
                 .background(reelsPlaceholderColor())
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(
+            modifier = Modifier.height(
+                ReelsDimensions.posterGridPlaceholderPosterToTitleSpacing
+            )
+        )
 
         Box(
             modifier = Modifier
-                .fillMaxWidth(0.92f)
-                .size(height = 14.dp, width = 1.dp)
-                .clip(MaterialTheme.shapes.medium)
+                .fillMaxWidth(ReelsDimensions.posterGridPlaceholderTitleWidthFraction)
+                .height(ReelsDimensions.posterGridPlaceholderTitleHeight)
+                .clip(
+                    RoundedCornerShape(ReelsDimensions.posterGridPlaceholderBarCornerSize)
+                )
                 .background(reelsPlaceholderColor())
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(
+            modifier = Modifier.height(
+                ReelsDimensions.posterGridPlaceholderTitleToYearSpacing
+            )
+        )
 
         Box(
             modifier = Modifier
-                .fillMaxWidth(0.4f)
-                .size(height = 10.dp, width = 1.dp)
-                .clip(MaterialTheme.shapes.medium)
+                .fillMaxWidth(ReelsDimensions.posterGridPlaceholderYearWidthFraction)
+                .height(ReelsDimensions.posterGridPlaceholderYearHeight)
+                .clip(
+                    RoundedCornerShape(ReelsDimensions.posterGridPlaceholderBarCornerSize)
+                )
                 .background(reelsPlaceholderColor())
         )
     }

@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
@@ -46,25 +45,29 @@ internal fun FilmographyPlaceholderCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(ReelsRatios.poster)
-                .clip(RoundedCornerShape(ReelsDimensions.filmographyPosterCornerRadius))
+                .clip(RoundedCornerShape(ReelsDimensions.posterGridPlaceholderCornerSize))
                 .background(reelsPlaceholderColor())
         )
 
         Box(
             modifier = Modifier
-                .padding(top = ReelsDimensions.filmographyPosterToTitleSpacing)
-                .fillMaxWidth(0.82f)
-                .height(12.dp)
-                .clip(MaterialTheme.shapes.small)
+                .padding(top = ReelsDimensions.posterGridPlaceholderPosterToTitleSpacing)
+                .fillMaxWidth(ReelsDimensions.posterGridPlaceholderTitleWidthFraction)
+                .height(ReelsDimensions.posterGridPlaceholderTitleHeight)
+                .clip(
+                    RoundedCornerShape(ReelsDimensions.posterGridPlaceholderBarCornerSize)
+                )
                 .background(reelsPlaceholderColor())
         )
 
         Box(
             modifier = Modifier
-                .padding(top = ReelsDimensions.filmographyTitleToYearSpacing)
-                .width(36.dp)
-                .height(10.dp)
-                .clip(MaterialTheme.shapes.small)
+                .padding(top = ReelsDimensions.posterGridPlaceholderTitleToYearSpacing)
+                .fillMaxWidth(ReelsDimensions.posterGridPlaceholderYearWidthFraction)
+                .height(ReelsDimensions.posterGridPlaceholderYearHeight)
+                .clip(
+                    RoundedCornerShape(ReelsDimensions.posterGridPlaceholderBarCornerSize)
+                )
                 .background(reelsPlaceholderColor())
         )
     }
