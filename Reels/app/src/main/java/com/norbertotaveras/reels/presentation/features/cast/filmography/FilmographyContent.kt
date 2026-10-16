@@ -72,8 +72,8 @@ internal fun FilmographyContent(
         if (!state.isOnline && !isOfflineNoticeDismissed) {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 CachedContentBanner(
-                    message = "Viewing cached credits",
-                    supportingText = "Latest unavailable offline",
+                    message = "Offline",
+                    supportingText = "Saved library available",
                     onDismiss = { isOfflineNoticeDismissed = true }
                 )
             }

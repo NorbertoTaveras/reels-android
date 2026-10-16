@@ -124,8 +124,8 @@ internal fun FavoritesContent(
         ) {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 CachedContentBanner(
-                    message = "Saved library",
-                    supportingText = "Available offline",
+                    message = "Offline",
+                    supportingText = "Saved library available",
                     onDismiss = { dismissedCachedNoticeTab = state.selectedTab }
                 )
             }
@@ -347,11 +347,16 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
             if (isUsingCachedContent && showCachedNotice) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     CachedContentBanner(
-                        message = when (listType) {
-                            TmdbLibraryList.Watchlist -> "Cached watchlist"
-                            TmdbLibraryList.Rated -> "Cached ratings"
+                        message = if (state.isOnline) {
+                            "Showing cached results"
+                        } else {
+                            "Offline"
                         },
-                        supportingText = state.tmdbSyncedAtMillis[listType].toTmdbSyncLabel(),
+                        supportingText = if (state.isOnline) {
+                            state.tmdbSyncedAtMillis[listType].toTmdbSyncLabel()
+                        } else {
+                            "Saved library available"
+                        },
                         onDismiss = onCachedNoticeDismiss
                     )
                 }
@@ -359,7 +364,6 @@ private fun androidx.compose.foundation.lazy.grid.LazyGridScope.tmdbAccountMovie
 
             item(span = { GridItemSpan(maxLineSpan) }) {
                 LibrarySyncStatus(
-                    listType = listType,
                     syncedAtMillis = state.tmdbSyncedAtMillis[listType],
                     onRefresh = onRefresh
                 )
@@ -473,7 +477,6 @@ private fun LibraryTabs(
 
 @Composable
 private fun LibrarySyncStatus(
-    listType: TmdbLibraryList,
     syncedAtMillis: Long?,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
@@ -506,18 +509,10 @@ private fun LibrarySyncStatus(
                 )
 
                 Text(
-                    text = when (listType) {
-                        TmdbLibraryList.Rated -> {
-                            "Your TMDB ratings · ${syncedAtMillis.toTmdbSyncLabel()}"
-                        }
-                        TmdbLibraryList.Watchlist -> {
-                            val syncLabel = syncedAtMillis.toTmdbSyncLabel(
-                                prefix = "",
-                                missingLabel = "earlier"
-                            )
-                            "Synced via TMDB · $syncLabel"
-                        }
-                    },
+                    text = "Synced via TMDB · ${syncedAtMillis.toTmdbSyncLabel(
+                        prefix = "",
+                        missingLabel = "earlier"
+                    )}",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -525,7 +520,7 @@ private fun LibrarySyncStatus(
 
             Box(
                 modifier = Modifier
-                    .size(22.dp)
+                    .size(ReelsDimensions.favoritesSyncStatusButtonSize)
                     .clickable(role = Role.Button, onClick = onRefresh),
                 contentAlignment = Alignment.Center
             ) {

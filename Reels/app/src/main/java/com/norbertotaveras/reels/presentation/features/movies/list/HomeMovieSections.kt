@@ -89,7 +89,8 @@ internal fun HomeMovieSection(
                 if (cachedRefreshError != null || refreshState is LoadState.Error) {
                     CachedContentBanner(
                         modifier = Modifier.padding(horizontal = ReelsSpacing.screenHorizontal),
-                        message = "Showing saved movies. New results will load when the connection improves."
+                        message = "Showing saved movies",
+                        supportingText = "New results will load when the connection improves"
                     )
                 }
 

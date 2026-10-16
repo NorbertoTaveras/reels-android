@@ -25,14 +25,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.MovieFilter
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Tune
-import androidx.compose.material.icons.outlined.WifiOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -53,6 +50,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.extensions.toReleaseYear
+import com.norbertotaveras.reels.presentation.ui.components.common.CachedContentBanner
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
@@ -376,96 +374,14 @@ internal fun DiscoverCachedResultsBanner(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-    ) {
-        Column {
-            Row(
-                modifier = Modifier.padding(
-                    horizontal = ReelsDimensions.discoverOfflineBannerHorizontalPadding,
-                    vertical = ReelsDimensions.discoverOfflineBannerVerticalPadding
-                ),
-                horizontalArrangement = Arrangement.spacedBy(
-                    ReelsDimensions.discoverOfflineBannerContentSpacing
-                ),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Surface(
-                    modifier = Modifier.size(
-                        ReelsDimensions.discoverOfflineBannerIconContainerSize
-                    ),
-                    shape = RoundedCornerShape(
-                        ReelsDimensions.discoverOfflineBannerIconCornerSize
-                    ),
-                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f),
-                    contentColor = MaterialTheme.colorScheme.secondary
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = if (isOffline) {
-                                Icons.Outlined.WifiOff
-                            } else {
-                                Icons.Outlined.CloudOff
-                            },
-                            contentDescription = null,
-                            modifier = Modifier.size(
-                                ReelsDimensions.discoverOfflineBannerIconSize
-                            )
-                        )
-                    }
-                }
-
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = if (isOffline) {
-                            "Offline · Cached results"
-                        } else {
-                            "TMDB unavailable · Cached results"
-                        },
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            fontSize = 12.sp,
-                            lineHeight = 16.sp
-                        ),
-                        color = MaterialTheme.colorScheme.secondary,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = if (isOffline) {
-                            "Reconnect to refresh"
-                        } else {
-                            "Try again shortly"
-                        },
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontSize = 10.sp,
-                            lineHeight = 15.sp
-                        ),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                Surface(
-                    modifier = Modifier
-                        .size(ReelsDimensions.discoverOfflineBannerDismissSize)
-                        .clickable(onClick = onDismiss),
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = Icons.Filled.Close,
-                            contentDescription = "Dismiss cached results notice",
-                            modifier = Modifier.size(
-                                ReelsDimensions.discoverOfflineBannerDismissIconSize
-                            )
-                        )
-                    }
-                }
-            }
-
-            HorizontalDivider(color = reelsBorderColor(), thickness = 1.dp)
-        }
-    }
+    CachedContentBanner(
+        modifier = modifier,
+        message = if (isOffline) "Offline" else "Showing cached results",
+        supportingText = if (isOffline) {
+            "Saved library available"
+        } else {
+            "Try again shortly"
+        },
+        onDismiss = onDismiss
+    )
 }

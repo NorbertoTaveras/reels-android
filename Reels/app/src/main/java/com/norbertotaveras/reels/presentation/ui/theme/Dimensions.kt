@@ -26,6 +26,11 @@ object ReelsDimensions {
     val cachedContentIconContainerSize = 28.dp
     val cachedContentIconSize = 14.dp
     val cachedContentIconCornerSize = 8.dp
+    val cachedContentCornerSize = 16.dp
+    val cachedContentHorizontalPadding = 16.dp
+    val cachedContentVerticalPadding = 12.dp
+    val cachedContentSpacing = 8.dp
+    val cachedContentTextSpacing = 2.dp
     val cachedContentDismissButtonSize = 24.dp
     val cachedContentDismissIconSize = 16.dp
 
@@ -210,15 +215,6 @@ object ReelsDimensions {
     val discoverStateTitleToMessageSpacing = 8.dp
     val discoverStateMessageToActionSpacing = 28.dp
     val discoverStateActionIconSize = 15.dp
-    val discoverOfflineBannerHorizontalPadding = 20.dp
-    val discoverOfflineBannerVerticalPadding = 12.dp
-    val discoverOfflineBannerContentSpacing = 12.dp
-    val discoverOfflineBannerIconContainerSize = 28.dp
-    val discoverOfflineBannerIconCornerSize = 8.dp
-    val discoverOfflineBannerIconSize = 15.dp
-    val discoverOfflineBannerDismissSize = 24.dp
-    val discoverOfflineBannerDismissIconSize = 14.dp
-
     val favoritesScreenTopPadding = 12.dp
     val favoritesScreenBottomPadding = 32.dp
     val favoritesHeaderToBadgeSpacing = 4.dp
@@ -292,6 +288,7 @@ object ReelsDimensions {
     val favoritesFeatureDescriptionLineHeight = 16.sp
     val favoritesSyncStatusCornerSize = 16.dp
     val favoritesSyncStatusDotSize = 8.dp
+    val favoritesSyncStatusButtonSize = 22.dp
     val favoritesSyncStatusIconSize = 14.dp
     val favoritesOfflineStatusIconSize = 12.dp
 
