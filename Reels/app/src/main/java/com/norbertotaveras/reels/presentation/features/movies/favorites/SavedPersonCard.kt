@@ -108,7 +108,7 @@ internal fun SavedPersonCard(
                     text = person.name,
                     style = MaterialTheme.typography.labelLarge.copy(
                         fontSize = 14.sp,
-                        lineHeight = 18.sp
+                        lineHeight = 19.25f.sp
                     ),
                     color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Medium,

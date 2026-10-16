@@ -107,7 +107,7 @@ internal fun DiscoverPosterCard(
             text = movie.title,
             style = MaterialTheme.typography.bodyMedium.copy(
                 fontSize = 12.sp,
-                lineHeight = 16.sp
+                lineHeight = 16.5f.sp
             ),
             color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.Medium,
@@ -122,7 +122,7 @@ internal fun DiscoverPosterCard(
                 text = year,
                 style = MaterialTheme.typography.bodySmall.copy(
                     fontSize = 10.sp,
-                    lineHeight = 13.sp
+                    lineHeight = 15.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,

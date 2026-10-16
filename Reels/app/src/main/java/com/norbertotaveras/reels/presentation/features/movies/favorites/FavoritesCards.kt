@@ -98,7 +98,7 @@ internal fun TmdbAccountMovieCard(
                 text = movie.title,
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = 14.sp,
-                    lineHeight = 18.sp
+                    lineHeight = 19.25f.sp
                 ),
                 color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Medium,

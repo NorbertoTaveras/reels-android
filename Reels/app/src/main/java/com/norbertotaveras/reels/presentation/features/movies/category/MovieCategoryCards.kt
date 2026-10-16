@@ -121,7 +121,7 @@ internal fun MovieCategoryPosterCard(
             text = movie.title,
             style = MaterialTheme.typography.labelMedium.copy(
                 fontSize = 12.sp,
-                lineHeight = 16.sp
+                lineHeight = 16.5f.sp
             ),
             color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.Medium,
