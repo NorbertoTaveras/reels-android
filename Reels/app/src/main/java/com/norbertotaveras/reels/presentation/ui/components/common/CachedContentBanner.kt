@@ -82,18 +82,18 @@ fun CachedContentBanner(
                 Text(
                     text = message,
                     style = MaterialTheme.typography.labelMedium.copy(
-                        fontSize = 12.sp,
-                        lineHeight = 15.sp
+                        fontSize = 11.sp,
+                        lineHeight = 16.5f.sp
                     ),
                     color = MaterialTheme.colorScheme.secondary,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.Medium
                 )
                 supportingText?.let { text ->
                     Text(
                         text = text,
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontSize = 10.sp,
-                            lineHeight = 13.sp
+                            lineHeight = 15.sp
                         ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

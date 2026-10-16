@@ -485,14 +485,14 @@ private fun LibrarySyncStatus(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(ReelsDimensions.favoritesSyncStatusCornerSize),
         color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.24f))
+        border = BorderStroke(1.dp, reelsBorderColor())
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = ReelsSpacing.large,
-                    vertical = ReelsSpacing.medium
+                    horizontal = ReelsDimensions.favoritesSyncStatusHorizontalPadding,
+                    vertical = ReelsDimensions.favoritesSyncStatusVerticalPadding
                 ),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
@@ -513,7 +513,10 @@ private fun LibrarySyncStatus(
                         prefix = "",
                         missingLabel = "earlier"
                     )}",
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontSize = 11.sp,
+                        lineHeight = 16.5f.sp
+                    ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

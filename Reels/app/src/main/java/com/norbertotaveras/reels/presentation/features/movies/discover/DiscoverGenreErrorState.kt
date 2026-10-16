@@ -28,8 +28,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 
 @Composable
 internal fun DiscoverGenreErrorState(
@@ -67,12 +67,18 @@ internal fun DiscoverGenreErrorState(
             ) {
                 Text(
                     text = "Couldn't load genres",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontSize = 11.sp,
+                        lineHeight = 16.5f.sp
+                    ),
+                    fontWeight = FontWeight.Medium
                 )
                 Text(
                     text = "Check your connection",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontSize = 10.sp,
+                        lineHeight = 15.sp
+                    ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -81,19 +87,31 @@ internal fun DiscoverGenreErrorState(
                 onClick = onRetry,
                 modifier = Modifier.height(ReelsDimensions.genreErrorActionHeight),
                 shape = RoundedCornerShape(ReelsDimensions.genreErrorActionCornerSize),
-                contentPadding = PaddingValues(horizontal = ReelsSpacing.medium)
+                contentPadding = PaddingValues(
+                    horizontal = ReelsDimensions.genreErrorActionHorizontalPadding,
+                    vertical = ReelsDimensions.genreErrorActionVerticalPadding
+                )
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.Refresh,
-                    contentDescription = null,
-                    modifier = Modifier.size(ReelsDimensions.genreErrorActionIconSize)
-                )
-                Text(
-                    text = "Retry",
-                    modifier = Modifier.padding(start = ReelsSpacing.xSmall),
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(
+                        ReelsDimensions.genreErrorActionContentSpacing
+                    ),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Refresh,
+                        contentDescription = null,
+                        modifier = Modifier.size(ReelsDimensions.genreErrorActionIconSize)
+                    )
+                    Text(
+                        text = "Retry",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = 10.sp,
+                            lineHeight = 15.sp
+                        ),
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
         }
     }
