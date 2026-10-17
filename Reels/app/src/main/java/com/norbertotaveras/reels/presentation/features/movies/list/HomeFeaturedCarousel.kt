@@ -48,12 +48,14 @@ import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.extensions.toReleaseYear
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsImageOverlayBackground
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsTextPrimary
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsTextSecondary
 import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContentColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
-import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
@@ -106,8 +108,6 @@ private fun FeaturedMovieHero(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val backgroundColor = MaterialTheme.colorScheme.background
-
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -129,9 +129,9 @@ private fun FeaturedMovieHero(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            backgroundColor.copy(alpha = 0f),
-                            backgroundColor.copy(alpha = 0.5f),
-                            backgroundColor
+                            ReelsImageOverlayBackground.copy(alpha = 0f),
+                            ReelsImageOverlayBackground.copy(alpha = 0.5f),
+                            ReelsImageOverlayBackground
                         )
                     )
                 )
@@ -156,7 +156,7 @@ private fun FeaturedMovieHero(
                     Text(
                         text = year,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = ReelsTextSecondary
                     )
                 }
             }
@@ -169,7 +169,7 @@ private fun FeaturedMovieHero(
                     fontSize = 20.sp,
                     lineHeight = 30.sp
                 ),
-                color = MaterialTheme.colorScheme.onBackground,
+                color = ReelsTextPrimary,
                 fontWeight = FontWeight.Medium,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
@@ -183,7 +183,7 @@ private fun FeaturedMovieHero(
                     fontSize = 14.sp,
                     lineHeight = 20.sp
                 ),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = ReelsTextSecondary,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -212,11 +212,7 @@ internal fun RatingBadge(
         } else {
             MaterialTheme.shapes.extraLarge
         },
-        color = if (compact) {
-            reelsPosterRatingContainerColor()
-        } else {
-            reelsRatingContainerColor()
-        },
+        color = reelsPosterRatingContainerColor(),
         contentColor = reelsImageRatingContentColor()
     ) {
         Row(
@@ -285,7 +281,7 @@ private fun HeroPagerDots(
                 color = if (index == activePage) {
                     MaterialTheme.colorScheme.primary
                 } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.42f)
+                    ReelsTextSecondary.copy(alpha = 0.42f)
                 },
                 content = {}
             )
