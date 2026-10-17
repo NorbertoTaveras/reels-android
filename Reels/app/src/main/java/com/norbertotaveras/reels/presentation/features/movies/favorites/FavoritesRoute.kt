@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarHost
 import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarVisuals
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun FavoritesRoute(
@@ -67,7 +68,7 @@ fun FavoritesRoute(
     }
 
     LaunchedEffect(viewModel, snackbarHostState) {
-        viewModel.effect.collect { effect ->
+        viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is FavoritesEffect.NavigateToMovieDetails -> {
                     onMovieClick(effect.movieId)

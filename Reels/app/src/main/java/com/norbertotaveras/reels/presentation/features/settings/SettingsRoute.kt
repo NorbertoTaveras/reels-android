@@ -23,6 +23,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarHost
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun SettingsRoute(
@@ -61,7 +62,7 @@ fun SettingsRoute(
     }
 
     LaunchedEffect(viewModel, snackbarHostState) {
-        viewModel.effect.collect { effect ->
+        viewModel.effect.collectLatest { effect ->
             when (effect) {
                 SettingsEffect.NavigateToLibrary -> {
                     onNavigateToLibrary()

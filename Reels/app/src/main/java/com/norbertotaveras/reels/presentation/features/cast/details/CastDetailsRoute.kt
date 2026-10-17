@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarHost
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun CastDetailsRoute(
@@ -32,7 +33,7 @@ fun CastDetailsRoute(
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(viewModel, snackbarHostState) {
-        viewModel.effect.collect { effect ->
+        viewModel.effect.collectLatest { effect ->
             when (effect) {
                 CastDetailsEffect.NavigateBack -> onBackClick()
                 is CastDetailsEffect.NavigateToFilmography -> {
