@@ -165,8 +165,8 @@ fun MovieHeroHeader(
                         text = title,
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontSize = 20.sp,
-                            lineHeight = 25.sp,
-                            fontWeight = FontWeight.SemiBold
+                            lineHeight = 30.sp,
+                            fontWeight = FontWeight.Medium
                         ),
                         color = MaterialTheme.colorScheme.onBackground,
                         maxLines = 2,
