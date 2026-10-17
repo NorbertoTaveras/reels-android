@@ -79,13 +79,20 @@ fun TrailerCard(
                     contentScale = ContentScale.Crop
                 )
 
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(ReelsRatios.trailer)
+                        .background(MaterialTheme.colorScheme.background.copy(alpha = 0.30f))
+                )
+
                 Surface(
                     modifier = Modifier
                         .align(Alignment.Center)
                         .size(ReelsDimensions.detailsTrailerPlayButtonSize),
                     shape = CircleShape,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.92f),
-                    contentColor = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.90f),
+                    contentColor = MaterialTheme.colorScheme.background
                 ) {
                     Box(
                         contentAlignment = Alignment.Center
@@ -93,7 +100,8 @@ fun TrailerCard(
                         Icon(
                             imageVector = Icons.Filled.PlayArrow,
                             contentDescription = null,
-                            modifier = Modifier.size(ReelsDimensions.detailsTrailerPlayIconSize)
+                            modifier = Modifier.size(ReelsDimensions.detailsTrailerPlayIconSize),
+                            tint = MaterialTheme.colorScheme.background
                         )
                     }
                 }
