@@ -55,6 +55,7 @@ fun MovieDetailsContent(
     onFavoriteClick: () -> Unit,
     onWatchlistClick: () -> Unit,
     onRatingClick: () -> Unit,
+    onPlanClick: () -> Unit,
     onOfflineRefreshClick: () -> Unit,
     onCastClick: (Int) -> Unit,
     onCastSaveClick: (Int) -> Unit,
@@ -91,6 +92,7 @@ fun MovieDetailsContent(
                 onFavoriteClick = onFavoriteClick,
                 onWatchlistClick = onWatchlistClick,
                 onRatingClick = onRatingClick,
+                onPlanClick = onPlanClick,
                 statusContent = if (isOfflineContent) {
                     {
                         CachedVersionNotice(
@@ -228,6 +230,7 @@ private fun MovieDetailsContentPreview() {
             onFavoriteClick = {},
             onWatchlistClick = {},
             onRatingClick = {},
+            onPlanClick = {},
             onOfflineRefreshClick = {},
             onCastClick = {},
             onCastSaveClick = {},

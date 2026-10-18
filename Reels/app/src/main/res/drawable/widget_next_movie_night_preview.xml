@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (c) 2026 Norberto Taveras. All rights reserved.
+
+  This source code is proprietary and confidential. Unauthorized copying,
+  modification, distribution, or use is prohibited.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="360dp"
+    android:height="220dp"
+    android:viewportWidth="360"
+    android:viewportHeight="220">
+    <path
+        android:fillColor="#111113"
+        android:pathData="M22,0 L338,0 Q360,0 360,22 L360,198 Q360,220 338,220 L22,220 Q0,220 0,198 L0,22 Q0,0 22,0 Z" />
+    <path
+        android:fillColor="#E6A64F"
+        android:pathData="M20,22 L164,22 L164,34 L20,34 Z" />
+    <path
+        android:fillColor="#313136"
+        android:pathData="M20,58 L112,58 Q122,58 122,68 L122,190 Q122,200 112,200 L20,200 Q10,200 10,190 L10,68 Q10,58 20,58 Z" />
+    <path
+        android:fillColor="#F6F4F1"
+        android:pathData="M142,68 L328,68 L328,82 L142,82 Z" />
+    <path
+        android:fillColor="#AEAAB0"
+        android:pathData="M142,96 L292,96 L292,106 L142,106 Z" />
+    <path
+        android:fillColor="#AEAAB0"
+        android:pathData="M142,120 L232,120 L232,130 L142,130 Z" />
+    <path
+        android:fillColor="#E6A64F"
+        android:pathData="M142,154 L250,154 Q260,154 260,164 L260,184 Q260,194 250,194 L142,194 Q132,194 132,184 L132,164 Q132,154 142,154 Z" />
+</vector>

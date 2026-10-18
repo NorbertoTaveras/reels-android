@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
@@ -113,6 +114,15 @@ fun SettingsScreen(
         }
 
         SettingsSection(title = "DATA & STORAGE") {
+            SettingsRow(
+                icon = Icons.Filled.CalendarMonth,
+                title = "Plans & Reminders",
+                subtitle = "Releases and Movie Nights",
+                onClick = { onEvent(SettingsEvent.PlansClicked) }
+            )
+
+            SettingsDivider()
+
             SettingsRow(
                 icon = Icons.Filled.Download,
                 title = "Saved Library",

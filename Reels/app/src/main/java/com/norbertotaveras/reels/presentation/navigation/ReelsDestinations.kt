@@ -13,6 +13,9 @@ object ReelsDestinations {
     const val SEARCH = "search"
     const val FAVORITES = "favorites"
     const val SETTINGS = "settings"
+    const val PLANS = "plans"
+    const val PLANS_TAB_ARG = "tab"
+    const val PLANS_ROUTE = "$PLANS?$PLANS_TAB_ARG={$PLANS_TAB_ARG}"
     const val MOVIE_DETAILS = "movieDetails"
     const val MOVIE_ID_ARG = "movieId"
     const val MOVIE_DETAILS_ROUTE = "$MOVIE_DETAILS/{$MOVIE_ID_ARG}"
@@ -31,4 +34,5 @@ object ReelsDestinations {
     fun movieCastRoute(movieId: Int): String = "$MOVIE_CAST/$movieId"
     fun castDetailsRoute(personId: Int): String = "$CAST_DETAILS/$personId"
     fun filmographyRoute(personId: Int): String = "$FILMOGRAPHY/$personId"
+    fun plansRoute(tab: String = "releases"): String = "$PLANS?$PLANS_TAB_ARG=$tab"
 }

@@ -59,6 +59,7 @@ fun MovieHeroHeader(
     onFavoriteClick: () -> Unit,
     onWatchlistClick: () -> Unit,
     onRatingClick: () -> Unit,
+    onPlanClick: () -> Unit,
     modifier: Modifier = Modifier,
     isFavoriteLoading: Boolean = false,
     isWatchlisted: Boolean = false,
@@ -184,7 +185,8 @@ fun MovieHeroHeader(
                         isAccountActionLoading = isAccountActionLoading,
                         onFavoriteClick = onFavoriteClick,
                         onWatchlistClick = onWatchlistClick,
-                        onRatingClick = onRatingClick
+                        onRatingClick = onRatingClick,
+                        onPlanClick = onPlanClick,
                     )
                 }
             }
@@ -213,7 +215,8 @@ private fun MovieHeroHeaderPreview() {
                 onBackClick = {},
                 onFavoriteClick = {},
                 onWatchlistClick = {},
-                onRatingClick = {}
+                onRatingClick = {},
+                onPlanClick = {},
             )
         }
     }

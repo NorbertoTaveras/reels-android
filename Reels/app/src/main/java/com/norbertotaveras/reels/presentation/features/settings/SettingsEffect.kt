@@ -9,6 +9,7 @@ package com.norbertotaveras.reels.presentation.features.settings
 
 sealed interface SettingsEffect {
     data object NavigateToLibrary : SettingsEffect
+    data object NavigateToPlans : SettingsEffect
     data class OpenExternalUrl(val url: String) : SettingsEffect
     data class ShowMessage(val message: String) : SettingsEffect
 }

@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun SettingsRoute(
     onNavigateToLibrary: () -> Unit,
+    onNavigateToPlans: () -> Unit,
     onOpenExternalUrl: (String) -> Unit,
     tmdbAuthCallbackId: Long? = null,
     onTmdbAuthCallbackConsumed: (Long) -> Unit = {},
@@ -67,6 +68,8 @@ fun SettingsRoute(
                 SettingsEffect.NavigateToLibrary -> {
                     onNavigateToLibrary()
                 }
+
+                SettingsEffect.NavigateToPlans -> onNavigateToPlans()
 
                 is SettingsEffect.OpenExternalUrl -> {
                     onOpenExternalUrl(effect.url)

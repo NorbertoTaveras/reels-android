@@ -15,6 +15,7 @@ fun MovieDetailsScreen(
     state: MovieDetailsUiState,
     onEvent: (MovieDetailsEvent) -> Unit,
     modifier: Modifier = Modifier,
+    onPlanClick: () -> Unit = {},
 ) {
     when {
         state.isLoading -> {
@@ -70,6 +71,7 @@ fun MovieDetailsScreen(
                 onRatingClick = {
                     onEvent(MovieDetailsEvent.RatingClicked)
                 },
+                onPlanClick = onPlanClick,
                 onOfflineRefreshClick = {
                     onEvent(MovieDetailsEvent.RetryClicked)
                 },

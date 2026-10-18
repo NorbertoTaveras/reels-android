@@ -10,6 +10,7 @@ package com.norbertotaveras.reels.domain.usecase.movie
 import com.norbertotaveras.reels.domain.model.movie.MovieDetailsContentDataModel
 import com.norbertotaveras.reels.domain.repository.favorites.FavoriteMoviesRepository
 import com.norbertotaveras.reels.domain.repository.movie.MovieRepository
+import com.norbertotaveras.reels.domain.repository.plans.TrackedReleaseRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
@@ -17,6 +18,7 @@ import javax.inject.Inject
 class LoadMovieDetailsContentUseCase @Inject constructor(
     private val movieRepository: MovieRepository,
     private val favoriteMoviesRepository: FavoriteMoviesRepository,
+    private val trackedReleaseRepository: TrackedReleaseRepository,
 ) {
     suspend operator fun invoke(
         movieId: Int,
@@ -50,6 +52,13 @@ class LoadMovieDetailsContentUseCase @Inject constructor(
                         ?: IllegalStateException("Movie details request failed")
                 )
             }
+        }
+
+        if (movieSource.cachedAt == null) {
+            trackedReleaseRepository.refreshReleaseDate(
+                movieId = movieId,
+                releaseDate = movie.releaseDate,
+            )
         }
 
         return coroutineScope {

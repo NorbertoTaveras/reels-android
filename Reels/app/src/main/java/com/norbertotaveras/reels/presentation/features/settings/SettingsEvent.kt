@@ -21,6 +21,7 @@ sealed interface SettingsEvent {
     data class ThemeSelected(val theme: AppTheme) : SettingsEvent
     data object PreferenceDialogDismissed : SettingsEvent
     data object SavedLibraryClicked : SettingsEvent
+    data object PlansClicked : SettingsEvent
     data object ClearImageCacheClicked : SettingsEvent
     data object ClearImageCacheConfirmed : SettingsEvent
     data object ClearImageCacheDismissed : SettingsEvent

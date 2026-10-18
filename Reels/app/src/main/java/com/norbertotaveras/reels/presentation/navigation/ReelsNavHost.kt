@@ -36,12 +36,15 @@ import com.norbertotaveras.reels.presentation.features.movies.favorites.Favorite
 import com.norbertotaveras.reels.presentation.features.movies.list.MoviesListRoute
 import com.norbertotaveras.reels.presentation.features.movies.search.SearchRoute
 import com.norbertotaveras.reels.presentation.features.settings.SettingsRoute
+import com.norbertotaveras.reels.presentation.features.plans.PlansRoute
 
 @Composable
 fun ReelsNavHost(
     modifier: Modifier = Modifier,
     tmdbAuthCallbackId: Long? = null,
     onTmdbAuthCallbackConsumed: (Long) -> Unit = {},
+    deepLinkRequest: String? = null,
+    onDeepLinkConsumed: (String) -> Unit = {},
 ) {
     val navController = rememberNavController()
     val context = LocalContext.current
@@ -74,6 +77,15 @@ fun ReelsNavHost(
         if (tmdbAuthCallbackId != null) {
             navController.navigateToBottomNavRoute(ReelsDestinations.SETTINGS)
         }
+    }
+
+    LaunchedEffect(deepLinkRequest) {
+        val request = deepLinkRequest ?: return@LaunchedEffect
+        when {
+            request.startsWith("plans:") -> navController.navigate(ReelsDestinations.plansRoute(request.substringAfter(':')))
+            request.startsWith("movie:") -> request.substringAfter(':').toIntOrNull()?.let(navController::navigateToMovieDetails)
+        }
+        onDeepLinkConsumed(request)
     }
 
     val bottomNavRoutes = reelsBottomNavItems.map { item -> item.route }
@@ -137,6 +149,21 @@ fun ReelsNavHost(
                 )
             }
 
+            composable(
+                route = ReelsDestinations.PLANS_ROUTE,
+                arguments = listOf(
+                    navArgument(ReelsDestinations.PLANS_TAB_ARG) {
+                        type = NavType.StringType
+                        defaultValue = "releases"
+                    }
+                )
+            ) {
+                PlansRoute(
+                    onBackClick = navController::navigateUp,
+                    onMovieClick = navController::navigateToMovieDetails,
+                )
+            }
+
             composable(ReelsDestinations.SEARCH) {
                 SearchRoute(
                     onMovieClick = { movieId ->
@@ -163,6 +190,9 @@ fun ReelsNavHost(
                 SettingsRoute(
                     onNavigateToLibrary = {
                         navController.navigateToBottomNavRoute(ReelsDestinations.FAVORITES)
+                    },
+                    onNavigateToPlans = {
+                        navController.navigate(ReelsDestinations.plansRoute())
                     },
                     onOpenExternalUrl = openExternalUrl,
                     tmdbAuthCallbackId = tmdbAuthCallbackId,

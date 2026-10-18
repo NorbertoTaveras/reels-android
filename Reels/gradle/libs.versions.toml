@@ -19,6 +19,7 @@ coil = "3.4.0"
 room = "2.8.4"
 datastore = "1.2.1"
 graphicsPath = "1.1.0"
+glance = "1.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -45,6 +46,8 @@ androidx-compose-material-icons-extended = { group = "androidx.compose.material"
 androidx-compose-material-icons-core-android = { group = "androidx.compose.material", name = "material-icons-core-android" }
 androidx-compose-material-icons-extended-android = { group = "androidx.compose.material", name = "material-icons-extended-android" }
 androidx-graphics-path = { group = "androidx.graphics", name = "graphics-path", version.ref = "graphicsPath" }
+androidx-glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glance" }
+androidx-glance-material3 = { group = "androidx.glance", name = "glance-material3", version.ref = "glance" }
 
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }

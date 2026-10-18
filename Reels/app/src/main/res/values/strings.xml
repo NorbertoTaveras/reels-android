@@ -5,5 +5,27 @@
   modification, distribution, or use is prohibited.
 -->
 <resources>
+    <string name="notification_channel_releases">Release reminders</string>
+    <string name="notification_channel_movie_nights">Movie Night reminders</string>
+    <string name="notification_channel_movie_night_progress">Movie Night progress</string>
+    <string name="movie_night_start_now">Start now</string>
+    <string name="movie_night_pause">Pause</string>
+    <string name="movie_night_resume">Resume</string>
+    <string name="movie_night_finish">Finish movie</string>
+    <string name="movie_night_end">End night</string>
+    <string name="movie_night_completed">Movie finished</string>
+    <string name="movie_night_progress_paused">Paused at %1$d%%</string>
+    <string name="movie_night_progress_playing">%1$d%% complete</string>
+    <string name="movie_night_notification_title">%1$s starts soon</string>
+    <string name="movie_night_notification_time">Scheduled for %1$s</string>
+    <string name="movie_night_in_progress">In progress</string>
+    <string name="widget_upcoming_releases">Upcoming Releases</string>
+    <string name="widget_upcoming_releases_description">See your next tracked movie releases</string>
+    <string name="widget_next_movie_night">Next Movie Night</string>
+    <string name="widget_next_movie_night_description">See and start your next Movie Night plan</string>
+    <string name="widget_no_tracked_releases">Track a movie to see it here</string>
+    <string name="widget_no_movie_night">Schedule a Movie Night to see it here</string>
+    <string name="widget_offline">Offline · Saved plans</string>
+    <string name="widget_runtime_unavailable">Runtime unavailable</string>
     <string name="app_name">Reels</string>
 </resources>

@@ -36,6 +36,7 @@ class MainActivity : ComponentActivity() {
     lateinit var observeSettingsUseCase: ObserveSettingsUseCase
 
     private var tmdbAuthCallbackId by mutableStateOf<Long?>(null)
+    private var deepLinkRequest by mutableStateOf<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +67,11 @@ class MainActivity : ComponentActivity() {
                         if (tmdbAuthCallbackId == callbackId) {
                             tmdbAuthCallbackId = null
                         }
-                    }
+                    },
+                    deepLinkRequest = deepLinkRequest,
+                    onDeepLinkConsumed = { request ->
+                        if (deepLinkRequest == request) deepLinkRequest = null
+                    },
                 )
             }
         }
@@ -86,6 +91,15 @@ class MainActivity : ComponentActivity() {
 
         if (isTmdbCallback) {
             tmdbAuthCallbackId = SystemClock.elapsedRealtimeNanos()
+            return
+        }
+
+        if (callbackUri.scheme == "reels") {
+            deepLinkRequest = when (callbackUri.host) {
+                "plans" -> "plans:${callbackUri.getQueryParameter("tab") ?: "releases"}"
+                "movie" -> callbackUri.pathSegments.firstOrNull()?.let { "movie:$it" }
+                else -> null
+            }
         }
     }
 }

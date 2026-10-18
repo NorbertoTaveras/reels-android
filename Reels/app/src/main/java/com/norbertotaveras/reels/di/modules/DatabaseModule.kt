@@ -14,6 +14,8 @@ import com.norbertotaveras.reels.data.local.dao.CachedMovieDao
 import com.norbertotaveras.reels.data.local.dao.FavoriteMovieDao
 import com.norbertotaveras.reels.data.local.dao.SavedPersonDao
 import com.norbertotaveras.reels.data.local.dao.TmdbMovieActivityDao
+import com.norbertotaveras.reels.data.local.dao.MovieNightDao
+import com.norbertotaveras.reels.data.local.dao.TrackedReleaseDao
 import com.norbertotaveras.reels.data.local.db.ReelsDatabase
 import dagger.Module
 import dagger.Provides
@@ -72,4 +74,12 @@ object DatabaseModule {
     ): TmdbMovieActivityDao {
         return database.tmdbMovieActivityDao()
     }
+
+    @Provides
+    fun provideTrackedReleaseDao(database: ReelsDatabase): TrackedReleaseDao =
+        database.trackedReleaseDao()
+
+    @Provides
+    fun provideMovieNightDao(database: ReelsDatabase): MovieNightDao =
+        database.movieNightDao()
 }

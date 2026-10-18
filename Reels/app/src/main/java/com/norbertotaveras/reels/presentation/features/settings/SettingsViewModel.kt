@@ -97,6 +97,7 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.ThemeSelected -> onThemeSelected(event.theme)
             SettingsEvent.PreferenceDialogDismissed -> onPreferenceDialogDismissed()
             SettingsEvent.SavedLibraryClicked -> onSavedLibraryClicked()
+            SettingsEvent.PlansClicked -> onPlansClicked()
             SettingsEvent.ClearImageCacheClicked -> onClearImageCacheClicked()
             SettingsEvent.ClearImageCacheConfirmed -> onClearImageCacheConfirmed()
             SettingsEvent.ClearImageCacheDismissed -> onClearImageCacheDismissed()
@@ -243,6 +244,12 @@ class SettingsViewModel @Inject constructor(
     private fun onSavedLibraryClicked() {
         viewModelScope.launch {
             _effect.emit(SettingsEffect.NavigateToLibrary)
+        }
+    }
+
+    private fun onPlansClicked() {
+        viewModelScope.launch {
+            _effect.emit(SettingsEffect.NavigateToPlans)
         }
     }
 

@@ -17,6 +17,8 @@ import com.norbertotaveras.reels.data.local.converter.ReelsTypeConverters
 import com.norbertotaveras.reels.data.local.dao.FavoriteMovieDao
 import com.norbertotaveras.reels.data.local.dao.SavedPersonDao
 import com.norbertotaveras.reels.data.local.dao.TmdbMovieActivityDao
+import com.norbertotaveras.reels.data.local.dao.MovieNightDao
+import com.norbertotaveras.reels.data.local.dao.TrackedReleaseDao
 import com.norbertotaveras.reels.data.local.entity.CachedGenreEntity
 import com.norbertotaveras.reels.data.local.entity.CachedContentStatusEntity
 import com.norbertotaveras.reels.data.local.entity.CachedMovieCastEntity
@@ -32,6 +34,8 @@ import com.norbertotaveras.reels.data.local.entity.MovieRemoteKeyEntity
 import com.norbertotaveras.reels.data.local.entity.SavedPersonEntity
 import com.norbertotaveras.reels.data.local.entity.SavedPersonKnownForEntity
 import com.norbertotaveras.reels.data.local.entity.TmdbMovieActivityEntity
+import com.norbertotaveras.reels.data.local.entity.MovieNightEntity
+import com.norbertotaveras.reels.data.local.entity.TrackedReleaseEntity
 
 @Database(
     entities = [
@@ -49,9 +53,11 @@ import com.norbertotaveras.reels.data.local.entity.TmdbMovieActivityEntity
         CachedGenreEntity::class,
         CachedContentStatusEntity::class,
         CachedMovieAccountStateEntity::class,
-        TmdbMovieActivityEntity::class
+        TmdbMovieActivityEntity::class,
+        TrackedReleaseEntity::class,
+        MovieNightEntity::class
     ],
-    version = 7,
+    version = 8,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
@@ -59,7 +65,8 @@ import com.norbertotaveras.reels.data.local.entity.TmdbMovieActivityEntity
         AutoMigration(from = 3, to = 4),
         AutoMigration(from = 4, to = 5),
         AutoMigration(from = 5, to = 6),
-        AutoMigration(from = 6, to = 7)
+        AutoMigration(from = 6, to = 7),
+        AutoMigration(from = 7, to = 8)
     ]
 )
 @TypeConverters(ReelsTypeConverters::class)
@@ -69,4 +76,6 @@ abstract class ReelsDatabase : RoomDatabase() {
     abstract fun cachedMovieDao(): CachedMovieDao
     abstract fun cachedContentDao(): CachedContentDao
     abstract fun tmdbMovieActivityDao(): TmdbMovieActivityDao
+    abstract fun trackedReleaseDao(): TrackedReleaseDao
+    abstract fun movieNightDao(): MovieNightDao
 }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (c) 2026 Norberto Taveras. All rights reserved.
+
+  This source code is proprietary and confidential. Unauthorized copying,
+  modification, distribution, or use is prohibited.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M4,5h16v14h-16zM7,7v2h2v-2zM11,7v2h2v-2zM15,7v2h2v-2zM7,15v2h2v-2zM11,15v2h2v-2zM15,15v2h2v-2zM9,10.5v3l3,1.75 3,-1.75v-3l-3,-1.75z" />
+</vector>

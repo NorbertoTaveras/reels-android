@@ -15,6 +15,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -24,6 +27,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarHost
 import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarVisuals
 import kotlinx.coroutines.flow.collectLatest
+import com.norbertotaveras.reels.presentation.features.plans.MoviePlansSheet
+import com.norbertotaveras.reels.presentation.features.plans.MoviePlansViewModel
 
 @Composable
 fun MovieDetailsRoute(
@@ -34,9 +39,11 @@ fun MovieDetailsRoute(
     onSimilarMovieClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MovieDetailsViewModel = hiltViewModel(),
+    plansViewModel: MoviePlansViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    var isPlansSheetVisible by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(viewModel, snackbarHostState) {
         viewModel.effect.collectLatest { effect ->
@@ -74,14 +81,15 @@ fun MovieDetailsRoute(
             modifier = Modifier
                 .fillMaxSize()
                 .then(
-                    if (state.isRatingSheetVisible) {
+                    if (state.isRatingSheetVisible || isPlansSheetVisible) {
                         Modifier.blur(12.dp)
                     } else {
                         Modifier
                     }
                 ),
             state = state,
-            onEvent = viewModel::onEvent
+            onEvent = viewModel::onEvent,
+            onPlanClick = { isPlansSheetVisible = true },
         )
 
         if (state.isRatingSheetVisible) {
@@ -101,6 +109,14 @@ fun MovieDetailsRoute(
                 onDismiss = {
                     viewModel.onEvent(MovieDetailsEvent.RatingSheetDismissed)
                 }
+            )
+        }
+
+        if (isPlansSheetVisible && state.movie != null) {
+            MoviePlansSheet(
+                movie = checkNotNull(state.movie),
+                viewModel = plansViewModel,
+                onDismiss = { isPlansSheetVisible = false },
             )
         }
 

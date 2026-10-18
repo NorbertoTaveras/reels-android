@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.BookmarkBorder
@@ -55,6 +56,7 @@ internal fun HeroActionRow(
     onFavoriteClick: () -> Unit,
     onWatchlistClick: () -> Unit,
     onRatingClick: () -> Unit,
+    onPlanClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     FlowRow(
@@ -87,6 +89,17 @@ internal fun HeroActionRow(
             rating = tmdbRating,
             isLoading = isAccountActionLoading,
             onClick = onRatingClick
+        )
+
+        HeroToggleActionButton(
+            selected = false,
+            selectedIcon = Icons.Filled.CalendarMonth,
+            unselectedIcon = Icons.Filled.CalendarMonth,
+            selectedContentDescription = "Open plans",
+            unselectedContentDescription = "Open plans",
+            selectedColor = MaterialTheme.colorScheme.primary,
+            isLoading = false,
+            onClick = onPlanClick,
         )
     }
 }
