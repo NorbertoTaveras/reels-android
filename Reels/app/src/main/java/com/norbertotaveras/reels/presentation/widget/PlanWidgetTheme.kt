@@ -19,6 +19,8 @@ internal object PlanWidgetTheme {
     val Secondary = ColorProvider(day = Color(0xFF706357), night = Color(0xFFAEAAB0))
     val Accent = ColorProvider(day = Color(0xFFCF9137), night = Color(0xFFE6A64F))
     val OnAccent = ColorProvider(day = Color(0xFF201C18), night = Color(0xFF201C18))
+    val OnImage = ColorProvider(day = Color(0xFFF6F4F1), night = Color(0xFFF6F4F1))
+    val OnImageSecondary = ColorProvider(day = Color(0xFFD7D2CD), night = Color(0xFFD7D2CD))
 }
 
 internal object PlanWidgetDimensions {
@@ -30,9 +32,13 @@ internal object PlanWidgetDimensions {
     val ContentPadding = 12.dp
     val CompactPosterWidth = 28.dp
     val CompactPosterHeight = 40.dp
-    val PosterWidth = 38.dp
-    val PosterHeight = 54.dp
     val PosterCornerSize = 7.dp
+    val MiniPosterWidth = 20.dp
+    val MiniPosterHeight = 28.dp
+    val MiniPosterCornerSize = 5.dp
+    val HeroCornerSize = 10.dp
+    val HeroHeight = 64.dp
+    val SingleHeroHeight = 110.dp
+    val HeroPadding = 8.dp
     val ContentSpacing = 8.dp
-    val RowSpacing = 6.dp
 }

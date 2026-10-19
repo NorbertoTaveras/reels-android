@@ -16,8 +16,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
-import androidx.glance.Image
-import androidx.glance.ImageProvider
 import androidx.glance.LocalSize
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
@@ -28,16 +26,13 @@ import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.layout.Alignment
-import androidx.glance.layout.Box
 import androidx.glance.layout.Column
-import androidx.glance.layout.ContentScale
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
-import androidx.glance.layout.size
 import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
@@ -48,8 +43,6 @@ import com.norbertotaveras.reels.data.widget.PlanWidgetEntryPoint
 import com.norbertotaveras.reels.data.widget.WidgetPosterLoader
 import com.norbertotaveras.reels.domain.model.plans.TrackedRelease
 import dagger.hilt.android.EntryPointAccessors
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 
 class UpcomingReleasesWidget : GlanceAppWidget() {
     override val sizeMode = SizeMode.Responsive(
@@ -67,8 +60,9 @@ class UpcomingReleasesWidget : GlanceAppWidget() {
             .sortedBy { it.releaseDate ?: MAX_DATE }
             .take(MAX_VISIBLE_RELEASES)
         val posters = releases.associate { it.movieId to WidgetPosterLoader.load(context, it.posterPath) }
+        val backdrop = WidgetPosterLoader.createBackdrop(posters[releases.firstOrNull()?.movieId])
         val isOnline = entryPoint.networkMonitor().isOnline()
-        provideContent { UpcomingReleasesContent(context, releases, posters, isOnline) }
+        provideContent { UpcomingReleasesContent(context, releases, posters, backdrop, isOnline) }
     }
 }
 
@@ -81,69 +75,147 @@ private fun UpcomingReleasesContent(
     context: Context,
     releases: List<TrackedRelease>,
     posters: Map<Int, Bitmap?>,
+    backdrop: Bitmap?,
     isOnline: Boolean,
 ) {
     val size = LocalSize.current
     val isCompact = size.width < PlanWidgetDimensions.MediumSize.width ||
         size.height < PlanWidgetDimensions.MediumSize.height
-    val visibleCount = when {
-        isCompact -> 1
-        size.width >= PlanWidgetDimensions.ExpandedSize.width -> 3
-        else -> 2
-    }
+    val isExpanded = size.width >= PlanWidgetDimensions.ExpandedSize.width
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
             .background(PlanWidgetTheme.Background)
             .cornerRadius(PlanWidgetDimensions.CornerSize)
             .clickable(plansAction(context, RELEASES_TAB))
-            .padding(
-                if (isCompact) PlanWidgetDimensions.CompactPadding else PlanWidgetDimensions.ContentPadding,
-            ),
+            .padding(if (isCompact) PlanWidgetDimensions.CompactPadding else PlanWidgetDimensions.ContentPadding),
     ) {
-        WidgetHeader(
-            title = context.getString(R.string.widget_upcoming_releases),
-            isOnline = isOnline,
-            compact = isCompact,
-        )
+        WidgetHeader(context.getString(R.string.widget_upcoming_releases))
         Spacer(GlanceModifier.height(if (isCompact) 3.dp else 6.dp))
-        if (releases.isEmpty()) {
-            EmptyWidgetMessage(
+        when {
+            releases.isEmpty() -> EmptyWidgetMessage(
+                context = context,
                 message = context.getString(R.string.widget_no_tracked_releases),
-                actionLabel = context.getString(R.string.widget_open_reels),
+                compact = isCompact,
             )
-        } else {
-            releases.take(visibleCount).forEachIndexed { index, release ->
-                ReleaseRow(
-                    context = context,
-                    release = release,
-                    poster = posters[release.movieId],
-                    compact = isCompact || visibleCount == 3,
-                )
-                if (index < visibleCount - 1) Spacer(GlanceModifier.height(PlanWidgetDimensions.RowSpacing))
-            }
+
+            isCompact -> ReleaseRow(context, releases.first(), posters[releases.first().movieId], isOnline)
+            else -> ReleaseCollection(
+                context = context,
+                releases = releases,
+                posters = posters,
+                backdrop = backdrop,
+                isExpanded = isExpanded,
+                isOnline = isOnline,
+                primaryModifier = GlanceModifier.defaultWeight(),
+            )
         }
     }
 }
 
 @Composable
-internal fun WidgetHeader(title: String, isOnline: Boolean, compact: Boolean) {
-    Row(modifier = GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+private fun ReleaseCollection(
+    context: Context,
+    releases: List<TrackedRelease>,
+    posters: Map<Int, Bitmap?>,
+    backdrop: Bitmap?,
+    isExpanded: Boolean,
+    isOnline: Boolean,
+    primaryModifier: GlanceModifier,
+) {
+    val primary = releases.first()
+    if (isExpanded && releases.size > 1) {
+        Row(modifier = GlanceModifier.fillMaxWidth()) {
+            WidgetBackdrop(
+                title = primary.title,
+                backdrop = backdrop,
+                modifier = GlanceModifier.defaultWeight(),
+            ) {
+                ReleaseHero(context, primary, isOnline)
+            }
+            Spacer(GlanceModifier.width(6.dp))
+            Column(modifier = GlanceModifier.width(112.dp)) {
+                releases.drop(1).take(2).forEachIndexed { index, release ->
+                    SecondaryReleaseRow(context, release, posters[release.movieId], isOnline)
+                    if (index == 0 && releases.size > 2) Spacer(GlanceModifier.height(4.dp))
+                }
+            }
+        }
+    } else {
+        WidgetBackdrop(
+            title = primary.title,
+            backdrop = backdrop,
+            modifier = if (releases.size == 1) primaryModifier else GlanceModifier.fillMaxWidth(),
+            height = if (releases.size == 1) {
+                PlanWidgetDimensions.SingleHeroHeight
+            } else {
+                PlanWidgetDimensions.HeroHeight
+            },
+            fillHeight = releases.size == 1,
+        ) {
+            ReleaseHero(context, primary, isOnline)
+        }
+        releases.getOrNull(1)?.let { release ->
+            Spacer(GlanceModifier.height(4.dp))
+            SecondaryReleaseRow(context, release, posters[release.movieId], isOnline)
+        }
+    }
+}
+
+@Composable
+private fun ReleaseHero(context: Context, release: TrackedRelease, isOnline: Boolean) {
+    Column {
         Text(
-            text = title,
+            text = release.title,
             maxLines = 1,
             style = TextStyle(
-                color = PlanWidgetTheme.Primary,
-                fontSize = if (compact) 11.sp else 12.sp,
+                color = PlanWidgetTheme.OnImage,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
             ),
-            modifier = GlanceModifier.defaultWeight(),
         )
-        if (!isOnline) {
+        Text(
+            text = release.dateLabel(context, isOnline),
+            maxLines = 1,
+            style = TextStyle(color = PlanWidgetTheme.OnImageSecondary, fontSize = 12.sp),
+        )
+        Text(
+            text = release.reminder.toWidgetLabel(context),
+            maxLines = 1,
+            style = TextStyle(color = PlanWidgetTheme.OnImageSecondary, fontSize = 12.sp),
+        )
+    }
+}
+
+@Composable
+private fun SecondaryReleaseRow(
+    context: Context,
+    release: TrackedRelease,
+    poster: Bitmap?,
+    isOnline: Boolean,
+) {
+    Row(
+        modifier = GlanceModifier
+            .fillMaxWidth()
+            .clickable(movieAction(context, release.movieId)),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        WidgetMiniPoster(release.title, poster)
+        Spacer(GlanceModifier.width(6.dp))
+        Column(modifier = GlanceModifier.defaultWeight()) {
             Text(
-                text = "Cached",
+                text = release.title,
                 maxLines = 1,
-                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 10.sp),
+                style = TextStyle(
+                    color = PlanWidgetTheme.Primary,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                ),
+            )
+            Text(
+                text = release.dateLabel(context, isOnline),
+                maxLines = 1,
+                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
             )
         }
     }
@@ -154,7 +226,7 @@ private fun ReleaseRow(
     context: Context,
     release: TrackedRelease,
     poster: Bitmap?,
-    compact: Boolean,
+    isOnline: Boolean,
 ) {
     Row(
         modifier = GlanceModifier
@@ -162,7 +234,7 @@ private fun ReleaseRow(
             .clickable(movieAction(context, release.movieId)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        WidgetPoster(title = release.title, poster = poster, compact = compact)
+        WidgetPoster(title = release.title, poster = poster)
         Spacer(GlanceModifier.width(PlanWidgetDimensions.ContentSpacing))
         Column(modifier = GlanceModifier.defaultWeight()) {
             Text(
@@ -170,82 +242,14 @@ private fun ReleaseRow(
                 maxLines = 1,
                 style = TextStyle(
                     color = PlanWidgetTheme.Primary,
-                    fontSize = if (compact) 12.sp else 13.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                 ),
             )
             Text(
-                text = release.releaseDate.toRelativeReleaseDate(),
+                text = release.dateLabel(context, isOnline),
                 maxLines = 1,
-                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 11.sp),
-            )
-        }
-    }
-}
-
-@Composable
-internal fun WidgetPoster(title: String, poster: Bitmap?, compact: Boolean) {
-    val width = if (compact) PlanWidgetDimensions.CompactPosterWidth else PlanWidgetDimensions.PosterWidth
-    val height = if (compact) PlanWidgetDimensions.CompactPosterHeight else PlanWidgetDimensions.PosterHeight
-    if (poster != null) {
-        Image(
-            provider = ImageProvider(poster),
-            contentDescription = title,
-            modifier = GlanceModifier
-                .width(width)
-                .height(height)
-                .cornerRadius(PlanWidgetDimensions.PosterCornerSize),
-            contentScale = ContentScale.Crop,
-        )
-    } else {
-        Box(
-            modifier = GlanceModifier
-                .width(width)
-                .height(height)
-                .background(PlanWidgetTheme.Surface)
-                .cornerRadius(PlanWidgetDimensions.PosterCornerSize),
-            contentAlignment = Alignment.Center,
-        ) {
-            Image(
-                provider = ImageProvider(R.drawable.ic_reels_notification),
-                contentDescription = title,
-                modifier = GlanceModifier.size(18.dp),
-            )
-        }
-    }
-}
-
-@Composable
-internal fun EmptyWidgetMessage(message: String, actionLabel: String) {
-    Column(
-        modifier = GlanceModifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Image(
-            provider = ImageProvider(R.drawable.ic_reels_notification),
-            contentDescription = null,
-            modifier = GlanceModifier.size(18.dp),
-        )
-        Text(
-            text = message,
-            maxLines = 1,
-            style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 10.sp),
-        )
-        Box(
-            modifier = GlanceModifier
-                .background(PlanWidgetTheme.Surface)
-                .cornerRadius(12.dp)
-                .padding(horizontal = 8.dp, vertical = 2.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = actionLabel,
-                style = TextStyle(
-                    color = PlanWidgetTheme.Primary,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                ),
+                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
             )
         }
     }
@@ -259,18 +263,8 @@ internal fun movieAction(context: Context, movieId: Int) = actionStartActivity(
     Intent(Intent.ACTION_VIEW, Uri.parse("reels://movie/$movieId"), context, MainActivity::class.java),
 )
 
-private fun String?.toRelativeReleaseDate(): String {
-    if (this == null) return "TBA"
-    return runCatching {
-        val days = ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(this))
-        when (days) {
-            0L -> "Today"
-            1L -> "Tomorrow"
-            in 2..30 -> "In $days days"
-            else -> LocalDate.parse(this).toString()
-        }
-    }.getOrDefault(this)
-}
+private fun TrackedRelease.dateLabel(context: Context, isOnline: Boolean): String =
+    if (isOnline) releaseDate.toRelativeReleaseDate(context) else context.getString(R.string.widget_cached)
 
 private const val RELEASES_TAB = "releases"
 private const val MAX_DATE = "9999-12-31"
