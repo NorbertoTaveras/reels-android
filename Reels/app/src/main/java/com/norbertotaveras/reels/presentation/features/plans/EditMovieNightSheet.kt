@@ -19,7 +19,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 
@@ -34,7 +33,6 @@ internal fun EditMovieNightSheet(
     onSave: (Long, Int, Int?, String?, Int?, String?) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val context = LocalContext.current
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
@@ -52,7 +50,6 @@ internal fun EditMovieNightSheet(
                 isSaving = isSaving,
                 canScheduleExactAlarms = canScheduleExactAlarms,
                 canPostNotifications = canPostNotifications,
-                onRequestExactAlarms = context::openExactAlarmSettings,
                 onDismiss = onDismiss,
                 onSave = onSave,
                 existingPlan = plan,

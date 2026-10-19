@@ -58,7 +58,6 @@ internal fun MovieNightPlanForm(
     isSaving: Boolean,
     canScheduleExactAlarms: Boolean,
     canPostNotifications: Boolean,
-    onRequestExactAlarms: () -> Unit,
     onDismiss: () -> Unit,
     onSave: (Long, Int, Int?, String?, Int?, String?) -> Unit,
     existingPlan: MovieNightPlan? = null,
@@ -173,10 +172,10 @@ internal fun MovieNightPlanForm(
                 modifier = Modifier.weight(1f),
             )
         }
-        PlanPermissionNotice(canPostNotifications = canPostNotifications)
-        if (!canScheduleExactAlarms) {
-            PreciseAlarmNotice(canScheduleExactAlarms, onRequestExactAlarms)
-        }
+        PlanPermissionNotice(
+            canPostNotifications = canPostNotifications,
+            canScheduleExactAlarms = canScheduleExactAlarms,
+        )
     }
 
     PlanSheetDivider()

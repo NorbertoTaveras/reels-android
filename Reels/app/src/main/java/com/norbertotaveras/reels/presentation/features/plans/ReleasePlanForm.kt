@@ -298,8 +298,22 @@ private fun ReleaseReminderRow(
 }
 
 @Composable
-internal fun PlanPermissionNotice(canPostNotifications: Boolean) {
-    if (canPostNotifications) return
+internal fun PlanPermissionNotice(
+    canPostNotifications: Boolean,
+    canScheduleExactAlarms: Boolean = true,
+) {
+    if (canPostNotifications && canScheduleExactAlarms) return
+    val message = when {
+        !canPostNotifications && !canScheduleExactAlarms ->
+            "Reels needs notification permission to send the reminder. " +
+                "Exact alarm timing on Android 12+ may require an additional permission from " +
+                "Settings \u2192 Apps \u2192 Reels \u2192 Alarms & Reminders."
+        !canPostNotifications ->
+            "Reels needs notification permission to send the reminder."
+        else ->
+            "Exact alarm timing on Android 12+ may require an additional permission from " +
+                "Settings \u2192 Apps \u2192 Reels \u2192 Alarms & Reminders."
+    }
     Surface(
         modifier = Modifier.padding(top = ReelsDimensions.planSheetContentSpacing),
         shape = RoundedCornerShape(ReelsDimensions.planSheetNoticeCornerSize),
@@ -316,7 +330,7 @@ internal fun PlanPermissionNotice(canPostNotifications: Boolean) {
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                "Reels needs notification permission to remind you. Exact alarms may require an additional permission on Android 12+.",
+                message,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

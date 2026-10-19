@@ -99,7 +99,6 @@ fun MoviePlansSheet(
                     isSaving = state.isSaving,
                     canScheduleExactAlarms = state.canScheduleExactAlarms,
                     canPostNotifications = state.canPostNotifications,
-                    onRequestExactAlarms = context::openExactAlarmSettings,
                     onDismiss = onDismiss,
                     onSave = { scheduledAt, runtime, reminder, venue, attendees, note ->
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
