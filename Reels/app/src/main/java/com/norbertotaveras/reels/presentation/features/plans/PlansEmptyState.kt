@@ -22,7 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 
 @Composable
 internal fun PlansEmptyState(
@@ -30,13 +30,26 @@ internal fun PlansEmptyState(
     title: String,
     message: String,
 ) {
-    Box(Modifier.fillMaxSize().padding(40.dp), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .padding(horizontal = ReelsDimensions.plansEmptyHorizontalPadding),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.plansEmptySpacing),
+        ) {
             Box(
-                Modifier.size(64.dp).background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp)),
+                Modifier
+                    .size(ReelsDimensions.plansEmptyIconContainerSize)
+                    .background(
+                        MaterialTheme.colorScheme.surface,
+                        RoundedCornerShape(ReelsDimensions.plansEmptyIconContainerSize / 2),
+                    ),
                 contentAlignment = Alignment.Center,
             ) { icon() }
-            Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             Text(
                 message,
                 style = MaterialTheme.typography.bodyMedium,

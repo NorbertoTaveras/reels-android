@@ -7,7 +7,6 @@
 
 package com.norbertotaveras.reels.presentation.features.plans
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,8 +20,8 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,10 +43,7 @@ internal fun EditMovieNightSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+                .verticalScroll(rememberScrollState()),
         ) {
             MovieNightPlanForm(
                 movieTitle = plan.title,
@@ -62,7 +58,15 @@ internal fun EditMovieNightSheet(
                 existingPlan = plan,
             )
             errorMessage?.let { message ->
-                Text(message, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = message,
+                    modifier = Modifier.padding(
+                        horizontal = ReelsDimensions.planSheetHorizontalPadding,
+                        vertical = ReelsDimensions.planSheetSectionVerticalPadding,
+                    ),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
             }
         }
     }

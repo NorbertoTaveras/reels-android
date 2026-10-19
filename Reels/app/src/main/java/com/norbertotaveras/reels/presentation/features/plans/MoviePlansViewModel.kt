@@ -67,6 +67,7 @@ class MoviePlansViewModel @Inject constructor(
     fun trackRelease(
         movie: MovieDetailsDataModel,
         reminder: ReleaseReminder,
+        customReminderAt: Long?,
         notificationsEnabled: Boolean,
         onComplete: () -> Unit,
     ) {
@@ -78,6 +79,7 @@ class MoviePlansViewModel @Inject constructor(
                     posterPath = movie.posterPath,
                     releaseDate = movie.releaseDate,
                     reminder = reminder,
+                    customReminderAt = customReminderAt,
                     notificationsEnabled = notificationsEnabled,
                 )
             )

@@ -5,13 +5,14 @@
  * modification, distribution, or use is prohibited.
  */
 
-package com.norbertotaveras.reels.data.widget
+package com.norbertotaveras.reels.presentation.widget
 
 import android.content.Context
 import androidx.glance.GlanceId
 import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.updateAll
+import com.norbertotaveras.reels.data.widget.PlanWidgetEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 
 class StartMovieNightAction : ActionCallback {

@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.norbertotaveras.reels.domain.model.movie.MovieDetailsDataModel
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,10 +59,7 @@ fun MoviePlansSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+                .verticalScroll(rememberScrollState()),
         ) {
             when (mode) {
                 MoviePlansSheetMode.Choice -> PlanTypeChoice(
@@ -80,11 +78,17 @@ fun MoviePlansSheet(
                     canPostNotifications = state.canPostNotifications,
                     onRequestExactAlarms = context::openExactAlarmSettings,
                     onDismiss = onDismiss,
-                    onSave = { reminder, notifications ->
+                    onSave = { reminder, customReminderAt, notifications ->
                         if (notifications && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                         }
-                        viewModel.trackRelease(movie, reminder, notifications, onDismiss)
+                        viewModel.trackRelease(
+                            movie = movie,
+                            reminder = reminder,
+                            customReminderAt = customReminderAt,
+                            notificationsEnabled = notifications,
+                            onComplete = onDismiss,
+                        )
                     },
                     onRemove = { viewModel.removeTrackedRelease(onDismiss) },
                 )
@@ -115,7 +119,15 @@ fun MoviePlansSheet(
                 )
             }
             state.errorMessage?.let { message ->
-                Text(message, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = message,
+                    modifier = Modifier.padding(
+                        horizontal = ReelsDimensions.planSheetHorizontalPadding,
+                        vertical = ReelsDimensions.planSheetSectionVerticalPadding,
+                    ),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
             }
         }
     }

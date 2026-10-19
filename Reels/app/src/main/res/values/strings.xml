@@ -26,6 +26,8 @@
     <string name="widget_no_tracked_releases">Track a movie to see it here</string>
     <string name="widget_no_movie_night">Schedule a Movie Night to see it here</string>
     <string name="widget_offline">Offline · Saved plans</string>
+    <string name="widget_cached">Cached</string>
+    <string name="widget_open_reels">Open Reels</string>
     <string name="widget_runtime_unavailable">Runtime unavailable</string>
     <string name="app_name">Reels</string>
 </resources>

@@ -7,56 +7,47 @@
 
 package com.norbertotaveras.reels.presentation.features.plans
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePickerDialog
-import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
-import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
-import coil3.compose.AsyncImage
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,146 +63,151 @@ internal fun MovieNightPlanForm(
     onSave: (Long, Int, Int?, String?, Int?, String?) -> Unit,
     existingPlan: MovieNightPlan? = null,
 ) {
-    val initialDateTime = remember(existingPlan?.scheduledAt) {
-        existingPlan?.scheduledAt
-            ?.let { Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()) }
-    }
+    val initialDateTime = existingPlan?.scheduledAt
+        ?.let { Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()) }
     var date by rememberSaveable(existingPlan?.id) {
         mutableStateOf(initialDateTime?.toLocalDate() ?: LocalDate.now().plusDays(1))
     }
     var time by rememberSaveable(existingPlan?.id) {
-        mutableStateOf(initialDateTime?.toLocalTime()?.withSecond(0)?.withNano(0) ?: LocalTime.of(19, 0))
+        mutableStateOf(initialDateTime?.toLocalTime()?.withSecond(0)?.withNano(0) ?: LocalTime.of(20, 0))
     }
     var runtime by rememberSaveable(existingPlan?.id) {
         mutableStateOf((existingPlan?.runtimeMinutes ?: initialRuntimeMinutes?.takeIf { it in 1..600 })?.toString().orEmpty())
     }
-    var reminder by rememberSaveable(existingPlan?.id) { mutableStateOf(existingPlan?.reminderMinutesBefore ?: 30) }
+    var reminder by rememberSaveable(existingPlan?.id) {
+        mutableStateOf(existingPlan?.reminderMinutesBefore ?: 30)
+    }
     var reminderEnabled by rememberSaveable(existingPlan?.id) {
         mutableStateOf(existingPlan == null || existingPlan.reminderMinutesBefore != null)
     }
-    var venue by rememberSaveable(existingPlan?.id) { mutableStateOf(existingPlan?.venue.orEmpty()) }
-    var attendees by rememberSaveable(existingPlan?.id) { mutableStateOf(existingPlan?.attendeeCount?.toString().orEmpty()) }
-    var note by rememberSaveable(existingPlan?.id) { mutableStateOf(existingPlan?.note.orEmpty()) }
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
     var showTimePicker by rememberSaveable { mutableStateOf(false) }
     val runtimeValue = runtime.toIntOrNull()
     val tmdbRuntime = initialRuntimeMinutes?.takeIf { it in 1..600 }
-    val attendeeValue = attendees.toIntOrNull()
     val scheduledAt = date.atTime(time).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-    val isValid = runtimeValue in 1..600 &&
-        (attendees.isBlank() || attendeeValue != null && attendeeValue > 0) &&
-        scheduledAt > System.currentTimeMillis()
+    val isValid = runtimeValue in 1..600 && scheduledAt > System.currentTimeMillis()
 
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            if (existingPlan == null) "Movie night" else "Edit movie night",
-            modifier = Modifier.weight(1f),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.SemiBold,
+    PlanSheetHeader(
+        title = if (existingPlan == null) "Movie night" else "Edit movie night",
+        onDismiss = onDismiss,
+    )
+    PlanSheetDivider()
+    MoviePlanSummary(
+        title = movieTitle,
+        posterPath = posterPath,
+        subtitle = tmdbRuntime?.toDurationLabel() ?: "Runtime required",
+    )
+    PlanSheetDivider()
+
+    Column(
+        modifier = Modifier.padding(
+            horizontal = ReelsDimensions.planSheetHorizontalPadding,
+            vertical = ReelsDimensions.planSheetSectionVerticalPadding,
+        ),
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.planSheetContentSpacing),
+    ) {
+        PlanDateTimeField(
+            label = "Date",
+            value = date.format(planInputDateFormatter),
+            icon = Icons.Filled.CalendarMonth,
+            onClick = { showDatePicker = true },
         )
-        IconButton(onClick = onDismiss) { Icon(Icons.Filled.Close, contentDescription = "Close") }
-    }
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        AsyncImage(
-            model = posterPath.toTmdbImageUrl(),
-            contentDescription = movieTitle,
-            modifier = Modifier.width(40.dp).height(58.dp).clip(RoundedCornerShape(8.dp)),
-            contentScale = ContentScale.Crop,
+        PlanDateTimeField(
+            label = "Start time",
+            value = time.format(planInputTimeFormatter),
+            icon = Icons.Filled.Schedule,
+            onClick = { showTimePicker = true },
         )
-        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(movieTitle, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
-            tmdbRuntime?.let { minutes ->
-                Text("${minutes / 60}h ${minutes % 60}m", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
+        if (scheduledAt <= System.currentTimeMillis()) {
+            Text("Choose a future date and time.", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
         }
-    }
-    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("Date", style = MaterialTheme.typography.labelMedium)
-            OutlinedButton(onClick = { showDatePicker = true }, modifier = Modifier.fillMaxWidth()) {
-                Text(date.format(movieNightDateFormatter))
-            }
-        }
-        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("Start time", style = MaterialTheme.typography.labelMedium)
-            OutlinedButton(onClick = { showTimePicker = true }, modifier = Modifier.fillMaxWidth()) {
-                Text(time.format(movieNightTimeFormatter))
-            }
-        }
-    }
-    if (scheduledAt <= System.currentTimeMillis()) {
-        Text("Choose a future date and time.", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
-    }
-    if (tmdbRuntime == null) {
-        OutlinedTextField(
-            value = runtime,
-            onValueChange = { runtime = it.filter(Char::isDigit).take(3) },
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Runtime (minutes)") },
-            supportingText = { Text("Required, from 1 to 600 minutes") },
-            isError = runtime.isNotBlank() && runtimeValue !in 1..600,
-            singleLine = true,
-        )
-    } else {
-        Surface(shape = RoundedCornerShape(12.dp), color = MaterialTheme.colorScheme.surfaceVariant) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(14.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+        if (tmdbRuntime == null) {
+            OutlinedTextField(
+                value = runtime,
+                onValueChange = { runtime = it.filter(Char::isDigit).take(3) },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Runtime (minutes)") },
+                supportingText = { Text("Required, from 1 to 600 minutes") },
+                isError = runtime.isNotBlank() && runtimeValue !in 1..600,
+                singleLine = true,
+            )
+        } else {
+            Surface(
+                shape = RoundedCornerShape(ReelsDimensions.planSheetFieldCornerSize),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
             ) {
-                Icon(Icons.Filled.Schedule, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                Column(Modifier.weight(1f)) {
-                    Text("Runtime", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text("${tmdbRuntime / 60}h ${tmdbRuntime % 60}m", style = MaterialTheme.typography.titleSmall)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(ReelsDimensions.planSheetRuntimePadding),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.plansRowSpacing),
+                ) {
+                    Icon(Icons.Filled.Schedule, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Runtime", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(tmdbRuntime.toDurationLabel(), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+                    }
+                    Text("From TMDB", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                Text("From TMDB", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
-    }
-    Text("Reminder", style = MaterialTheme.typography.titleSmall)
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        movieNightReminderOptions.forEach { (value, label) ->
-            FilterChip(
-                selected = reminderEnabled && reminder == value,
-                onClick = { reminder = value; reminderEnabled = true },
-                label = { Text(label) },
+
+        Text("Reminder before start", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.plansActionSpacing),
+        ) {
+            movieNightReminderOptions.forEach { (value, label) ->
+                PlanChoiceChip(
+                    label = label,
+                    selected = reminderEnabled && reminder == value,
+                    onClick = { reminder = value; reminderEnabled = true },
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            PlanChoiceChip(
+                label = "Off",
+                selected = !reminderEnabled,
+                onClick = { reminderEnabled = false },
+                modifier = Modifier.weight(1f),
             )
         }
-        FilterChip(selected = !reminderEnabled, onClick = { reminderEnabled = false }, label = { Text("Off") })
+        PlanPermissionNotice(canPostNotifications = canPostNotifications)
+        if (!canScheduleExactAlarms) {
+            PreciseAlarmNotice(canScheduleExactAlarms, onRequestExactAlarms)
+        }
     }
-    HorizontalDivider()
-    OutlinedTextField(
-        value = venue,
-        onValueChange = { venue = it },
-        modifier = Modifier.fillMaxWidth(),
-        label = { Text("Venue (optional)") },
-        singleLine = true,
-    )
-    OutlinedTextField(
-        value = attendees,
-        onValueChange = { attendees = it.filter(Char::isDigit).take(3) },
-        modifier = Modifier.fillMaxWidth(),
-        label = { Text("Attendees (optional)") },
-        isError = attendees.isNotBlank() && (attendeeValue == null || attendeeValue < 1),
-        singleLine = true,
-    )
-    OutlinedTextField(
-        value = note,
-        onValueChange = { note = it },
-        modifier = Modifier.fillMaxWidth(),
-        label = { Text("Note (optional)") },
-        minLines = 2,
-    )
-    PreciseAlarmNotice(canScheduleExactAlarms, onRequestExactAlarms)
-    NotificationPermissionNotice(canPostNotifications)
-    Button(
-        onClick = {
-            onSave(scheduledAt, checkNotNull(runtimeValue), reminder.takeIf { reminderEnabled }, venue, attendeeValue, note)
-        },
-        enabled = isValid && !isSaving,
-        modifier = Modifier.fillMaxWidth(),
-    ) { Text(if (existingPlan == null) "Schedule" else "Save changes") }
-    TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) { Text("Cancel") }
+
+    PlanSheetDivider()
+    Column(
+        modifier = Modifier.padding(
+            horizontal = ReelsDimensions.planSheetHorizontalPadding,
+            vertical = ReelsDimensions.planSheetSectionVerticalPadding,
+        ),
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.planSheetContentSpacing),
+    ) {
+        Button(
+            onClick = {
+                onSave(
+                    scheduledAt,
+                    checkNotNull(runtimeValue),
+                    reminder.takeIf { reminderEnabled },
+                    existingPlan?.venue,
+                    existingPlan?.attendeeCount,
+                    existingPlan?.note,
+                )
+            },
+            enabled = isValid && !isSaving,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(ReelsDimensions.planSheetPrimaryActionHeight),
+            shape = RoundedCornerShape(ReelsDimensions.planSheetPrimaryActionCornerSize),
+        ) {
+            Text(if (existingPlan == null) "Schedule movie night" else "Save changes")
+        }
+        TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) { Text("Cancel") }
+    }
 
     if (showDatePicker) {
         val pickerState = rememberDatePickerState(
@@ -246,12 +242,63 @@ internal fun MovieNightPlanForm(
     }
 }
 
-private val movieNightReminderOptions = listOf(
-    15 to "15 min",
-    30 to "30 min",
-    60 to "1 hour",
-    120 to "2 hr",
-)
+@Composable
+private fun PlanDateTimeField(
+    label: String,
+    value: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(ReelsDimensions.planSheetHeaderSpacing)) {
+        Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(ReelsDimensions.planSheetFieldHeight)
+                .clickable(onClick = onClick),
+            shape = RoundedCornerShape(ReelsDimensions.planSheetFieldCornerSize),
+            color = MaterialTheme.colorScheme.background,
+            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = ReelsDimensions.planSheetFieldHorizontalPadding),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.plansRowSpacing),
+            ) {
+                Icon(icon, null, modifier = Modifier.size(ReelsDimensions.planSheetChoiceIconSize), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+            }
+        }
+    }
+}
 
-private val movieNightDateFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy")
-private val movieNightTimeFormatter = DateTimeFormatter.ofPattern("hh:mm a")
+@Composable
+private fun PlanChoiceChip(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.clickable(onClick = onClick),
+        shape = RoundedCornerShape(ReelsDimensions.planSheetFieldCornerSize),
+        color = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.background,
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.45f) else MaterialTheme.colorScheme.outlineVariant,
+        ),
+    ) {
+        Row(
+            modifier = Modifier.padding(vertical = ReelsDimensions.planSheetOptionVerticalPadding),
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            Text(
+                label,
+                style = MaterialTheme.typography.labelSmall,
+                color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+private fun Int.toDurationLabel(): String = "${this / 60}h ${this % 60}m"

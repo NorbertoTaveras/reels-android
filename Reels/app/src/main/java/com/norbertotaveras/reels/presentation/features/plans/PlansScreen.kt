@@ -7,40 +7,39 @@
 
 package com.norbertotaveras.reels.presentation.features.plans
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SecondaryTabRow
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.shape.CircleShape
-import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
 import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
+import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
 
 @Composable
 fun PlansScreen(
@@ -66,24 +65,39 @@ fun PlansScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = ReelsSpacing.screenHorizontal, vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                .padding(
+                    start = ReelsDimensions.plansHeaderHorizontalPadding,
+                    top = ReelsDimensions.plansHeaderTopPadding,
+                    end = ReelsDimensions.plansHeaderHorizontalPadding,
+                    bottom = ReelsDimensions.plansHeaderBottomPadding,
+                ),
+            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.plansHeaderSpacing),
         ) {
             Surface(
-                modifier = Modifier.size(44.dp),
+                modifier = Modifier.size(ReelsDimensions.plansBackButtonSize),
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.surface,
                 border = BorderStroke(1.dp, reelsBorderColor()),
             ) {
                 IconButton(onClick = onBackClick) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Navigate back")
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Navigate back",
+                        modifier = Modifier.size(ReelsDimensions.plansBackIconSize),
+                    )
                 }
             }
-            Text("Plans", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.SemiBold)
+            Text(
+                text = "Plans",
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontSize = ReelsDimensions.plansTitleSize,
+                    lineHeight = ReelsDimensions.plansTitleLineHeight,
+                ),
+                fontWeight = FontWeight.Medium,
+            )
         }
 
         SecondaryTabRow(
@@ -92,13 +106,17 @@ fun PlansScreen(
             divider = {},
             indicator = {
                 TabRowDefaults.SecondaryIndicator(
-                    modifier = Modifier.tabIndicatorOffset(state.selectedTab.ordinal),
+                    modifier = Modifier
+                        .tabIndicatorOffset(state.selectedTab.ordinal)
+                        .padding(horizontal = ReelsDimensions.plansTabIndicatorHorizontalInset)
+                        .height(ReelsDimensions.plansTabIndicatorHeight),
                     color = MaterialTheme.colorScheme.primary,
                 )
             },
         ) {
             PlansTab.entries.forEach { tab ->
                 Tab(
+                    modifier = Modifier.height(ReelsDimensions.plansTabHeight),
                     selected = state.selectedTab == tab,
                     onClick = { onTabSelected(tab) },
                     text = { Text(tab.label) },

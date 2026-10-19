@@ -81,7 +81,7 @@
         </receiver>
 
         <receiver
-            android:name=".data.widget.UpcomingReleasesWidgetReceiver"
+            android:name=".presentation.widget.UpcomingReleasesWidgetReceiver"
             android:label="@string/widget_upcoming_releases"
             android:exported="true">
             <intent-filter>
@@ -92,7 +92,7 @@
                 android:resource="@xml/upcoming_releases_widget_info" />
         </receiver>
         <receiver
-            android:name=".data.widget.NextMovieNightWidgetReceiver"
+            android:name=".presentation.widget.NextMovieNightWidgetReceiver"
             android:label="@string/widget_next_movie_night"
             android:exported="true">
             <intent-filter>

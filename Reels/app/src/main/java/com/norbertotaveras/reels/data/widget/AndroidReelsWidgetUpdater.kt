@@ -10,6 +10,8 @@ package com.norbertotaveras.reels.data.widget
 import android.content.Context
 import androidx.glance.appwidget.updateAll
 import com.norbertotaveras.reels.domain.plans.ReelsWidgetUpdater
+import com.norbertotaveras.reels.presentation.widget.NextMovieNightWidget
+import com.norbertotaveras.reels.presentation.widget.UpcomingReleasesWidget
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton

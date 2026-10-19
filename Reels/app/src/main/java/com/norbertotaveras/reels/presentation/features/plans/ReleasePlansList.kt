@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.plans.TrackedRelease
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import java.time.LocalDate
 
 @Composable
@@ -72,7 +73,7 @@ internal fun ReleasePlansList(
     val (released, upcoming) = releases.partition { release ->
         release.releaseDate?.let { runCatching { LocalDate.parse(it).isBefore(today) }.getOrDefault(false) } == true
     }
-    LazyColumn(contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp)) {
+    LazyColumn(contentPadding = PaddingValues(horizontal = ReelsDimensions.plansListHorizontalPadding)) {
         items(upcoming, key = { it.movieId }) { release ->
             ReleasePlanRow(release, onMovieClick, onRemove)
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f))
@@ -97,22 +98,28 @@ private fun ReleasePlanRow(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onMovieClick(release.movieId) }
-            .padding(vertical = 14.dp),
+            .padding(vertical = ReelsDimensions.plansReleaseRowVerticalPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         AsyncImage(
             model = release.posterPath.toTmdbImageUrl(),
             contentDescription = release.title,
-            modifier = Modifier.width(52.dp).height(76.dp).clip(RoundedCornerShape(9.dp)),
+            modifier = Modifier
+                .width(ReelsDimensions.plansPosterWidth)
+                .height(ReelsDimensions.plansPosterHeight)
+                .clip(RoundedCornerShape(ReelsDimensions.plansPosterCornerSize)),
             contentScale = ContentScale.Crop,
         )
-        Spacer(Modifier.width(12.dp))
-        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+        Spacer(Modifier.width(ReelsDimensions.plansRowSpacing))
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.plansMetadataSpacing),
+        ) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     release.title,
                     modifier = Modifier.weight(1f, fill = false),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -137,7 +144,7 @@ private fun ReleasePlanRow(
 @Composable
 private fun ReleaseStatusBadge(status: String) {
     Surface(
-        shape = RoundedCornerShape(7.dp),
+        shape = RoundedCornerShape(ReelsDimensions.plansStatusCornerSize),
         color = when (status) {
             "Out today" -> MaterialTheme.colorScheme.tertiaryContainer
             "Date moved" -> MaterialTheme.colorScheme.secondaryContainer
@@ -146,7 +153,10 @@ private fun ReleaseStatusBadge(status: String) {
     ) {
         Text(
             status,
-            modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
+            modifier = Modifier.padding(
+                horizontal = ReelsDimensions.plansStatusHorizontalPadding,
+                vertical = ReelsDimensions.plansStatusVerticalPadding,
+            ),
             style = MaterialTheme.typography.labelSmall,
             color = when (status) {
                 "Out today" -> MaterialTheme.colorScheme.onTertiaryContainer
@@ -159,8 +169,16 @@ private fun ReleaseStatusBadge(status: String) {
 
 @Composable
 private fun PlanMetadataLine(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        Icon(icon, null, modifier = Modifier.size(13.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.plansMetadataSpacing),
+    ) {
+        Icon(
+            icon,
+            null,
+            modifier = Modifier.size(ReelsDimensions.plansMetadataIconSize),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         Text(text, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
