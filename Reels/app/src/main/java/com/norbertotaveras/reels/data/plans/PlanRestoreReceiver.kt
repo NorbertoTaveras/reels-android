@@ -11,12 +11,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
+import com.norbertotaveras.reels.domain.model.plans.MovieNightStatus
 import com.norbertotaveras.reels.domain.plans.PlanScheduler
+import com.norbertotaveras.reels.domain.plans.ReelsNotificationManager
+import com.norbertotaveras.reels.domain.plans.ReelsWidgetUpdater
+import com.norbertotaveras.reels.domain.plans.hasRuntimeEnded
 import com.norbertotaveras.reels.domain.repository.plans.MovieNightRepository
 import com.norbertotaveras.reels.domain.repository.plans.TrackedReleaseRepository
-import com.norbertotaveras.reels.domain.plans.ReelsWidgetUpdater
-import com.norbertotaveras.reels.domain.plans.ReelsNotificationManager
-import com.norbertotaveras.reels.domain.model.plans.MovieNightStatus
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -42,7 +43,18 @@ class PlanRestoreReceiver : BroadcastReceiver() {
                     when {
                         (plan.status == MovieNightStatus.Upcoming || plan.status == MovieNightStatus.StartingSoon) &&
                             plan.scheduledAt + MISSED_GRACE_MILLIS <= System.currentTimeMillis() -> {
-                            movieNights.markMissed(plan.id)
+                            if (movieNights.markMissed(plan.id).isSuccess) {
+                                notifications.cancelMovieNightProgress(plan.id)
+                            }
+                        }
+                        plan.status == MovieNightStatus.StartingSoon -> {
+                            scheduler.scheduleMovieNight(plan)
+                            notifications.showMovieNightCountdown(plan)
+                        }
+                        plan.status == MovieNightStatus.Active && plan.hasRuntimeEnded() -> {
+                            movieNights.finish(plan.id)
+                            val completed = movieNights.getMovieNights().firstOrNull { it.id == plan.id } ?: plan
+                            notifications.showMovieNightCompleted(completed)
                         }
                         plan.status == MovieNightStatus.Active || plan.status == MovieNightStatus.Paused -> {
                             notifications.showMovieNightProgress(plan)

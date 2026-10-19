@@ -16,8 +16,12 @@
     <string name="movie_night_completed">Movie finished</string>
     <string name="movie_night_progress_paused">Paused at %1$d%%</string>
     <string name="movie_night_progress_playing">%1$d%% complete</string>
-    <string name="movie_night_notification_title">%1$s starts soon</string>
+    <string name="movie_night_reminder_title">Movie Night: %1$s</string>
     <string name="movie_night_notification_time">Scheduled for %1$s</string>
+    <string name="movie_night_countdown_minutes">Starts in %1$d min</string>
+    <string name="movie_night_countdown_now">Ready to start</string>
+    <string name="release_notification_date">Releases %1$s</string>
+    <string name="release_notification_date_available">Release date is now available</string>
     <string name="movie_night_in_progress">In progress</string>
     <string name="widget_upcoming_releases">Upcoming Releases</string>
     <string name="widget_upcoming_releases_description">See your next tracked movie releases</string>

@@ -8,9 +8,9 @@
 package com.norbertotaveras.reels.data.plans
 
 import android.Manifest
+import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -19,20 +19,20 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import com.norbertotaveras.reels.MainActivity
 import com.norbertotaveras.reels.R
 import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
 import com.norbertotaveras.reels.domain.model.plans.MovieNightStatus
 import com.norbertotaveras.reels.domain.model.plans.TrackedRelease
+import com.norbertotaveras.reels.domain.plans.MovieNightJourney
 import com.norbertotaveras.reels.domain.plans.ReelsNotificationManager
+import com.norbertotaveras.reels.domain.plans.canStartJourney
+import com.norbertotaveras.reels.domain.plans.countdownProgress
+import com.norbertotaveras.reels.domain.plans.runtimeProgress
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.math.roundToInt
-import androidx.core.net.toUri
 
 @Singleton
 class AndroidReelsNotificationManager @Inject constructor(
@@ -45,17 +45,17 @@ class AndroidReelsNotificationManager @Inject constructor(
         systemManager.createNotificationChannels(
             listOf(
                 NotificationChannel(
-                    RELEASE_CHANNEL_ID,
+                    PlanNotificationContract.ReleaseChannelId,
                     context.getString(R.string.notification_channel_releases),
                     NotificationManager.IMPORTANCE_DEFAULT,
                 ),
                 NotificationChannel(
-                    MOVIE_NIGHT_CHANNEL_ID,
+                    PlanNotificationContract.MovieNightChannelId,
                     context.getString(R.string.notification_channel_movie_nights),
                     NotificationManager.IMPORTANCE_DEFAULT,
                 ),
                 NotificationChannel(
-                    JOURNEY_CHANNEL_ID,
+                    PlanNotificationContract.JourneyChannelId,
                     context.getString(R.string.notification_channel_movie_night_progress),
                     NotificationManager.IMPORTANCE_LOW,
                 ),
@@ -66,35 +66,47 @@ class AndroidReelsNotificationManager @Inject constructor(
     override fun showReleaseReminder(release: TrackedRelease) {
         if (!canPostNotifications())
             return
-        val content = release.releaseDate?.let { "Releases $it" } ?: "Release date is now available"
         manager.notify(
-            RELEASE_NOTIFICATION_OFFSET + release.movieId,
-            baseBuilder(RELEASE_CHANNEL_ID, release.title, content, movieIntent(release.movieId)).build(),
+            PlanNotificationContract.ReleaseNotificationOffset + release.movieId,
+            baseBuilder(
+                PlanNotificationContract.ReleaseChannelId,
+                release.title,
+                PlanNotificationFormatter.releaseContent(context, release),
+                movieIntent(release.movieId),
+            ).build(),
         )
     }
 
     override fun showMovieNightReminder(plan: MovieNightPlan) {
         if (!canPostNotifications())
             return
-        val time = Instant.ofEpochMilli(plan.scheduledAt)
-            .atZone(ZoneId.systemDefault())
-            .format(DateTimeFormatter.ofPattern("h:mm a"))
-        val startAction = NotificationCompat.Action.Builder(
-            0,
-            context.getString(R.string.movie_night_start_now),
-            actionIntent(plan.id, PlanAlarmContract.ActionMovieNightStart),
-        ).build()
-        manager.notify(
-            movieNightNotificationId(plan.id),
-            baseBuilder(
-                MOVIE_NIGHT_CHANNEL_ID,
-                context.getString(R.string.movie_night_notification_title, plan.title),
-                context.getString(R.string.movie_night_notification_time, time),
-                plansIntent(MOVIE_NIGHTS_TAB),
-            )
-                .addAction(startAction)
-                .build(),
+        val builder = baseBuilder(
+            PlanNotificationContract.MovieNightChannelId,
+            context.getString(R.string.movie_night_reminder_title, plan.title),
+            context.getString(R.string.movie_night_notification_time, PlanNotificationFormatter.movieNightTime(plan)),
+            plansIntent(PlanNotificationContract.MovieNightsTab),
         )
+        if (plan.canStartJourney()) builder.addAction(startAction(plan.id))
+        manager.notify(movieNightReminderNotificationId(plan.id), builder.build())
+    }
+
+    override fun showMovieNightCountdown(plan: MovieNightPlan) {
+        if (plan.status != MovieNightStatus.StartingSoon) {
+            cancelProgressTick(plan.id)
+            return
+        }
+        scheduleProgressTick(plan.id)
+        if (!canPostNotifications()) return
+        val builder = journeyBuilder(
+            plan,
+            PlanNotificationFormatter.countdownContent(context, plan),
+            plan.countdownProgress(),
+        )
+            .setWhen(plan.scheduledAt)
+            .setUsesChronometer(true)
+            .setChronometerCountDown(true)
+            .addAction(startAction(plan.id))
+        manager.notify(movieNightJourneyNotificationId(plan.id), builder.build())
     }
 
     override fun showMovieNightProgress(plan: MovieNightPlan) {
@@ -104,7 +116,8 @@ class AndroidReelsNotificationManager @Inject constructor(
             cancelProgressTick(plan.id)
         }
         if (!canPostNotifications()) return
-        val progress = calculateProgress(plan)
+        manager.cancel(movieNightReminderNotificationId(plan.id))
+        val progress = plan.runtimeProgress()
         val isPaused = plan.status == MovieNightStatus.Paused
         val toggleAction = NotificationCompat.Action.Builder(
             0,
@@ -125,47 +138,39 @@ class AndroidReelsNotificationManager @Inject constructor(
             actionIntent(plan.id, PlanAlarmContract.ActionMovieNightEnd),
         ).build()
         val builder = baseBuilder(
-            JOURNEY_CHANNEL_ID,
+            PlanNotificationContract.JourneyChannelId,
             plan.title,
             context.getString(
                 if (isPaused) R.string.movie_night_progress_paused else R.string.movie_night_progress_playing,
                 progress,
             ),
-            plansIntent(MOVIE_NIGHTS_TAB),
+            plansIntent(PlanNotificationContract.MovieNightsTab),
         )
-            .setOngoing(true)
-            .setAutoCancel(false)
-            .setOnlyAlertOnce(true)
             .addAction(toggleAction)
             .addAction(finishAction)
             .addAction(endAction)
-
-        if (Build.VERSION.SDK_INT >= 36) {
-            builder.setStyle(NotificationCompat.ProgressStyle().setProgress(progress))
-            if (manager.canPostPromotedNotifications())
-                builder.setRequestPromotedOngoing(true)
-        } else {
-            builder.setProgress(100, progress, false)
-        }
-        manager.notify(movieNightNotificationId(plan.id), builder.build())
+        applyJourneyStyle(builder, progress)
+        manager.notify(movieNightJourneyNotificationId(plan.id), builder.build())
     }
 
     override fun showMovieNightCompleted(plan: MovieNightPlan) {
         cancelProgressTick(plan.id)
+        manager.cancel(movieNightReminderNotificationId(plan.id))
         if (!canPostNotifications()) return
         manager.notify(
-            movieNightNotificationId(plan.id),
+            movieNightJourneyNotificationId(plan.id),
             baseBuilder(
-                MOVIE_NIGHT_CHANNEL_ID,
+                PlanNotificationContract.MovieNightChannelId,
                 plan.title,
                 context.getString(R.string.movie_night_completed),
-                plansIntent(MOVIE_NIGHTS_TAB),
+                plansIntent(PlanNotificationContract.MovieNightsTab),
             ).setOngoing(false).build(),
         )
     }
 
     override fun cancelMovieNightProgress(planId: String) {
-        manager.cancel(movieNightNotificationId(planId))
+        manager.cancel(movieNightReminderNotificationId(planId))
+        manager.cancel(movieNightJourneyNotificationId(planId))
         cancelProgressTick(planId)
     }
 
@@ -187,21 +192,17 @@ class AndroidReelsNotificationManager @Inject constructor(
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
             PackageManager.PERMISSION_GRANTED)
 
-    private fun calculateProgress(plan: MovieNightPlan): Int {
-        val startedAt = plan.startedAt ?: return 0
-        val endPoint = plan.pausedAt ?: System.currentTimeMillis()
-        val elapsed = (endPoint - startedAt - plan.accumulatedPausedMillis).coerceAtLeast(0L)
-        val duration = plan.runtimeMinutes * 60_000L
-        return (elapsed.toDouble() / duration * 100).roundToInt().coerceIn(0, 100)
-    }
-
     private fun movieIntent(movieId: Int): PendingIntent = activityIntent(
-        requestCode = MOVIE_REQUEST_OFFSET + movieId,
+        requestCode = PlanNotificationContract.MovieRequestOffset + movieId,
         uri = "reels://movie/$movieId",
     )
 
     private fun plansIntent(tab: String): PendingIntent = activityIntent(
-        requestCode = if (tab == RELEASES_TAB) RELEASES_REQUEST_CODE else MOVIE_NIGHTS_REQUEST_CODE,
+        requestCode = if (tab == PlanNotificationContract.ReleasesTab) {
+            PlanNotificationContract.ReleasesRequestCode
+        } else {
+            PlanNotificationContract.MovieNightsRequestCode
+        },
         uri = "reels://plans?tab=$tab",
     )
 
@@ -221,14 +222,17 @@ class AndroidReelsNotificationManager @Inject constructor(
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
     )
 
-    private fun movieNightNotificationId(planId: String): Int =
-        MOVIE_NIGHT_NOTIFICATION_OFFSET + planId.hashCode()
+    private fun movieNightReminderNotificationId(planId: String): Int =
+        PlanNotificationContract.MovieNightReminderOffset + planId.hashCode()
+
+    private fun movieNightJourneyNotificationId(planId: String): Int =
+        PlanNotificationContract.MovieNightJourneyOffset + planId.hashCode()
 
     private fun scheduleProgressTick(planId: String) {
         val alarmManager = context.getSystemService(AlarmManager::class.java)
         alarmManager.setAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
-            System.currentTimeMillis() + PROGRESS_UPDATE_INTERVAL_MILLIS,
+            System.currentTimeMillis() + MovieNightJourney.UPDATE_INTERVAL_MILLIS,
             progressPendingIntent(planId),
         )
     }
@@ -239,25 +243,52 @@ class AndroidReelsNotificationManager @Inject constructor(
 
     private fun progressPendingIntent(planId: String): PendingIntent = PendingIntent.getBroadcast(
         context,
-        PROGRESS_REQUEST_OFFSET + planId.hashCode(),
+        PlanNotificationContract.ProgressRequestOffset + planId.hashCode(),
         Intent(context, MovieNightActionReceiver::class.java)
             .setAction(PlanAlarmContract.ActionMovieNightProgress)
             .putExtra(PlanAlarmContract.ExtraPlanId, planId),
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
     )
 
-    private companion object {
-        const val RELEASE_CHANNEL_ID = "tracked_releases"
-        const val MOVIE_NIGHT_CHANNEL_ID = "movie_nights"
-        const val JOURNEY_CHANNEL_ID = "movie_night_progress"
-        const val RELEASE_NOTIFICATION_OFFSET = 30_000
-        const val MOVIE_NIGHT_NOTIFICATION_OFFSET = 40_000
-        const val MOVIE_REQUEST_OFFSET = 50_000
-        const val RELEASES_REQUEST_CODE = 60_001
-        const val MOVIE_NIGHTS_REQUEST_CODE = 60_002
-        const val PROGRESS_REQUEST_OFFSET = 70_000
-        const val PROGRESS_UPDATE_INTERVAL_MILLIS = 60_000L
-        const val RELEASES_TAB = "releases"
-        const val MOVIE_NIGHTS_TAB = "movie_nights"
+    private fun journeyBuilder(
+        plan: MovieNightPlan,
+        content: String,
+        progress: Int,
+    ): NotificationCompat.Builder = baseBuilder(
+        PlanNotificationContract.JourneyChannelId,
+        plan.title,
+        content,
+        plansIntent(PlanNotificationContract.MovieNightsTab),
+    ).also { applyJourneyStyle(it, progress) }
+
+    private fun applyJourneyStyle(builder: NotificationCompat.Builder, progress: Int) {
+        builder
+            .setOngoing(true)
+            .setAutoCancel(false)
+            .setOnlyAlertOnce(true)
+            .setCategory(NotificationCompat.CATEGORY_PROGRESS)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) {
+            val accent = ContextCompat.getColor(context, R.color.reels_notification_accent)
+            builder.setStyle(
+                NotificationCompat.ProgressStyle()
+                    .addProgressSegment(
+                        NotificationCompat.ProgressStyle.Segment(PlanNotificationContract.ProgressMax)
+                            .setColor(accent),
+                    )
+                    .setStyledByProgress(true)
+                    .setProgress(progress),
+            )
+            if (manager.canPostPromotedNotifications()) {
+                builder.setRequestPromotedOngoing(true)
+            }
+        } else {
+            builder.setProgress(PlanNotificationContract.ProgressMax, progress, false)
+        }
     }
+
+    private fun startAction(planId: String): NotificationCompat.Action = NotificationCompat.Action.Builder(
+        0,
+        context.getString(R.string.movie_night_start_now),
+        actionIntent(planId, PlanAlarmContract.ActionMovieNightStart),
+    ).build()
 }

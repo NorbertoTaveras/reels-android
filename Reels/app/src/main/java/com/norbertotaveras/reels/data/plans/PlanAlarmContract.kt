@@ -10,6 +10,7 @@ package com.norbertotaveras.reels.data.plans
 internal object PlanAlarmContract {
     const val ActionReleaseReminder = "com.norbertotaveras.reels.RELEASE_REMINDER"
     const val ActionMovieNightReminder = "com.norbertotaveras.reels.MOVIE_NIGHT_REMINDER"
+    const val ActionMovieNightCountdown = "com.norbertotaveras.reels.MOVIE_NIGHT_COUNTDOWN"
     const val ActionMovieNightMissed = "com.norbertotaveras.reels.MOVIE_NIGHT_MISSED"
     const val ActionMovieNightStart = "com.norbertotaveras.reels.MOVIE_NIGHT_START"
     const val ActionMovieNightPause = "com.norbertotaveras.reels.MOVIE_NIGHT_PAUSE"

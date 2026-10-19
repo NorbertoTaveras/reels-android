@@ -15,6 +15,7 @@ interface ReelsNotificationManager {
     fun canPostNotifications(): Boolean
     fun showReleaseReminder(release: TrackedRelease)
     fun showMovieNightReminder(plan: MovieNightPlan)
+    fun showMovieNightCountdown(plan: MovieNightPlan)
     fun showMovieNightProgress(plan: MovieNightPlan)
     fun showMovieNightCompleted(plan: MovieNightPlan)
     fun cancelMovieNightProgress(planId: String)

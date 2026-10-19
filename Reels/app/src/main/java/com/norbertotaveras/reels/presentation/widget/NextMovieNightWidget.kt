@@ -42,6 +42,7 @@ import com.norbertotaveras.reels.data.widget.PlanWidgetEntryPoint
 import com.norbertotaveras.reels.data.widget.WidgetPosterLoader
 import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
 import com.norbertotaveras.reels.domain.model.plans.MovieNightStatus
+import com.norbertotaveras.reels.domain.plans.canStartJourney
 import dagger.hilt.android.EntryPointAccessors
 
 class NextMovieNightWidget : GlanceAppWidget() {
@@ -301,8 +302,7 @@ private fun MovieNightStatus.isVisibleInWidget(): Boolean = when (this) {
 }
 
 private fun MovieNightPlan.canStartFromWidget(): Boolean =
-    status == MovieNightStatus.StartingSoon ||
-        scheduledAt - System.currentTimeMillis() in 0..START_WINDOW_MILLIS
+    status == MovieNightStatus.StartingSoon || canStartJourney()
 
 private fun MovieNightPlan.detailsLabel(context: Context, isOnline: Boolean): String =
     if (isOnline) "${toWidgetDateTime()} · ${runtimeLabel(context)}" else context.getString(R.string.widget_cached)
@@ -312,5 +312,4 @@ private fun MovieNightPlan.reminderLabel(context: Context): String = reminderMin
 } ?: context.getString(R.string.widget_reminder_none)
 
 private const val MOVIE_NIGHTS_TAB = "movie_nights"
-private const val START_WINDOW_MILLIS = 60 * 60 * 1_000L
 private const val MAX_VISIBLE_MOVIE_NIGHTS = 2

@@ -17,6 +17,7 @@ import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
 import com.norbertotaveras.reels.domain.model.plans.MovieNightStatus
 import com.norbertotaveras.reels.domain.model.plans.ReleaseReminder
 import com.norbertotaveras.reels.domain.model.plans.TrackedRelease
+import com.norbertotaveras.reels.domain.plans.MovieNightJourney
 import com.norbertotaveras.reels.domain.plans.PlanScheduler
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.LocalDate
@@ -58,6 +59,13 @@ class AndroidPlanScheduler @Inject constructor(
                 }
             }
         }
+        val countdownAt = plan.scheduledAt - MovieNightJourney.COUNTDOWN_WINDOW_MILLIS
+        if (plan.status == MovieNightStatus.Upcoming && plan.scheduledAt > System.currentTimeMillis()) {
+            schedule(
+                countdownAt.coerceAtLeast(System.currentTimeMillis() + IMMEDIATE_ALARM_DELAY_MILLIS),
+                movieNightCountdownPendingIntent(plan.id),
+            )
+        }
         val missedAt = plan.scheduledAt + MISSED_GRACE_MILLIS
         if (missedAt > System.currentTimeMillis()) {
             schedule(missedAt, movieNightMissedPendingIntent(plan.id))
@@ -66,6 +74,7 @@ class AndroidPlanScheduler @Inject constructor(
 
     override fun cancelMovieNight(id: String) {
         alarmManager.cancel(movieNightPendingIntent(id))
+        alarmManager.cancel(movieNightCountdownPendingIntent(id))
         alarmManager.cancel(movieNightMissedPendingIntent(id))
     }
 
@@ -135,15 +144,26 @@ class AndroidPlanScheduler @Inject constructor(
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
     )
 
+    private fun movieNightCountdownPendingIntent(planId: String): PendingIntent = PendingIntent.getBroadcast(
+        context,
+        MOVIE_NIGHT_COUNTDOWN_REQUEST_OFFSET + planId.hashCode(),
+        Intent(context, PlanAlarmReceiver::class.java)
+            .setAction(PlanAlarmContract.ActionMovieNightCountdown)
+            .putExtra(PlanAlarmContract.ExtraPlanId, planId),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+    )
+
     private companion object {
         const val RELEASE_REQUEST_OFFSET = 10_000
         const val MOVIE_NIGHT_REQUEST_OFFSET = 20_000
         const val MOVIE_NIGHT_MISSED_REQUEST_OFFSET = 25_000
+        const val MOVIE_NIGHT_COUNTDOWN_REQUEST_OFFSET = 27_000
         const val MINUTES_PER_DAY = 1_440
         const val DEFAULT_RELEASE_MINUTES = 1_440
         const val MILLIS_PER_MINUTE = 60_000L
         const val INEXACT_WINDOW_MILLIS = 15 * MILLIS_PER_MINUTE
         const val MISSED_GRACE_MILLIS = 15 * MILLIS_PER_MINUTE
+        const val IMMEDIATE_ALARM_DELAY_MILLIS = 1_000L
         val DEFAULT_RELEASE_REMINDER_TIME: LocalTime = LocalTime.of(9, 0)
     }
 }

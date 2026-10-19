@@ -11,7 +11,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
+import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
+import com.norbertotaveras.reels.domain.model.plans.MovieNightStatus
 import com.norbertotaveras.reels.domain.plans.ReelsNotificationManager
+import com.norbertotaveras.reels.domain.plans.hasRuntimeEnded
 import com.norbertotaveras.reels.domain.repository.plans.MovieNightRepository
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -54,20 +57,22 @@ class MovieNightActionReceiver : BroadcastReceiver() {
         }
     }
 
-    private suspend fun updateProgress(plan: com.norbertotaveras.reels.domain.model.plans.MovieNightPlan) {
-        if (plan.status != com.norbertotaveras.reels.domain.model.plans.MovieNightStatus.Active) return
-        val startedAt = plan.startedAt ?: return
-        val elapsed = System.currentTimeMillis() - startedAt - plan.accumulatedPausedMillis
-        if (elapsed >= plan.runtimeMinutes * MILLIS_PER_MINUTE) {
-            movieNights.finish(plan.id)
-            val completed = movieNights.getMovieNights().firstOrNull { it.id == plan.id } ?: plan
-            notifications.showMovieNightCompleted(completed)
-        } else {
-            notifications.showMovieNightProgress(plan)
-        }
-    }
+    private suspend fun updateProgress(plan: MovieNightPlan) {
+        when (plan.status) {
+            MovieNightStatus.StartingSoon ->
+                notifications.showMovieNightCountdown(plan)
 
-    private companion object {
-        const val MILLIS_PER_MINUTE = 60_000L
+            MovieNightStatus.Active -> {
+                if (plan.hasRuntimeEnded()) {
+                    movieNights.finish(plan.id)
+                    val completed = movieNights.getMovieNights().firstOrNull { it.id == plan.id } ?: plan
+                    notifications.showMovieNightCompleted(completed)
+                } else {
+                    notifications.showMovieNightProgress(plan)
+                }
+            }
+
+            else -> notifications.cancelMovieNightProgress(plan.id)
+        }
     }
 }

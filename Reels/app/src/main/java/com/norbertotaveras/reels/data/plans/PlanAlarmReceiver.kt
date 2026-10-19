@@ -10,11 +10,11 @@ package com.norbertotaveras.reels.data.plans
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.plans.ReelsNotificationManager
+import com.norbertotaveras.reels.domain.plans.ReelsWidgetUpdater
 import com.norbertotaveras.reels.domain.repository.plans.MovieNightRepository
 import com.norbertotaveras.reels.domain.repository.plans.TrackedReleaseRepository
-import com.norbertotaveras.reels.domain.plans.ReelsWidgetUpdater
-import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -37,6 +37,7 @@ class PlanAlarmReceiver : BroadcastReceiver() {
                 when (intent.action) {
                     PlanAlarmContract.ActionReleaseReminder -> showRelease(intent)
                     PlanAlarmContract.ActionMovieNightReminder -> showMovieNight(intent)
+                    PlanAlarmContract.ActionMovieNightCountdown -> startMovieNightCountdown(intent)
                     PlanAlarmContract.ActionMovieNightMissed -> markMovieNightMissed(intent)
                 }
                 widgetUpdater.updateAll()
@@ -55,14 +56,23 @@ class PlanAlarmReceiver : BroadcastReceiver() {
 
     private suspend fun showMovieNight(intent: Intent) {
         val planId = intent.getStringExtra(PlanAlarmContract.ExtraPlanId) ?: return
-        movieNights.markStartingSoon(planId)
         movieNights.getMovieNights().firstOrNull { it.id == planId }?.let {
             notifications.showMovieNightReminder(it)
         }
     }
 
+    private suspend fun startMovieNightCountdown(intent: Intent) {
+        val planId = intent.getStringExtra(PlanAlarmContract.ExtraPlanId) ?: return
+        if (movieNights.markStartingSoon(planId).isFailure) return
+        movieNights.getMovieNights().firstOrNull { it.id == planId }?.let {
+            notifications.showMovieNightCountdown(it)
+        }
+    }
+
     private suspend fun markMovieNightMissed(intent: Intent) {
         val planId = intent.getStringExtra(PlanAlarmContract.ExtraPlanId) ?: return
-        movieNights.markMissed(planId)
+        if (movieNights.markMissed(planId).isSuccess) {
+            notifications.cancelMovieNightProgress(planId)
+        }
     }
 }
