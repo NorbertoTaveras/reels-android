@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 interface MovieNightRepository {
     fun observeMovieNights(): Flow<List<MovieNightPlan>>
     fun observeMovieNight(id: String): Flow<MovieNightPlan?>
+    fun observeUpcomingMovieNight(movieId: Int): Flow<MovieNightPlan?>
     suspend fun getMovieNights(): List<MovieNightPlan>
     suspend fun schedule(plan: MovieNightPlan): Result<Unit>
     suspend fun edit(plan: MovieNightPlan): Result<Unit>

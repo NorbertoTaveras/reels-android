@@ -11,24 +11,29 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.norbertotaveras.reels.presentation.features.plans.MoviePlansSheet
+import com.norbertotaveras.reels.presentation.features.plans.MoviePlansViewModel
+import com.norbertotaveras.reels.presentation.features.plans.dateLabel
+import com.norbertotaveras.reels.presentation.features.plans.reminderLabel
+import com.norbertotaveras.reels.presentation.features.plans.timeLabel
 import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarHost
 import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarVisuals
 import kotlinx.coroutines.flow.collectLatest
-import com.norbertotaveras.reels.presentation.features.plans.MoviePlansSheet
-import com.norbertotaveras.reels.presentation.features.plans.MoviePlansViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun MovieDetailsRoute(
@@ -43,6 +48,7 @@ fun MovieDetailsRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
     var isPlansSheetVisible by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(viewModel, snackbarHostState) {
@@ -117,6 +123,21 @@ fun MovieDetailsRoute(
                 movie = checkNotNull(state.movie),
                 viewModel = plansViewModel,
                 onDismiss = { isPlansSheetVisible = false },
+                onMovieNightSaved = { plan ->
+                    isPlansSheetVisible = false
+                    coroutineScope.launch {
+                        snackbarHostState.currentSnackbarData?.dismiss()
+                        snackbarHostState.showSnackbar(
+                            visuals = ReelsSnackbarVisuals(
+                                message = "Movie night scheduled!",
+                                supportingText = buildString {
+                                    append("${plan.dateLabel()} · ${plan.timeLabel()}")
+                                    append("\nReminder ${plan.reminderLabel()}")
+                                },
+                            )
+                        )
+                    }
+                },
             )
         }
 

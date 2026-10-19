@@ -36,6 +36,9 @@ class MovieNightRepositoryImpl @Inject constructor(
     override fun observeMovieNight(id: String): Flow<MovieNightPlan?> =
         dao.observe(id).map { it?.toDataModel() }.flowOn(ioDispatcher)
 
+    override fun observeUpcomingMovieNight(movieId: Int): Flow<MovieNightPlan?> =
+        dao.observeUpcomingForMovie(movieId).map { it?.toDataModel() }.flowOn(ioDispatcher)
+
     override suspend fun getMovieNights(): List<MovieNightPlan> = withContext(ioDispatcher) {
         dao.getAll().map { it.toDataModel() }
     }

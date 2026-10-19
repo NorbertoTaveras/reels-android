@@ -7,10 +7,12 @@
 
 package com.norbertotaveras.reels.presentation.features.plans
 
+import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
 import com.norbertotaveras.reels.domain.model.plans.TrackedRelease
 
 data class MoviePlansUiState(
     val trackedRelease: TrackedRelease? = null,
+    val movieNightPlan: MovieNightPlan? = null,
     val isSaving: Boolean = false,
     val canScheduleExactAlarms: Boolean = true,
     val canPostNotifications: Boolean = true,

@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.norbertotaveras.reels.domain.model.movie.MovieDetailsDataModel
+import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,6 +42,7 @@ fun MoviePlansSheet(
     movie: MovieDetailsDataModel,
     viewModel: MoviePlansViewModel,
     onDismiss: () -> Unit,
+    onMovieNightSaved: (MovieNightPlan) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -65,6 +67,7 @@ fun MoviePlansSheet(
                 MoviePlansSheetMode.Choice -> PlanTypeChoice(
                     movieTitle = movie.title,
                     isTracked = state.trackedRelease != null,
+                    movieNightPlan = state.movieNightPlan,
                     showRelease = state.trackedRelease != null || movie.isUnreleased(),
                     onReleaseClick = { mode = MoviePlansSheetMode.Release },
                     onMovieNightClick = { mode = MoviePlansSheetMode.MovieNight },
@@ -99,12 +102,13 @@ fun MoviePlansSheet(
                     isSaving = state.isSaving,
                     canScheduleExactAlarms = state.canScheduleExactAlarms,
                     canPostNotifications = state.canPostNotifications,
+                    existingPlan = state.movieNightPlan,
                     onDismiss = onDismiss,
                     onSave = { scheduledAt, runtime, reminder, venue, attendees, note ->
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                         }
-                        viewModel.scheduleMovieNight(
+                        viewModel.saveMovieNight(
                             movie = movie,
                             scheduledAt = scheduledAt,
                             runtimeMinutes = runtime,
@@ -112,7 +116,7 @@ fun MoviePlansSheet(
                             venue = venue,
                             attendeeCount = attendees,
                             note = note,
-                            onComplete = onDismiss,
+                            onComplete = onMovieNightSaved,
                         )
                     },
                 )

@@ -91,6 +91,15 @@ fun ReelsSnackbarHost(
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
+                    reelsVisuals?.supportingText?.let { supportingText ->
+                        Text(
+                            text = supportingText,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                 }
 
                 snackbarData.visuals.actionLabel?.let { actionLabel ->

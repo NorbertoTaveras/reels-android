@@ -26,15 +26,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.Alignment
+import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 
 @Composable
 internal fun PlanTypeChoice(
     movieTitle: String,
     isTracked: Boolean,
+    movieNightPlan: MovieNightPlan?,
     showRelease: Boolean,
     onReleaseClick: () -> Unit,
     onMovieNightClick: () -> Unit,
@@ -93,8 +95,9 @@ internal fun PlanTypeChoice(
                 modifier = Modifier.size(ReelsDimensions.planSheetChoiceIconSize),
             )
         },
-        title = "Plan a movie night",
-        subtitle = "Choose when you want to watch",
+        title = if (movieNightPlan == null) "Plan a movie night" else "Movie night scheduled",
+        subtitle = movieNightPlan?.let { "${it.dateLabel()} · ${it.timeLabel()}" }
+            ?: "Choose when you want to watch",
         onClick = onMovieNightClick,
     )
 }

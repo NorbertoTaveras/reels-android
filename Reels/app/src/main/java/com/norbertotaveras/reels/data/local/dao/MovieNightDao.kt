@@ -21,6 +21,17 @@ interface MovieNightDao {
     @Query("SELECT * FROM movie_nights WHERE id = :id")
     fun observe(id: String): Flow<MovieNightEntity?>
 
+    @Query(
+        """
+        SELECT * FROM movie_nights
+        WHERE movieId = :movieId
+        AND status IN ('Upcoming', 'StartingSoon')
+        ORDER BY updatedAt DESC
+        LIMIT 1
+        """
+    )
+    fun observeUpcomingForMovie(movieId: Int): Flow<MovieNightEntity?>
+
     @Query("SELECT * FROM movie_nights ORDER BY scheduledAt")
     suspend fun getAll(): List<MovieNightEntity>
 
