@@ -90,7 +90,11 @@ private fun UpcomingReleasesContent(
             .clickable(plansAction(context, RELEASES_TAB))
             .padding(if (isCompact) PlanWidgetDimensions.CompactPadding else PlanWidgetDimensions.ContentPadding),
     ) {
-        WidgetHeader(context.getString(R.string.widget_upcoming_releases))
+        WidgetHeader(
+            context.getString(
+                if (isCompact) R.string.widget_upcoming else R.string.widget_upcoming_releases,
+            ),
+        )
         Spacer(GlanceModifier.height(if (isCompact) 3.dp else 6.dp))
         when {
             releases.isEmpty() -> EmptyWidgetMessage(
@@ -125,22 +129,7 @@ private fun ReleaseCollection(
 ) {
     val primary = releases.first()
     if (isExpanded && releases.size > 1) {
-        Row(modifier = GlanceModifier.fillMaxWidth()) {
-            WidgetBackdrop(
-                title = primary.title,
-                backdrop = backdrop,
-                modifier = GlanceModifier.defaultWeight(),
-            ) {
-                ReleaseHero(context, primary, isOnline)
-            }
-            Spacer(GlanceModifier.width(6.dp))
-            Column(modifier = GlanceModifier.width(112.dp)) {
-                releases.drop(1).take(2).forEachIndexed { index, release ->
-                    SecondaryReleaseRow(context, release, posters[release.movieId], isOnline)
-                    if (index == 0 && releases.size > 2) Spacer(GlanceModifier.height(4.dp))
-                }
-            }
-        }
+        ExpandedReleaseCollection(context, releases, posters, isOnline)
     } else {
         WidgetBackdrop(
             title = primary.title,
@@ -159,6 +148,61 @@ private fun ReleaseCollection(
             Spacer(GlanceModifier.height(4.dp))
             SecondaryReleaseRow(context, release, posters[release.movieId], isOnline)
         }
+    }
+}
+
+@Composable
+private fun ExpandedReleaseCollection(
+    context: Context,
+    releases: List<TrackedRelease>,
+    posters: Map<Int, Bitmap?>,
+    isOnline: Boolean,
+) {
+    releases.take(MAX_VISIBLE_RELEASES).forEachIndexed { index, release ->
+        ExpandedReleaseRow(context, release, posters[release.movieId], isOnline)
+        if (index < releases.lastIndex && index < MAX_VISIBLE_RELEASES - 1) WidgetDivider()
+    }
+    if (!isOnline) {
+        Text(
+            text = context.getString(R.string.widget_locally_stored_releases),
+            maxLines = 1,
+            style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 10.sp),
+        )
+    }
+}
+
+@Composable
+private fun ExpandedReleaseRow(
+    context: Context,
+    release: TrackedRelease,
+    poster: Bitmap?,
+    isOnline: Boolean,
+) {
+    Row(
+        modifier = GlanceModifier
+            .fillMaxWidth()
+            .clickable(movieAction(context, release.movieId)),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        WidgetMiniPoster(release.title, poster)
+        Spacer(GlanceModifier.width(6.dp))
+        Column(modifier = GlanceModifier.defaultWeight()) {
+            Text(
+                text = release.title,
+                maxLines = 1,
+                style = TextStyle(
+                    color = PlanWidgetTheme.Primary,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                ),
+            )
+            Text(
+                text = release.dateLabel(context, isOnline),
+                maxLines = 1,
+                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 11.sp),
+            )
+        }
+        release.releaseDate?.let { WidgetCountdownBadge(it.toWidgetReleaseCountdown()) }
     }
 }
 
@@ -264,7 +308,7 @@ internal fun movieAction(context: Context, movieId: Int) = actionStartActivity(
 )
 
 private fun TrackedRelease.dateLabel(context: Context, isOnline: Boolean): String =
-    if (isOnline) releaseDate.toRelativeReleaseDate(context) else context.getString(R.string.widget_cached)
+    releaseDate.toWidgetReleaseDate(context, isOnline)
 
 private const val RELEASES_TAB = "releases"
 private const val MAX_DATE = "9999-12-31"

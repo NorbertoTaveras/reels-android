@@ -41,14 +41,7 @@ internal fun WidgetHeader(title: String) {
         modifier = GlanceModifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = "R",
-            style = TextStyle(
-                color = PlanWidgetTheme.Accent,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-            ),
-        )
+        WidgetMark(GlanceModifier.size(PlanWidgetDimensions.BrandMarkSize))
         Spacer(GlanceModifier.width(4.dp))
         Text(
             text = title.uppercase(),
@@ -151,14 +144,11 @@ internal fun EmptyWidgetMessage(context: Context, message: String, compact: Bool
         ) {
             WidgetMark(GlanceModifier.size(24.dp))
             Spacer(GlanceModifier.width(8.dp))
-            Column(modifier = GlanceModifier.defaultWeight()) {
-                Text(
-                    text = message,
-                    maxLines = 1,
-                    style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
-                )
-                WidgetOpenAction(context.getString(R.string.widget_open_reels))
-            }
+            Text(
+                text = message,
+                maxLines = 1,
+                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
+            )
         }
     } else {
         Column(
@@ -183,11 +173,50 @@ private fun WidgetMark(modifier: GlanceModifier) {
         modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
+        Box(
+            modifier = GlanceModifier
+                .size(PlanWidgetDimensions.BrandMarkSize)
+                .background(PlanWidgetTheme.Accent)
+                .cornerRadius(PlanWidgetDimensions.BrandMarkCornerSize),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = "R",
+                style = TextStyle(
+                    color = PlanWidgetTheme.OnAccent,
+                    fontSize = 8.sp,
+                    fontWeight = FontWeight.Bold,
+                ),
+            )
+        }
+    }
+}
+
+@Composable
+internal fun WidgetDivider() {
+    Spacer(
+        modifier = GlanceModifier
+            .fillMaxWidth()
+            .height(PlanWidgetDimensions.DividerHeight)
+            .background(PlanWidgetTheme.Divider),
+    )
+}
+
+@Composable
+internal fun WidgetCountdownBadge(label: String) {
+    Box(
+        modifier = GlanceModifier
+            .background(PlanWidgetTheme.Surface)
+            .cornerRadius(8.dp)
+            .padding(horizontal = 5.dp, vertical = 2.dp),
+        contentAlignment = Alignment.Center,
+    ) {
         Text(
-            text = "R",
+            text = label,
+            maxLines = 1,
             style = TextStyle(
                 color = PlanWidgetTheme.Accent,
-                fontSize = 16.sp,
+                fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
             ),
         )

@@ -92,7 +92,11 @@ private fun NextMovieNightContent(
             .clickable(plansAction(context, MOVIE_NIGHTS_TAB))
             .padding(if (isCompact) PlanWidgetDimensions.CompactPadding else PlanWidgetDimensions.ContentPadding),
     ) {
-        WidgetHeader(context.getString(R.string.widget_next_movie_night))
+        WidgetHeader(
+            context.getString(
+                if (isCompact) R.string.widget_movie_night else R.string.widget_next_movie_night,
+            ),
+        )
         Spacer(GlanceModifier.height(if (isCompact) 3.dp else 6.dp))
         when {
             plans.isEmpty() -> EmptyWidgetMessage(
@@ -127,17 +131,7 @@ private fun MovieNightCollection(
 ) {
     val primary = plans.first()
     if (isExpanded && plans.size > 1) {
-        Row(modifier = GlanceModifier.fillMaxWidth()) {
-            WidgetBackdrop(
-                title = primary.title,
-                backdrop = backdrop,
-                modifier = GlanceModifier.defaultWeight(),
-            ) {
-                MovieNightHero(context, primary, isOnline)
-            }
-            Spacer(GlanceModifier.width(6.dp))
-            SecondaryMovieNightRow(context, plans[1], posters[plans[1].id], isOnline)
-        }
+        ExpandedMovieNightCollection(context, plans, posters, isOnline)
     } else {
         WidgetBackdrop(
             title = primary.title,
@@ -167,24 +161,44 @@ private fun MovieNightHero(context: Context, plan: MovieNightPlan, isOnline: Boo
             maxLines = 1,
             style = TextStyle(color = PlanWidgetTheme.OnImageSecondary, fontSize = 12.sp),
         )
-        MovieNightJourneyAction(context, plan)
+        MovieNightJourneyAction(context, plan, fillWidth = plan.canStartFromWidget())
     }
 }
 
 @Composable
-private fun SecondaryMovieNightRow(
+private fun ExpandedMovieNightCollection(
+    context: Context,
+    plans: List<MovieNightPlan>,
+    posters: Map<String, Bitmap?>,
+    isOnline: Boolean,
+) {
+    plans.take(MAX_VISIBLE_MOVIE_NIGHTS).forEachIndexed { index, plan ->
+        ExpandedMovieNightRow(
+            context = context,
+            plan = plan,
+            poster = posters[plan.id],
+            isOnline = isOnline,
+            primary = index == 0,
+        )
+        if (index == 0 && plans.size > 1) WidgetDivider()
+    }
+}
+
+@Composable
+private fun ExpandedMovieNightRow(
     context: Context,
     plan: MovieNightPlan,
     poster: Bitmap?,
     isOnline: Boolean,
+    primary: Boolean,
 ) {
     Row(
         modifier = GlanceModifier
-            .width(112.dp)
+            .fillMaxWidth()
             .clickable(movieAction(context, plan.movieId)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        WidgetMiniPoster(plan.title, poster)
+        if (primary) WidgetPoster(plan.title, poster) else WidgetMiniPoster(plan.title, poster)
         Spacer(GlanceModifier.width(6.dp))
         Column(modifier = GlanceModifier.defaultWeight()) {
             Text(
@@ -197,11 +211,19 @@ private fun SecondaryMovieNightRow(
                 ),
             )
             Text(
-                text = if (isOnline) plan.toWidgetDateTime() else context.getString(R.string.widget_cached),
+                text = plan.widgetDateLabel(context, isOnline),
                 maxLines = 1,
-                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
+                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 11.sp),
             )
+            if (primary) {
+                Text(
+                    text = plan.runtimeLabel(context),
+                    maxLines = 1,
+                    style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 11.sp),
+                )
+            }
         }
+        WidgetCountdownBadge(plan.toWidgetCountdown(context, short = true))
     }
 }
 
@@ -231,7 +253,7 @@ private fun MovieNightRow(
                 ),
             )
             Text(
-                text = if (isOnline) plan.toWidgetDateTime() else context.getString(R.string.widget_cached),
+                text = plan.widgetDateLabel(context, isOnline),
                 maxLines = 1,
                 style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
             )
@@ -241,7 +263,11 @@ private fun MovieNightRow(
 }
 
 @Composable
-private fun MovieNightJourneyAction(context: Context, plan: MovieNightPlan) {
+private fun MovieNightJourneyAction(
+    context: Context,
+    plan: MovieNightPlan,
+    fillWidth: Boolean = false,
+) {
     when {
         plan.status == MovieNightStatus.Active || plan.status == MovieNightStatus.Paused -> {
             Text(
@@ -261,7 +287,7 @@ private fun MovieNightJourneyAction(context: Context, plan: MovieNightPlan) {
 
         plan.canStartFromWidget() -> {
             Box(
-                modifier = GlanceModifier
+                modifier = (if (fillWidth) GlanceModifier.fillMaxWidth() else GlanceModifier)
                     .background(PlanWidgetTheme.Accent)
                     .cornerRadius(12.dp)
                     .clickable(
@@ -305,7 +331,18 @@ private fun MovieNightPlan.canStartFromWidget(): Boolean =
     status == MovieNightStatus.StartingSoon || canStartJourney()
 
 private fun MovieNightPlan.detailsLabel(context: Context, isOnline: Boolean): String =
-    if (isOnline) "${toWidgetDateTime()} · ${runtimeLabel(context)}" else context.getString(R.string.widget_cached)
+    if (isOnline) {
+        "${toRelativeWidgetDateTime(context)} · ${runtimeLabel(context)}"
+    } else {
+        context.getString(R.string.widget_cached_date, toRelativeWidgetDateTime(context))
+    }
+
+private fun MovieNightPlan.widgetDateLabel(context: Context, isOnline: Boolean): String =
+    if (isOnline) {
+        toRelativeWidgetDateTime(context)
+    } else {
+        context.getString(R.string.widget_cached_date, toRelativeWidgetDateTime(context))
+    }
 
 private fun MovieNightPlan.reminderLabel(context: Context): String = reminderMinutesBefore?.let {
     context.getString(R.string.widget_reminder_minutes_before, it)
