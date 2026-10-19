@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -198,6 +199,10 @@ internal fun MovieNightPlanForm(
                 )
             },
             enabled = isValid && !isSaving,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.background,
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(ReelsDimensions.planSheetPrimaryActionHeight),
@@ -205,7 +210,15 @@ internal fun MovieNightPlanForm(
         ) {
             Text(if (existingPlan == null) "Schedule movie night" else "Save changes")
         }
-        TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) { Text("Cancel") }
+        TextButton(
+            onClick = onDismiss,
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.textButtonColors(
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            ),
+        ) {
+            Text("Cancel")
+        }
     }
 
     if (showDatePicker) {

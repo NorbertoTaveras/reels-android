@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.NotificationsNone
 import androidx.compose.material.icons.filled.RadioButtonChecked
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -153,6 +154,10 @@ internal fun ReleasePlanForm(
                 )
             },
             enabled = !isSaving && (reminder != ReleaseReminder.Custom || customReminderAt > System.currentTimeMillis()),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.background,
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(ReelsDimensions.planSheetPrimaryActionHeight),
@@ -160,7 +165,15 @@ internal fun ReleasePlanForm(
         ) {
             Text(if (isTracked) "Save changes" else "Track release")
         }
-        TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) { Text("Cancel") }
+        TextButton(
+            onClick = onDismiss,
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.textButtonColors(
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            ),
+        ) {
+            Text("Cancel")
+        }
         if (isTracked) {
             TextButton(onClick = onRemove, enabled = !isSaving, modifier = Modifier.fillMaxWidth()) {
                 Text("Stop tracking", color = MaterialTheme.colorScheme.error)
