@@ -65,6 +65,7 @@ fun MovieHeroHeader(
     isWatchlisted: Boolean = false,
     tmdbRating: Double? = null,
     isAccountActionLoading: Boolean = false,
+    hasPlans: Boolean = false,
     statusContent: (@Composable () -> Unit)? = null,
 ) {
     Box(
@@ -183,6 +184,7 @@ fun MovieHeroHeader(
                         isWatchlisted = isWatchlisted,
                         tmdbRating = tmdbRating,
                         isAccountActionLoading = isAccountActionLoading,
+                        hasPlans = hasPlans,
                         onFavoriteClick = onFavoriteClick,
                         onWatchlistClick = onWatchlistClick,
                         onRatingClick = onRatingClick,

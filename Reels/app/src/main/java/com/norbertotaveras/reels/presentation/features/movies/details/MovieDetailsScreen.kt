@@ -16,6 +16,7 @@ fun MovieDetailsScreen(
     onEvent: (MovieDetailsEvent) -> Unit,
     modifier: Modifier = Modifier,
     onPlanClick: () -> Unit = {},
+    hasPlans: Boolean = false,
 ) {
     when {
         state.isLoading -> {
@@ -59,6 +60,7 @@ fun MovieDetailsScreen(
                 isWatchlisted = state.isWatchlisted,
                 tmdbRating = state.tmdbRating,
                 isAccountActionLoading = state.isAccountActionLoading,
+                hasPlans = hasPlans,
                 onBackClick = {
                     onEvent(MovieDetailsEvent.BackClicked)
                 },

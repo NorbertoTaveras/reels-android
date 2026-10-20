@@ -608,6 +608,10 @@ object ReelsDimensions {
     val plansEmptySpacing = 12.dp
 
     val planSheetHorizontalPadding = 20.dp
+    val planSheetCornerSize = 24.dp
+    val planSheetChoiceOptionsVerticalPadding = 8.dp
+    val planSheetChoiceCloseCornerSize = 12.dp
+    val planSheetChoiceTitleLineHeight = 27.sp
     val planSheetHeaderVerticalPadding = 16.dp
     val planSheetBottomPadding = 24.dp
     val planSheetCloseButtonSize = 32.dp

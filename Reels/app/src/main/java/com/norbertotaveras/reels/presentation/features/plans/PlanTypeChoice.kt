@@ -19,18 +19,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.EventAvailable
-import androidx.compose.material.icons.filled.Movie
+import androidx.compose.material.icons.outlined.Theaters
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
 
 @Composable
 internal fun PlanTypeChoice(
@@ -55,12 +59,20 @@ internal fun PlanTypeChoice(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(ReelsDimensions.planSheetHeaderSpacing),
         ) {
-            Text("Movie plans", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(
+                "Movie plans",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    lineHeight = ReelsDimensions.planSheetChoiceTitleLineHeight,
+                ),
+                fontWeight = FontWeight.Medium,
+            )
             Text(movieTitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Surface(
-            modifier = Modifier.size(ReelsDimensions.planSheetCloseButtonSize),
-            shape = RoundedCornerShape(ReelsDimensions.planSheetChoiceIconCornerSize),
+            modifier = Modifier
+                .padding(top = ReelsDimensions.planSheetHeaderSpacing)
+                .size(ReelsDimensions.planSheetCloseButtonSize),
+            shape = RoundedCornerShape(ReelsDimensions.planSheetChoiceCloseCornerSize),
             color = MaterialTheme.colorScheme.surfaceVariant,
         ) {
             IconButton(onClick = onDismiss) {
@@ -68,38 +80,43 @@ internal fun PlanTypeChoice(
                     Icons.Filled.Close,
                     contentDescription = "Close",
                     modifier = Modifier.size(ReelsDimensions.planSheetCloseIconSize),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
     }
     PlanSheetDivider()
-    if (showRelease) {
+    Column(modifier = Modifier.padding(vertical = ReelsDimensions.planSheetChoiceOptionsVerticalPadding)) {
+        if (showRelease) {
+            PlanChoiceRow(
+                icon = {
+                    Icon(
+                        Icons.Filled.EventAvailable,
+                        contentDescription = null,
+                        modifier = Modifier.size(ReelsDimensions.planSheetChoiceIconSize),
+                    )
+                },
+                title = if (isTracked) "Release reminder" else "Track release",
+                subtitle = if (isTracked) "Update reminder settings" else "Get notified when it arrives",
+                onClick = onReleaseClick,
+            )
+            PlanSheetDivider()
+        }
         PlanChoiceRow(
             icon = {
                 Icon(
-                    Icons.Filled.EventAvailable,
+                    Icons.Outlined.Theaters,
                     contentDescription = null,
                     modifier = Modifier.size(ReelsDimensions.planSheetChoiceIconSize),
                 )
             },
-            title = if (isTracked) "Release reminder" else "Track release",
-            subtitle = if (isTracked) "Update reminder settings" else "Get notified when it arrives",
-            onClick = onReleaseClick,
+            title = if (movieNightPlan == null) "Plan a movie night" else "Movie night scheduled",
+            subtitle = movieNightPlan?.let { "${it.dateLabel()} · ${it.timeLabel()}" }
+                ?: "Choose when you want to watch",
+            onClick = onMovieNightClick,
+            highlightColor = if (movieNightPlan != null) ReelsTeal else null,
         )
     }
-    PlanChoiceRow(
-        icon = {
-            Icon(
-                Icons.Filled.Movie,
-                contentDescription = null,
-                modifier = Modifier.size(ReelsDimensions.planSheetChoiceIconSize),
-            )
-        },
-        title = if (movieNightPlan == null) "Plan a movie night" else "Movie night scheduled",
-        subtitle = movieNightPlan?.let { "${it.dateLabel()} · ${it.timeLabel()}" }
-            ?: "Choose when you want to watch",
-        onClick = onMovieNightClick,
-    )
 }
 
 @Composable
@@ -108,6 +125,7 @@ private fun PlanChoiceRow(
     title: String,
     subtitle: String,
     onClick: () -> Unit,
+    highlightColor: Color? = null,
 ) {
     Row(
         modifier = Modifier
@@ -123,18 +141,27 @@ private fun PlanChoiceRow(
         Surface(
             modifier = Modifier.size(ReelsDimensions.planSheetChoiceIconContainerSize),
             shape = RoundedCornerShape(ReelsDimensions.planSheetChoiceIconCornerSize),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+            color = highlightColor?.copy(alpha = 0.15f)
+                ?: MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
         ) {
             Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                androidx.compose.runtime.CompositionLocalProvider(
-                    androidx.compose.material3.LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant,
+                CompositionLocalProvider(
+                    LocalContentColor provides (highlightColor ?: MaterialTheme.colorScheme.onSurfaceVariant),
                 ) {
                     icon()
                 }
             }
         }
-        Column(modifier = Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.planSheetHeaderSpacing),
+        ) {
+            Text(
+                title,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = highlightColor ?: MaterialTheme.colorScheme.onSurface,
+            )
             Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Icon(
@@ -144,5 +171,4 @@ private fun PlanChoiceRow(
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
-    PlanSheetDivider()
 }

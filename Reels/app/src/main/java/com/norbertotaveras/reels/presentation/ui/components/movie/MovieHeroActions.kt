@@ -21,10 +21,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.CircularProgressIndicator
@@ -53,6 +53,7 @@ internal fun HeroActionRow(
     isWatchlisted: Boolean,
     tmdbRating: Double?,
     isAccountActionLoading: Boolean,
+    hasPlans: Boolean,
     onFavoriteClick: () -> Unit,
     onWatchlistClick: () -> Unit,
     onRatingClick: () -> Unit,
@@ -92,12 +93,13 @@ internal fun HeroActionRow(
         )
 
         HeroToggleActionButton(
-            selected = false,
-            selectedIcon = Icons.Filled.CalendarMonth,
-            unselectedIcon = Icons.Filled.CalendarMonth,
-            selectedContentDescription = "Open plans",
-            unselectedContentDescription = "Open plans",
+            selected = hasPlans,
+            selectedIcon = Icons.Outlined.CalendarMonth,
+            unselectedIcon = Icons.Outlined.CalendarMonth,
+            selectedContentDescription = "View movie plans",
+            unselectedContentDescription = "Movie plans",
             selectedColor = MaterialTheme.colorScheme.primary,
+            selectedBorderAlpha = 1f,
             isLoading = false,
             onClick = onPlanClick,
         )
@@ -207,6 +209,7 @@ private fun HeroToggleActionButton(
     isLoading: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    selectedBorderAlpha: Float = 0.60f,
 ) {
     Surface(
         modifier = modifier
@@ -235,7 +238,7 @@ private fun HeroToggleActionButton(
         border = BorderStroke(
             width = 1.dp,
             color = if (selected) {
-                selectedColor.copy(alpha = 0.60f)
+                selectedColor.copy(alpha = selectedBorderAlpha)
             } else {
                 MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
             }

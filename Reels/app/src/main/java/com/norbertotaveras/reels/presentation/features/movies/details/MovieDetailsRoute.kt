@@ -46,6 +46,7 @@ fun MovieDetailsRoute(
     plansViewModel: MoviePlansViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val plansState by plansViewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     var isPlansSheetVisible by rememberSaveable { mutableStateOf(false) }
@@ -93,6 +94,7 @@ fun MovieDetailsRoute(
                     }
                 ),
             state = state,
+            hasPlans = plansState.trackedRelease != null || plansState.movieNightPlan != null,
             onEvent = viewModel::onEvent,
             onPlanClick = { isPlansSheetVisible = true },
         )
