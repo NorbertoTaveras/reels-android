@@ -21,7 +21,7 @@ private val fullDateFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy")
 private val shortDateFormatter = DateTimeFormatter.ofPattern("MMM d")
 private val movieNightDateFormatter = DateTimeFormatter.ofPattern("MMM d")
 private val movieNightTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
-private val movieNightConfirmationFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd '·' HH:mm")
+private val movieNightConfirmationFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy '·' h:mm a")
 
 internal fun TrackedRelease.releaseDateLabel(today: LocalDate = LocalDate.now()): String {
     val date = releaseDate?.let { runCatching { LocalDate.parse(it) }.getOrNull() } ?: return "TBA"
