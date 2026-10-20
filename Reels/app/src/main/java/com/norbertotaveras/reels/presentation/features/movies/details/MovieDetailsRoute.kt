@@ -27,9 +27,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.norbertotaveras.reels.presentation.features.plans.MoviePlansSheet
 import com.norbertotaveras.reels.presentation.features.plans.MoviePlansViewModel
-import com.norbertotaveras.reels.presentation.features.plans.dateLabel
-import com.norbertotaveras.reels.presentation.features.plans.reminderLabel
-import com.norbertotaveras.reels.presentation.features.plans.timeLabel
+import com.norbertotaveras.reels.presentation.features.plans.scheduleConfirmationDetails
 import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarHost
 import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarVisuals
 import kotlinx.coroutines.flow.collectLatest
@@ -130,10 +128,7 @@ fun MovieDetailsRoute(
                         snackbarHostState.showSnackbar(
                             visuals = ReelsSnackbarVisuals(
                                 message = "Movie night scheduled!",
-                                supportingText = buildString {
-                                    append("${plan.dateLabel()} · ${plan.timeLabel()}")
-                                    append("\nReminder ${plan.reminderLabel()}")
-                                },
+                                supportingText = plan.scheduleConfirmationDetails(),
                             )
                         )
                     }

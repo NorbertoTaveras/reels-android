@@ -79,6 +79,13 @@ internal fun MovieNightPlan.reminderLabel(): String = reminderMinutesBefore?.let
     }
 } ?: "No reminder"
 
+internal fun MovieNightPlan.scheduleConfirmationDetails(): String = buildString {
+    append("${dateLabel()} · ${timeLabel()}")
+    append('\n')
+    if (reminderMinutesBefore != null) append("Reminder ")
+    append(reminderLabel())
+}
+
 internal fun MovieNightPlan.statusLabel(): String = when (status) {
     MovieNightStatus.Upcoming -> "Upcoming"
     MovieNightStatus.StartingSoon -> "Starting soon"

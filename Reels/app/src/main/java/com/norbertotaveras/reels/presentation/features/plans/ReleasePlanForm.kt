@@ -47,6 +47,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import coil3.compose.AsyncImage
@@ -314,6 +315,8 @@ private fun ReleaseReminderRow(
 internal fun PlanPermissionNotice(
     canPostNotifications: Boolean,
     canScheduleExactAlarms: Boolean = true,
+    modifier: Modifier = Modifier.padding(top = ReelsDimensions.planSheetContentSpacing),
+    containerColor: Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.75f),
 ) {
     if (canPostNotifications && canScheduleExactAlarms) return
     val message = when {
@@ -328,9 +331,9 @@ internal fun PlanPermissionNotice(
                 "Settings \u2192 Apps \u2192 Reels \u2192 Alarms & Reminders."
     }
     Surface(
-        modifier = Modifier.padding(top = ReelsDimensions.planSheetContentSpacing),
+        modifier = modifier,
         shape = RoundedCornerShape(ReelsDimensions.planSheetNoticeCornerSize),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.75f),
+        color = containerColor,
     ) {
         Row(
             modifier = Modifier.padding(ReelsDimensions.planSheetNoticePadding),

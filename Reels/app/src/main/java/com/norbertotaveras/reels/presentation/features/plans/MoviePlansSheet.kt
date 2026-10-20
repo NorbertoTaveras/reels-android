@@ -11,12 +11,12 @@ import android.Manifest
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -30,7 +30,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.norbertotaveras.reels.domain.model.movie.MovieDetailsDataModel
 import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
@@ -57,11 +56,18 @@ fun MoviePlansSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = MaterialTheme.colorScheme.surface,
+        dragHandle = {
+            if (mode == MoviePlansSheetMode.MovieNight) MovieNightSheetDragHandle()
+            else BottomSheetDefaults.DragHandle()
+        },
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState()),
+                .then(
+                    if (mode == MoviePlansSheetMode.MovieNight) Modifier
+                    else Modifier.verticalScroll(rememberScrollState())
+                ),
         ) {
             when (mode) {
                 MoviePlansSheetMode.Choice -> PlanTypeChoice(
@@ -103,9 +109,12 @@ fun MoviePlansSheet(
                     canScheduleExactAlarms = state.canScheduleExactAlarms,
                     canPostNotifications = state.canPostNotifications,
                     existingPlan = state.movieNightPlan,
+                    errorMessage = state.errorMessage,
                     onDismiss = onDismiss,
                     onSave = { scheduledAt, runtime, reminder, venue, attendees, note ->
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        if (reminder != null && !state.canPostNotifications &&
+                            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                        ) {
                             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                         }
                         viewModel.saveMovieNight(
@@ -121,7 +130,7 @@ fun MoviePlansSheet(
                     },
                 )
             }
-            state.errorMessage?.let { message ->
+            state.errorMessage?.takeUnless { mode == MoviePlansSheetMode.MovieNight }?.let { message ->
                 Text(
                     text = message,
                     modifier = Modifier.padding(

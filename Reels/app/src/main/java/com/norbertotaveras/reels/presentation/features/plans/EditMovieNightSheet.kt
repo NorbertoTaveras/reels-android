@@ -9,18 +9,13 @@ package com.norbertotaveras.reels.presentation.features.plans
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,11 +32,11 @@ internal fun EditMovieNightSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = MaterialTheme.colorScheme.surface,
+        dragHandle = { MovieNightSheetDragHandle() },
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState()),
+                .fillMaxWidth(),
         ) {
             MovieNightPlanForm(
                 movieTitle = plan.title,
@@ -53,18 +48,8 @@ internal fun EditMovieNightSheet(
                 onDismiss = onDismiss,
                 onSave = onSave,
                 existingPlan = plan,
+                errorMessage = errorMessage,
             )
-            errorMessage?.let { message ->
-                Text(
-                    text = message,
-                    modifier = Modifier.padding(
-                        horizontal = ReelsDimensions.planSheetHorizontalPadding,
-                        vertical = ReelsDimensions.planSheetSectionVerticalPadding,
-                    ),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
         }
     }
 }

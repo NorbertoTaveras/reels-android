@@ -634,6 +634,22 @@ object ReelsDimensions {
     val planSheetNoticePadding = 14.dp
     val planSheetPrimaryActionHeight = 52.dp
     val planSheetPrimaryActionCornerSize = 14.dp
+    const val movieNightSheetMaxHeightFraction = 0.88f
+    val movieNightSheetCompactHeight = 500.dp
+    val movieNightSheetHandleWidth = 40.dp
+    val movieNightSheetHandleHeight = 4.dp
+    val movieNightSheetHandleTopPadding = 12.dp
+    val movieNightSheetHandleBottomPadding = 4.dp
+    val movieNightSheetBodyPadding = 20.dp
+    val movieNightSheetFooterBottomPadding = 32.dp
+    val movieNightSheetActionSpacing = 12.dp
+    val movieNightSheetCancelHeight = 44.dp
+    val movieNightSheetFieldCornerSize = 16.dp
+    val movieNightSheetFieldHeight = 46.dp
+    val movieNightSheetFieldLabelSpacing = 8.dp
+    val movieNightSheetChipVerticalPadding = 10.dp
+    val movieNightSheetRuntimeLabelSize = 10.sp
+    val movieNightSheetRuntimeLabelLineHeight = 15.sp
 
     val widgetCornerSize = 16.dp
     val widgetCompactPadding = 10.dp
