@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
+import com.norbertotaveras.reels.domain.model.plans.ReleaseReminder
+import com.norbertotaveras.reels.domain.model.plans.TrackedRelease
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
 
@@ -48,6 +51,8 @@ fun PlansScreen(
     onMovieClick: (Int) -> Unit,
     onTabSelected: (PlansTab) -> Unit,
     onReleaseRemove: (Int) -> Unit,
+    onReleaseEdit: (TrackedRelease, ReleaseReminder, Long?, Boolean, () -> Unit) -> Unit,
+    onClearPlanError: () -> Unit,
     onMovieNightEdit: (MovieNightPlan, Long, Int, Int?, String?, Int?, String?, () -> Unit) -> Unit,
     onMovieNightStart: (String) -> Unit,
     onMovieNightPause: (String) -> Unit,
@@ -59,21 +64,18 @@ fun PlansScreen(
     modifier: Modifier = Modifier,
 ) {
     var editingPlan by remember { mutableStateOf<MovieNightPlan?>(null) }
+    var editingRelease by remember { mutableStateOf<TrackedRelease?>(null) }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-    ) {
+    Column(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = ReelsDimensions.plansHeaderHorizontalPadding,
-                    top = ReelsDimensions.plansHeaderTopPadding,
-                    end = ReelsDimensions.plansHeaderHorizontalPadding,
-                    bottom = ReelsDimensions.plansHeaderBottomPadding,
-                ),
+            modifier =
+                Modifier.fillMaxWidth()
+                    .padding(
+                        start = ReelsDimensions.plansHeaderHorizontalPadding,
+                        top = ReelsDimensions.plansHeaderTopPadding,
+                        end = ReelsDimensions.plansHeaderHorizontalPadding,
+                        bottom = ReelsDimensions.plansHeaderBottomPadding,
+                    ),
             verticalArrangement = Arrangement.spacedBy(ReelsDimensions.plansHeaderSpacing),
         ) {
             Surface(
@@ -92,10 +94,11 @@ fun PlansScreen(
             }
             Text(
                 text = "Plans",
-                style = MaterialTheme.typography.headlineSmall.copy(
-                    fontSize = ReelsDimensions.plansTitleSize,
-                    lineHeight = ReelsDimensions.plansTitleLineHeight,
-                ),
+                style =
+                    MaterialTheme.typography.headlineSmall.copy(
+                        fontSize = ReelsDimensions.plansTitleSize,
+                        lineHeight = ReelsDimensions.plansTitleLineHeight,
+                    ),
                 fontWeight = FontWeight.Medium,
             )
         }
@@ -103,13 +106,17 @@ fun PlansScreen(
         SecondaryTabRow(
             selectedTabIndex = state.selectedTab.ordinal,
             containerColor = MaterialTheme.colorScheme.background,
-            divider = {},
+            divider = {
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+                )
+            },
             indicator = {
                 TabRowDefaults.SecondaryIndicator(
-                    modifier = Modifier
-                        .tabIndicatorOffset(state.selectedTab.ordinal)
-                        .padding(horizontal = ReelsDimensions.plansTabIndicatorHorizontalInset)
-                        .height(ReelsDimensions.plansTabIndicatorHeight),
+                    modifier =
+                        Modifier.tabIndicatorOffset(state.selectedTab.ordinal)
+                            .padding(horizontal = ReelsDimensions.plansTabIndicatorHorizontalInset)
+                            .height(ReelsDimensions.plansTabIndicatorHeight),
                     color = MaterialTheme.colorScheme.primary,
                 )
             },
@@ -118,30 +125,64 @@ fun PlansScreen(
                 Tab(
                     modifier = Modifier.height(ReelsDimensions.plansTabHeight),
                     selected = state.selectedTab == tab,
+                    selectedContentColor = MaterialTheme.colorScheme.primary,
+                    unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     onClick = { onTabSelected(tab) },
-                    text = { Text(tab.label) },
+                    text = {
+                        Text(
+                            tab.label,
+                            style =
+                                MaterialTheme.typography.labelLarge.copy(
+                                    fontSize = ReelsDimensions.plansTabTextSize,
+                                    lineHeight = ReelsDimensions.plansTabTextLineHeight,
+                                ),
+                            fontWeight = FontWeight.Medium,
+                        )
+                    },
                 )
             }
         }
 
         when (state.selectedTab) {
-            PlansTab.Releases -> ReleasePlansList(
-                releases = state.trackedReleases,
-                onMovieClick = onMovieClick,
-                onRemove = onReleaseRemove,
-            )
-            PlansTab.MovieNights -> MovieNightPlansList(
-                plans = state.movieNights,
-                onMovieClick = onMovieClick,
-                onEdit = { editingPlan = it },
-                onStart = onMovieNightStart,
-                onPause = onMovieNightPause,
-                onResume = onMovieNightResume,
-                onFinish = onMovieNightFinish,
-                onCancel = onMovieNightCancel,
-                onRemove = onMovieNightRemove,
-            )
+            PlansTab.Releases ->
+                ReleasePlansList(
+                    releases = state.trackedReleases,
+                    onMovieClick = onMovieClick,
+                    onRemove = onReleaseRemove,
+                    onEdit = {
+                        onClearPlanError()
+                        editingRelease = it
+                    },
+                )
+            PlansTab.MovieNights ->
+                MovieNightPlansList(
+                    plans = state.movieNights,
+                    onMovieClick = onMovieClick,
+                    onEdit = { editingPlan = it },
+                    onStart = onMovieNightStart,
+                    onPause = onMovieNightPause,
+                    onResume = onMovieNightResume,
+                    onFinish = onMovieNightFinish,
+                    onCancel = onMovieNightCancel,
+                    onRemove = onMovieNightRemove,
+                )
         }
+    }
+
+    editingRelease?.let { release ->
+        LaunchedEffect(release.movieId) { onRefreshExactAlarmAccess() }
+        EditReleaseReminderSheet(
+            release = release,
+            isSaving = state.isSaving,
+            canScheduleExactAlarms = state.canScheduleExactAlarms,
+            canPostNotifications = state.canPostNotifications,
+            errorMessage = state.errorMessage,
+            onPermissionResult = onRefreshExactAlarmAccess,
+            onSave = { reminder, customAt, notifications ->
+                onReleaseEdit(release, reminder, customAt, notifications) { editingRelease = null }
+            },
+            onDismiss = { editingRelease = null },
+        )
     }
 
     editingPlan?.let { plan ->
@@ -153,15 +194,9 @@ fun PlansScreen(
             canPostNotifications = state.canPostNotifications,
             errorMessage = state.errorMessage,
             onSave = { scheduledAt, runtime, reminder, venue, attendees, note ->
-                onMovieNightEdit(
-                    plan,
-                    scheduledAt,
-                    runtime,
-                    reminder,
-                    venue,
-                    attendees,
-                    note,
-                ) { editingPlan = null }
+                onMovieNightEdit(plan, scheduledAt, runtime, reminder, venue, attendees, note) {
+                    editingPlan = null
+                }
             },
             onDismiss = { editingPlan = null },
         )

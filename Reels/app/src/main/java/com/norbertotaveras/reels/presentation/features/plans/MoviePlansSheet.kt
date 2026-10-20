@@ -97,7 +97,9 @@ fun MoviePlansSheet(
                     isSaving = state.isSaving,
                 )
                 MoviePlansSheetMode.Release -> ReleasePlanForm(
-                    movie = movie,
+                    movieTitle = movie.title,
+                    posterPath = movie.posterPath,
+                    initialReleaseDate = movie.releaseDate,
                     trackedRelease = state.trackedRelease,
                     isSaving = state.isSaving,
                     canScheduleExactAlarms = state.canScheduleExactAlarms,

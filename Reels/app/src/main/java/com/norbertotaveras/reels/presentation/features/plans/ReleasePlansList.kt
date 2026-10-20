@@ -7,6 +7,8 @@
 
 package com.norbertotaveras.reels.presentation.features.plans
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,13 +23,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Alarm
-import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.EventAvailable
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.NotificationsNone
+import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -43,16 +49,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.plans.TrackedRelease
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
+import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
 import java.time.LocalDate
 
 @Composable
@@ -60,6 +71,7 @@ internal fun ReleasePlansList(
     releases: List<TrackedRelease>,
     onMovieClick: (Int) -> Unit,
     onRemove: (Int) -> Unit,
+    onEdit: (TrackedRelease) -> Unit,
 ) {
     if (releases.isEmpty()) {
         PlansEmptyState(
@@ -70,19 +82,28 @@ internal fun ReleasePlansList(
         return
     }
     val today = LocalDate.now()
-    val (released, upcoming) = releases.partition { release ->
-        release.releaseDate?.let { runCatching { LocalDate.parse(it).isBefore(today) }.getOrDefault(false) } == true
-    }
-    LazyColumn(contentPadding = PaddingValues(horizontal = ReelsDimensions.plansListHorizontalPadding)) {
+    val (released, upcoming) =
+        releases.partition { release ->
+            release.releaseDate?.let {
+                runCatching { LocalDate.parse(it).isBefore(today) }.getOrDefault(false)
+            } == true
+        }
+    LazyColumn(
+        contentPadding =
+            PaddingValues(
+                top = ReelsDimensions.plansReleaseListTopPadding,
+                bottom = ReelsDimensions.plansListBottomPadding,
+            )
+    ) {
         items(upcoming, key = { it.movieId }) { release ->
-            ReleasePlanRow(release, onMovieClick, onRemove)
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f))
+            ReleasePlanRow(release, onMovieClick, onRemove, onEdit)
+            ReleaseRowDivider()
         }
         if (released.isNotEmpty()) {
             item(key = "released-heading") { ReleasedHeading() }
             items(released, key = { "released-${it.movieId}" }) { release ->
-                ReleasePlanRow(release, onMovieClick, onRemove)
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f))
+                ReleasePlanRow(release, onMovieClick, onRemove, onEdit, isReleased = true)
+                ReleaseRowDivider()
             }
         }
     }
@@ -93,40 +114,51 @@ private fun ReleasePlanRow(
     release: TrackedRelease,
     onMovieClick: (Int) -> Unit,
     onRemove: (Int) -> Unit,
+    onEdit: (TrackedRelease) -> Unit,
+    isReleased: Boolean = false,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onMovieClick(release.movieId) }
-            .padding(vertical = ReelsDimensions.plansReleaseRowVerticalPadding),
-        verticalAlignment = Alignment.CenterVertically,
+        modifier =
+            Modifier.fillMaxWidth()
+                .alpha(if (isReleased) 0.75f else 1f)
+                .clickable { onMovieClick(release.movieId) }
+                .padding(
+                    horizontal = ReelsDimensions.plansListHorizontalPadding,
+                    vertical = ReelsDimensions.plansReleaseRowVerticalPadding,
+                ),
+        verticalAlignment = Alignment.Top,
     ) {
         AsyncImage(
             model = release.posterPath.toTmdbImageUrl(),
             contentDescription = release.title,
-            modifier = Modifier
-                .width(ReelsDimensions.plansPosterWidth)
-                .height(ReelsDimensions.plansPosterHeight)
-                .clip(RoundedCornerShape(ReelsDimensions.plansPosterCornerSize)),
+            modifier =
+                Modifier.width(ReelsDimensions.plansPosterWidth)
+                    .height(ReelsDimensions.plansPosterHeight)
+                    .clip(RoundedCornerShape(ReelsDimensions.plansPosterCornerSize)),
             contentScale = ContentScale.Crop,
         )
         Spacer(Modifier.width(ReelsDimensions.plansRowSpacing))
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.plansMetadataSpacing),
+            verticalArrangement = Arrangement.spacedBy(ReelsDimensions.plansReleaseMetadataSpacing),
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.plansActionSpacing),
+            ) {
                 Text(
                     release.title,
-                    modifier = Modifier.weight(1f, fill = false),
+                    modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
                 )
                 release.releaseStatusLabel()?.let { status -> ReleaseStatusBadge(status) }
             }
-            PlanMetadataLine(Icons.Filled.CalendarMonth, release.releaseDateLabel())
+            PlanMetadataLine(
+                Icons.Outlined.CalendarMonth,
+                release.releaseDateLabel(),
+                highlightRelativeDate = true,
+            )
             release.previousDateLabel()?.let { previous ->
                 Text(
                     "Was $previous",
@@ -135,66 +167,177 @@ private fun ReleasePlanRow(
                     textDecoration = TextDecoration.LineThrough,
                 )
             }
-            PlanMetadataLine(Icons.Filled.Alarm, release.reminderLabel())
+            PlanMetadataLine(
+                if (isReleased || !release.hasActiveReminder()) Icons.Outlined.NotificationsOff
+                else Icons.Outlined.NotificationsNone,
+                if (isReleased) "\u2014" else release.reminderLabel(),
+                highlightIcon = !isReleased && release.hasActiveReminder(),
+            )
         }
-        ReleaseOverflowMenu(onRemove = { onRemove(release.movieId) })
+        Spacer(Modifier.width(ReelsDimensions.plansRowSpacing))
+        ReleaseOverflowMenu(
+            onRemove = { onRemove(release.movieId) },
+            onEdit = { onEdit(release) },
+            onOpenMovie = { onMovieClick(release.movieId) },
+        )
     }
 }
 
 @Composable
 private fun ReleaseStatusBadge(status: String) {
+    val accent =
+        when (status) {
+            "Out today" -> ReelsTeal
+            "Date moved" -> MaterialTheme.colorScheme.primary
+            else -> MaterialTheme.colorScheme.onSurfaceVariant
+        }
     Surface(
-        shape = RoundedCornerShape(ReelsDimensions.plansStatusCornerSize),
-        color = when (status) {
-            "Out today" -> MaterialTheme.colorScheme.tertiaryContainer
-            "Date moved" -> MaterialTheme.colorScheme.secondaryContainer
-            else -> MaterialTheme.colorScheme.surfaceVariant
-        },
-    ) {
-        Text(
-            status,
-            modifier = Modifier.padding(
-                horizontal = ReelsDimensions.plansStatusHorizontalPadding,
-                vertical = ReelsDimensions.plansStatusVerticalPadding,
+        shape = CircleShape,
+        color =
+            if (status == "Released") MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+            else accent.copy(alpha = 0.12f),
+        border =
+            BorderStroke(
+                1.dp,
+                if (status == "Released") reelsBorderColor() else accent.copy(alpha = 0.3f),
             ),
-            style = MaterialTheme.typography.labelSmall,
-            color = when (status) {
-                "Out today" -> MaterialTheme.colorScheme.onTertiaryContainer
-                "Date moved" -> MaterialTheme.colorScheme.onSecondaryContainer
-                else -> MaterialTheme.colorScheme.onSurfaceVariant
-            },
-        )
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement =
+                Arrangement.spacedBy(ReelsDimensions.plansReleaseMetadataSpacing),
+            modifier =
+                Modifier.padding(
+                    horizontal = ReelsDimensions.plansReleaseStatusHorizontalPadding,
+                    vertical = ReelsDimensions.plansReleaseStatusVerticalPadding,
+                ),
+        ) {
+            if (status == "Out today")
+                Box(
+                    Modifier.size(ReelsDimensions.plansReleaseStatusDotSize)
+                        .background(accent, CircleShape)
+                )
+            Text(
+                status,
+                style =
+                    MaterialTheme.typography.labelSmall.copy(
+                        fontSize = ReelsDimensions.plansReleaseStatusTextSize,
+                        lineHeight = ReelsDimensions.plansReleaseStatusLineHeight,
+                    ),
+                fontWeight = FontWeight.SemiBold,
+                color = accent,
+            )
+        }
     }
 }
 
 @Composable
-private fun PlanMetadataLine(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String) {
+private fun PlanMetadataLine(
+    icon: ImageVector,
+    text: String,
+    highlightIcon: Boolean = false,
+    highlightRelativeDate: Boolean = false,
+) {
+    val accent = MaterialTheme.colorScheme.primary
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.plansMetadataSpacing),
+        horizontalArrangement =
+            Arrangement.spacedBy(ReelsDimensions.plansReleaseMetadataIconSpacing),
     ) {
         Icon(
             icon,
             null,
-            modifier = Modifier.size(ReelsDimensions.plansMetadataIconSize),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(ReelsDimensions.plansReleaseMetadataIconSize),
+            tint =
+                if (highlightIcon) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Text(text, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            text =
+                buildAnnotatedString {
+                    val relativeStart = if (highlightRelativeDate) text.indexOf(" · ") else -1
+                    append(text)
+                    if (relativeStart >= 0)
+                        addStyle(SpanStyle(color = accent), relativeStart, text.length)
+                },
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
 @Composable
-private fun ReleaseOverflowMenu(onRemove: () -> Unit) {
+private fun ReleaseOverflowMenu(onRemove: () -> Unit, onEdit: () -> Unit, onOpenMovie: () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     Box {
-        IconButton(onClick = { expanded = true }) {
-            Icon(Icons.Filled.MoreVert, contentDescription = "Release options")
+        IconButton(
+            onClick = { expanded = true },
+            modifier = Modifier.size(ReelsDimensions.plansReleaseMenuButtonSize),
+        ) {
+            Icon(
+                Icons.Filled.MoreVert,
+                contentDescription = "Release options",
+                modifier = Modifier.size(ReelsDimensions.plansReleaseMenuIconSize),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.width(ReelsDimensions.plansReleaseMenuWidth),
+            shape = RoundedCornerShape(ReelsDimensions.movieNightSheetFieldCornerSize),
+            containerColor = MaterialTheme.colorScheme.surface,
+            border = BorderStroke(1.dp, reelsBorderColor()),
+        ) {
             DropdownMenuItem(
-                text = { Text("Stop tracking") },
-                leadingIcon = { Icon(Icons.Filled.DeleteOutline, null) },
-                onClick = { expanded = false; onRemove() },
+                text = { Text("Edit reminder", style = MaterialTheme.typography.bodyMedium) },
+                leadingIcon = {
+                    Icon(
+                        Icons.Outlined.Edit,
+                        null,
+                        modifier = Modifier.size(ReelsDimensions.plansReleaseMenuIconSize),
+                    )
+                },
+                onClick = {
+                    expanded = false
+                    onEdit()
+                },
+            )
+            DropdownMenuItem(
+                text = { Text("Open movie", style = MaterialTheme.typography.bodyMedium) },
+                leadingIcon = {
+                    Icon(
+                        Icons.AutoMirrored.Outlined.OpenInNew,
+                        null,
+                        modifier = Modifier.size(ReelsDimensions.plansReleaseMenuIconSize),
+                    )
+                },
+                onClick = {
+                    expanded = false
+                    onOpenMovie()
+                },
+            )
+            HorizontalDivider(color = reelsBorderColor())
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        "Stop tracking",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        Icons.Filled.DeleteOutline,
+                        null,
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(ReelsDimensions.plansReleaseMenuIconSize),
+                    )
+                },
+                onClick = {
+                    expanded = false
+                    onRemove()
+                },
             )
         }
     }
@@ -203,12 +346,26 @@ private fun ReleaseOverflowMenu(onRemove: () -> Unit) {
 @Composable
 private fun ReleasedHeading() {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp),
+        modifier =
+            Modifier.fillMaxWidth()
+                .padding(
+                    horizontal = ReelsDimensions.plansListHorizontalPadding,
+                    vertical = ReelsDimensions.plansReleasedHeadingVerticalPadding,
+                ),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.plansRowSpacing),
     ) {
         HorizontalDivider(modifier = Modifier.weight(1f))
-        Text("RELEASED", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            "RELEASED",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         HorizontalDivider(modifier = Modifier.weight(1f))
     }
+}
+
+@Composable
+private fun ReleaseRowDivider() {
+    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
 }

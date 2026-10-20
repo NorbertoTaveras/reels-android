@@ -27,6 +27,8 @@ fun PlansRoute(
         onMovieClick = onMovieClick,
         onTabSelected = viewModel::selectTab,
         onReleaseRemove = viewModel::removeRelease,
+        onReleaseEdit = viewModel::editReleaseReminder,
+        onClearPlanError = viewModel::clearPlanError,
         onMovieNightEdit = viewModel::editMovieNight,
         onMovieNightStart = viewModel::startMovieNight,
         onMovieNightPause = viewModel::pauseMovieNight,

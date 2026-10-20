@@ -59,7 +59,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
 import coil3.compose.AsyncImage
-import com.norbertotaveras.reels.domain.model.movie.MovieDetailsDataModel
 import com.norbertotaveras.reels.domain.model.plans.ReleaseReminder
 import com.norbertotaveras.reels.domain.model.plans.TrackedRelease
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
@@ -73,7 +72,9 @@ import java.time.temporal.ChronoUnit
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ReleasePlanForm(
-    movie: MovieDetailsDataModel,
+    movieTitle: String,
+    posterPath: String?,
+    initialReleaseDate: String?,
     trackedRelease: TrackedRelease?,
     isSaving: Boolean,
     canScheduleExactAlarms: Boolean,
@@ -87,7 +88,7 @@ internal fun ReleasePlanForm(
             Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault())
         }
     val releaseDate =
-        (trackedRelease?.releaseDate ?: movie.releaseDate)?.let {
+        (trackedRelease?.releaseDate ?: initialReleaseDate)?.let {
             runCatching { LocalDate.parse(it) }.getOrNull()
         }
     var reminder by
@@ -125,8 +126,8 @@ internal fun ReleasePlanForm(
         PlanSheetHeader(title = "Release reminder", onDismiss = onDismiss)
         PlanSheetDivider()
         MoviePlanSummary(
-            title = movie.title,
-            posterPath = movie.posterPath,
+            title = movieTitle,
+            posterPath = posterPath,
             subtitle = releaseDate.releaseSummary(),
         )
         PlanSheetDivider()

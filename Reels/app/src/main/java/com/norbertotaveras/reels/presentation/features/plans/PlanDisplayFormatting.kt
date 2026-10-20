@@ -69,6 +69,9 @@ internal fun TrackedRelease.reminderLabel(): String = when {
     else -> "1 day before"
 }
 
+internal fun TrackedRelease.hasActiveReminder(): Boolean =
+    notificationsEnabled && reminder != ReleaseReminder.None && releaseDate != null
+
 internal fun MovieNightPlan.dateLabel(): String = Instant.ofEpochMilli(scheduledAt)
     .atZone(ZoneId.systemDefault())
     .format(movieNightDateFormatter)

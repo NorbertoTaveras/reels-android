@@ -15,5 +15,6 @@ class TrackReleaseUseCase @Inject constructor(
     private val repository: TrackedReleaseRepository,
 ) {
     suspend operator fun invoke(release: TrackedRelease): Result<Unit> = repository.track(release)
+    suspend fun updateReminder(release: TrackedRelease): Result<Unit> = repository.updateReminder(release)
     suspend fun remove(movieId: Int): Result<Unit> = repository.remove(movieId)
 }
