@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -31,10 +30,10 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.norbertotaveras.reels.domain.model.movie.MovieDetailsDataModel
 import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
+import com.norbertotaveras.reels.domain.model.plans.ReleaseReminder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import kotlinx.coroutines.delay
 
@@ -45,9 +44,9 @@ fun MoviePlansSheet(
     viewModel: MoviePlansViewModel,
     onDismiss: () -> Unit,
     onMovieNightSaved: (MovieNightPlan) -> Unit,
+    onReleaseFeedback: (String) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val context = LocalContext.current
     var mode by rememberSaveable { mutableStateOf(MoviePlansSheetMode.Choice) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val onSaved by rememberUpdatedState(onMovieNightSaved)
@@ -71,33 +70,31 @@ fun MoviePlansSheet(
         containerColor = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(ReelsDimensions.planSheetCornerSize),
         dragHandle = {
-            if (mode == MoviePlansSheetMode.Choice ||
-                mode == MoviePlansSheetMode.MovieNight ||
-                mode == MoviePlansSheetMode.MovieNightConfirmation
-            ) {
-                MovieNightSheetDragHandle()
-            } else {
-                BottomSheetDefaults.DragHandle()
-            }
+            MovieNightSheetDragHandle()
         },
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .then(
-                    if (mode == MoviePlansSheetMode.MovieNight) Modifier
+                    if (mode == MoviePlansSheetMode.MovieNight || mode == MoviePlansSheetMode.Release) Modifier
                     else Modifier.verticalScroll(rememberScrollState())
                 ),
         ) {
             when (mode) {
                 MoviePlansSheetMode.Choice -> PlanTypeChoice(
                     movieTitle = movie.title,
+                    releaseDate = state.trackedRelease?.releaseDate ?: movie.releaseDate,
                     isTracked = state.trackedRelease != null,
                     movieNightPlan = state.movieNightPlan,
                     showRelease = state.trackedRelease != null || movie.isUnreleased(),
                     onReleaseClick = { mode = MoviePlansSheetMode.Release },
                     onMovieNightClick = { mode = MoviePlansSheetMode.MovieNight },
                     onDismiss = onDismiss,
+                    onStopTracking = {
+                        viewModel.removeTrackedRelease { onReleaseFeedback("Release tracking stopped") }
+                    },
+                    isSaving = state.isSaving,
                 )
                 MoviePlansSheetMode.Release -> ReleasePlanForm(
                     movie = movie,
@@ -105,10 +102,11 @@ fun MoviePlansSheet(
                     isSaving = state.isSaving,
                     canScheduleExactAlarms = state.canScheduleExactAlarms,
                     canPostNotifications = state.canPostNotifications,
-                    onRequestExactAlarms = context::openExactAlarmSettings,
                     onDismiss = onDismiss,
                     onSave = { reminder, customReminderAt, notifications ->
-                        if (notifications && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        if (notifications && reminder != ReleaseReminder.None &&
+                            !state.canPostNotifications && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                        ) {
                             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                         }
                         viewModel.trackRelease(
@@ -116,10 +114,13 @@ fun MoviePlansSheet(
                             reminder = reminder,
                             customReminderAt = customReminderAt,
                             notificationsEnabled = notifications,
-                            onComplete = onDismiss,
+                            onComplete = {
+                                val label = releaseReminderOptions.first { it.value == reminder }.title
+                                onReleaseFeedback("Release tracked · $label")
+                            },
                         )
                     },
-                    onRemove = { viewModel.removeTrackedRelease(onDismiss) },
+                    errorMessage = state.errorMessage,
                 )
                 MoviePlansSheetMode.MovieNight -> MovieNightPlanForm(
                     movieTitle = movie.title,
@@ -153,7 +154,7 @@ fun MoviePlansSheet(
                     MovieNightScheduleConfirmation(plan = plan)
                 }
             }
-            state.errorMessage?.takeUnless { mode == MoviePlansSheetMode.MovieNight }?.let { message ->
+            state.errorMessage?.takeIf { mode == MoviePlansSheetMode.Choice }?.let { message ->
                 Text(
                     text = message,
                     modifier = Modifier.padding(

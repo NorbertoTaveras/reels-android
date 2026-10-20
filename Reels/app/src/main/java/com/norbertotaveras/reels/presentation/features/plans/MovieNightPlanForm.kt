@@ -394,56 +394,6 @@ internal fun MovieNightPlanForm(
 }
 
 @Composable
-private fun PlanDateTimeField(
-    label: String,
-    value: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    onClick: () -> Unit,
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.movieNightSheetFieldLabelSpacing)
-    ) {
-        Text(
-            label,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Surface(
-            modifier =
-                Modifier.fillMaxWidth()
-                    .height(ReelsDimensions.movieNightSheetFieldHeight)
-                    .clickable(onClick = onClick),
-            shape = RoundedCornerShape(ReelsDimensions.movieNightSheetFieldCornerSize),
-            color = MaterialTheme.colorScheme.background,
-            border =
-                androidx.compose.foundation.BorderStroke(
-                    1.dp,
-                    MaterialTheme.colorScheme.outlineVariant,
-                ),
-        ) {
-            Row(
-                modifier =
-                    Modifier.padding(horizontal = ReelsDimensions.planSheetFieldHorizontalPadding),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.plansRowSpacing),
-            ) {
-                Icon(
-                    icon,
-                    null,
-                    modifier = Modifier.size(ReelsDimensions.planSheetCloseIconSize),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    value,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Normal,
-                )
-            }
-        }
-    }
-}
-
-@Composable
 private fun PlanChoiceChip(
     label: String,
     selected: Boolean,

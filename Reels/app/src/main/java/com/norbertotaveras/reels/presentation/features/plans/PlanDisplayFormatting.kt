@@ -23,6 +23,11 @@ private val movieNightDateFormatter = DateTimeFormatter.ofPattern("MMM d")
 private val movieNightTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
 private val movieNightConfirmationFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy '·' h:mm a")
 
+internal fun String?.releaseChoiceLabel(): String {
+    val date = this?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+    return "Release date: ${date?.format(fullDateFormatter) ?: "TBA"}"
+}
+
 internal fun TrackedRelease.releaseDateLabel(today: LocalDate = LocalDate.now()): String {
     val date = releaseDate?.let { runCatching { LocalDate.parse(it) }.getOrNull() } ?: return "TBA"
     val days = ChronoUnit.DAYS.between(today, date)

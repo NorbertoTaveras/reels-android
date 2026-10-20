@@ -18,7 +18,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.EventAvailable
+import androidx.compose.material.icons.outlined.EventAvailable
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Theaters
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
@@ -39,12 +41,15 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsTeal
 @Composable
 internal fun PlanTypeChoice(
     movieTitle: String,
+    releaseDate: String?,
     isTracked: Boolean,
     movieNightPlan: MovieNightPlan?,
     showRelease: Boolean,
     onReleaseClick: () -> Unit,
     onMovieNightClick: () -> Unit,
     onDismiss: () -> Unit,
+    onStopTracking: () -> Unit,
+    isSaving: Boolean,
 ) {
     Row(
         modifier = Modifier
@@ -91,16 +96,31 @@ internal fun PlanTypeChoice(
             PlanChoiceRow(
                 icon = {
                     Icon(
-                        Icons.Filled.EventAvailable,
+                        if (isTracked) Icons.Outlined.EventAvailable else Icons.Outlined.CalendarMonth,
                         contentDescription = null,
                         modifier = Modifier.size(ReelsDimensions.planSheetChoiceIconSize),
                     )
                 },
-                title = if (isTracked) "Release reminder" else "Track release",
-                subtitle = if (isTracked) "Update reminder settings" else "Get notified when it arrives",
+                title = if (isTracked) "Release tracked" else "Track release",
+                subtitle = if (isTracked) "Tap to change reminder" else releaseDate.releaseChoiceLabel(),
                 onClick = onReleaseClick,
+                highlightColor = if (isTracked) MaterialTheme.colorScheme.primary else null,
+                highlightContainerAlpha = 0.20f,
             )
-            PlanSheetDivider()
+            if (isTracked) {
+                Text(
+                    "Stop tracking",
+                    modifier = Modifier
+                        .padding(
+                            start = ReelsDimensions.planSheetStopTrackingStartPadding,
+                            bottom = ReelsDimensions.planSheetChoiceOptionsVerticalPadding,
+                        )
+                        .clickable(enabled = !isSaving, onClick = onStopTracking),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textDecoration = TextDecoration.Underline,
+                )
+            }
         }
         PlanChoiceRow(
             icon = {
@@ -126,6 +146,7 @@ private fun PlanChoiceRow(
     subtitle: String,
     onClick: () -> Unit,
     highlightColor: Color? = null,
+    highlightContainerAlpha: Float = 0.15f,
 ) {
     Row(
         modifier = Modifier
@@ -141,8 +162,8 @@ private fun PlanChoiceRow(
         Surface(
             modifier = Modifier.size(ReelsDimensions.planSheetChoiceIconContainerSize),
             shape = RoundedCornerShape(ReelsDimensions.planSheetChoiceIconCornerSize),
-            color = highlightColor?.copy(alpha = 0.15f)
-                ?: MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+            color = highlightColor?.copy(alpha = highlightContainerAlpha)
+                ?: MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
         ) {
             Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
                 CompositionLocalProvider(

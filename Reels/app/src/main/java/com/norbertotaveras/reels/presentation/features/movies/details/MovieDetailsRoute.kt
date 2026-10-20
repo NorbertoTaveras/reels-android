@@ -124,6 +124,13 @@ fun MovieDetailsRoute(
                 movie = checkNotNull(state.movie),
                 viewModel = plansViewModel,
                 onDismiss = { isPlansSheetVisible = false },
+                onReleaseFeedback = { message ->
+                    isPlansSheetVisible = false
+                    coroutineScope.launch {
+                        snackbarHostState.currentSnackbarData?.dismiss()
+                        snackbarHostState.showSnackbar(ReelsSnackbarVisuals(message = message))
+                    }
+                },
                 onMovieNightSaved = { plan ->
                     isPlansSheetVisible = false
                     coroutineScope.launch {

@@ -86,18 +86,21 @@ class MoviePlansViewModel @Inject constructor(
         notificationsEnabled: Boolean,
         onComplete: () -> Unit,
     ) {
+        val release = state.value.trackedRelease?.copy(
+            reminder = reminder,
+            customReminderAt = customReminderAt,
+            notificationsEnabled = notificationsEnabled,
+        ) ?: TrackedRelease(
+            movieId = movie.id,
+            title = movie.title,
+            posterPath = movie.posterPath,
+            releaseDate = movie.releaseDate,
+            reminder = reminder,
+            customReminderAt = customReminderAt,
+            notificationsEnabled = notificationsEnabled,
+        )
         save(onComplete) {
-            trackReleaseUseCase(
-                TrackedRelease(
-                    movieId = movie.id,
-                    title = movie.title,
-                    posterPath = movie.posterPath,
-                    releaseDate = movie.releaseDate,
-                    reminder = reminder,
-                    customReminderAt = customReminderAt,
-                    notificationsEnabled = notificationsEnabled,
-                )
-            )
+            trackReleaseUseCase(release)
         }
     }
 
