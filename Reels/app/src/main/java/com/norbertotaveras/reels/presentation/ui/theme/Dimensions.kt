@@ -650,6 +650,13 @@ object ReelsDimensions {
     val movieNightSheetChipVerticalPadding = 10.dp
     val movieNightSheetRuntimeLabelSize = 10.sp
     val movieNightSheetRuntimeLabelLineHeight = 15.sp
+    val movieNightConfirmationTopPadding = 40.dp
+    val movieNightConfirmationBottomPadding = 56.dp
+    val movieNightConfirmationIconContainerSize = 64.dp
+    val movieNightConfirmationIconSize = 30.dp
+    val movieNightConfirmationIconCornerSize = 24.dp
+    val movieNightConfirmationIconSpacing = 16.dp
+    val movieNightConfirmationTextSpacing = 4.dp
 
     val widgetCornerSize = 16.dp
     val widgetCompactPadding = 10.dp

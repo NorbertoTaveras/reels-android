@@ -115,7 +115,7 @@ internal fun MovieNightPlanForm(
 
     Column(modifier = Modifier.fillMaxWidth().heightIn(max = maxHeight)) {
         PlanSheetHeader(
-            title = if (existingPlan == null) "Movie night" else "Edit movie night",
+            title = "Movie night",
             onDismiss = onDismiss,
         )
         PlanSheetDivider()

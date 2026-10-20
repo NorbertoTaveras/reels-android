@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -34,6 +35,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.norbertotaveras.reels.domain.model.movie.MovieDetailsDataModel
 import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,19 +48,34 @@ fun MoviePlansSheet(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var mode by rememberSaveable { mutableStateOf(MoviePlansSheetMode.Choice) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val onSaved by rememberUpdatedState(onMovieNightSaved)
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { viewModel.refreshExactAlarmAccess() }
 
     LaunchedEffect(Unit) { viewModel.refreshExactAlarmAccess() }
+    LaunchedEffect(mode, state.movieNightPlan?.id) {
+        if (mode == MoviePlansSheetMode.MovieNightConfirmation) {
+            val plan = state.movieNightPlan ?: return@LaunchedEffect
+            delay(PlanFeedbackTiming.movieNightConfirmationMillis)
+            sheetState.hide()
+            onSaved(plan)
+        }
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surface,
         dragHandle = {
-            if (mode == MoviePlansSheetMode.MovieNight) MovieNightSheetDragHandle()
-            else BottomSheetDefaults.DragHandle()
+            if (mode == MoviePlansSheetMode.MovieNight ||
+                mode == MoviePlansSheetMode.MovieNightConfirmation
+            ) {
+                MovieNightSheetDragHandle()
+            } else {
+                BottomSheetDefaults.DragHandle()
+            }
         },
     ) {
         Column(
@@ -125,10 +142,13 @@ fun MoviePlansSheet(
                             venue = venue,
                             attendeeCount = attendees,
                             note = note,
-                            onComplete = onMovieNightSaved,
+                            onComplete = { mode = MoviePlansSheetMode.MovieNightConfirmation },
                         )
                     },
                 )
+                MoviePlansSheetMode.MovieNightConfirmation -> state.movieNightPlan?.let { plan ->
+                    MovieNightScheduleConfirmation(plan = plan)
+                }
             }
             state.errorMessage?.takeUnless { mode == MoviePlansSheetMode.MovieNight }?.let { message ->
                 Text(

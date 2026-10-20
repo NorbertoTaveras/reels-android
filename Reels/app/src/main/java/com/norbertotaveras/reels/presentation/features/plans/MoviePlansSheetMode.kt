@@ -11,4 +11,5 @@ internal enum class MoviePlansSheetMode {
     Choice,
     Release,
     MovieNight,
+    MovieNightConfirmation,
 }

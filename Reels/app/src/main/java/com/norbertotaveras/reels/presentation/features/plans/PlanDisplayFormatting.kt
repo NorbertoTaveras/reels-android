@@ -21,6 +21,7 @@ private val fullDateFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy")
 private val shortDateFormatter = DateTimeFormatter.ofPattern("MMM d")
 private val movieNightDateFormatter = DateTimeFormatter.ofPattern("MMM d")
 private val movieNightTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
+private val movieNightConfirmationFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd '·' HH:mm")
 
 internal fun TrackedRelease.releaseDateLabel(today: LocalDate = LocalDate.now()): String {
     val date = releaseDate?.let { runCatching { LocalDate.parse(it) }.getOrNull() } ?: return "TBA"
@@ -79,12 +80,9 @@ internal fun MovieNightPlan.reminderLabel(): String = reminderMinutesBefore?.let
     }
 } ?: "No reminder"
 
-internal fun MovieNightPlan.scheduleConfirmationDetails(): String = buildString {
-    append("${dateLabel()} · ${timeLabel()}")
-    append('\n')
-    if (reminderMinutesBefore != null) append("Reminder ")
-    append(reminderLabel())
-}
+internal fun MovieNightPlan.scheduleConfirmationDateTime(): String = Instant.ofEpochMilli(scheduledAt)
+    .atZone(ZoneId.systemDefault())
+    .format(movieNightConfirmationFormatter)
 
 internal fun MovieNightPlan.statusLabel(): String = when (status) {
     MovieNightStatus.Upcoming -> "Upcoming"
