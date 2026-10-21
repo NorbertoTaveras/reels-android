@@ -28,6 +28,9 @@ fun MovieNightPlan.runtimeProgress(now: Long = System.currentTimeMillis()): Int 
 fun MovieNightPlan.hasRuntimeEnded(now: Long = System.currentTimeMillis()): Boolean =
     runtimeElapsedMillis(now) >= runtimeDurationMillis()
 
+fun MovieNightPlan.runtimeRemainingMillis(now: Long = System.currentTimeMillis()): Long =
+    (runtimeDurationMillis() - runtimeElapsedMillis(now)).coerceIn(0L, runtimeDurationMillis())
+
 fun MovieNightPlan.canStartJourney(now: Long = System.currentTimeMillis()): Boolean =
     scheduledAt - now in 0..MovieNightJourney.COUNTDOWN_WINDOW_MILLIS
 

@@ -36,6 +36,8 @@
     <string name="widget_open_reels">Open Reels</string>
     <string name="widget_runtime_unavailable">Runtime unavailable</string>
     <string name="widget_runtime_minutes">%1$d min</string>
+    <string name="widget_runtime_remaining">%1$dh %2$dm left</string>
+    <string name="widget_movie_night_paused">Paused</string>
     <string name="widget_release_tba">TBA</string>
     <string name="widget_release_today">Today</string>
     <string name="widget_release_tomorrow">Tomorrow</string>

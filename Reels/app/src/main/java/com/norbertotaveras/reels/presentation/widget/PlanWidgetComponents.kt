@@ -34,6 +34,7 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import com.norbertotaveras.reels.R
+import com.norbertotaveras.reels.presentation.ui.theme.PlanWidgetDimensions
 
 @Composable
 internal fun WidgetHeader(title: String) {
@@ -56,22 +57,27 @@ internal fun WidgetHeader(title: String) {
 }
 
 @Composable
-internal fun WidgetPoster(title: String, poster: Bitmap?) {
+internal fun WidgetPoster(
+    title: String,
+    poster: Bitmap?,
+    width: Dp = PlanWidgetDimensions.CompactPosterWidth,
+    height: Dp = PlanWidgetDimensions.CompactPosterHeight,
+) {
     if (poster != null) {
         Image(
             provider = ImageProvider(poster),
             contentDescription = title,
             modifier = GlanceModifier
-                .width(PlanWidgetDimensions.CompactPosterWidth)
-                .height(PlanWidgetDimensions.CompactPosterHeight)
+                .width(width)
+                .height(height)
                 .cornerRadius(PlanWidgetDimensions.PosterCornerSize),
             contentScale = ContentScale.Crop,
         )
     } else {
         WidgetMark(
             modifier = GlanceModifier
-                .width(PlanWidgetDimensions.CompactPosterWidth)
-                .height(PlanWidgetDimensions.CompactPosterHeight)
+                .width(width)
+                .height(height)
                 .background(PlanWidgetTheme.Surface)
                 .cornerRadius(PlanWidgetDimensions.PosterCornerSize),
         )

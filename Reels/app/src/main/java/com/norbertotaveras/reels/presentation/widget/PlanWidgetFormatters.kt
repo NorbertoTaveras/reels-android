@@ -10,7 +10,10 @@ package com.norbertotaveras.reels.presentation.widget
 import android.content.Context
 import com.norbertotaveras.reels.R
 import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
+import com.norbertotaveras.reels.domain.model.plans.MovieNightStatus
 import com.norbertotaveras.reels.domain.model.plans.ReleaseReminder
+import com.norbertotaveras.reels.domain.plans.canStartJourney
+import com.norbertotaveras.reels.domain.plans.runtimeRemainingMillis
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
@@ -30,6 +33,7 @@ internal fun MovieNightPlan.toRelativeWidgetDateTime(context: Context): String {
 }
 
 internal fun MovieNightPlan.toWidgetCountdown(context: Context, short: Boolean = false): String {
+    if (hasWidgetJourney) return runtimeRemainingLabel(context)
     val remaining = Duration.ofMillis((scheduledAt - System.currentTimeMillis()).coerceAtLeast(0L))
     val days = remaining.toDays()
     val hours = remaining.toHours()
@@ -45,6 +49,18 @@ internal fun MovieNightPlan.toWidgetCountdown(context: Context, short: Boolean =
         minutes > 0 -> "In ${minutes}m"
         else -> context.getString(R.string.widget_now)
     }
+}
+
+internal val MovieNightPlan.hasWidgetJourney: Boolean
+    get() = status == MovieNightStatus.Active || status == MovieNightStatus.Paused
+
+internal fun MovieNightPlan.canStartFromWidget(): Boolean =
+    status == MovieNightStatus.StartingSoon ||
+        (status == MovieNightStatus.Upcoming && canStartJourney())
+
+internal fun MovieNightPlan.runtimeRemainingLabel(context: Context): String {
+    val minutes = (runtimeRemainingMillis() + MILLIS_PER_MINUTE - 1) / MILLIS_PER_MINUTE
+    return context.getString(R.string.widget_runtime_remaining, minutes / 60, minutes % 60)
 }
 
 internal fun String?.toWidgetReleaseDate(context: Context, isOnline: Boolean): String {
@@ -92,3 +108,4 @@ internal fun ReleaseReminder.toWidgetLabel(context: Context): String = when (thi
 private val RELEASE_DATE_FORMAT = DateTimeFormatter.ofPattern("MMM d")
 private val MOVIE_NIGHT_DATE_FORMAT = DateTimeFormatter.ofPattern("EEE, MMM d · h:mm a")
 private val MOVIE_NIGHT_TIME_FORMAT = DateTimeFormatter.ofPattern("h:mm a")
+private const val MILLIS_PER_MINUTE = 60_000L

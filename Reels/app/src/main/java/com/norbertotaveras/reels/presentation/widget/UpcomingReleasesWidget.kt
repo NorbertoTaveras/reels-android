@@ -47,6 +47,7 @@ import com.norbertotaveras.reels.MainActivity
 import com.norbertotaveras.reels.R
 import com.norbertotaveras.reels.data.widget.PlanWidgetEntryPoint
 import com.norbertotaveras.reels.domain.model.plans.TrackedRelease
+import com.norbertotaveras.reels.presentation.ui.theme.PlanWidgetDimensions
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.map
 
