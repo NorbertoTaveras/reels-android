@@ -80,6 +80,18 @@ internal fun String?.toWidgetReleaseDate(context: Context, isOnline: Boolean): S
     }.getOrDefault(this)
 }
 
+internal fun String?.toCompactWidgetReleaseDate(context: Context, isOnline: Boolean): String {
+    if (!isOnline) return context.getString(R.string.widget_cached)
+    val date = this?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+        ?: return context.getString(R.string.widget_release_tba)
+    return when (val days = ChronoUnit.DAYS.between(LocalDate.now(), date)) {
+        0L -> context.getString(R.string.widget_release_today)
+        1L -> context.getString(R.string.widget_release_tomorrow)
+        in 2..Long.MAX_VALUE -> context.getString(R.string.widget_release_in_days, days)
+        else -> date.format(RELEASE_DATE_FORMAT)
+    }
+}
+
 internal fun String.toWidgetReleaseCountdown(): String {
     val days = runCatching { ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(this)) }
         .getOrDefault(0L)

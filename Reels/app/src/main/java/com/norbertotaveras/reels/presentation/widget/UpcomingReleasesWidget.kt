@@ -351,7 +351,7 @@ private fun ReleaseRow(
                 ),
             )
             Text(
-                text = release.dateLabel(context, isOnline),
+                text = release.releaseDate.toCompactWidgetReleaseDate(context, isOnline),
                 maxLines = 1,
                 style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
             )

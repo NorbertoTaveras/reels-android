@@ -32,6 +32,8 @@
     <string name="widget_no_tracked_releases">No releases tracked</string>
     <string name="widget_no_movie_night">No movie night planned</string>
     <string name="widget_cached_date">%1$s · cached</string>
+    <string name="widget_cached">Cached</string>
+    <string name="widget_release_in_days">In %1$d days</string>
     <string name="widget_locally_stored_releases">Showing locally stored releases</string>
     <string name="widget_open_reels">Open Reels</string>
     <string name="widget_runtime_unavailable">Runtime unavailable</string>
