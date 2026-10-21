@@ -14,6 +14,7 @@ import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
 import com.norbertotaveras.reels.domain.model.plans.MovieNightStatus
 import com.norbertotaveras.reels.domain.plans.ReelsNotificationManager
+import com.norbertotaveras.reels.domain.plans.ReelsWidgetUpdater
 import com.norbertotaveras.reels.domain.plans.hasRuntimeEnded
 import com.norbertotaveras.reels.domain.repository.plans.MovieNightRepository
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,6 +28,7 @@ import kotlinx.coroutines.launch
 class MovieNightActionReceiver : BroadcastReceiver() {
     @Inject lateinit var movieNights: MovieNightRepository
     @Inject lateinit var notifications: ReelsNotificationManager
+    @Inject lateinit var widgetUpdater: ReelsWidgetUpdater
     @Inject @IoDispatcher lateinit var ioDispatcher: CoroutineDispatcher
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -48,7 +50,10 @@ class MovieNightActionReceiver : BroadcastReceiver() {
                 when (intent.action) {
                     PlanAlarmContract.ActionMovieNightFinish -> notifications.showMovieNightCompleted(plan)
                     PlanAlarmContract.ActionMovieNightEnd -> notifications.cancelMovieNightProgress(planId)
-                    PlanAlarmContract.ActionMovieNightProgress -> updateProgress(plan)
+                    PlanAlarmContract.ActionMovieNightProgress -> {
+                        updateProgress(plan)
+                        widgetUpdater.updateAll()
+                    }
                     else -> notifications.showMovieNightProgress(plan)
                 }
             } finally {

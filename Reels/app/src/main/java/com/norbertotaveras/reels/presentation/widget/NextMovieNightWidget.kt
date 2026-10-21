@@ -10,8 +10,13 @@ package com.norbertotaveras.reels.presentation.widget
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.Preferences
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalSize
@@ -24,6 +29,7 @@ import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
+import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -39,11 +45,11 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import com.norbertotaveras.reels.R
 import com.norbertotaveras.reels.data.widget.PlanWidgetEntryPoint
-import com.norbertotaveras.reels.data.widget.WidgetPosterLoader
 import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
 import com.norbertotaveras.reels.domain.model.plans.MovieNightStatus
 import com.norbertotaveras.reels.domain.plans.canStartJourney
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.flow.map
 
 class NextMovieNightWidget : GlanceAppWidget() {
     override val sizeMode = SizeMode.Responsive(
@@ -56,15 +62,19 @@ class NextMovieNightWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val entryPoint = EntryPointAccessors.fromApplication(context, PlanWidgetEntryPoint::class.java)
-        val plans = entryPoint.movieNightRepository()
-            .getMovieNights()
-            .filter { it.status.isVisibleInWidget() }
-            .sortedBy(MovieNightPlan::scheduledAt)
-            .take(MAX_VISIBLE_MOVIE_NIGHTS)
-        val posters = plans.associate { it.id to WidgetPosterLoader.load(context, it.posterPath) }
-        val backdrop = WidgetPosterLoader.createBackdrop(posters[plans.firstOrNull()?.id])
-        val isOnline = entryPoint.networkMonitor().isOnline()
-        provideContent { NextMovieNightContent(context, plans, posters, backdrop, isOnline) }
+        val repository = entryPoint.movieNightRepository()
+        val initialPlans = repository.getMovieNights().visibleWidgetPlans()
+        provideContent {
+            val plans by remember(repository) {
+                repository.observeMovieNights().map { it.visibleWidgetPlans() }
+            }.collectAsState(initialPlans)
+            val isOnline by entryPoint.networkMonitor().connectivity
+                .collectAsState(entryPoint.networkMonitor().isOnline())
+            val artwork = rememberWidgetArtwork(context, plans.associate { it.id to it.posterPath })
+            key(currentState<Preferences>()) {
+                NextMovieNightContent(context, plans, artwork.posters, artwork.backdrop, isOnline)
+            }
+        }
     }
 }
 
@@ -130,13 +140,13 @@ private fun MovieNightCollection(
     primaryModifier: GlanceModifier,
 ) {
     val primary = plans.first()
-    if (isExpanded && plans.size > 1) {
+    if (isExpanded) {
         ExpandedMovieNightCollection(context, plans, posters, isOnline)
     } else {
         WidgetBackdrop(
             title = primary.title,
             backdrop = backdrop,
-            modifier = primaryModifier,
+            modifier = primaryModifier.clickable(movieAction(context, primary.movieId)),
             fillHeight = true,
         ) {
             MovieNightHero(context, primary, isOnline)
@@ -221,6 +231,7 @@ private fun ExpandedMovieNightRow(
                     maxLines = 1,
                     style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 11.sp),
                 )
+                if (plan.canStartFromWidget()) MovieNightJourneyAction(context, plan)
             }
         }
         WidgetCountdownBadge(plan.toWidgetCountdown(context, short = true))
@@ -350,3 +361,8 @@ private fun MovieNightPlan.reminderLabel(context: Context): String = reminderMin
 
 private const val MOVIE_NIGHTS_TAB = "movie_nights"
 private const val MAX_VISIBLE_MOVIE_NIGHTS = 2
+
+private fun List<MovieNightPlan>.visibleWidgetPlans(): List<MovieNightPlan> =
+    filter { it.status.isVisibleInWidget() }
+        .sortedBy(MovieNightPlan::scheduledAt)
+        .take(MAX_VISIBLE_MOVIE_NIGHTS)

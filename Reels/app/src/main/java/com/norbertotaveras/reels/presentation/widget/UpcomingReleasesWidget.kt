@@ -12,8 +12,13 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.Preferences
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalSize
@@ -25,6 +30,7 @@ import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
+import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
@@ -40,9 +46,9 @@ import androidx.glance.text.TextStyle
 import com.norbertotaveras.reels.MainActivity
 import com.norbertotaveras.reels.R
 import com.norbertotaveras.reels.data.widget.PlanWidgetEntryPoint
-import com.norbertotaveras.reels.data.widget.WidgetPosterLoader
 import com.norbertotaveras.reels.domain.model.plans.TrackedRelease
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.flow.map
 
 class UpcomingReleasesWidget : GlanceAppWidget() {
     override val sizeMode = SizeMode.Responsive(
@@ -55,14 +61,19 @@ class UpcomingReleasesWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val entryPoint = EntryPointAccessors.fromApplication(context, PlanWidgetEntryPoint::class.java)
-        val releases = entryPoint.trackedReleaseRepository()
-            .getTrackedReleases()
-            .sortedBy { it.releaseDate ?: MAX_DATE }
-            .take(MAX_VISIBLE_RELEASES)
-        val posters = releases.associate { it.movieId to WidgetPosterLoader.load(context, it.posterPath) }
-        val backdrop = WidgetPosterLoader.createBackdrop(posters[releases.firstOrNull()?.movieId])
-        val isOnline = entryPoint.networkMonitor().isOnline()
-        provideContent { UpcomingReleasesContent(context, releases, posters, backdrop, isOnline) }
+        val repository = entryPoint.trackedReleaseRepository()
+        val initialReleases = repository.getTrackedReleases().visibleWidgetReleases()
+        provideContent {
+            val releases by remember(repository) {
+                repository.observeTrackedReleases().map { it.visibleWidgetReleases() }
+            }.collectAsState(initialReleases)
+            val isOnline by entryPoint.networkMonitor().connectivity
+                .collectAsState(entryPoint.networkMonitor().isOnline())
+            val artwork = rememberWidgetArtwork(context, releases.associate { it.movieId to it.posterPath })
+            key(currentState<Preferences>()) {
+                UpcomingReleasesContent(context, releases, artwork.posters, artwork.backdrop, isOnline)
+            }
+        }
     }
 }
 
@@ -312,4 +323,7 @@ private fun TrackedRelease.dateLabel(context: Context, isOnline: Boolean): Strin
 
 private const val RELEASES_TAB = "releases"
 private const val MAX_DATE = "9999-12-31"
+
+private fun List<TrackedRelease>.visibleWidgetReleases(): List<TrackedRelease> =
+    sortedBy { it.releaseDate ?: MAX_DATE }.take(MAX_VISIBLE_RELEASES)
 private const val MAX_VISIBLE_RELEASES = 3
