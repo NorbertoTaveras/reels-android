@@ -13,7 +13,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,20 +30,19 @@ import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.EventAvailable
 import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -54,6 +52,7 @@ import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
 import com.norbertotaveras.reels.domain.model.plans.MovieNightStatus
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
+import com.norbertotaveras.reels.presentation.ui.theme.reelsMutedContainerColor
 
 @Composable
 internal fun MovieNightPlansList(
@@ -130,7 +129,14 @@ private fun MovieNightCard(
             .padding(horizontal = ReelsDimensions.plansListHorizontalPadding),
         shape = RoundedCornerShape(ReelsDimensions.plansMovieNightCardCornerSize),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        border = BorderStroke(
+            1.dp,
+            if (plan.status == MovieNightStatus.Active) {
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+            } else {
+                MaterialTheme.colorScheme.outlineVariant
+            },
+        ),
     ) {
         Box {
             if (isJourney) {
@@ -139,7 +145,11 @@ private fun MovieNightCard(
                         Modifier
                             .width(ReelsDimensions.plansJourneyAccentWidth)
                             .fillMaxHeight()
-                            .background(MaterialTheme.colorScheme.primary)
+                            .background(
+                                MaterialTheme.colorScheme.primary.copy(
+                                    alpha = if (plan.status == MovieNightStatus.Paused) 0.3f else 1f
+                                )
+                            )
                     )
                 }
             }
@@ -199,9 +209,16 @@ private fun MovieNightCard(
                             .fillMaxWidth()
                             .height(ReelsDimensions.plansProgressHeight)
                             .clip(RoundedCornerShape(ReelsDimensions.plansProgressHeight)),
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = reelsMutedContainerColor(),
+                        strokeCap = StrokeCap.Round,
+                        gapSize = 0.dp,
+                        drawStopIndicator = {},
                     )
                 }
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(ReelsDimensions.plansActionSectionSpacing))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f))
+                Spacer(Modifier.height(ReelsDimensions.plansActionSectionSpacing))
                 MovieNightActions(
                     plan = plan,
                     onMovieClick = onMovieClick,
@@ -262,56 +279,6 @@ private fun MovieNightMetadata(icon: androidx.compose.ui.graphics.vector.ImageVe
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(text, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-}
-
-@Composable
-private fun MovieNightActions(
-    plan: MovieNightPlan,
-    onMovieClick: (Int) -> Unit,
-    onEdit: (MovieNightPlan) -> Unit,
-    onStart: (String) -> Unit,
-    onPause: (String) -> Unit,
-    onResume: (String) -> Unit,
-    onFinish: (String) -> Unit,
-    onCancel: (String) -> Unit,
-    onRemove: (String) -> Unit,
-) {
-    FlowRow(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.plansActionSpacing),
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.plansActionSpacing),
-    ) {
-        when (plan.status) {
-            MovieNightStatus.Upcoming -> {
-                OutlinedButton(onClick = { onEdit(plan) }, modifier = Modifier.weight(1f)) { Text("Edit") }
-                TextButton(onClick = { onCancel(plan.id) }) { Text("Cancel") }
-            }
-            MovieNightStatus.StartingSoon -> {
-                Button(onClick = { onStart(plan.id) }, modifier = Modifier.weight(1f)) { Text("Start now") }
-                OutlinedButton(onClick = { onEdit(plan) }) { Text("Edit") }
-                TextButton(onClick = { onCancel(plan.id) }) { Text("Cancel") }
-            }
-            MovieNightStatus.Active -> {
-                OutlinedButton(onClick = { onFinish(plan.id) }, modifier = Modifier.weight(1f)) { Text("Mark watched") }
-                OutlinedButton(onClick = { onPause(plan.id) }) { Text("Pause") }
-            }
-            MovieNightStatus.Paused -> {
-                OutlinedButton(onClick = { onResume(plan.id) }, modifier = Modifier.weight(1f)) { Text("Resume") }
-                TextButton(onClick = { onCancel(plan.id) }) { Text("End night") }
-            }
-            MovieNightStatus.Completed -> {
-                OutlinedButton(onClick = { onMovieClick(plan.movieId) }, modifier = Modifier.weight(1f)) { Text("Open movie") }
-                TextButton(onClick = { onRemove(plan.id) }) { Text("Dismiss") }
-            }
-            MovieNightStatus.Missed -> {
-                OutlinedButton(onClick = { onEdit(plan) }, modifier = Modifier.weight(1f)) { Text("Reschedule") }
-                TextButton(onClick = { onRemove(plan.id) }) { Text("Dismiss") }
-            }
-            MovieNightStatus.Cancelled -> {
-                OutlinedButton(onClick = { onRemove(plan.id) }, modifier = Modifier.fillMaxWidth()) { Text("Dismiss") }
-            }
-        }
     }
 }
 
