@@ -14,6 +14,8 @@ internal object PlanWidgetDimensions {
     val CompactSize = DpSize(146.dp, 72.dp)
     val MediumSize = DpSize(220.dp, 146.dp)
     val ExpandedSize = DpSize(294.dp, 146.dp)
+    // Midpoint between the rendered Figma medium (304dp) and expanded (368dp) widgets.
+    val ExpandedLayoutMinWidth = 336.dp
     val CornerSize = 16.dp
     val CompactPadding = 8.dp
     val ContentPadding = 12.dp
@@ -40,4 +42,13 @@ internal object PlanWidgetDimensions {
     val StartCornerSize = 8.dp
     val StartHorizontalPadding = 10.dp
     val StartVerticalPadding = 5.dp
+    val PrimaryReleasePosterHeight = 56.dp
+    val SecondaryReleasePosterHeight = 44.dp
+    const val ReleasePosterAspectRatio = 40f / 56f
+    val ReleaseDetailsPadding = 7.dp
+    val ReleaseRowSpacing = 9.dp
+    val CachedFooterHeight = 18.dp
+    val MediumReleasePosterWidth = 26.dp
+    val MediumReleasePosterHeight = 36.dp
+    val SecondaryReleaseRowHeight = 46.dp
 }

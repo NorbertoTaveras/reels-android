@@ -20,4 +20,5 @@ internal object PlanWidgetTheme {
     val Divider = ColorProvider(day = Color(0xFFE4DEE6), night = Color(0xFF3A3840))
     val OnImage = ColorProvider(day = Color(0xFFF6F4F1), night = Color(0xFFF6F4F1))
     val OnImageSecondary = ColorProvider(day = Color(0xFFD7D2CD), night = Color(0xFFD7D2CD))
+    val ImageFallback = ColorProvider(day = Color(0xFF29282E), night = Color(0xFF29282E))
 }

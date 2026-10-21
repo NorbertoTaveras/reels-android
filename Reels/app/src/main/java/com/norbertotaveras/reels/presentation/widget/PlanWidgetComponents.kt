@@ -119,7 +119,7 @@ internal fun WidgetBackdrop(
     val sizedModifier = if (fillHeight) modifier else modifier.height(height)
     Box(
         modifier = sizedModifier
-            .background(PlanWidgetTheme.Surface)
+            .background(PlanWidgetTheme.ImageFallback)
             .cornerRadius(PlanWidgetDimensions.HeroCornerSize),
     ) {
         if (backdrop != null) {
@@ -129,6 +129,8 @@ internal fun WidgetBackdrop(
                 modifier = GlanceModifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
             )
+        } else {
+            WidgetMark(GlanceModifier.fillMaxSize())
         }
         Box(
             modifier = GlanceModifier

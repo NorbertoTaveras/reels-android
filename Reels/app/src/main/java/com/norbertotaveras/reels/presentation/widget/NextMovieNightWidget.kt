@@ -88,7 +88,7 @@ private fun NextMovieNightContent(
     val size = LocalSize.current
     val isCompact = size.width < PlanWidgetDimensions.MediumSize.width ||
         size.height < PlanWidgetDimensions.MediumSize.height
-    val isExpanded = size.width >= PlanWidgetDimensions.ExpandedSize.width
+    val isExpanded = size.width >= PlanWidgetDimensions.ExpandedLayoutMinWidth
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
