@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -133,19 +132,21 @@ private fun MovieNightCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
-        Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+        Box {
             if (isJourney) {
-                Box(
-                    Modifier
-                        .width(ReelsDimensions.plansJourneyAccentWidth)
-                        .fillMaxHeight()
-                        .background(MaterialTheme.colorScheme.primary)
-                )
+                Box(Modifier.matchParentSize()) {
+                    Box(
+                        Modifier
+                            .width(ReelsDimensions.plansJourneyAccentWidth)
+                            .fillMaxHeight()
+                            .background(MaterialTheme.colorScheme.primary)
+                    )
+                }
             }
             Column(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(ReelsDimensions.plansMovieNightCardPadding)
-                    .weight(1f)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth().clickable { onMovieClick(plan.movieId) },
