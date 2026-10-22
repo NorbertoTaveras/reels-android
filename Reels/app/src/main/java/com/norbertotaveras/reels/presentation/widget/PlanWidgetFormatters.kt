@@ -93,7 +93,7 @@ internal fun String?.toCompactWidgetReleaseDate(context: Context, isOnline: Bool
         0L -> context.getString(R.string.widget_release_today)
         1L -> context.getString(R.string.widget_release_tomorrow)
         in 2..Long.MAX_VALUE -> context.getString(R.string.widget_release_in_days, days)
-        else -> date.format(RELEASE_DATE_FORMAT)
+        else -> context.getString(R.string.widget_release_released)
     }
 }
 
