@@ -8,6 +8,7 @@
 package com.norbertotaveras.reels.di.app
 
 import android.app.Application
+import com.norbertotaveras.reels.data.widget.WidgetConnectivityObserver
 import com.norbertotaveras.reels.domain.plans.ReelsNotificationManager
 import com.norbertotaveras.reels.domain.repository.settings.SettingsRepository
 import com.norbertotaveras.reels.domain.usecase.plans.RefreshTrackedReleasesUseCase
@@ -25,12 +26,17 @@ class ReelsApplication : Application() {
     @Inject lateinit var notificationManager: ReelsNotificationManager
     @Inject lateinit var settingsRepository: SettingsRepository
     @Inject lateinit var refreshTrackedReleases: RefreshTrackedReleasesUseCase
+    @Inject lateinit var widgetConnectivityObserver: WidgetConnectivityObserver
     @Inject @IoDispatcher lateinit var ioDispatcher: CoroutineDispatcher
 
     override fun onCreate() {
         super.onCreate()
         notificationManager.createChannels()
-        CoroutineScope(SupervisorJob() + ioDispatcher).launch {
+        val applicationScope = CoroutineScope(SupervisorJob() + ioDispatcher)
+        applicationScope.launch {
+            widgetConnectivityObserver.observe()
+        }
+        applicationScope.launch {
             val language = settingsRepository.observeSettings().first().languageRegion.languageCode
             refreshTrackedReleases(language)
         }
