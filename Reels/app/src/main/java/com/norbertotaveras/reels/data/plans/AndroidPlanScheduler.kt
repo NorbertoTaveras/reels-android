@@ -51,22 +51,20 @@ class AndroidPlanScheduler @Inject constructor(
         cancelMovieNight(plan.id)
         if (plan.status != MovieNightStatus.Upcoming && plan.status != MovieNightStatus.StartingSoon)
             return
-        if (plan.status == MovieNightStatus.Upcoming) {
-            plan.reminderMinutesBefore?.let { reminderMinutes ->
-                val triggerAt = plan.scheduledAt - reminderMinutes * MILLIS_PER_MINUTE
-                if (triggerAt > System.currentTimeMillis()) {
-                    schedule(triggerAt, movieNightPendingIntent(plan.id))
-                }
+        plan.reminderMinutesBefore?.let { reminderMinutes ->
+            val triggerAt = plan.scheduledAt - reminderMinutes * MILLIS_PER_MINUTE
+            if (triggerAt > System.currentTimeMillis()) {
+                schedule(triggerAt, movieNightPendingIntent(plan.id))
             }
         }
         val countdownAt = plan.scheduledAt - MovieNightJourney.COUNTDOWN_WINDOW_MILLIS
-        if (plan.status == MovieNightStatus.Upcoming && plan.scheduledAt > System.currentTimeMillis()) {
+        val missedAt = plan.scheduledAt + MISSED_GRACE_MILLIS
+        if (plan.status == MovieNightStatus.Upcoming && missedAt > System.currentTimeMillis()) {
             schedule(
                 countdownAt.coerceAtLeast(System.currentTimeMillis() + IMMEDIATE_ALARM_DELAY_MILLIS),
                 movieNightCountdownPendingIntent(plan.id),
             )
         }
-        val missedAt = plan.scheduledAt + MISSED_GRACE_MILLIS
         if (missedAt > System.currentTimeMillis()) {
             schedule(missedAt, movieNightMissedPendingIntent(plan.id))
         }
@@ -100,12 +98,12 @@ class AndroidPlanScheduler @Inject constructor(
         if (!release.notificationsEnabled || release.reminder == ReleaseReminder.None)
             return null
 
-        if (release.reminder == ReleaseReminder.Custom)
-            return release.customReminderAt
-
         val date = release.releaseDate?.let { value ->
             runCatching { LocalDate.parse(value) }.getOrNull()
         } ?: return null
+
+        if (release.reminder == ReleaseReminder.Custom)
+            return release.customReminderAt
 
         val daysBefore = (release.reminder.minutesBefore ?: DEFAULT_RELEASE_MINUTES) / MINUTES_PER_DAY
 
