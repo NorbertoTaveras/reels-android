@@ -63,12 +63,17 @@ internal fun MovieNightPlan.runtimeRemainingLabel(context: Context): String {
     return context.getString(R.string.widget_runtime_remaining, minutes / 60, minutes % 60)
 }
 
-internal fun String?.toWidgetReleaseDate(context: Context, isOnline: Boolean): String {
+internal fun String?.toWidgetReleaseDate(
+    context: Context,
+    isOnline: Boolean,
+    includeRelative: Boolean = true,
+): String {
     if (this == null) return context.getString(R.string.widget_release_tba)
     return runCatching {
         val date = LocalDate.parse(this)
         val formattedDate = date.format(RELEASE_DATE_FORMAT)
         if (!isOnline) return@runCatching context.getString(R.string.widget_cached_date, formattedDate)
+        if (!includeRelative) return@runCatching formattedDate
         val days = ChronoUnit.DAYS.between(LocalDate.now(), date)
         val relative = when (days) {
             0L -> context.getString(R.string.widget_release_today)
@@ -77,7 +82,7 @@ internal fun String?.toWidgetReleaseDate(context: Context, isOnline: Boolean): S
             else -> null
         }
         if (relative == null) formattedDate else "$formattedDate · $relative"
-    }.getOrDefault(this)
+    }.getOrDefault(context.getString(R.string.widget_release_tba))
 }
 
 internal fun String?.toCompactWidgetReleaseDate(context: Context, isOnline: Boolean): String {
@@ -92,11 +97,13 @@ internal fun String?.toCompactWidgetReleaseDate(context: Context, isOnline: Bool
     }
 }
 
-internal fun String.toWidgetReleaseCountdown(): String {
-    val days = runCatching { ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(this)) }
-        .getOrDefault(0L)
-        .coerceAtLeast(0L)
+internal fun String.toWidgetReleaseCountdown(context: Context): String {
+    val date = runCatching { LocalDate.parse(this) }.getOrNull()
+        ?: return context.getString(R.string.widget_release_tba)
+    val days = ChronoUnit.DAYS.between(LocalDate.now(), date)
     return when {
+        days < 0 -> context.getString(R.string.widget_release_released)
+        days == 0L -> context.getString(R.string.widget_release_today)
         days >= 60 -> "${max(1L, days / 30)}mo"
         else -> "${days}d"
     }

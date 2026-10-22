@@ -234,7 +234,11 @@ private fun ExpandedReleaseRow(
         WidgetPoster(
             title = release.title,
             poster = poster,
-            width = posterHeight * PlanWidgetDimensions.ReleasePosterAspectRatio,
+            width = posterHeight * if (primary) {
+                PlanWidgetDimensions.ReleasePosterAspectRatio
+            } else {
+                PlanWidgetDimensions.SecondaryReleasePosterAspectRatio
+            },
             height = posterHeight,
         )
         Spacer(GlanceModifier.width(PlanWidgetDimensions.ReleaseRowSpacing))
@@ -248,20 +252,16 @@ private fun ExpandedReleaseRow(
                     fontWeight = FontWeight.Bold,
                 ),
             )
-            Text(
-                text = if (primary && isOnline) {
-                    "${release.dateLabel(context, true)} · ${release.reminder.toWidgetLabel(context)}"
-                } else {
-                    release.dateLabel(context, isOnline)
-                },
-                maxLines = 1,
-                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
+            Spacer(GlanceModifier.height(PlanWidgetDimensions.ReleaseTitleSpacing))
+            WidgetReleaseMetadata(
+                date = release.releaseDate.toWidgetReleaseDate(context, isOnline, includeRelative = false),
+                reminder = release.reminder.toWidgetLabel(context).takeIf { primary && isOnline },
             )
         }
         Spacer(GlanceModifier.width(PlanWidgetDimensions.ContentSpacing))
         release.releaseDate?.let {
             Text(
-                text = it.toWidgetReleaseCountdown(),
+                text = it.toWidgetReleaseCountdown(context),
                 maxLines = 1,
                 style = TextStyle(
                     color = if (primary) PlanWidgetTheme.Accent else PlanWidgetTheme.Secondary,
@@ -285,10 +285,10 @@ private fun ReleaseHero(context: Context, release: TrackedRelease) {
                 fontWeight = FontWeight.Bold,
             ),
         )
-        Text(
-            text = "${release.dateLabel(context, true)} · ${release.reminder.toWidgetLabel(context)}",
-            maxLines = 1,
-            style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
+        Spacer(GlanceModifier.height(PlanWidgetDimensions.ReleaseTitleSpacing))
+        WidgetReleaseMetadata(
+            date = release.releaseDate.toWidgetReleaseDate(context, isOnline = true, includeRelative = false),
+            reminder = release.reminder.toWidgetLabel(context),
         )
     }
 }
@@ -332,7 +332,7 @@ private fun SecondaryReleaseRow(
         }
         release.releaseDate?.let {
             Text(
-                text = it.toWidgetReleaseCountdown(),
+                text = it.toWidgetReleaseCountdown(context),
                 style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
             )
         }
