@@ -9,6 +9,8 @@ package com.norbertotaveras.reels.presentation.widget
 
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.NorthEast
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -16,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.LocalSize
 import androidx.glance.background
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.layout.Alignment
@@ -39,13 +42,19 @@ import com.norbertotaveras.reels.presentation.ui.theme.PlanWidgetDimensions
 @Composable
 internal fun WidgetHeader(title: String) {
     Row(
-        modifier = GlanceModifier.fillMaxWidth(),
+        modifier = GlanceModifier.fillMaxWidth().padding(
+            start = PlanWidgetDimensions.ContentPadding,
+            top = PlanWidgetDimensions.HeaderTopPadding,
+            end = PlanWidgetDimensions.ContentPadding,
+            bottom = PlanWidgetDimensions.HeaderBottomPadding,
+        ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         WidgetMark(GlanceModifier.size(PlanWidgetDimensions.BrandMarkSize))
-        Spacer(GlanceModifier.width(4.dp))
+        Spacer(GlanceModifier.width(PlanWidgetDimensions.HeaderItemSpacing))
         Text(
             text = title.uppercase(),
+            modifier = GlanceModifier.defaultWeight(),
             maxLines = 1,
             style = TextStyle(
                 color = PlanWidgetTheme.Secondary,
@@ -53,6 +62,7 @@ internal fun WidgetHeader(title: String) {
                 fontWeight = FontWeight.Bold,
             ),
         )
+        WidgetIcon(Icons.Outlined.NorthEast, PlanWidgetDimensions.HeaderIconSize, PlanWidgetTheme.HeaderAction)
     }
 }
 
@@ -60,8 +70,8 @@ internal fun WidgetHeader(title: String) {
 internal fun WidgetPoster(
     title: String,
     poster: Bitmap?,
-    width: Dp = PlanWidgetDimensions.CompactPosterWidth,
-    height: Dp = PlanWidgetDimensions.CompactPosterHeight,
+    height: Dp = compactPosterHeight(),
+    width: Dp = height * (PlanWidgetDimensions.CompactPosterWidth / PlanWidgetDimensions.CompactPosterHeight),
 ) {
     if (poster != null) {
         Image(
@@ -83,6 +93,14 @@ internal fun WidgetPoster(
         )
     }
 }
+
+@Composable
+private fun compactPosterHeight(): Dp = minOf(
+    PlanWidgetDimensions.CompactPosterHeight,
+    (LocalSize.current.height - PlanWidgetDimensions.HeaderSpace -
+        PlanWidgetDimensions.CompactTopPadding - PlanWidgetDimensions.CompactBottomPadding)
+        .coerceAtLeast(0.dp),
+)
 
 @Composable
 internal fun WidgetMiniPoster(title: String, poster: Bitmap?) {
@@ -113,14 +131,10 @@ internal fun WidgetBackdrop(
     backdrop: Bitmap?,
     modifier: GlanceModifier = GlanceModifier.fillMaxWidth(),
     height: Dp = PlanWidgetDimensions.HeroHeight,
-    fillHeight: Boolean = false,
-    content: @Composable () -> Unit,
 ) {
-    val sizedModifier = if (fillHeight) modifier else modifier.height(height)
     Box(
-        modifier = sizedModifier
-            .background(PlanWidgetTheme.ImageFallback)
-            .cornerRadius(PlanWidgetDimensions.HeroCornerSize),
+        modifier = modifier.height(height)
+            .background(PlanWidgetTheme.ImageFallback),
     ) {
         if (backdrop != null) {
             Image(
@@ -132,14 +146,6 @@ internal fun WidgetBackdrop(
         } else {
             WidgetMark(GlanceModifier.fillMaxSize())
         }
-        Box(
-            modifier = GlanceModifier
-                .fillMaxSize()
-                .padding(PlanWidgetDimensions.HeroPadding),
-            contentAlignment = Alignment.BottomStart,
-        ) {
-            content()
-        }
     }
 }
 
@@ -147,7 +153,7 @@ internal fun WidgetBackdrop(
 internal fun EmptyWidgetMessage(context: Context, message: String, compact: Boolean) {
     if (compact) {
         Row(
-            modifier = GlanceModifier.fillMaxSize(),
+            modifier = GlanceModifier.fillMaxSize().padding(horizontal = PlanWidgetDimensions.ContentPadding),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             WidgetMark(GlanceModifier.size(24.dp))
@@ -202,33 +208,23 @@ private fun WidgetMark(modifier: GlanceModifier) {
 
 @Composable
 internal fun WidgetDivider() {
-    Spacer(
+    Box(
         modifier = GlanceModifier
             .fillMaxWidth()
             .height(PlanWidgetDimensions.DividerHeight)
-            .background(PlanWidgetTheme.Divider),
-    )
+            .padding(horizontal = PlanWidgetDimensions.ContentPadding),
+    ) {
+        Spacer(GlanceModifier.fillMaxSize().background(PlanWidgetTheme.Divider))
+    }
 }
 
 @Composable
-internal fun WidgetCountdownBadge(label: String) {
-    Box(
-        modifier = GlanceModifier
-            .background(PlanWidgetTheme.Surface)
-            .cornerRadius(8.dp)
-            .padding(horizontal = 5.dp, vertical = 2.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = label,
-            maxLines = 1,
-            style = TextStyle(
-                color = PlanWidgetTheme.Accent,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-            ),
-        )
-    }
+internal fun WidgetCountdown(label: String) {
+    Text(
+        text = label,
+        maxLines = 1,
+        style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
+    )
 }
 
 @Composable

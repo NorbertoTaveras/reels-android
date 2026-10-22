@@ -90,15 +90,13 @@ private fun UpcomingReleasesContent(
             .fillMaxSize()
             .background(PlanWidgetTheme.Background)
             .cornerRadius(PlanWidgetDimensions.CornerSize)
-            .clickable(plansAction(context, RELEASES_TAB))
-            .padding(if (isCompact) PlanWidgetDimensions.CompactPadding else PlanWidgetDimensions.ContentPadding),
+            .clickable(plansAction(context, RELEASES_TAB)),
     ) {
         WidgetHeader(
             context.getString(
                 if (isCompact) R.string.widget_upcoming else R.string.widget_upcoming_releases,
             ),
         )
-        Spacer(GlanceModifier.height(if (isCompact) 3.dp else 6.dp))
         when {
             releases.isEmpty() -> EmptyWidgetMessage(
                 context = context,
@@ -106,7 +104,10 @@ private fun UpcomingReleasesContent(
                 compact = isCompact,
             )
 
-            isCompact -> ReleaseRow(context, releases.first(), posters[releases.first().movieId], isOnline)
+            isCompact -> ReleaseRow(
+                context, releases.first(), posters[releases.first().movieId], isOnline,
+                GlanceModifier.defaultWeight(),
+            )
             else -> ReleaseCollection(
                 context = context,
                 releases = releases,
@@ -138,15 +139,26 @@ private fun ReleaseCollection(
             WidgetBackdrop(
                 title = primary.title,
                 backdrop = backdrop,
-                modifier = GlanceModifier.defaultWeight()
-                    .fillMaxWidth()
-                    .clickable(movieAction(context, primary.movieId)),
-                fillHeight = true,
-            ) {}
-            Column(
                 modifier = GlanceModifier.fillMaxWidth()
+                    .clickable(movieAction(context, primary.movieId)),
+                height = minOf(
+                    PlanWidgetDimensions.HeroHeight,
+                    (LocalSize.current.height - PlanWidgetDimensions.HeaderSpace -
+                        PlanWidgetDimensions.MediumReleaseDetailsHeight -
+                        if (releases.size > 1) {
+                            PlanWidgetDimensions.SecondaryReleaseRowHeight + PlanWidgetDimensions.DividerHeight
+                        } else {
+                            0.dp
+                        }).coerceAtLeast(0.dp),
+                ),
+            )
+            Column(
+                modifier = GlanceModifier.defaultWeight().fillMaxWidth()
                     .clickable(movieAction(context, primary.movieId))
-                    .padding(vertical = PlanWidgetDimensions.ReleaseDetailsPadding),
+                    .padding(
+                        horizontal = PlanWidgetDimensions.ContentPadding,
+                        vertical = PlanWidgetDimensions.ReleaseDetailsPadding,
+                    ),
             ) {
                 ReleaseHero(context, primary)
             }
@@ -168,8 +180,7 @@ private fun ExpandedReleaseCollection(
 ) {
     val footerHeight = if (isOnline) 0.dp else PlanWidgetDimensions.CachedFooterHeight
     val rowHeight = (
-        LocalSize.current.height - PlanWidgetDimensions.ContentPadding * 2 -
-            PlanWidgetDimensions.HeaderSpace - footerHeight -
+        LocalSize.current.height - PlanWidgetDimensions.HeaderSpace - footerHeight -
             PlanWidgetDimensions.DividerHeight * (releases.size - 1)
         ).coerceAtLeast(0.dp) / releases.size
     Column(modifier = modifier.fillMaxWidth()) {
@@ -195,6 +206,7 @@ private fun ExpandedReleaseCollection(
         if (!isOnline) {
             Text(
                 text = context.getString(R.string.widget_locally_stored_releases),
+                modifier = GlanceModifier.padding(horizontal = PlanWidgetDimensions.ContentPadding),
                 maxLines = 1,
                 style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
             )
@@ -215,7 +227,8 @@ private fun ExpandedReleaseRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(movieAction(context, release.movieId)),
+            .clickable(movieAction(context, release.movieId))
+            .padding(horizontal = PlanWidgetDimensions.ContentPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         WidgetPoster(
@@ -290,7 +303,8 @@ private fun SecondaryReleaseRow(
         modifier = GlanceModifier
             .fillMaxWidth()
             .height(PlanWidgetDimensions.SecondaryReleaseRowHeight)
-            .clickable(movieAction(context, release.movieId)),
+            .clickable(movieAction(context, release.movieId))
+            .padding(horizontal = PlanWidgetDimensions.ContentPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         WidgetPoster(
@@ -331,11 +345,18 @@ private fun ReleaseRow(
     release: TrackedRelease,
     poster: Bitmap?,
     isOnline: Boolean,
+    modifier: GlanceModifier,
 ) {
     Row(
-        modifier = GlanceModifier
+        modifier = modifier
             .fillMaxWidth()
-            .clickable(movieAction(context, release.movieId)),
+            .clickable(movieAction(context, release.movieId))
+            .padding(
+                start = PlanWidgetDimensions.ContentPadding,
+                top = PlanWidgetDimensions.CompactTopPadding,
+                end = PlanWidgetDimensions.ContentPadding,
+                bottom = PlanWidgetDimensions.CompactBottomPadding,
+            ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         WidgetPoster(title = release.title, poster = poster)
@@ -343,7 +364,7 @@ private fun ReleaseRow(
         Column(modifier = GlanceModifier.defaultWeight()) {
             Text(
                 text = release.title,
-                maxLines = 1,
+                maxLines = if (LocalSize.current.height >= PlanWidgetDimensions.CompactTwoLineMinHeight) 2 else 1,
                 style = TextStyle(
                     color = PlanWidgetTheme.Primary,
                     fontSize = 12.sp,
@@ -353,7 +374,10 @@ private fun ReleaseRow(
             Text(
                 text = release.releaseDate.toCompactWidgetReleaseDate(context, isOnline),
                 maxLines = 1,
-                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
+                style = TextStyle(
+                    color = if (isOnline) PlanWidgetTheme.Accent else PlanWidgetTheme.Secondary,
+                    fontSize = 12.sp,
+                ),
             )
         }
     }

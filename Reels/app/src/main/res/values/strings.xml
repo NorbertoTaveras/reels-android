@@ -53,6 +53,6 @@
     <string name="widget_reminder_custom">Custom reminder</string>
     <string name="widget_reminder_none">No reminder</string>
     <string name="widget_reminder_minutes_before">%1$d min before</string>
-    <string name="widget_start_action">▶ START</string>
+    <string name="widget_start_action">START</string>
     <string name="app_name">Reels</string>
 </resources>

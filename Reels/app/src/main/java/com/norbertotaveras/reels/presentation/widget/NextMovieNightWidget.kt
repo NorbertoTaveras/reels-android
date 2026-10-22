@@ -9,6 +9,8 @@ package com.norbertotaveras.reels.presentation.widget
 
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -94,15 +96,13 @@ private fun NextMovieNightContent(
             .fillMaxSize()
             .background(PlanWidgetTheme.Background)
             .cornerRadius(PlanWidgetDimensions.CornerSize)
-            .clickable(plansAction(context, MOVIE_NIGHTS_TAB))
-            .padding(if (isCompact) PlanWidgetDimensions.CompactPadding else PlanWidgetDimensions.ContentPadding),
+            .clickable(plansAction(context, MOVIE_NIGHTS_TAB)),
     ) {
         WidgetHeader(
             context.getString(
                 if (isCompact) R.string.widget_movie_night else R.string.widget_next_movie_night,
             ),
         )
-        Spacer(GlanceModifier.height(if (isCompact) 3.dp else 6.dp))
         when {
             plans.isEmpty() -> EmptyWidgetMessage(
                 context = context,
@@ -110,7 +110,10 @@ private fun NextMovieNightContent(
                 compact = isCompact,
             )
 
-            isCompact -> MovieNightRow(context, plans.first(), posters[plans.first().id], isOnline)
+            isCompact -> MovieNightRow(
+                context, plans.first(), posters[plans.first().id], isOnline,
+                GlanceModifier.defaultWeight(),
+            )
             else -> MovieNightCollection(
                 context = context,
                 plans = plans,
@@ -138,13 +141,31 @@ private fun MovieNightCollection(
     if (isExpanded) {
         ExpandedMovieNightCollection(context, plans, posters, isOnline, primaryModifier)
     } else {
-        WidgetBackdrop(
-            title = primary.title,
-            backdrop = backdrop,
-            modifier = primaryModifier.clickable(movieAction(context, primary.movieId)),
-            fillHeight = true,
-        ) {
-            MovieNightHero(context, primary, isOnline)
+        Column(modifier = primaryModifier.fillMaxWidth()) {
+            WidgetBackdrop(
+                title = primary.title,
+                backdrop = backdrop,
+                modifier = GlanceModifier.fillMaxWidth().clickable(movieAction(context, primary.movieId)),
+                height = minOf(
+                    PlanWidgetDimensions.HeroHeight,
+                    (LocalSize.current.height - PlanWidgetDimensions.HeaderSpace -
+                        if (primary.canStartFromWidget()) {
+                            PlanWidgetDimensions.MediumNightActionDetailsHeight
+                        } else {
+                            PlanWidgetDimensions.MediumNightDetailsHeight
+                        }).coerceAtLeast(0.dp),
+                ),
+            )
+            Column(
+                modifier = GlanceModifier.defaultWeight().fillMaxWidth()
+                    .clickable(movieAction(context, primary.movieId))
+                    .padding(
+                        horizontal = PlanWidgetDimensions.ContentPadding,
+                        vertical = PlanWidgetDimensions.ReleaseDetailsPadding,
+                    ),
+            ) {
+                MovieNightHero(context, primary, isOnline)
+            }
         }
     }
 }
@@ -156,20 +177,24 @@ private fun MovieNightHero(context: Context, plan: MovieNightPlan, isOnline: Boo
             text = plan.title,
             maxLines = 1,
             style = TextStyle(
-                color = PlanWidgetTheme.OnImage,
+                color = PlanWidgetTheme.Primary,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
             ),
         )
         Text(
-            text = plan.detailsLabel(context, isOnline),
+            text = if (plan.canStartFromWidget()) {
+                plan.toWidgetCountdown(context)
+            } else {
+                plan.widgetDateLabel(context, isOnline)
+            },
             maxLines = 1,
-            style = TextStyle(color = PlanWidgetTheme.OnImageSecondary, fontSize = 12.sp),
+            style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
         )
         Text(
-            text = plan.toWidgetCountdown(context),
+            text = if (plan.hasWidgetJourney) plan.runtimeRemainingLabel(context) else plan.runtimeLabel(context),
             maxLines = 1,
-            style = TextStyle(color = PlanWidgetTheme.OnImageSecondary, fontSize = 12.sp),
+            style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
         )
         MovieNightJourneyAction(context, plan, fillWidth = plan.canStartFromWidget())
     }
@@ -184,8 +209,8 @@ private fun ExpandedMovieNightCollection(
     modifier: GlanceModifier,
 ) {
     val availableHeight = (
-        LocalSize.current.height - PlanWidgetDimensions.ContentPadding * 2 -
-            PlanWidgetDimensions.HeaderSpace - PlanWidgetDimensions.DividerHeight
+        LocalSize.current.height - PlanWidgetDimensions.HeaderSpace -
+            PlanWidgetDimensions.DividerHeight * (plans.size - 1)
         ).coerceAtLeast(0.dp)
     Column(modifier = modifier.fillMaxWidth()) {
         plans.take(MAX_VISIBLE_MOVIE_NIGHTS).forEachIndexed { index, plan ->
@@ -230,7 +255,8 @@ private fun ExpandedMovieNightRow(
     Row(
         modifier = GlanceModifier.height(rowHeight)
             .fillMaxWidth()
-            .clickable(movieAction(context, plan.movieId)),
+            .clickable(movieAction(context, plan.movieId))
+            .padding(horizontal = PlanWidgetDimensions.ContentPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         WidgetPoster(
@@ -254,7 +280,7 @@ private fun ExpandedMovieNightRow(
                 text = plan.widgetDateLabel(context, isOnline),
                 maxLines = 1,
                 style = TextStyle(
-                    color = if (primary && plan.canStartFromWidget()) {
+                    color = if (primary) {
                         PlanWidgetTheme.Accent
                     } else {
                         PlanWidgetTheme.Secondary
@@ -278,7 +304,7 @@ private fun ExpandedMovieNightRow(
         if (primary && (plan.canStartFromWidget() || plan.hasWidgetJourney)) {
             MovieNightJourneyAction(context, plan)
         } else if (!primary) {
-            WidgetCountdownBadge(plan.toWidgetCountdown(context, short = true))
+            WidgetCountdown(plan.toWidgetCountdown(context, short = true))
         }
     }
 }
@@ -289,11 +315,18 @@ private fun MovieNightRow(
     plan: MovieNightPlan,
     poster: Bitmap?,
     isOnline: Boolean,
+    modifier: GlanceModifier,
 ) {
     Row(
-        modifier = GlanceModifier
+        modifier = modifier
             .fillMaxWidth()
-            .clickable(movieAction(context, plan.movieId)),
+            .clickable(movieAction(context, plan.movieId))
+            .padding(
+                start = PlanWidgetDimensions.ContentPadding,
+                top = PlanWidgetDimensions.CompactTopPadding,
+                end = PlanWidgetDimensions.ContentPadding,
+                bottom = PlanWidgetDimensions.CompactBottomPadding,
+            ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         WidgetPoster(title = plan.title, poster = poster)
@@ -301,7 +334,9 @@ private fun MovieNightRow(
         Column(modifier = GlanceModifier.defaultWeight()) {
             Text(
                 text = plan.title,
-                maxLines = if (plan.hasWidgetJourney) 1 else 2,
+                maxLines = if (plan.hasWidgetJourney || plan.canStartFromWidget() ||
+                    LocalSize.current.height < PlanWidgetDimensions.CompactTwoLineMinHeight
+                ) 1 else 2,
                 style = TextStyle(
                     color = PlanWidgetTheme.Primary,
                     fontSize = 12.sp,
@@ -315,9 +350,13 @@ private fun MovieNightRow(
                     plan.widgetDateLabel(context, isOnline)
                 },
                 maxLines = 1,
-                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
+                style = TextStyle(color = PlanWidgetTheme.Accent, fontSize = 12.sp),
             )
-            if (plan.canStartFromWidget() || plan.hasWidgetJourney) MovieNightJourneyAction(context, plan)
+            if ((plan.canStartFromWidget() || plan.hasWidgetJourney) &&
+                LocalSize.current.height >= PlanWidgetDimensions.CompactTwoLineMinHeight
+            ) {
+                MovieNightJourneyAction(context, plan)
+            }
         }
     }
 }
@@ -361,21 +400,25 @@ private fun MovieNightJourneyAction(
                     ),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(
-                    text = context.getString(R.string.widget_start_action),
-                    style = TextStyle(
-                        color = PlanWidgetTheme.OnAccent,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                    ),
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    WidgetIcon(Icons.Filled.PlayArrow, PlanWidgetDimensions.StartIconSize, PlanWidgetTheme.OnAccent)
+                    Spacer(GlanceModifier.width(PlanWidgetDimensions.HeaderItemSpacing))
+                    Text(
+                        text = context.getString(R.string.widget_start_action),
+                        style = TextStyle(
+                            color = PlanWidgetTheme.OnAccent,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                        ),
+                    )
+                }
             }
         }
 
         else -> Text(
             text = plan.reminderLabel(context),
             maxLines = 1,
-            style = TextStyle(color = PlanWidgetTheme.OnImageSecondary, fontSize = 12.sp),
+            style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
         )
     }
 }
@@ -389,13 +432,6 @@ private fun MovieNightStatus.isVisibleInWidget(): Boolean = when (this) {
 
     else -> false
 }
-
-private fun MovieNightPlan.detailsLabel(context: Context, isOnline: Boolean): String =
-    if (isOnline) {
-        "${toRelativeWidgetDateTime(context)} · ${runtimeLabel(context)}"
-    } else {
-        context.getString(R.string.widget_cached_date, toRelativeWidgetDateTime(context))
-    }
 
 private fun MovieNightPlan.widgetDateLabel(context: Context, isOnline: Boolean): String =
     if (isOnline) {
