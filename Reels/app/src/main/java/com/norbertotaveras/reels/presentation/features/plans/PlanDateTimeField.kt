@@ -37,6 +37,7 @@ internal fun PlanDateTimeField(
     icon: ImageVector,
     onClick: () -> Unit,
     labelSpacing: Dp = ReelsDimensions.movieNightSheetFieldLabelSpacing,
+    trailingIcon: ImageVector? = null,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(labelSpacing)) {
         Text(
@@ -67,9 +68,18 @@ internal fun PlanDateTimeField(
                 )
                 Text(
                     value,
+                    modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Normal,
                 )
+                trailingIcon?.let { pickerIcon ->
+                    Icon(
+                        pickerIcon,
+                        contentDescription = null,
+                        modifier = Modifier.size(ReelsDimensions.planSheetCloseIconSize),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
     }

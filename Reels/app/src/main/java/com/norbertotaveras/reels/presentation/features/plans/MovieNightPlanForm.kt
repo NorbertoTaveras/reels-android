@@ -22,6 +22,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.outlined.CalendarToday
+import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
@@ -151,12 +153,14 @@ internal fun MovieNightPlanForm(
                 value = date.format(planInputDateFormatter),
                 icon = Icons.Filled.CalendarMonth,
                 onClick = { showDatePicker = true },
+                trailingIcon = Icons.Outlined.CalendarToday,
             )
             PlanDateTimeField(
                 label = "Start time",
                 value = time.format(planInputTimeFormatter),
                 icon = Icons.Filled.Schedule,
                 onClick = { showTimePicker = true },
+                trailingIcon = Icons.Outlined.Schedule,
             )
             if (scheduledAt <= System.currentTimeMillis()) {
                 Text(
