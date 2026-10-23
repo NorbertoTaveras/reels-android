@@ -15,6 +15,7 @@ import com.norbertotaveras.reels.domain.model.settings.AppSettings
 import com.norbertotaveras.reels.domain.model.settings.AppTheme
 import com.norbertotaveras.reels.domain.model.settings.ImageQuality
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
+import com.norbertotaveras.reels.domain.model.settings.PlanPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -24,12 +25,11 @@ import kotlinx.coroutines.flow.map
 private val Context.settingsDataStore by preferencesDataStore(name = "settings")
 
 @Singleton
-class SettingsDataStore @Inject constructor(
-    @param:ApplicationContext private val context: Context,
-) {
-    val settings: Flow<AppSettings> = context.settingsDataStore.data.map { preferences ->
-        preferences.toAppSettings()
-    }
+class SettingsDataStore
+@Inject
+constructor(@param:ApplicationContext private val context: Context) {
+    val settings: Flow<AppSettings> =
+        context.settingsDataStore.data.map { preferences -> preferences.toAppSettings() }
 
     suspend fun updateImageQuality(imageQuality: ImageQuality) {
         context.settingsDataStore.edit { preferences ->
@@ -46,6 +46,15 @@ class SettingsDataStore @Inject constructor(
     suspend fun updateTheme(theme: AppTheme) {
         context.settingsDataStore.edit { preferences ->
             preferences[SettingsPreferenceKeys.THEME] = theme.name
+        }
+    }
+
+    suspend fun updatePlanPreferences(value: PlanPreferences) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[SettingsPreferenceKeys.RELEASE_REMINDER] = value.releaseReminder.name
+            preferences[SettingsPreferenceKeys.MOVIE_NIGHT_REMINDER] =
+                value.movieNightReminderMinutes ?: -1
+            preferences[SettingsPreferenceKeys.LIVE_UPDATES] = value.liveUpdatesEnabled
         }
     }
 

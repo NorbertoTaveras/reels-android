@@ -16,6 +16,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun PlansRoute(
     onBackClick: () -> Unit,
+    onBrowseReleases: () -> Unit,
+    onBrowseMovies: () -> Unit,
     onMovieClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PlansViewModel = hiltViewModel(),
@@ -24,6 +26,8 @@ fun PlansRoute(
     PlansScreen(
         state = state,
         onBackClick = onBackClick,
+        onBrowseReleases = onBrowseReleases,
+        onBrowseMovies = onBrowseMovies,
         onMovieClick = onMovieClick,
         onTabSelected = viewModel::selectTab,
         onReleaseRemove = viewModel::removeRelease,

@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.EventAvailable
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.EventAvailable
 import androidx.compose.material.icons.outlined.NotificationsNone
 import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material3.DropdownMenu
@@ -72,12 +73,23 @@ internal fun ReleasePlansList(
     onMovieClick: (Int) -> Unit,
     onRemove: (Int) -> Unit,
     onEdit: (TrackedRelease) -> Unit,
+    onBrowse: () -> Unit,
 ) {
     if (releases.isEmpty()) {
         PlansEmptyState(
-            icon = { Icon(Icons.Filled.EventAvailable, null) },
+            icon = {
+                Icon(
+                    Icons.Outlined.EventAvailable,
+                    null,
+                    Modifier.size(ReelsDimensions.plansEmptyIconSize),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
             title = "No tracked releases",
-            message = "Track a movie from Movie Details to follow its release date.",
+            message = "Track an upcoming movie to get notified when it arrives.",
+            actionLabel = "Find upcoming movies",
+            isRelease = true,
+            onBrowse = onBrowse,
         )
         return
     }

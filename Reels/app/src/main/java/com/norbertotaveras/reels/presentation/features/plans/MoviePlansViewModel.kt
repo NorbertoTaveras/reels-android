@@ -22,6 +22,7 @@ import com.norbertotaveras.reels.domain.repository.plans.TrackedReleaseRepositor
 import com.norbertotaveras.reels.domain.usecase.plans.ScheduleMovieNightUseCase
 import com.norbertotaveras.reels.domain.usecase.plans.TrackReleaseUseCase
 import com.norbertotaveras.reels.domain.usecase.plans.UpdateMovieNightUseCase
+import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.presentation.navigation.ReelsDestinations
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.UUID
@@ -34,7 +35,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class MoviePlansViewModel @Inject constructor(
+class MoviePlansViewModel
+@Inject
+constructor(
     savedStateHandle: SavedStateHandle,
     private val trackReleaseUseCase: TrackReleaseUseCase,
     private val scheduleMovieNightUseCase: ScheduleMovieNightUseCase,
@@ -43,29 +46,33 @@ class MoviePlansViewModel @Inject constructor(
     movieNightRepository: MovieNightRepository,
     private val scheduler: PlanScheduler,
     private val notificationManager: ReelsNotificationManager,
+    private val observeSettingsUseCase: ObserveSettingsUseCase,
 ) : ViewModel() {
     private val movieId = checkNotNull(savedStateHandle.get<Int>(ReelsDestinations.MOVIE_ID_ARG))
-    private val _state = MutableStateFlow(
-        MoviePlansUiState(
-            canScheduleExactAlarms = scheduler.canScheduleExactAlarms(),
-            canPostNotifications = notificationManager.canPostNotifications(),
+    private val _state =
+        MutableStateFlow(
+            MoviePlansUiState(
+                canScheduleExactAlarms = scheduler.canScheduleExactAlarms(),
+                canPostNotifications = notificationManager.canPostNotifications(),
+            )
         )
-    )
     val state: StateFlow<MoviePlansUiState> = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
+            observeSettingsUseCase().collect { settings ->
+                _state.update { it.copy(preferences = settings.planPreferences) }
+            }
+        }
+        viewModelScope.launch {
             combine(
-                trackedReleaseRepository.observeTrackedRelease(movieId),
-                movieNightRepository.observeUpcomingMovieNight(movieId),
-            ) { release, movieNight -> release to movieNight }
+                    trackedReleaseRepository.observeTrackedRelease(movieId),
+                    movieNightRepository.observeUpcomingMovieNight(movieId),
+                ) { release, movieNight ->
+                    release to movieNight
+                }
                 .collect { (release, movieNight) ->
-                    _state.update {
-                        it.copy(
-                            trackedRelease = release,
-                            movieNightPlan = movieNight,
-                        )
-                    }
+                    _state.update { it.copy(trackedRelease = release, movieNightPlan = movieNight) }
                 }
         }
     }
@@ -86,22 +93,26 @@ class MoviePlansViewModel @Inject constructor(
         notificationsEnabled: Boolean,
         onComplete: () -> Unit,
     ) {
-        val release = state.value.trackedRelease?.copy(
-            reminder = reminder,
-            customReminderAt = customReminderAt,
-            notificationsEnabled = notificationsEnabled,
-        ) ?: TrackedRelease(
-            movieId = movie.id,
-            title = movie.title,
-            posterPath = movie.posterPath,
-            releaseDate = movie.releaseDate,
-            reminder = reminder,
-            customReminderAt = customReminderAt,
-            notificationsEnabled = notificationsEnabled,
-        )
-        save(onComplete) {
-            trackReleaseUseCase(release)
-        }
+        val resolvedReminder =
+            if (reminder == ReleaseReminder.AppDefault) {
+                state.value.preferences.releaseReminder
+            } else reminder
+        val release =
+            state.value.trackedRelease?.copy(
+                reminder = resolvedReminder,
+                customReminderAt = customReminderAt,
+                notificationsEnabled = notificationsEnabled,
+            )
+                ?: TrackedRelease(
+                    movieId = movie.id,
+                    title = movie.title,
+                    posterPath = movie.posterPath,
+                    releaseDate = movie.releaseDate,
+                    reminder = resolvedReminder,
+                    customReminderAt = customReminderAt,
+                    notificationsEnabled = notificationsEnabled,
+                )
+        save(onComplete) { trackReleaseUseCase(release) }
     }
 
     fun removeTrackedRelease(onComplete: () -> Unit) {
@@ -119,34 +130,37 @@ class MoviePlansViewModel @Inject constructor(
         onComplete: (MovieNightPlan) -> Unit,
     ) {
         val existingPlan = state.value.movieNightPlan
-        val plan = existingPlan?.copy(
-            scheduledAt = scheduledAt,
-            runtimeMinutes = runtimeMinutes,
-            reminderMinutesBefore = reminderMinutes,
-            venue = venue?.takeIf(String::isNotBlank),
-            attendeeCount = attendeeCount,
-            note = note?.takeIf(String::isNotBlank),
-            status = MovieNightStatus.Upcoming,
-        ) ?: MovieNightPlan(
-            id = UUID.randomUUID().toString(),
-            movieId = movie.id,
-            title = movie.title,
-            posterPath = movie.posterPath,
-            scheduledAt = scheduledAt,
-            runtimeMinutes = runtimeMinutes,
-            reminderMinutesBefore = reminderMinutes,
-            venue = venue?.takeIf(String::isNotBlank),
-            attendeeCount = attendeeCount,
-            note = note?.takeIf(String::isNotBlank),
-        )
+        val plan =
+            existingPlan?.copy(
+                scheduledAt = scheduledAt,
+                runtimeMinutes = runtimeMinutes,
+                reminderMinutesBefore = reminderMinutes,
+                venue = venue?.takeIf(String::isNotBlank),
+                attendeeCount = attendeeCount,
+                note = note?.takeIf(String::isNotBlank),
+                status = MovieNightStatus.Upcoming,
+            )
+                ?: MovieNightPlan(
+                    id = UUID.randomUUID().toString(),
+                    movieId = movie.id,
+                    title = movie.title,
+                    posterPath = movie.posterPath,
+                    scheduledAt = scheduledAt,
+                    runtimeMinutes = runtimeMinutes,
+                    reminderMinutesBefore = reminderMinutes,
+                    venue = venue?.takeIf(String::isNotBlank),
+                    attendeeCount = attendeeCount,
+                    note = note?.takeIf(String::isNotBlank),
+                )
 
         viewModelScope.launch {
             _state.update { it.copy(isSaving = true, errorMessage = null) }
-            val result = if (existingPlan == null) {
-                scheduleMovieNightUseCase(plan)
-            } else {
-                updateMovieNightUseCase.edit(plan)
-            }
+            val result =
+                if (existingPlan == null) {
+                    scheduleMovieNightUseCase(plan)
+                } else {
+                    updateMovieNightUseCase.edit(plan)
+                }
             result.fold(
                 onSuccess = {
                     _state.update { it.copy(isSaving = false, movieNightPlan = plan) }
@@ -171,17 +185,21 @@ class MoviePlansViewModel @Inject constructor(
     private fun save(onComplete: () -> Unit, operation: suspend () -> Result<Unit>) {
         viewModelScope.launch {
             _state.update { it.copy(isSaving = true, errorMessage = null) }
-            operation().fold(
-                onSuccess = {
-                    _state.update { it.copy(isSaving = false) }
-                    onComplete()
-                },
-                onFailure = { error ->
-                    _state.update {
-                        it.copy(isSaving = false, errorMessage = error.message ?: "Unable to save this plan.")
-                    }
-                }
-            )
+            operation()
+                .fold(
+                    onSuccess = {
+                        _state.update { it.copy(isSaving = false) }
+                        onComplete()
+                    },
+                    onFailure = { error ->
+                        _state.update {
+                            it.copy(
+                                isSaving = false,
+                                errorMessage = error.message ?: "Unable to save this plan.",
+                            )
+                        }
+                    },
+                )
         }
     }
 }

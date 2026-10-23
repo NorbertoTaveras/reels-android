@@ -12,37 +12,35 @@ import com.norbertotaveras.reels.domain.model.favorite.LibraryContentDataModel
 import com.norbertotaveras.reels.domain.model.settings.AppSettings
 import com.norbertotaveras.reels.presentation.ui.extensions.displayLabel
 
-internal fun SettingsUiState.withSettings(
-    settings: AppSettings,
-): SettingsUiState {
+internal fun SettingsUiState.withSettings(settings: AppSettings): SettingsUiState {
     return copy(
         imageQualityLabel = settings.imageQuality.displayLabel,
         languageRegionLabel = settings.languageRegion.displayLabel,
         themeLabel = settings.theme.displayLabel,
         selectedImageQuality = settings.imageQuality,
         selectedLanguageRegion = settings.languageRegion,
-        selectedTheme = settings.theme
+        selectedTheme = settings.theme,
+        planPreferences = settings.planPreferences,
     )
 }
 
-internal fun SettingsUiState.withLibraryContent(
-    content: LibraryContentDataModel,
-): SettingsUiState {
+internal fun SettingsUiState.withLibraryContent(content: LibraryContentDataModel): SettingsUiState {
     return copy(
-        savedLibraryLabel = buildSavedLibraryLabel(
-            movieCount = content.movies.size,
-            personCount = content.people.size
-        )
+        savedLibraryLabel =
+            buildSavedLibraryLabel(
+                movieCount = content.movies.size,
+                personCount = content.people.size,
+            )
     )
 }
 
 internal fun SettingsUiState.withTmdbAccountState(
-    accountState: TmdbAccountStateDataModel,
+    accountState: TmdbAccountStateDataModel
 ): SettingsUiState {
-    val accountName = accountState.account?.displayName
-        ?.takeIf { displayName -> displayName.isNotBlank() }
-        ?: accountState.account?.username
-        ?: ""
+    val accountName =
+        accountState.account?.displayName?.takeIf { displayName -> displayName.isNotBlank() }
+            ?: accountState.account?.username
+            ?: ""
 
     return copy(
         isTmdbAccountConnected = accountState.isConnected,
@@ -52,6 +50,6 @@ internal fun SettingsUiState.withTmdbAccountState(
         tmdbAccountName = accountName,
         tmdbAccountUsername = accountState.account?.username.orEmpty(),
         tmdbAccountAvatarPath = accountState.account?.avatarPath,
-        tmdbAccountGravatarHash = accountState.account?.gravatarHash
+        tmdbAccountGravatarHash = accountState.account?.gravatarHash,
     )
 }

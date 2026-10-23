@@ -9,8 +9,10 @@ package com.norbertotaveras.reels.presentation.features.plans
 
 import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
 import com.norbertotaveras.reels.domain.model.plans.TrackedRelease
+import com.norbertotaveras.reels.domain.model.settings.PlanPreferences
 
 data class MoviePlansUiState(
+    val preferences: PlanPreferences = PlanPreferences(),
     val trackedRelease: TrackedRelease? = null,
     val movieNightPlan: MovieNightPlan? = null,
     val isSaving: Boolean = false,

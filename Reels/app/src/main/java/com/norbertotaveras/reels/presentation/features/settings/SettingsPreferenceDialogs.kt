@@ -60,16 +60,14 @@ internal fun LanguageRegionDialog(
         dismissLabel = "Cancel",
         confirmLabel = "Apply",
         onConfirm = { onOptionSelected(pendingOption) },
-        modifier = modifier
+        modifier = modifier,
     ) {
         Column(
-            modifier = Modifier
-                .heightIn(max = ReelsDimensions.settingsDialogContentMaxHeight)
-                .verticalScroll(rememberScrollState())
+            modifier =
+                Modifier.heightIn(max = ReelsDimensions.settingsDialogContentMaxHeight)
+                    .verticalScroll(rememberScrollState())
         ) {
-            DialogDescription(
-                text = "Sets the language for movie titles and metadata."
-            )
+            DialogDescription(text = "Sets the language for movie titles and metadata.")
 
             Spacer(modifier = Modifier.height(ReelsSpacing.large))
             PrivacySectionLabel(text = "LANGUAGE")
@@ -81,7 +79,7 @@ internal fun LanguageRegionDialog(
                         label = option.languageName,
                         description = option.regionName,
                         selected = option == pendingOption,
-                        onClick = { pendingOption = option }
+                        onClick = { pendingOption = option },
                     )
                 }
             }
@@ -120,7 +118,7 @@ internal fun <T> SettingsOptionDialog(
         dismissLabel = "Cancel",
         confirmLabel = confirmLabel,
         onConfirm = { onOptionSelected(pendingOption) },
-        modifier = modifier
+        modifier = modifier,
     ) {
         Column {
             DialogDescription(text = description)
@@ -134,7 +132,7 @@ internal fun <T> SettingsOptionDialog(
                         description = optionDescription(option),
                         icon = optionIcon?.invoke(option),
                         selected = option == pendingOption,
-                        onClick = { pendingOption = option }
+                        onClick = { pendingOption = option },
                     )
                 }
             }
@@ -148,19 +146,17 @@ internal fun <T> SettingsOptionDialog(
 }
 
 @Composable
-private fun DialogDescription(
-    text: String,
-    modifier: Modifier = Modifier,
-) {
+private fun DialogDescription(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
         modifier = modifier.fillMaxWidth(),
-        style = MaterialTheme.typography.bodyMedium.copy(
-            fontSize = ReelsDimensions.settingsDialogBodySize,
-            lineHeight = ReelsDimensions.settingsDialogBodyLineHeight
-        ),
+        style =
+            MaterialTheme.typography.bodyMedium.copy(
+                fontSize = ReelsDimensions.settingsDialogBodySize,
+                lineHeight = ReelsDimensions.settingsDialogBodyLineHeight,
+            ),
         color = MaterialTheme.colorScheme.onSurfaceVariant,
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
     )
 }
 
@@ -174,109 +170,108 @@ private fun SettingsOptionRow(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(ReelsDimensions.settingsDialogOptionCornerSize))
-            .background(
-                if (selected) {
-                    MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
-                } else {
-                    MaterialTheme.colorScheme.surface
-                }
-            )
-            .clickable(onClick = onClick)
-            .padding(
-                horizontal = ReelsDimensions.settingsDialogOptionHorizontalPadding,
-                vertical = ReelsDimensions.settingsDialogOptionVerticalPadding
-            ),
-        horizontalArrangement = Arrangement.spacedBy(
-            ReelsDimensions.settingsDialogOptionSpacing
-        ),
-        verticalAlignment = Alignment.CenterVertically
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(ReelsDimensions.settingsDialogOptionCornerSize))
+                .background(
+                    if (selected) {
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
+                    } else {
+                        MaterialTheme.colorScheme.surface
+                    }
+                )
+                .clickable(onClick = onClick)
+                .padding(
+                    horizontal = ReelsDimensions.settingsDialogOptionHorizontalPadding,
+                    vertical = ReelsDimensions.settingsDialogOptionVerticalPadding,
+                ),
+        horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.settingsDialogOptionSpacing),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         SettingsDialogRadio(selected = selected)
 
-        icon?.let { optionIcon ->
-            DialogOptionIcon(icon = optionIcon)
-        }
+        icon?.let { optionIcon -> DialogOptionIcon(icon = optionIcon) }
 
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(
-                ReelsDimensions.settingsDialogOptionTextSpacing
-            )
+            verticalArrangement =
+                Arrangement.spacedBy(ReelsDimensions.settingsDialogOptionTextSpacing),
         ) {
             Text(
                 text = label,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = ReelsDimensions.settingsDialogOptionTitleSize,
-                    lineHeight = ReelsDimensions.settingsDialogOptionTitleLineHeight,
-                    fontWeight = FontWeight.Medium
-                ),
-                color = if (selected) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.onSurface
-                }
+                style =
+                    MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = ReelsDimensions.settingsDialogOptionTitleSize,
+                        lineHeight = ReelsDimensions.settingsDialogOptionTitleLineHeight,
+                        fontWeight = FontWeight.Medium,
+                    ),
+                color =
+                    if (selected) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    },
             )
 
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodySmall.copy(
-                    fontSize = ReelsDimensions.settingsDialogOptionBodySize,
-                    lineHeight = ReelsDimensions.settingsDialogOptionBodyLineHeight,
-                    fontWeight = FontWeight.Medium
-                ),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            if (description.isNotEmpty())
+                Text(
+                    text = description,
+                    style =
+                        MaterialTheme.typography.bodySmall.copy(
+                            fontSize = ReelsDimensions.settingsDialogOptionBodySize,
+                            lineHeight = ReelsDimensions.settingsDialogOptionBodyLineHeight,
+                            fontWeight = FontWeight.Medium,
+                        ),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
         }
     }
 }
 
 @Composable
-private fun RegionOptionRow(
-    modifier: Modifier = Modifier,
-) {
+private fun RegionOptionRow(modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(ReelsDimensions.settingsDialogOptionCornerSize),
-        color = MaterialTheme.colorScheme.surfaceVariant
+        color = MaterialTheme.colorScheme.surfaceVariant,
     ) {
         Row(
             modifier = Modifier.padding(ReelsSpacing.medium),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 imageVector = Icons.Filled.Language,
                 contentDescription = null,
                 modifier = Modifier.size(ReelsDimensions.settingsDialogInfoIconSize),
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.primary,
             )
 
             Spacer(modifier = Modifier.width(ReelsSpacing.medium))
 
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(
-                    ReelsDimensions.settingsDialogOptionTextSpacing
-                )
+                verticalArrangement =
+                    Arrangement.spacedBy(ReelsDimensions.settingsDialogOptionTextSpacing),
             ) {
                 Text(
                     text = "All regions",
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = ReelsDimensions.settingsDialogOptionTitleSize,
-                        lineHeight = ReelsDimensions.settingsDialogOptionTitleLineHeight,
-                        fontWeight = FontWeight.Medium
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface
+                    style =
+                        MaterialTheme.typography.bodyMedium.copy(
+                            fontSize = ReelsDimensions.settingsDialogOptionTitleSize,
+                            lineHeight = ReelsDimensions.settingsDialogOptionTitleLineHeight,
+                            fontWeight = FontWeight.Medium,
+                        ),
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
                     text = "Movie availability varies by region",
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        fontSize = ReelsDimensions.settingsDialogOptionBodySize,
-                        lineHeight = ReelsDimensions.settingsDialogOptionBodyLineHeight
-                    ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    style =
+                        MaterialTheme.typography.bodySmall.copy(
+                            fontSize = ReelsDimensions.settingsDialogOptionBodySize,
+                            lineHeight = ReelsDimensions.settingsDialogOptionBodyLineHeight,
+                        ),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
 
@@ -284,7 +279,7 @@ private fun RegionOptionRow(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
                 modifier = Modifier.size(ReelsDimensions.settingsDialogChevronSize),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }

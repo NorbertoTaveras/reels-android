@@ -61,6 +61,7 @@ import androidx.compose.ui.text.font.FontWeight
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.model.plans.ReleaseReminder
 import com.norbertotaveras.reels.domain.model.plans.TrackedRelease
+import com.norbertotaveras.reels.presentation.ui.extensions.defaultReminderLabel
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import java.time.Instant
@@ -82,6 +83,7 @@ internal fun ReleasePlanForm(
     onDismiss: () -> Unit,
     onSave: (ReleaseReminder, Long?, Boolean) -> Unit,
     errorMessage: String?,
+    defaultReminder: ReleaseReminder = ReleaseReminder.OneDayBefore,
 ) {
     val existingCustomDateTime =
         trackedRelease?.customReminderAt?.let {
@@ -151,7 +153,14 @@ internal fun ReleasePlanForm(
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            releaseReminderOptions.forEachIndexed { index, option ->
+            releaseReminderOptions.forEachIndexed { index, baseOption ->
+                val option =
+                    if (baseOption.value == ReleaseReminder.AppDefault) {
+                        baseOption.copy(
+                            subtitle =
+                                "${defaultReminder.defaultReminderLabel()} at 9:00 AM (app setting)"
+                        )
+                    } else baseOption
                 ReleaseReminderRow(
                     option = option,
                     selected = reminder == option.value,

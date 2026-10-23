@@ -15,4 +15,5 @@ data class AppSettings(
     val theme: AppTheme = AppTheme.System,
     val recentSearches: List<String> = emptyList(),
     val discoverFilters: DiscoverFilterDataModel = DiscoverFilterDataModel(),
+    val planPreferences: PlanPreferences = PlanPreferences(),
 )

@@ -7,6 +7,7 @@
 
 package com.norbertotaveras.reels.presentation.features.settings
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,12 +15,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
@@ -34,8 +33,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.domain.model.settings.AppTheme
 import com.norbertotaveras.reels.domain.model.settings.ImageQuality
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
@@ -51,26 +50,28 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = ReelsSpacing.screenHorizontal)
-            .padding(
-                top = ReelsDimensions.settingsScreenTopPadding,
-                bottom = ReelsDimensions.settingsScreenBottomPadding
-            ),
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.settingsSectionSpacing)
+        modifier =
+            modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = ReelsSpacing.screenHorizontal)
+                .padding(
+                    top = ReelsDimensions.settingsScreenTopPadding,
+                    bottom = ReelsDimensions.settingsScreenBottomPadding,
+                ),
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.settingsSectionSpacing),
     ) {
         Text(
             text = "Settings",
-            style = MaterialTheme.typography.headlineSmall.copy(
-                fontSize = ReelsDimensions.settingsScreenTitleSize,
-                lineHeight = ReelsDimensions.settingsScreenTitleLineHeight,
-                letterSpacing = 0.sp
-            ),
+            style =
+                MaterialTheme.typography.headlineSmall.copy(
+                    fontSize = ReelsDimensions.settingsScreenTitleSize,
+                    lineHeight = ReelsDimensions.settingsScreenTitleLineHeight,
+                    letterSpacing = 0.sp,
+                ),
             color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
         )
 
         TmdbAccountSection(
@@ -83,7 +84,7 @@ fun SettingsScreen(
             },
             onRatingsSyncChanged = { enabled ->
                 onEvent(SettingsEvent.TmdbRatingsSyncChanged(enabled = enabled))
-            }
+            },
         )
 
         SettingsSection(title = "APP PREFERENCES") {
@@ -91,7 +92,7 @@ fun SettingsScreen(
                 icon = Icons.Filled.Image,
                 title = "Image Quality",
                 subtitle = state.imageQualityLabel,
-                onClick = { onEvent(SettingsEvent.ImageQualityClicked) }
+                onClick = { onEvent(SettingsEvent.ImageQualityClicked) },
             )
 
             SettingsDivider()
@@ -100,7 +101,7 @@ fun SettingsScreen(
                 icon = Icons.Filled.Language,
                 title = "Language & Region",
                 subtitle = state.languageRegionLabel,
-                onClick = { onEvent(SettingsEvent.LanguageRegionClicked) }
+                onClick = { onEvent(SettingsEvent.LanguageRegionClicked) },
             )
 
             SettingsDivider()
@@ -109,25 +110,18 @@ fun SettingsScreen(
                 icon = Icons.Filled.Palette,
                 title = "Theme",
                 subtitle = state.themeLabel,
-                onClick = { onEvent(SettingsEvent.ThemeClicked) }
+                onClick = { onEvent(SettingsEvent.ThemeClicked) },
             )
         }
 
+        SettingsReminderSection(state, onEvent)
+
         SettingsSection(title = "DATA & STORAGE") {
-            SettingsRow(
-                icon = Icons.Filled.CalendarMonth,
-                title = "Plans & Reminders",
-                subtitle = "Releases and Movie Nights",
-                onClick = { onEvent(SettingsEvent.PlansClicked) }
-            )
-
-            SettingsDivider()
-
             SettingsRow(
                 icon = Icons.Filled.Download,
                 title = "Saved Library",
                 subtitle = state.savedLibraryLabel,
-                onClick = { onEvent(SettingsEvent.SavedLibraryClicked) }
+                onClick = { onEvent(SettingsEvent.SavedLibraryClicked) },
             )
 
             SettingsDivider()
@@ -136,7 +130,7 @@ fun SettingsScreen(
                 icon = Icons.Filled.DeleteOutline,
                 title = "Clear Image Cache",
                 subtitle = state.clearImageCacheLabel,
-                onClick = { onEvent(SettingsEvent.ClearImageCacheClicked) }
+                onClick = { onEvent(SettingsEvent.ClearImageCacheClicked) },
             )
         }
 
@@ -145,7 +139,7 @@ fun SettingsScreen(
                 icon = Icons.Filled.Info,
                 title = "App Version",
                 subtitle = state.appVersionLabel,
-                showsChevron = false
+                showsChevron = false,
             )
 
             SettingsDivider()
@@ -154,26 +148,22 @@ fun SettingsScreen(
                 icon = Icons.Filled.Shield,
                 title = "Privacy Notice",
                 subtitle = state.privacyLabel,
-                onClick = { onEvent(SettingsEvent.PrivacyClicked) }
+                onClick = { onEvent(SettingsEvent.PrivacyClicked) },
             )
         }
 
-        TmdbAttributionSection(
-            onClick = { onEvent(SettingsEvent.TmdbAttributionClicked) }
-        )
+        TmdbAttributionSection(onClick = { onEvent(SettingsEvent.TmdbAttributionClicked) })
     }
 
     if (state.isPrivacyNoticeVisible) {
-        PrivacyNoticeDialog(
-            onDismiss = { onEvent(SettingsEvent.PrivacyNoticeDismissed) }
-        )
+        PrivacyNoticeDialog(onDismiss = { onEvent(SettingsEvent.PrivacyNoticeDismissed) })
     }
 
     if (state.isClearImageCacheDialogVisible) {
         ClearImageCacheDialog(
             cacheSizeLabel = state.imageCacheSizeLabel,
             onConfirm = { onEvent(SettingsEvent.ClearImageCacheConfirmed) },
-            onDismiss = { onEvent(SettingsEvent.ClearImageCacheDismissed) }
+            onDismiss = { onEvent(SettingsEvent.ClearImageCacheDismissed) },
         )
     }
 
@@ -196,13 +186,14 @@ fun SettingsScreen(
                 confirmLabel = "Save",
                 supportingContent = {
                     SettingsInfoBanner(
-                        text = "Saved offline movies always use the quality they were downloaded at."
+                        text =
+                            "Saved offline movies always use the quality they were downloaded at."
                     )
                 },
                 onOptionSelected = { imageQuality ->
                     onEvent(SettingsEvent.ImageQualitySelected(imageQuality))
                 },
-                onDismiss = { onEvent(SettingsEvent.PreferenceDialogDismissed) }
+                onDismiss = { onEvent(SettingsEvent.PreferenceDialogDismissed) },
             )
         }
 
@@ -212,7 +203,7 @@ fun SettingsScreen(
                 onOptionSelected = { languageRegion ->
                     onEvent(SettingsEvent.LanguageRegionSelected(languageRegion))
                 },
-                onDismiss = { onEvent(SettingsEvent.PreferenceDialogDismissed) }
+                onDismiss = { onEvent(SettingsEvent.PreferenceDialogDismissed) },
             )
         }
 
@@ -238,23 +229,19 @@ fun SettingsScreen(
                         AppTheme.Light -> Icons.Filled.LightMode
                     }
                 },
-                onOptionSelected = { theme ->
-                    onEvent(SettingsEvent.ThemeSelected(theme))
-                },
-                onDismiss = { onEvent(SettingsEvent.PreferenceDialogDismissed) }
+                onOptionSelected = { theme -> onEvent(SettingsEvent.ThemeSelected(theme)) },
+                onDismiss = { onEvent(SettingsEvent.PreferenceDialogDismissed) },
             )
         }
 
-        null -> Unit
+        else -> Unit
     }
+
+    SettingsReminderDialogs(state, onEvent)
 }
+
 @Preview
 @Composable
 private fun SettingsScreenPreview() {
-    ReelsTheme {
-        SettingsScreen(
-            state = SettingsUiState(),
-            onEvent = {}
-        )
-    }
+    ReelsTheme { SettingsScreen(state = SettingsUiState(), onEvent = {}) }
 }

@@ -10,8 +10,14 @@ package com.norbertotaveras.reels.presentation.features.settings
 import com.norbertotaveras.reels.domain.model.settings.AppTheme
 import com.norbertotaveras.reels.domain.model.settings.ImageQuality
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
+import com.norbertotaveras.reels.domain.model.settings.PlanPreferences
 
 data class SettingsUiState(
+    val planPreferences: PlanPreferences = PlanPreferences(),
+    val canPostNotifications: Boolean = false,
+    val canScheduleExactAlarms: Boolean = false,
+    val supportsLiveUpdates: Boolean = false,
+    val canPromoteLiveUpdates: Boolean = false,
     val imageQualityLabel: String = "High quality",
     val languageRegionLabel: String = "English · United States",
     val themeLabel: String = "System default",

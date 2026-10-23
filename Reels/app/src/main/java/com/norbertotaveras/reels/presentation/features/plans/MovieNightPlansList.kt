@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.EventAvailable
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.outlined.Theaters
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -65,17 +66,30 @@ internal fun MovieNightPlansList(
     onFinish: (String) -> Unit,
     onCancel: (String) -> Unit,
     onRemove: (String) -> Unit,
+    onBrowse: () -> Unit,
 ) {
     if (plans.isEmpty()) {
         PlansEmptyState(
-            icon = { Icon(Icons.Filled.CalendarMonth, null) },
-            title = "No Movie Nights",
-            message = "Schedule a Movie Night from a movie's details.",
+            icon = {
+                Icon(
+                    Icons.Outlined.Theaters,
+                    null,
+                    Modifier.size(ReelsDimensions.plansEmptyIconSize),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
+            title = "No movie nights planned",
+            message = "Schedule a movie from its details screen.",
+            actionLabel = "Browse movies",
+            isRelease = false,
+            onBrowse = onBrowse,
         )
         return
     }
     val (pastPlans, currentPlans) = plans.partition { it.status.isPastPlan() }
-    LazyColumn(contentPadding = PaddingValues(vertical = ReelsDimensions.plansMovieNightVerticalSpacing)) {
+    LazyColumn(
+        contentPadding = PaddingValues(vertical = ReelsDimensions.plansMovieNightVerticalSpacing)
+    ) {
         items(currentPlans, key = { it.id }) { plan ->
             MovieNightCard(
                 plan = plan,
@@ -124,26 +138,26 @@ private fun MovieNightCard(
 ) {
     val isJourney = plan.status == MovieNightStatus.Active || plan.status == MovieNightStatus.Paused
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = ReelsDimensions.plansListHorizontalPadding),
+        modifier =
+            Modifier.fillMaxWidth()
+                .padding(horizontal = ReelsDimensions.plansListHorizontalPadding),
         shape = RoundedCornerShape(ReelsDimensions.plansMovieNightCardCornerSize),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(
-            1.dp,
-            if (plan.status == MovieNightStatus.Active) {
-                MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
-            } else {
-                MaterialTheme.colorScheme.outlineVariant
-            },
-        ),
+        border =
+            BorderStroke(
+                1.dp,
+                if (plan.status == MovieNightStatus.Active) {
+                    MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                } else {
+                    MaterialTheme.colorScheme.outlineVariant
+                },
+            ),
     ) {
         Box {
             if (isJourney) {
                 Box(Modifier.matchParentSize()) {
                     Box(
-                        Modifier
-                            .width(ReelsDimensions.plansJourneyAccentWidth)
+                        Modifier.width(ReelsDimensions.plansJourneyAccentWidth)
                             .fillMaxHeight()
                             .background(
                                 MaterialTheme.colorScheme.primary.copy(
@@ -154,9 +168,8 @@ private fun MovieNightCard(
                 }
             }
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(ReelsDimensions.plansMovieNightCardPadding)
+                modifier =
+                    Modifier.fillMaxWidth().padding(ReelsDimensions.plansMovieNightCardPadding)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth().clickable { onMovieClick(plan.movieId) },
@@ -165,16 +178,17 @@ private fun MovieNightCard(
                     AsyncImage(
                         model = plan.posterPath.toTmdbImageUrl(),
                         contentDescription = plan.title,
-                        modifier = Modifier
-                            .width(ReelsDimensions.plansPosterWidth)
-                            .height(ReelsDimensions.plansPosterHeight)
-                            .clip(RoundedCornerShape(ReelsDimensions.plansPosterCornerSize)),
+                        modifier =
+                            Modifier.width(ReelsDimensions.plansPosterWidth)
+                                .height(ReelsDimensions.plansPosterHeight)
+                                .clip(RoundedCornerShape(ReelsDimensions.plansPosterCornerSize)),
                         contentScale = ContentScale.Crop,
                     )
                     Spacer(Modifier.width(ReelsDimensions.plansRowSpacing))
                     Column(
                         modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.plansMetadataSpacing),
+                        verticalArrangement =
+                            Arrangement.spacedBy(ReelsDimensions.plansMetadataSpacing),
                     ) {
                         if (plan.status != MovieNightStatus.Upcoming) {
                             PlanStatusBadge(plan.status, plan.statusLabel())
@@ -192,23 +206,34 @@ private fun MovieNightCard(
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             MovieNightMetadata(Icons.Filled.Alarm, plan.reminderLabel())
-                            MovieNightMetadata(Icons.Filled.EventAvailable, "${plan.runtimeMinutes / 60}h ${plan.runtimeMinutes % 60}m")
+                            MovieNightMetadata(
+                                Icons.Filled.EventAvailable,
+                                "${plan.runtimeMinutes / 60}h ${plan.runtimeMinutes % 60}m",
+                            )
                         }
                     }
                 }
                 if (isJourney) {
                     Spacer(Modifier.height(12.dp))
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(plan.progressLabel(), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text("${(plan.progressFraction() * 100).toInt()}%", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(
+                            plan.progressLabel(),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Text(
+                            "${(plan.progressFraction() * 100).toInt()}%",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
                     Spacer(Modifier.height(5.dp))
                     LinearProgressIndicator(
                         progress = { plan.progressFraction() },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(ReelsDimensions.plansProgressHeight)
-                            .clip(RoundedCornerShape(ReelsDimensions.plansProgressHeight)),
+                        modifier =
+                            Modifier.fillMaxWidth()
+                                .height(ReelsDimensions.plansProgressHeight)
+                                .clip(RoundedCornerShape(ReelsDimensions.plansProgressHeight)),
                         color = MaterialTheme.colorScheme.primary,
                         trackColor = reelsMutedContainerColor(),
                         strokeCap = StrokeCap.Round,
@@ -217,7 +242,9 @@ private fun MovieNightCard(
                     )
                 }
                 Spacer(Modifier.height(ReelsDimensions.plansActionSectionSpacing))
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f))
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
+                )
                 Spacer(Modifier.height(ReelsDimensions.plansActionSectionSpacing))
                 MovieNightActions(
                     plan = plan,
@@ -237,32 +264,33 @@ private fun MovieNightCard(
 
 @Composable
 private fun PlanStatusBadge(status: MovieNightStatus, label: String) {
-    val containerColor = when (status) {
-        MovieNightStatus.Active,
-        MovieNightStatus.StartingSoon,
-        MovieNightStatus.Missed,
-        -> MaterialTheme.colorScheme.primary.copy(alpha = 0.16f)
+    val containerColor =
+        when (status) {
+            MovieNightStatus.Active,
+            MovieNightStatus.StartingSoon,
+            MovieNightStatus.Missed -> MaterialTheme.colorScheme.primary.copy(alpha = 0.16f)
 
-        else -> MaterialTheme.colorScheme.surfaceVariant
-    }
-    val contentColor = when (status) {
-        MovieNightStatus.Active,
-        MovieNightStatus.StartingSoon,
-        MovieNightStatus.Missed,
-        -> MaterialTheme.colorScheme.primary
+            else -> MaterialTheme.colorScheme.surfaceVariant
+        }
+    val contentColor =
+        when (status) {
+            MovieNightStatus.Active,
+            MovieNightStatus.StartingSoon,
+            MovieNightStatus.Missed -> MaterialTheme.colorScheme.primary
 
-        else -> MaterialTheme.colorScheme.onSurfaceVariant
-    }
+            else -> MaterialTheme.colorScheme.onSurfaceVariant
+        }
     Surface(
         shape = RoundedCornerShape(ReelsDimensions.plansStatusCornerSize),
         color = containerColor,
     ) {
         Text(
             label,
-            modifier = Modifier.padding(
-                horizontal = ReelsDimensions.plansStatusHorizontalPadding,
-                vertical = ReelsDimensions.plansStatusVerticalPadding,
-            ),
+            modifier =
+                Modifier.padding(
+                    horizontal = ReelsDimensions.plansStatusHorizontalPadding,
+                    vertical = ReelsDimensions.plansStatusVerticalPadding,
+                ),
             style = MaterialTheme.typography.labelSmall,
             color = contentColor,
         )
@@ -270,40 +298,54 @@ private fun PlanStatusBadge(status: MovieNightStatus, label: String) {
 }
 
 @Composable
-private fun MovieNightMetadata(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+private fun MovieNightMetadata(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    text: String,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+    ) {
         Icon(
             icon,
             null,
             modifier = Modifier.size(ReelsDimensions.plansMetadataIconSize),
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Text(text, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            text,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
 @Composable
 private fun PlanSectionHeading(label: String) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                horizontal = ReelsDimensions.plansListHorizontalPadding,
-                vertical = ReelsDimensions.plansMovieNightVerticalSpacing,
-            ),
+        modifier =
+            Modifier.fillMaxWidth()
+                .padding(
+                    horizontal = ReelsDimensions.plansListHorizontalPadding,
+                    vertical = ReelsDimensions.plansMovieNightVerticalSpacing,
+                ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.plansRowSpacing),
     ) {
         androidx.compose.material3.HorizontalDivider(modifier = Modifier.weight(1f))
-        Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         androidx.compose.material3.HorizontalDivider(modifier = Modifier.weight(1f))
     }
 }
 
-private fun MovieNightStatus.isPastPlan(): Boolean = when (this) {
-    MovieNightStatus.Completed,
-    MovieNightStatus.Missed,
-    MovieNightStatus.Cancelled,
-    -> true
-    else -> false
-}
+private fun MovieNightStatus.isPastPlan(): Boolean =
+    when (this) {
+        MovieNightStatus.Completed,
+        MovieNightStatus.Missed,
+        MovieNightStatus.Cancelled -> true
+        else -> false
+    }

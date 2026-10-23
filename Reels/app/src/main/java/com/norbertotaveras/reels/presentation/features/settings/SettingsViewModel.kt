@@ -13,6 +13,9 @@ import com.norbertotaveras.reels.domain.model.account.TmdbLibraryList
 import com.norbertotaveras.reels.domain.model.settings.AppTheme
 import com.norbertotaveras.reels.domain.model.settings.ImageQuality
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
+import com.norbertotaveras.reels.domain.model.settings.PlanPreferences
+import com.norbertotaveras.reels.domain.plans.PlanScheduler
+import com.norbertotaveras.reels.domain.plans.ReelsNotificationManager
 import com.norbertotaveras.reels.domain.usecase.account.DisconnectTmdbAccountUseCase
 import com.norbertotaveras.reels.domain.usecase.account.FinishTmdbAuthenticationUseCase
 import com.norbertotaveras.reels.domain.usecase.account.ObserveTmdbAccountUseCase
@@ -28,6 +31,7 @@ import com.norbertotaveras.reels.domain.usecase.settings.GetImageCacheSizeUseCas
 import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateImageQualityUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateLanguageRegionUseCase
+import com.norbertotaveras.reels.domain.usecase.settings.UpdatePlanPreferencesUseCase
 import com.norbertotaveras.reels.domain.usecase.settings.UpdateThemeUseCase
 import com.norbertotaveras.reels.presentation.ui.extensions.toStorageSizeLabel
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
@@ -49,7 +53,9 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
-class SettingsViewModel @Inject constructor(
+class SettingsViewModel
+@Inject
+constructor(
     private val observeSettingsUseCase: ObserveSettingsUseCase,
     private val observeLibraryContentUseCase: ObserveLibraryContentUseCase,
     private val observeTmdbAccountUseCase: ObserveTmdbAccountUseCase,
@@ -66,13 +72,17 @@ class SettingsViewModel @Inject constructor(
     private val updateImageQualityUseCase: UpdateImageQualityUseCase,
     private val updateLanguageRegionUseCase: UpdateLanguageRegionUseCase,
     private val updateThemeUseCase: UpdateThemeUseCase,
+    private val updatePlanPreferencesUseCase: UpdatePlanPreferencesUseCase,
+    private val planScheduler: PlanScheduler,
+    private val notificationManager: ReelsNotificationManager,
 ) : ViewModel() {
-    private val _state = MutableStateFlow(
-        SettingsUiState(
-            appVersionLabel = buildAppVersionLabel(),
-            appConfigurationLabel = buildAppConfigurationLabel()
+    private val _state =
+        MutableStateFlow(
+            SettingsUiState(
+                appVersionLabel = buildAppVersionLabel(),
+                appConfigurationLabel = buildAppConfigurationLabel(),
+            )
         )
-    )
     val state: StateFlow<SettingsUiState> = _state.asStateFlow()
 
     private val _effect = MutableSharedFlow<SettingsEffect>()
@@ -88,11 +98,28 @@ class SettingsViewModel @Inject constructor(
 
     fun onEvent(event: SettingsEvent) {
         when (event) {
-            SettingsEvent.ScreenResumed -> loadImageCacheSize()
+            SettingsEvent.ScreenResumed -> {
+                loadImageCacheSize()
+                refreshPlanAccess()
+            }
+            is SettingsEvent.PlanPreferenceClicked -> showPreferenceDialog(event.dialog)
+            is SettingsEvent.ReleaseReminderSelected ->
+                updatePlanPreferences { it.copy(releaseReminder = event.reminder) }
+            is SettingsEvent.MovieNightReminderSelected ->
+                updatePlanPreferences { it.copy(movieNightReminderMinutes = event.minutes) }
+            is SettingsEvent.LiveUpdatesChanged ->
+                updatePlanPreferences { it.copy(liveUpdatesEnabled = event.enabled) }
+            SettingsEvent.NotificationAccessRequested ->
+                openPlanSettings(SettingsEffect.OpenNotificationSettings)
+            SettingsEvent.LiveUpdateAccessRequested ->
+                openPlanSettings(SettingsEffect.OpenLiveUpdateSettings)
+            SettingsEvent.PreciseReminderAccessRequested ->
+                openPlanSettings(SettingsEffect.OpenPreciseReminderSettings)
             SettingsEvent.ImageQualityClicked -> onImageQualityClicked()
             is SettingsEvent.ImageQualitySelected -> onImageQualitySelected(event.imageQuality)
             SettingsEvent.LanguageRegionClicked -> onLanguageRegionClicked()
-            is SettingsEvent.LanguageRegionSelected -> onLanguageRegionSelected(event.languageRegion)
+            is SettingsEvent.LanguageRegionSelected ->
+                onLanguageRegionSelected(event.languageRegion)
             SettingsEvent.ThemeClicked -> onThemeClicked()
             is SettingsEvent.ThemeSelected -> onThemeSelected(event.theme)
             SettingsEvent.PreferenceDialogDismissed -> onPreferenceDialogDismissed()
@@ -120,19 +147,42 @@ class SettingsViewModel @Inject constructor(
     private fun observeSettings() {
         viewModelScope.launch {
             observeSettingsUseCase().collect { settings ->
-                _state.update { currentState ->
-                    currentState.withSettings(settings = settings)
-                }
+                _state.update { currentState -> currentState.withSettings(settings = settings) }
             }
+        }
+    }
+
+    private fun refreshPlanAccess() {
+        _state.update {
+            it.copy(
+                canPostNotifications = notificationManager.canPostNotifications(),
+                canScheduleExactAlarms = planScheduler.canScheduleExactAlarms(),
+                supportsLiveUpdates = notificationManager.supportsLiveUpdates(),
+                canPromoteLiveUpdates = notificationManager.canPromoteLiveUpdates(),
+            )
+        }
+    }
+
+    private fun openPlanSettings(effect: SettingsEffect) {
+        dismissPreferenceDialog()
+        viewModelScope.launch { _effect.emit(effect) }
+    }
+
+    private fun updatePlanPreferences(transform: (PlanPreferences) -> PlanPreferences) {
+        viewModelScope.launch {
+            val previous = _state.value.planPreferences
+            runCatching { updatePlanPreferencesUseCase(transform(previous)) }
+                .onSuccess { dismissPreferenceDialog() }
+                .onFailure {
+                    _effect.emit(SettingsEffect.ShowMessage("Unable to update reminder settings."))
+                }
         }
     }
 
     private fun observeSavedLibrary() {
         viewModelScope.launch {
             observeLibraryContentUseCase().collect { content ->
-                _state.update { currentState ->
-                    currentState.withLibraryContent(content = content)
-                }
+                _state.update { currentState -> currentState.withLibraryContent(content = content) }
             }
         }
     }
@@ -149,44 +199,41 @@ class SettingsViewModel @Inject constructor(
 
     private fun observeTmdbSyncStatus() {
         viewModelScope.launch {
-            val lastSyncedAt = observeSettingsUseCase()
-                .map { settings -> settings.languageRegion.languageCode }
-                .distinctUntilChanged()
-                .flatMapLatest { language ->
-                    combine(
-                        observeTmdbLibraryLastSyncedAtUseCase(
-                            list = TmdbLibraryList.Watchlist,
-                            language = language
-                        ),
-                        observeTmdbLibraryLastSyncedAtUseCase(
-                            list = TmdbLibraryList.Rated,
-                            language = language
+            val lastSyncedAt =
+                observeSettingsUseCase()
+                    .map { settings -> settings.languageRegion.languageCode }
+                    .distinctUntilChanged()
+                    .flatMapLatest { language ->
+                        combine(
+                            observeTmdbLibraryLastSyncedAtUseCase(
+                                list = TmdbLibraryList.Watchlist,
+                                language = language,
+                            ),
+                            observeTmdbLibraryLastSyncedAtUseCase(
+                                list = TmdbLibraryList.Rated,
+                                language = language,
+                            ),
+                        ) { watchlistSyncedAt, ratingsSyncedAt ->
+                            listOfNotNull(watchlistSyncedAt, ratingsSyncedAt).maxOrNull()
+                        }
+                    }
+
+            combine(lastSyncedAt, observeNetworkConnectivityUseCase()) { syncedAtMillis, isOnline ->
+                    syncedAtMillis to isOnline
+                }
+                .collect { (syncedAtMillis, isOnline) ->
+                    _state.update { currentState ->
+                        currentState.copy(
+                            tmdbLastSyncedAtMillis = syncedAtMillis,
+                            isOnline = isOnline,
                         )
-                    ) { watchlistSyncedAt, ratingsSyncedAt ->
-                        listOfNotNull(watchlistSyncedAt, ratingsSyncedAt).maxOrNull()
                     }
                 }
-
-            combine(
-                lastSyncedAt,
-                observeNetworkConnectivityUseCase()
-            ) { syncedAtMillis, isOnline ->
-                syncedAtMillis to isOnline
-            }.collect { (syncedAtMillis, isOnline) ->
-                _state.update { currentState ->
-                    currentState.copy(
-                        tmdbLastSyncedAtMillis = syncedAtMillis,
-                        isOnline = isOnline
-                    )
-                }
-            }
         }
     }
 
     private fun refreshTmdbAccount() {
-        viewModelScope.launch {
-            refreshTmdbAccountUseCase()
-        }
+        viewModelScope.launch { refreshTmdbAccountUseCase() }
     }
 
     private fun onImageQualityClicked() {
@@ -230,33 +277,23 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun showPreferenceDialog(dialog: SettingsPreferenceDialog) {
-        _state.update { currentState ->
-            currentState.copy(activePreferenceDialog = dialog)
-        }
+        _state.update { currentState -> currentState.copy(activePreferenceDialog = dialog) }
     }
 
     private fun dismissPreferenceDialog() {
-        _state.update { currentState ->
-            currentState.copy(activePreferenceDialog = null)
-        }
+        _state.update { currentState -> currentState.copy(activePreferenceDialog = null) }
     }
 
     private fun onSavedLibraryClicked() {
-        viewModelScope.launch {
-            _effect.emit(SettingsEffect.NavigateToLibrary)
-        }
+        viewModelScope.launch { _effect.emit(SettingsEffect.NavigateToLibrary) }
     }
 
     private fun onPlansClicked() {
-        viewModelScope.launch {
-            _effect.emit(SettingsEffect.NavigateToPlans)
-        }
+        viewModelScope.launch { _effect.emit(SettingsEffect.NavigateToPlans) }
     }
 
     private fun onClearImageCacheClicked() {
-        _state.update { currentState ->
-            currentState.copy(isClearImageCacheDialogVisible = true)
-        }
+        _state.update { currentState -> currentState.copy(isClearImageCacheDialogVisible = true) }
     }
 
     private fun onClearImageCacheConfirmed() {
@@ -270,8 +307,9 @@ class SettingsViewModel @Inject constructor(
                     updateImageCacheLabel(sizeBytes = 0L)
                     _effect.emit(
                         SettingsEffect.ShowMessage(
-                            message = "Image cache cleared · " +
-                                "${clearedBytes.toStorageSizeLabel()} freed"
+                            message =
+                                "Image cache cleared · " +
+                                    "${clearedBytes.toStorageSizeLabel()} freed"
                         )
                     )
                 }
@@ -284,9 +322,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun onClearImageCacheDismissed() {
-        _state.update { currentState ->
-            currentState.copy(isClearImageCacheDialogVisible = false)
-        }
+        _state.update { currentState -> currentState.copy(isClearImageCacheDialogVisible = false) }
     }
 
     private fun loadImageCacheSize() {
@@ -301,7 +337,7 @@ class SettingsViewModel @Inject constructor(
             currentState.copy(
                 imageCacheSizeLabel = sizeBytes.toStorageSizeLabel(),
                 clearImageCacheLabel =
-                    "${sizeBytes.toStorageSizeLabel()} · Frees cached poster images"
+                    "${sizeBytes.toStorageSizeLabel()} · Frees cached poster images",
             )
         }
     }
@@ -320,9 +356,8 @@ class SettingsViewModel @Inject constructor(
                 .onFailure { error ->
                     _effect.emit(
                         SettingsEffect.ShowMessage(
-                            message = error.toUserMessage(
-                                fallback = "Unable to start TMDB connection."
-                            )
+                            message =
+                                error.toUserMessage(fallback = "Unable to start TMDB connection.")
                         )
                     )
                 }
@@ -343,9 +378,10 @@ class SettingsViewModel @Inject constructor(
                 .onFailure { error ->
                     _effect.emit(
                         SettingsEffect.ShowMessage(
-                            message = error.toUserMessage(
-                                fallback = "Approve access in TMDB before finishing."
-                            )
+                            message =
+                                error.toUserMessage(
+                                    fallback = "Approve access in TMDB before finishing."
+                                )
                         )
                     )
                 }
@@ -361,9 +397,8 @@ class SettingsViewModel @Inject constructor(
                 .onFailure { error ->
                     _effect.emit(
                         SettingsEffect.ShowMessage(
-                            message = error.toUserMessage(
-                                fallback = "Unable to disconnect TMDB account."
-                            )
+                            message =
+                                error.toUserMessage(fallback = "Unable to disconnect TMDB account.")
                         )
                     )
                 }
@@ -371,53 +406,38 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun onTmdbWatchlistSyncChanged(enabled: Boolean) {
-        viewModelScope.launch {
-            updateTmdbWatchlistSyncUseCase(enabled = enabled)
-        }
+        viewModelScope.launch { updateTmdbWatchlistSyncUseCase(enabled = enabled) }
     }
 
     private fun onTmdbRatingsSyncChanged(enabled: Boolean) {
-        viewModelScope.launch {
-            updateTmdbRatingsSyncUseCase(enabled = enabled)
-        }
+        viewModelScope.launch { updateTmdbRatingsSyncUseCase(enabled = enabled) }
     }
 
     private fun runTmdbAccountAction(action: suspend () -> Unit) {
         viewModelScope.launch {
             if (_state.value.isTmdbAccountLoading) return@launch
 
-            _state.update { currentState ->
-                currentState.copy(isTmdbAccountLoading = true)
-            }
+            _state.update { currentState -> currentState.copy(isTmdbAccountLoading = true) }
 
             try {
                 action()
             } finally {
-                _state.update { currentState ->
-                    currentState.copy(isTmdbAccountLoading = false)
-                }
+                _state.update { currentState -> currentState.copy(isTmdbAccountLoading = false) }
             }
         }
     }
 
     private fun onPrivacyClicked() {
-        _state.update { currentState ->
-            currentState.copy(isPrivacyNoticeVisible = true)
-        }
+        _state.update { currentState -> currentState.copy(isPrivacyNoticeVisible = true) }
     }
 
     private fun onPrivacyNoticeDismissed() {
-        _state.update { currentState ->
-            currentState.copy(isPrivacyNoticeVisible = false)
-        }
+        _state.update { currentState -> currentState.copy(isPrivacyNoticeVisible = false) }
     }
 
     private fun onTmdbAttributionClicked() {
         viewModelScope.launch {
-            _effect.emit(
-                SettingsEffect.OpenExternalUrl(url = TMDB_WEBSITE_URL)
-            )
+            _effect.emit(SettingsEffect.OpenExternalUrl(url = TMDB_WEBSITE_URL))
         }
     }
-
 }

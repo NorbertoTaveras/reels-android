@@ -8,7 +8,12 @@
 package com.norbertotaveras.reels.presentation.features.settings
 
 enum class SettingsPreferenceDialog {
+    ReleaseReminder,
+    MovieNightReminder,
+    Notifications,
+    LiveUpdates,
+    PreciseReminders,
     ImageQuality,
     LanguageRegion,
-    Theme
+    Theme,
 }

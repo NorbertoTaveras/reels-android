@@ -15,8 +15,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -50,9 +50,10 @@ fun MoviePlansSheet(
     var mode by rememberSaveable { mutableStateOf(MoviePlansSheetMode.Choice) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val onSaved by rememberUpdatedState(onMovieNightSaved)
-    val notificationPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { viewModel.refreshExactAlarmAccess() }
+    val notificationPermissionLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+            viewModel.refreshExactAlarmAccess()
+        }
 
     LaunchedEffect(Unit) { viewModel.refreshExactAlarmAccess() }
     LaunchedEffect(mode, state.movieNightPlan?.id) {
@@ -69,109 +70,133 @@ fun MoviePlansSheet(
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(ReelsDimensions.planSheetCornerSize),
-        dragHandle = {
-            MovieNightSheetDragHandle()
-        },
+        dragHandle = { MovieNightSheetDragHandle() },
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .then(
-                    if (mode == MoviePlansSheetMode.MovieNight || mode == MoviePlansSheetMode.Release) Modifier
-                    else Modifier.verticalScroll(rememberScrollState())
-                ),
+            modifier =
+                Modifier.fillMaxWidth()
+                    .then(
+                        if (
+                            mode == MoviePlansSheetMode.MovieNight ||
+                                mode == MoviePlansSheetMode.Release
+                        )
+                            Modifier
+                        else Modifier.verticalScroll(rememberScrollState())
+                    )
         ) {
             when (mode) {
-                MoviePlansSheetMode.Choice -> PlanTypeChoice(
-                    movieTitle = movie.title,
-                    releaseDate = state.trackedRelease?.releaseDate ?: movie.releaseDate,
-                    isTracked = state.trackedRelease != null,
-                    movieNightPlan = state.movieNightPlan,
-                    showRelease = state.trackedRelease != null || movie.isUnreleased(),
-                    onReleaseClick = { mode = MoviePlansSheetMode.Release },
-                    onMovieNightClick = { mode = MoviePlansSheetMode.MovieNight },
-                    onDismiss = onDismiss,
-                    onStopTracking = {
-                        viewModel.removeTrackedRelease { onReleaseFeedback("Release tracking stopped") }
-                    },
-                    isSaving = state.isSaving,
-                )
-                MoviePlansSheetMode.Release -> ReleasePlanForm(
-                    movieTitle = movie.title,
-                    posterPath = movie.posterPath,
-                    initialReleaseDate = movie.releaseDate,
-                    trackedRelease = state.trackedRelease,
-                    isSaving = state.isSaving,
-                    canScheduleExactAlarms = state.canScheduleExactAlarms,
-                    canPostNotifications = state.canPostNotifications,
-                    onDismiss = onDismiss,
-                    onSave = { reminder, customReminderAt, notifications ->
-                        if (notifications && reminder != ReleaseReminder.None &&
-                            !state.canPostNotifications && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-                        ) {
-                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                        }
-                        viewModel.trackRelease(
-                            movie = movie,
-                            reminder = reminder,
-                            customReminderAt = customReminderAt,
-                            notificationsEnabled = notifications,
-                            onComplete = {
-                                val label = releaseReminderOptions.first { it.value == reminder }.title
-                                onReleaseFeedback("Release tracked · $label")
-                            },
-                        )
-                    },
-                    errorMessage = state.errorMessage,
-                )
-                MoviePlansSheetMode.MovieNight -> MovieNightPlanForm(
-                    movieTitle = movie.title,
-                    posterPath = movie.posterPath,
-                    initialRuntimeMinutes = movie.runtime,
-                    isSaving = state.isSaving,
-                    canScheduleExactAlarms = state.canScheduleExactAlarms,
-                    canPostNotifications = state.canPostNotifications,
-                    existingPlan = state.movieNightPlan,
-                    errorMessage = state.errorMessage,
-                    onDismiss = onDismiss,
-                    onSave = { scheduledAt, runtime, reminder, venue, attendees, note ->
-                        if (reminder != null && !state.canPostNotifications &&
-                            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-                        ) {
-                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                        }
-                        viewModel.saveMovieNight(
-                            movie = movie,
-                            scheduledAt = scheduledAt,
-                            runtimeMinutes = runtime,
-                            reminderMinutes = reminder,
-                            venue = venue,
-                            attendeeCount = attendees,
-                            note = note,
-                            onComplete = { mode = MoviePlansSheetMode.MovieNightConfirmation },
-                        )
-                    },
-                )
-                MoviePlansSheetMode.MovieNightConfirmation -> state.movieNightPlan?.let { plan ->
-                    MovieNightScheduleConfirmation(plan = plan)
+                MoviePlansSheetMode.Choice ->
+                    PlanTypeChoice(
+                        movieTitle = movie.title,
+                        releaseDate = state.trackedRelease?.releaseDate ?: movie.releaseDate,
+                        isTracked = state.trackedRelease != null,
+                        movieNightPlan = state.movieNightPlan,
+                        showRelease = state.trackedRelease != null || movie.isUnreleased(),
+                        onReleaseClick = { mode = MoviePlansSheetMode.Release },
+                        onMovieNightClick = { mode = MoviePlansSheetMode.MovieNight },
+                        onDismiss = onDismiss,
+                        onStopTracking = {
+                            viewModel.removeTrackedRelease {
+                                onReleaseFeedback("Release tracking stopped")
+                            }
+                        },
+                        isSaving = state.isSaving,
+                    )
+                MoviePlansSheetMode.Release ->
+                    ReleasePlanForm(
+                        defaultReminder = state.preferences.releaseReminder,
+                        movieTitle = movie.title,
+                        posterPath = movie.posterPath,
+                        initialReleaseDate = movie.releaseDate,
+                        trackedRelease = state.trackedRelease,
+                        isSaving = state.isSaving,
+                        canScheduleExactAlarms = state.canScheduleExactAlarms,
+                        canPostNotifications = state.canPostNotifications,
+                        onDismiss = onDismiss,
+                        onSave = { reminder, customReminderAt, notifications ->
+                            if (
+                                notifications &&
+                                    reminder != ReleaseReminder.None &&
+                                    !state.canPostNotifications &&
+                                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                            ) {
+                                notificationPermissionLauncher.launch(
+                                    Manifest.permission.POST_NOTIFICATIONS
+                                )
+                            }
+                            viewModel.trackRelease(
+                                movie = movie,
+                                reminder = reminder,
+                                customReminderAt = customReminderAt,
+                                notificationsEnabled = notifications,
+                                onComplete = {
+                                    val label =
+                                        releaseReminderOptions.first { it.value == reminder }.title
+                                    onReleaseFeedback("Release tracked · $label")
+                                },
+                            )
+                        },
+                        errorMessage = state.errorMessage,
+                    )
+                MoviePlansSheetMode.MovieNight ->
+                    MovieNightPlanForm(
+                        defaultReminderMinutes = state.preferences.movieNightReminderMinutes,
+                        movieTitle = movie.title,
+                        posterPath = movie.posterPath,
+                        initialRuntimeMinutes = movie.runtime,
+                        isSaving = state.isSaving,
+                        canScheduleExactAlarms = state.canScheduleExactAlarms,
+                        canPostNotifications = state.canPostNotifications,
+                        existingPlan = state.movieNightPlan,
+                        errorMessage = state.errorMessage,
+                        onDismiss = onDismiss,
+                        onSave = { scheduledAt, runtime, reminder, venue, attendees, note ->
+                            if (
+                                reminder != null &&
+                                    !state.canPostNotifications &&
+                                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                            ) {
+                                notificationPermissionLauncher.launch(
+                                    Manifest.permission.POST_NOTIFICATIONS
+                                )
+                            }
+                            viewModel.saveMovieNight(
+                                movie = movie,
+                                scheduledAt = scheduledAt,
+                                runtimeMinutes = runtime,
+                                reminderMinutes = reminder,
+                                venue = venue,
+                                attendeeCount = attendees,
+                                note = note,
+                                onComplete = { mode = MoviePlansSheetMode.MovieNightConfirmation },
+                            )
+                        },
+                    )
+                MoviePlansSheetMode.MovieNightConfirmation ->
+                    state.movieNightPlan?.let { plan ->
+                        MovieNightScheduleConfirmation(plan = plan)
+                    }
+            }
+            state.errorMessage
+                ?.takeIf { mode == MoviePlansSheetMode.Choice }
+                ?.let { message ->
+                    Text(
+                        text = message,
+                        modifier =
+                            Modifier.padding(
+                                horizontal = ReelsDimensions.planSheetHorizontalPadding,
+                                vertical = ReelsDimensions.planSheetSectionVerticalPadding,
+                            ),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
                 }
-            }
-            state.errorMessage?.takeIf { mode == MoviePlansSheetMode.Choice }?.let { message ->
-                Text(
-                    text = message,
-                    modifier = Modifier.padding(
-                        horizontal = ReelsDimensions.planSheetHorizontalPadding,
-                        vertical = ReelsDimensions.planSheetSectionVerticalPadding,
-                    ),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
         }
     }
 }
 
 private fun MovieDetailsDataModel.isUnreleased(): Boolean {
-    val date = releaseDate?.let { value -> runCatching { java.time.LocalDate.parse(value) }.getOrNull() }
+    val date =
+        releaseDate?.let { value -> runCatching { java.time.LocalDate.parse(value) }.getOrNull() }
     return date == null || !date.isBefore(java.time.LocalDate.now())
 }

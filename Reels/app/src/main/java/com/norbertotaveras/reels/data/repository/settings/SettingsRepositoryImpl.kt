@@ -8,13 +8,14 @@
 package com.norbertotaveras.reels.data.repository.settings
 
 import com.norbertotaveras.reels.data.local.preferences.SettingsDataStore
+import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
 import com.norbertotaveras.reels.domain.model.settings.AppSettings
 import com.norbertotaveras.reels.domain.model.settings.AppTheme
 import com.norbertotaveras.reels.domain.model.settings.ImageQuality
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
+import com.norbertotaveras.reels.domain.model.settings.PlanPreferences
 import com.norbertotaveras.reels.domain.repository.settings.SettingsRepository
-import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
@@ -23,7 +24,9 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 
 @Singleton
-class SettingsRepositoryImpl @Inject constructor(
+class SettingsRepositoryImpl
+@Inject
+constructor(
     private val settingsDataStore: SettingsDataStore,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : SettingsRepository {
@@ -44,9 +47,11 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateTheme(theme: AppTheme) {
-        withContext(ioDispatcher) {
-            settingsDataStore.updateTheme(theme = theme)
-        }
+        withContext(ioDispatcher) { settingsDataStore.updateTheme(theme = theme) }
+    }
+
+    override suspend fun updatePlanPreferences(preferences: PlanPreferences) {
+        withContext(ioDispatcher) { settingsDataStore.updatePlanPreferences(preferences) }
     }
 
     override suspend fun updateRecentSearches(recentSearches: List<String>) {
@@ -56,8 +61,6 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateDiscoverFilters(filters: DiscoverFilterDataModel) {
-        withContext(ioDispatcher) {
-            settingsDataStore.updateDiscoverFilters(filters = filters)
-        }
+        withContext(ioDispatcher) { settingsDataStore.updateDiscoverFilters(filters = filters) }
     }
 }

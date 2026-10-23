@@ -28,15 +28,15 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.norbertotaveras.reels.presentation.features.cast.details.CastDetailsRoute
 import com.norbertotaveras.reels.presentation.features.cast.filmography.FilmographyRoute
-import com.norbertotaveras.reels.presentation.features.movies.discover.DiscoverRoute
 import com.norbertotaveras.reels.presentation.features.movies.cast.MovieCastRoute
 import com.norbertotaveras.reels.presentation.features.movies.category.MovieCategoryRoute
 import com.norbertotaveras.reels.presentation.features.movies.details.MovieDetailsRoute
+import com.norbertotaveras.reels.presentation.features.movies.discover.DiscoverRoute
 import com.norbertotaveras.reels.presentation.features.movies.favorites.FavoritesRoute
 import com.norbertotaveras.reels.presentation.features.movies.list.MoviesListRoute
 import com.norbertotaveras.reels.presentation.features.movies.search.SearchRoute
-import com.norbertotaveras.reels.presentation.features.settings.SettingsRoute
 import com.norbertotaveras.reels.presentation.features.plans.PlansRoute
+import com.norbertotaveras.reels.presentation.features.settings.SettingsRoute
 
 @Composable
 fun ReelsNavHost(
@@ -50,17 +50,17 @@ fun ReelsNavHost(
     val context = LocalContext.current
     val openExternalUrl: (String) -> Unit = openExternalUrl@{ url ->
         val uri = Uri.parse(url)
-        val isSupportedScheme = uri.scheme.equals("http", ignoreCase = true) ||
-            uri.scheme.equals("https", ignoreCase = true)
+        val isSupportedScheme =
+            uri.scheme.equals("http", ignoreCase = true) ||
+                uri.scheme.equals("https", ignoreCase = true)
 
         if (!isSupportedScheme) {
             Toast.makeText(context, "Unsupported link", Toast.LENGTH_SHORT).show()
             return@openExternalUrl
         }
 
-        val intent = Intent(Intent.ACTION_VIEW, uri).apply {
-            addCategory(Intent.CATEGORY_BROWSABLE)
-        }
+        val intent =
+            Intent(Intent.ACTION_VIEW, uri).apply { addCategory(Intent.CATEGORY_BROWSABLE) }
 
         try {
             context.startActivity(intent)
@@ -82,8 +82,13 @@ fun ReelsNavHost(
     LaunchedEffect(deepLinkRequest) {
         val request = deepLinkRequest ?: return@LaunchedEffect
         when {
-            request.startsWith("plans:") -> navController.navigate(ReelsDestinations.plansRoute(request.substringAfter(':')))
-            request.startsWith("movie:") -> request.substringAfter(':').toIntOrNull()?.let(navController::navigateToMovieDetails)
+            request.startsWith("plans:") ->
+                navController.navigate(ReelsDestinations.plansRoute(request.substringAfter(':')))
+            request.startsWith("movie:") ->
+                request
+                    .substringAfter(':')
+                    .toIntOrNull()
+                    ?.let(navController::navigateToMovieDetails)
         }
         onDeepLinkConsumed(request)
     }
@@ -102,63 +107,61 @@ fun ReelsNavHost(
                         if (route != currentRoute) {
                             navController.navigateToBottomNavRoute(route)
                         }
-                    }
+                    },
                 )
             }
-        }
+        },
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = ReelsDestinations.HOME,
-            modifier = Modifier
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
+            modifier = Modifier.padding(innerPadding).consumeWindowInsets(innerPadding),
         ) {
             composable(ReelsDestinations.HOME) {
                 MoviesListRoute(
-                    onMovieClick = { movieId ->
-                        navController.navigateToMovieDetails(movieId)
-                    },
-                    onSeeAllClick = { category ->
-                        navController.navigateToMovieCategory(category)
-                    }
+                    onMovieClick = { movieId -> navController.navigateToMovieDetails(movieId) },
+                    onSeeAllClick = { category -> navController.navigateToMovieCategory(category) },
                 )
             }
 
             composable(ReelsDestinations.DISCOVER) {
                 DiscoverRoute(
-                    onMovieClick = { movieId ->
-                        navController.navigateToMovieDetails(movieId)
-                    }
+                    onMovieClick = { movieId -> navController.navigateToMovieDetails(movieId) }
                 )
             }
 
             composable(
                 route = ReelsDestinations.MOVIE_CATEGORY_ROUTE,
-                arguments = listOf(
-                    navArgument(ReelsDestinations.MOVIE_CATEGORY_ARG) {
-                        type = NavType.StringType
-                    }
-                )
+                arguments =
+                    listOf(
+                        navArgument(ReelsDestinations.MOVIE_CATEGORY_ARG) {
+                            type = NavType.StringType
+                        }
+                    ),
             ) {
                 MovieCategoryRoute(
                     onBackClick = navController::navigateUp,
-                    onMovieClick = { movieId ->
-                        navController.navigateToMovieDetails(movieId)
-                    }
+                    onMovieClick = { movieId -> navController.navigateToMovieDetails(movieId) },
                 )
             }
 
             composable(
                 route = ReelsDestinations.PLANS_ROUTE,
-                arguments = listOf(
-                    navArgument(ReelsDestinations.PLANS_TAB_ARG) {
-                        type = NavType.StringType
-                        defaultValue = "releases"
-                    }
-                )
+                arguments =
+                    listOf(
+                        navArgument(ReelsDestinations.PLANS_TAB_ARG) {
+                            type = NavType.StringType
+                            defaultValue = "releases"
+                        }
+                    ),
             ) {
                 PlansRoute(
+                    onBrowseReleases = {
+                        navController.navigateToBottomNavRoute(ReelsDestinations.SEARCH)
+                    },
+                    onBrowseMovies = {
+                        navController.navigateToBottomNavRoute(ReelsDestinations.DISCOVER)
+                    },
                     onBackClick = navController::navigateUp,
                     onMovieClick = navController::navigateToMovieDetails,
                 )
@@ -166,23 +169,17 @@ fun ReelsNavHost(
 
             composable(ReelsDestinations.SEARCH) {
                 SearchRoute(
-                    onMovieClick = { movieId ->
-                        navController.navigateToMovieDetails(movieId)
-                    }
+                    onMovieClick = { movieId -> navController.navigateToMovieDetails(movieId) }
                 )
             }
 
             composable(ReelsDestinations.FAVORITES) {
                 FavoritesRoute(
-                    onMovieClick = { movieId ->
-                        navController.navigateToMovieDetails(movieId)
-                    },
-                    onPersonClick = { personId ->
-                        navController.navigateToCastDetails(personId)
-                    },
+                    onMovieClick = { movieId -> navController.navigateToMovieDetails(movieId) },
+                    onPersonClick = { personId -> navController.navigateToCastDetails(personId) },
                     onNavigateToSettings = {
                         navController.navigateToBottomNavRoute(ReelsDestinations.SETTINGS)
-                    }
+                    },
                 )
             }
 
@@ -191,86 +188,62 @@ fun ReelsNavHost(
                     onNavigateToLibrary = {
                         navController.navigateToBottomNavRoute(ReelsDestinations.FAVORITES)
                     },
-                    onNavigateToPlans = {
-                        navController.navigate(ReelsDestinations.plansRoute())
-                    },
+                    onNavigateToPlans = { navController.navigate(ReelsDestinations.plansRoute()) },
                     onOpenExternalUrl = openExternalUrl,
                     tmdbAuthCallbackId = tmdbAuthCallbackId,
-                    onTmdbAuthCallbackConsumed = onTmdbAuthCallbackConsumed
+                    onTmdbAuthCallbackConsumed = onTmdbAuthCallbackConsumed,
                 )
             }
 
             composable(
                 route = ReelsDestinations.MOVIE_DETAILS_ROUTE,
-                arguments = listOf(
-                    navArgument(ReelsDestinations.MOVIE_ID_ARG) {
-                        type = NavType.IntType
-                    }
-                )
+                arguments =
+                    listOf(navArgument(ReelsDestinations.MOVIE_ID_ARG) { type = NavType.IntType }),
             ) {
                 MovieDetailsRoute(
                     onBackClick = navController::navigateUp,
-                    onCastClick = { personId ->
-                        navController.navigateToCastDetails(personId)
-                    },
-                    onCastSeeAllClick = { movieId ->
-                        navController.navigateToMovieCast(movieId)
-                    },
+                    onCastClick = { personId -> navController.navigateToCastDetails(personId) },
+                    onCastSeeAllClick = { movieId -> navController.navigateToMovieCast(movieId) },
                     onTrailerClick = openExternalUrl,
                     onSimilarMovieClick = { movieId ->
                         navController.navigateToMovieDetails(movieId)
-                    }
+                    },
                 )
             }
 
             composable(
                 route = ReelsDestinations.MOVIE_CAST_ROUTE,
-                arguments = listOf(
-                    navArgument(ReelsDestinations.MOVIE_ID_ARG) {
-                        type = NavType.IntType
-                    }
-                )
+                arguments =
+                    listOf(navArgument(ReelsDestinations.MOVIE_ID_ARG) { type = NavType.IntType }),
             ) {
                 MovieCastRoute(
                     onBackClick = navController::navigateUp,
-                    onCastClick = { personId ->
-                        navController.navigateToCastDetails(personId)
-                    }
+                    onCastClick = { personId -> navController.navigateToCastDetails(personId) },
                 )
             }
 
             composable(
                 route = ReelsDestinations.CAST_DETAILS_ROUTE,
-                arguments = listOf(
-                    navArgument(ReelsDestinations.PERSON_ID_ARG) {
-                        type = NavType.IntType
-                    }
-                )
+                arguments =
+                    listOf(navArgument(ReelsDestinations.PERSON_ID_ARG) { type = NavType.IntType }),
             ) {
                 CastDetailsRoute(
                     onBackClick = navController::navigateUp,
                     onFilmographyClick = { personId ->
                         navController.navigate(ReelsDestinations.filmographyRoute(personId))
                     },
-                    onMovieClick = { movieId ->
-                        navController.navigateToMovieDetails(movieId)
-                    }
+                    onMovieClick = { movieId -> navController.navigateToMovieDetails(movieId) },
                 )
             }
 
             composable(
                 route = ReelsDestinations.FILMOGRAPHY_ROUTE,
-                arguments = listOf(
-                    navArgument(ReelsDestinations.PERSON_ID_ARG) {
-                        type = NavType.IntType
-                    }
-                )
+                arguments =
+                    listOf(navArgument(ReelsDestinations.PERSON_ID_ARG) { type = NavType.IntType }),
             ) {
                 FilmographyRoute(
                     onBackClick = navController::navigateUp,
-                    onMovieClick = { movieId ->
-                        navController.navigateToMovieDetails(movieId)
-                    }
+                    onMovieClick = { movieId -> navController.navigateToMovieDetails(movieId) },
                 )
             }
         }

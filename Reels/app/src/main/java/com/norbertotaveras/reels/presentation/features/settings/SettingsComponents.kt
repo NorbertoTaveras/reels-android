@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -52,24 +53,20 @@ internal fun SettingsSection(
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.settingsSectionContentSpacing)
+        verticalArrangement = Arrangement.spacedBy(ReelsDimensions.settingsSectionContentSpacing),
     ) {
         SettingsSectionLabel(text = title)
 
         Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(
-                    width = ReelsDimensions.settingsDividerThickness,
-                    color = reelsBorderColor(),
-                    shape = RoundedCornerShape(
-                        ReelsDimensions.settingsCardCornerSize
-                    )
-                ),
-            shape = RoundedCornerShape(
-                ReelsDimensions.settingsCardCornerSize
-            ),
-            color = MaterialTheme.colorScheme.surface
+            modifier =
+                Modifier.fillMaxWidth()
+                    .border(
+                        width = ReelsDimensions.settingsDividerThickness,
+                        color = reelsBorderColor(),
+                        shape = RoundedCornerShape(ReelsDimensions.settingsCardCornerSize),
+                    ),
+            shape = RoundedCornerShape(ReelsDimensions.settingsCardCornerSize),
+            color = MaterialTheme.colorScheme.surface,
         ) {
             Column(content = content)
         }
@@ -84,70 +81,72 @@ internal fun SettingsRow(
     modifier: Modifier = Modifier,
     showsChevron: Boolean = true,
     onClick: (() -> Unit)? = null,
+    subtitleColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
 ) {
-    val rowModifier = modifier
-        .fillMaxWidth()
-        .heightIn(min = ReelsDimensions.settingsRowMinHeight)
-        .then(
-            if (onClick != null) {
-                Modifier.clickable(onClick = onClick)
-            } else {
-                Modifier
-            }
-        )
+    val rowModifier =
+        modifier
+            .fillMaxWidth()
+            .heightIn(min = ReelsDimensions.settingsRowMinHeight)
+            .then(
+                if (onClick != null) {
+                    Modifier.clickable(onClick = onClick)
+                } else {
+                    Modifier
+                }
+            )
 
     Row(
-        modifier = rowModifier
-            .padding(
+        modifier =
+            rowModifier.padding(
                 horizontal = ReelsDimensions.settingsRowHorizontalPadding,
-                vertical = ReelsDimensions.settingsRowVerticalPadding
+                vertical = ReelsDimensions.settingsRowVerticalPadding,
             ),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
-            modifier = Modifier
-                .size(ReelsDimensions.settingsRowIconContainerSize)
-                .clip(MaterialTheme.shapes.medium)
-                .background(MaterialTheme.colorScheme.surfaceVariant),
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier.size(ReelsDimensions.settingsRowIconContainerSize)
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+            contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
                 modifier = Modifier.size(ReelsDimensions.settingsRowIconSize),
-                tint = ReelsAccent
+                tint = ReelsAccent,
             )
         }
 
         Spacer(modifier = Modifier.width(ReelsSpacing.large))
 
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = ReelsDimensions.settingsRowTitleSize,
-                    lineHeight = ReelsDimensions.settingsRowTitleLineHeight,
-                    letterSpacing = 0.sp
-                ),
+                style =
+                    MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = ReelsDimensions.settingsRowTitleSize,
+                        lineHeight = ReelsDimensions.settingsRowTitleLineHeight,
+                        letterSpacing = 0.sp,
+                    ),
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Medium,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
 
             Text(
                 text = subtitle,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = ReelsDimensions.settingsRowSubtitleSize,
-                    lineHeight = ReelsDimensions.settingsRowSubtitleLineHeight,
-                    letterSpacing = 0.sp
-                ),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style =
+                    MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = ReelsDimensions.settingsRowSubtitleSize,
+                        lineHeight = ReelsDimensions.settingsRowSubtitleLineHeight,
+                        letterSpacing = 0.sp,
+                    ),
+                color = subtitleColor,
                 fontWeight = FontWeight.Medium,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
         }
 
@@ -156,39 +155,34 @@ internal fun SettingsRow(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
                 modifier = Modifier.size(ReelsDimensions.settingsChevronSize),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
 }
 
 @Composable
-internal fun SettingsDivider(
-    modifier: Modifier = Modifier,
-) {
+internal fun SettingsDivider(modifier: Modifier = Modifier) {
     HorizontalDivider(
         modifier = modifier,
         thickness = ReelsDimensions.settingsDividerThickness,
-        color = reelsBorderColor()
+        color = reelsBorderColor(),
     )
 }
 
 @Composable
-internal fun SettingsSectionLabel(
-    text: String,
-    modifier: Modifier = Modifier,
-) {
+internal fun SettingsSectionLabel(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
-        modifier = modifier.padding(
-            horizontal = ReelsDimensions.settingsSectionTitleHorizontalPadding
-        ),
-        style = MaterialTheme.typography.labelMedium.copy(
-            fontSize = ReelsDimensions.settingsSectionTitleSize,
-            lineHeight = ReelsDimensions.settingsSectionTitleLineHeight,
-            letterSpacing = ReelsDimensions.settingsSectionTitleLetterSpacing
-        ),
+        modifier =
+            modifier.padding(horizontal = ReelsDimensions.settingsSectionTitleHorizontalPadding),
+        style =
+            MaterialTheme.typography.labelMedium.copy(
+                fontSize = ReelsDimensions.settingsSectionTitleSize,
+                lineHeight = ReelsDimensions.settingsSectionTitleLineHeight,
+                letterSpacing = ReelsDimensions.settingsSectionTitleLetterSpacing,
+            ),
         color = MaterialTheme.colorScheme.onSurfaceVariant,
-        fontWeight = FontWeight.Normal
+        fontWeight = FontWeight.Normal,
     )
 }

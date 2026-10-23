@@ -7,6 +7,8 @@
 
 package com.norbertotaveras.reels.data.local.preferences
 
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 
 internal object SettingsPreferenceKeys {
@@ -15,4 +17,7 @@ internal object SettingsPreferenceKeys {
     val THEME = stringPreferencesKey("theme")
     val RECENT_SEARCHES = stringPreferencesKey("recent_searches")
     val DISCOVER_FILTERS = stringPreferencesKey("discover_filters")
+    val RELEASE_REMINDER = stringPreferencesKey("release_reminder")
+    val MOVIE_NIGHT_REMINDER = intPreferencesKey("movie_night_reminder")
+    val LIVE_UPDATES = booleanPreferencesKey("live_updates")
 }

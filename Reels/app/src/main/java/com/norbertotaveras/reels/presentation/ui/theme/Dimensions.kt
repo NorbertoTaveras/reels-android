@@ -626,8 +626,14 @@ object ReelsDimensions {
     val plansActionLineHeight = 16.sp
     val plansProgressHeight = 4.dp
     val plansEmptyHorizontalPadding = 40.dp
-    val plansEmptyIconContainerSize = 56.dp
-    val plansEmptyIconSize = 22.dp
+    val plansEmptyTopPadding = 96.dp
+    val plansEmptyIconContainerSize = 80.dp
+    val plansEmptyIconCornerSize = 24.dp
+    val plansEmptyIconSize = 32.dp
+    val plansEmptyTitleSpacing = 24.dp
+    val plansEmptyActionTopSpacing = 28.dp
+    val plansEmptyActionHeight = 48.dp
+    val plansEmptyActionCornerSize = 16.dp
     val plansEmptySpacing = 12.dp
 
     val planSheetHorizontalPadding = 20.dp

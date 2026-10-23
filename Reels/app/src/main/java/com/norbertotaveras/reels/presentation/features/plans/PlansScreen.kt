@@ -48,6 +48,8 @@ import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
 fun PlansScreen(
     state: PlansUiState,
     onBackClick: () -> Unit,
+    onBrowseReleases: () -> Unit,
+    onBrowseMovies: () -> Unit,
     onMovieClick: (Int) -> Unit,
     onTabSelected: (PlansTab) -> Unit,
     onReleaseRemove: (Int) -> Unit,
@@ -146,6 +148,7 @@ fun PlansScreen(
         when (state.selectedTab) {
             PlansTab.Releases ->
                 ReleasePlansList(
+                    onBrowse = onBrowseReleases,
                     releases = state.trackedReleases,
                     onMovieClick = onMovieClick,
                     onRemove = onReleaseRemove,
@@ -156,6 +159,7 @@ fun PlansScreen(
                 )
             PlansTab.MovieNights ->
                 MovieNightPlansList(
+                    onBrowse = onBrowseMovies,
                     plans = state.movieNights,
                     onMovieClick = onMovieClick,
                     onEdit = { editingPlan = it },

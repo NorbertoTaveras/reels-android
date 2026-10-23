@@ -12,11 +12,22 @@ import com.norbertotaveras.reels.domain.model.plans.TrackedRelease
 
 interface ReelsNotificationManager {
     fun createChannels()
+
     fun canPostNotifications(): Boolean
+
+    fun supportsLiveUpdates(): Boolean
+
+    fun canPromoteLiveUpdates(): Boolean
+
     fun showReleaseReminder(release: TrackedRelease)
+
     fun showMovieNightReminder(plan: MovieNightPlan)
-    fun showMovieNightCountdown(plan: MovieNightPlan)
-    fun showMovieNightProgress(plan: MovieNightPlan)
+
+    suspend fun showMovieNightCountdown(plan: MovieNightPlan)
+
+    suspend fun showMovieNightProgress(plan: MovieNightPlan)
+
     fun showMovieNightCompleted(plan: MovieNightPlan)
+
     fun cancelMovieNightProgress(planId: String)
 }

@@ -8,23 +8,46 @@
 package com.norbertotaveras.reels.data.local.preferences
 
 import androidx.datastore.preferences.core.Preferences
+import com.norbertotaveras.reels.domain.model.plans.ReleaseReminder
 import com.norbertotaveras.reels.domain.model.settings.AppSettings
 import com.norbertotaveras.reels.domain.model.settings.AppTheme
 import com.norbertotaveras.reels.domain.model.settings.ImageQuality
 import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
+import com.norbertotaveras.reels.domain.model.settings.PlanPreferences
 
 internal fun Preferences.toAppSettings(): AppSettings {
     return AppSettings(
-        imageQuality = this[SettingsPreferenceKeys.IMAGE_QUALITY]
-            .toEnumOrDefault(ImageQuality.High),
+        imageQuality =
+            this[SettingsPreferenceKeys.IMAGE_QUALITY].toEnumOrDefault(ImageQuality.High),
         languageRegion = this[SettingsPreferenceKeys.LANGUAGE_REGION].toLanguageRegion(),
         theme = this[SettingsPreferenceKeys.THEME].toEnumOrDefault(AppTheme.System),
-        recentSearches = SettingsJsonCodec.decodeRecentSearches(
-            value = this[SettingsPreferenceKeys.RECENT_SEARCHES]
-        ),
-        discoverFilters = SettingsJsonCodec.decodeDiscoverFilters(
-            value = this[SettingsPreferenceKeys.DISCOVER_FILTERS]
-        )
+        recentSearches =
+            SettingsJsonCodec.decodeRecentSearches(
+                value = this[SettingsPreferenceKeys.RECENT_SEARCHES]
+            ),
+        planPreferences =
+            PlanPreferences(
+                releaseReminder =
+                    this[SettingsPreferenceKeys.RELEASE_REMINDER]
+                        .toEnumOrDefault(ReleaseReminder.OneDayBefore)
+                        .takeIf {
+                            it in
+                                listOf(
+                                    ReleaseReminder.OnReleaseDay,
+                                    ReleaseReminder.OneDayBefore,
+                                    ReleaseReminder.OneWeekBefore,
+                                )
+                        } ?: ReleaseReminder.OneDayBefore,
+                movieNightReminderMinutes =
+                    (this[SettingsPreferenceKeys.MOVIE_NIGHT_REMINDER] ?: 30)
+                        .takeUnless { it == -1 }
+                        ?.takeIf { it in listOf(15, 30, 60, 120) },
+                liveUpdatesEnabled = this[SettingsPreferenceKeys.LIVE_UPDATES] ?: true,
+            ),
+        discoverFilters =
+            SettingsJsonCodec.decodeDiscoverFilters(
+                value = this[SettingsPreferenceKeys.DISCOVER_FILTERS]
+            ),
     )
 }
 

@@ -127,19 +127,19 @@ constructor(
 
     fun startMovieNight(id: String) = updateMovieNight {
         if (updateMovieNightUseCase.start(id).isSuccess) {
-            currentMovieNight(id)?.let(notificationManager::showMovieNightProgress)
+            currentMovieNight(id)?.let { notificationManager.showMovieNightProgress(it) }
         }
     }
 
     fun pauseMovieNight(id: String) = updateMovieNight {
         if (updateMovieNightUseCase.pause(id).isSuccess) {
-            currentMovieNight(id)?.let(notificationManager::showMovieNightProgress)
+            currentMovieNight(id)?.let { notificationManager.showMovieNightProgress(it) }
         }
     }
 
     fun resumeMovieNight(id: String) = updateMovieNight {
         if (updateMovieNightUseCase.resume(id).isSuccess) {
-            currentMovieNight(id)?.let(notificationManager::showMovieNightProgress)
+            currentMovieNight(id)?.let { notificationManager.showMovieNightProgress(it) }
         }
     }
 

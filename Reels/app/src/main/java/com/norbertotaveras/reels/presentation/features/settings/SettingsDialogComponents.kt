@@ -59,101 +59,102 @@ internal fun SettingsDialog(
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
     dismissLabel: String? = null,
+    onDismissAction: (() -> Unit)? = null,
     destructive: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     Dialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+        properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         SettingsDialogWindowEffects()
 
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    MaterialTheme.colorScheme.background.copy(
-                        alpha = ReelsDimensions.settingsDialogBackdropAlpha
+            modifier =
+                Modifier.fillMaxSize()
+                    .background(
+                        MaterialTheme.colorScheme.background.copy(
+                            alpha = ReelsDimensions.settingsDialogBackdropAlpha
+                        )
                     )
-                )
-                .padding(horizontal = ReelsSpacing.xLarge),
-            contentAlignment = Alignment.Center
+                    .padding(horizontal = ReelsSpacing.xLarge),
+            contentAlignment = Alignment.Center,
         ) {
             Surface(
-                modifier = modifier
-                    .widthIn(max = ReelsDimensions.settingsDialogMaxWidth)
-                    .fillMaxWidth(),
+                modifier =
+                    modifier.widthIn(max = ReelsDimensions.settingsDialogMaxWidth).fillMaxWidth(),
                 shape = RoundedCornerShape(ReelsDimensions.settingsDialogCornerSize),
                 color = MaterialTheme.colorScheme.surface,
-                border = BorderStroke(
-                    ReelsDimensions.settingsDialogBorderWidth,
-                    MaterialTheme.colorScheme.outline
-                ),
-                shadowElevation = ReelsSpacing.xLarge
+                border =
+                    BorderStroke(
+                        ReelsDimensions.settingsDialogBorderWidth,
+                        MaterialTheme.colorScheme.outline,
+                    ),
+                shadowElevation = ReelsSpacing.xLarge,
             ) {
                 Column {
                     DialogIcon(
                         icon = icon,
                         destructive = destructive,
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .padding(top = ReelsSpacing.xLarge)
+                        modifier =
+                            Modifier.align(Alignment.CenterHorizontally)
+                                .padding(top = ReelsSpacing.xLarge),
                     )
 
                     Text(
                         text = title,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                start = ReelsSpacing.xLarge,
-                                top = ReelsSpacing.medium,
-                                end = ReelsSpacing.xLarge,
-                                bottom = ReelsSpacing.xSmall
+                        modifier =
+                            Modifier.fillMaxWidth()
+                                .padding(
+                                    start = ReelsSpacing.xLarge,
+                                    top = ReelsSpacing.medium,
+                                    end = ReelsSpacing.xLarge,
+                                    bottom = ReelsSpacing.xSmall,
+                                ),
+                        style =
+                            MaterialTheme.typography.titleMedium.copy(
+                                fontSize = ReelsDimensions.settingsDialogTitleSize,
+                                lineHeight = ReelsDimensions.settingsDialogTitleLineHeight,
+                                fontWeight = FontWeight.Medium,
                             ),
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontSize = ReelsDimensions.settingsDialogTitleSize,
-                            lineHeight = ReelsDimensions.settingsDialogTitleLineHeight,
-                            fontWeight = FontWeight.Medium
-                        ),
                         color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
 
                     Box(
-                        modifier = Modifier.padding(
-                            horizontal = ReelsSpacing.xLarge,
-                            vertical = ReelsSpacing.medium
-                        )
+                        modifier =
+                            Modifier.padding(
+                                horizontal = ReelsSpacing.xLarge,
+                                vertical = ReelsSpacing.medium,
+                            )
                     ) {
                         content()
                     }
 
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                start = ReelsSpacing.large,
-                                top = ReelsSpacing.small,
-                                end = ReelsSpacing.large,
-                                bottom = ReelsDimensions.settingsDialogActionBottomPadding
-                            ),
-                        horizontalArrangement = Arrangement.spacedBy(
-                            ReelsSpacing.xSmall,
-                            Alignment.End
-                        ),
-                        verticalAlignment = Alignment.CenterVertically
+                        modifier =
+                            Modifier.fillMaxWidth()
+                                .padding(
+                                    start = ReelsSpacing.large,
+                                    top = ReelsSpacing.small,
+                                    end = ReelsSpacing.large,
+                                    bottom = ReelsDimensions.settingsDialogActionBottomPadding,
+                                ),
+                        horizontalArrangement =
+                            Arrangement.spacedBy(ReelsSpacing.xSmall, Alignment.End),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         dismissLabel?.let { label ->
                             SettingsDialogAction(
                                 label = label,
-                                onClick = onDismiss
+                                onClick = onDismissAction ?: onDismiss,
                             )
                         }
 
                         SettingsDialogAction(
                             label = confirmLabel,
                             onClick = onConfirm,
-                            destructive = destructive
+                            destructive = destructive,
                         )
                     }
                 }
@@ -165,9 +166,10 @@ internal fun SettingsDialog(
 @Composable
 private fun SettingsDialogWindowEffects() {
     val view = LocalView.current
-    val blurRadius = with(LocalDensity.current) {
-        ReelsDimensions.settingsDialogBackdropBlurRadius.toPx().roundToInt()
-    }
+    val blurRadius =
+        with(LocalDensity.current) {
+            ReelsDimensions.settingsDialogBackdropBlurRadius.toPx().roundToInt()
+        }
 
     DisposableEffect(view, blurRadius) {
         val window = (view.parent as? DialogWindowProvider)?.window
@@ -175,9 +177,7 @@ private fun SettingsDialogWindowEffects() {
         window?.setDimAmount(0f)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             window?.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
-            window?.attributes = window?.attributes?.apply {
-                blurBehindRadius = blurRadius
-            }
+            window?.attributes = window?.attributes?.apply { blurBehindRadius = blurRadius }
         }
 
         onDispose {
@@ -189,117 +189,109 @@ private fun SettingsDialogWindowEffects() {
 }
 
 @Composable
-private fun SettingsDialogAction(
-    label: String,
-    onClick: () -> Unit,
-    destructive: Boolean = false,
-) {
+private fun SettingsDialogAction(label: String, onClick: () -> Unit, destructive: Boolean = false) {
     TextButton(
         onClick = onClick,
         modifier = Modifier.height(ReelsDimensions.settingsDialogActionHeight),
         shape = RoundedCornerShape(ReelsDimensions.settingsDialogActionCornerSize),
-        colors = ButtonDefaults.textButtonColors(
-            contentColor = if (destructive) {
-                MaterialTheme.colorScheme.error
-            } else {
-                MaterialTheme.colorScheme.primary
-            }
-        ),
-        contentPadding = PaddingValues(horizontal = ReelsSpacing.large)
+        colors =
+            ButtonDefaults.textButtonColors(
+                contentColor =
+                    if (destructive) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.primary
+                    }
+            ),
+        contentPadding = PaddingValues(horizontal = ReelsSpacing.large),
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.labelLarge.copy(
-                fontSize = ReelsDimensions.settingsDialogActionTextSize,
-                lineHeight = ReelsDimensions.settingsDialogActionLineHeight,
-                fontWeight = FontWeight.Medium
-            )
+            style =
+                MaterialTheme.typography.labelLarge.copy(
+                    fontSize = ReelsDimensions.settingsDialogActionTextSize,
+                    lineHeight = ReelsDimensions.settingsDialogActionLineHeight,
+                    fontWeight = FontWeight.Medium,
+                ),
         )
     }
 }
 
 @Composable
-internal fun DialogOptionIcon(
-    icon: ImageVector,
-    modifier: Modifier = Modifier,
-) {
+internal fun DialogOptionIcon(icon: ImageVector, modifier: Modifier = Modifier) {
     Box(
-        modifier = modifier
-            .size(ReelsDimensions.settingsDialogOptionIconContainerSize)
-            .clip(RoundedCornerShape(ReelsDimensions.settingsDialogOptionIconCornerSize))
-            .background(MaterialTheme.colorScheme.surfaceVariant),
-        contentAlignment = Alignment.Center
+        modifier =
+            modifier
+                .size(ReelsDimensions.settingsDialogOptionIconContainerSize)
+                .clip(RoundedCornerShape(ReelsDimensions.settingsDialogOptionIconCornerSize))
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+        contentAlignment = Alignment.Center,
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(ReelsDimensions.settingsDialogOptionIconSize),
-            tint = MaterialTheme.colorScheme.primary
+            tint = MaterialTheme.colorScheme.primary,
         )
     }
 }
 
 @Composable
-internal fun SettingsDialogRadio(
-    selected: Boolean,
-    modifier: Modifier = Modifier,
-) {
+internal fun SettingsDialogRadio(selected: Boolean, modifier: Modifier = Modifier) {
     Box(
-        modifier = modifier
-            .size(ReelsDimensions.settingsDialogRadioSize)
-            .border(
-                width = ReelsDimensions.settingsDialogRadioBorderWidth,
-                color = if (selected) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.outline
-                },
-                shape = CircleShape
-            ),
-        contentAlignment = Alignment.Center
+        modifier =
+            modifier
+                .size(ReelsDimensions.settingsDialogRadioSize)
+                .border(
+                    width = ReelsDimensions.settingsDialogRadioBorderWidth,
+                    color =
+                        if (selected) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.outline
+                        },
+                    shape = CircleShape,
+                ),
+        contentAlignment = Alignment.Center,
     ) {
         if (selected) {
             Box(
-                modifier = Modifier
-                    .size(ReelsDimensions.settingsDialogRadioDotSize)
-                    .background(MaterialTheme.colorScheme.primary, CircleShape)
+                modifier =
+                    Modifier.size(ReelsDimensions.settingsDialogRadioDotSize)
+                        .background(MaterialTheme.colorScheme.primary, CircleShape)
             )
         }
     }
 }
 
 @Composable
-internal fun SettingsInfoBanner(
-    text: String,
-    modifier: Modifier = Modifier,
-) {
+internal fun SettingsInfoBanner(text: String, modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(ReelsDimensions.settingsDialogOptionCornerSize),
-        color = MaterialTheme.colorScheme.surfaceVariant
+        color = MaterialTheme.colorScheme.surfaceVariant,
     ) {
         Row(
             modifier = Modifier.padding(ReelsSpacing.medium),
-            horizontalArrangement = Arrangement.spacedBy(
-                ReelsDimensions.settingsDialogInfoSpacing
-            ),
-            verticalAlignment = Alignment.Top
+            horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.settingsDialogInfoSpacing),
+            verticalAlignment = Alignment.Top,
         ) {
             Icon(
                 imageVector = Icons.Filled.Info,
                 contentDescription = null,
-                modifier = Modifier
-                    .padding(top = ReelsDimensions.settingsDialogInfoIconTopPadding)
-                    .size(ReelsDimensions.settingsDialogInfoIconSize),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                modifier =
+                    Modifier.padding(top = ReelsDimensions.settingsDialogInfoIconTopPadding)
+                        .size(ReelsDimensions.settingsDialogInfoIconSize),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 text = text,
-                style = MaterialTheme.typography.bodySmall.copy(
-                    fontSize = ReelsDimensions.settingsDialogOptionBodySize,
-                    lineHeight = ReelsDimensions.settingsDialogInfoLineHeight
-                ),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style =
+                    MaterialTheme.typography.bodySmall.copy(
+                        fontSize = ReelsDimensions.settingsDialogOptionBodySize,
+                        lineHeight = ReelsDimensions.settingsDialogInfoLineHeight,
+                    ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
@@ -311,24 +303,26 @@ internal fun DialogIcon(
     modifier: Modifier = Modifier,
     destructive: Boolean = false,
 ) {
-    val contentColor = if (destructive) {
-        MaterialTheme.colorScheme.error
-    } else {
-        MaterialTheme.colorScheme.primary
-    }
+    val contentColor =
+        if (destructive) {
+            MaterialTheme.colorScheme.error
+        } else {
+            MaterialTheme.colorScheme.primary
+        }
 
     Box(
-        modifier = modifier
-            .size(ReelsDimensions.settingsDialogIconContainerSize)
-            .clip(RoundedCornerShape(ReelsDimensions.settingsDialogIconCornerSize))
-            .background(contentColor.copy(alpha = 0.12f)),
-        contentAlignment = Alignment.Center
+        modifier =
+            modifier
+                .size(ReelsDimensions.settingsDialogIconContainerSize)
+                .clip(RoundedCornerShape(ReelsDimensions.settingsDialogIconCornerSize))
+                .background(contentColor.copy(alpha = 0.12f)),
+        contentAlignment = Alignment.Center,
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(ReelsDimensions.settingsDialogIconSize),
-            tint = contentColor
+            tint = contentColor,
         )
     }
 }
@@ -341,40 +335,40 @@ internal fun CacheBreakdownRow(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(ReelsSpacing.medium),
+        modifier = modifier.fillMaxWidth().padding(ReelsSpacing.medium),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(ReelsSpacing.small),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
                 modifier = Modifier.size(ReelsDimensions.settingsDialogInfoIconSize),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 text = label,
-                style = MaterialTheme.typography.bodySmall.copy(
-                    fontSize = ReelsDimensions.settingsDialogOptionBodySize,
-                    lineHeight = ReelsDimensions.settingsDialogOptionBodyLineHeight,
-                    fontWeight = FontWeight.Medium
-                ),
-                color = MaterialTheme.colorScheme.onSurface
+                style =
+                    MaterialTheme.typography.bodySmall.copy(
+                        fontSize = ReelsDimensions.settingsDialogOptionBodySize,
+                        lineHeight = ReelsDimensions.settingsDialogOptionBodyLineHeight,
+                        fontWeight = FontWeight.Medium,
+                    ),
+                color = MaterialTheme.colorScheme.onSurface,
             )
         }
 
         Text(
             text = value,
-            style = MaterialTheme.typography.bodySmall.copy(
-                fontSize = ReelsDimensions.settingsDialogOptionBodySize,
-                lineHeight = ReelsDimensions.settingsDialogOptionBodyLineHeight
-            ),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            style =
+                MaterialTheme.typography.bodySmall.copy(
+                    fontSize = ReelsDimensions.settingsDialogOptionBodySize,
+                    lineHeight = ReelsDimensions.settingsDialogOptionBodyLineHeight,
+                ),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

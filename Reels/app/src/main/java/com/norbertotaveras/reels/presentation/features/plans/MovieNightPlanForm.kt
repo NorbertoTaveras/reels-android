@@ -70,6 +70,7 @@ internal fun MovieNightPlanForm(
     onSave: (Long, Int, Int?, String?, Int?, String?) -> Unit,
     existingPlan: MovieNightPlan? = null,
     errorMessage: String? = null,
+    defaultReminderMinutes: Int? = 30,
 ) {
     val initialDateTime =
         existingPlan?.scheduledAt?.let { Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()) }
@@ -93,11 +94,14 @@ internal fun MovieNightPlanForm(
         }
     var reminder by
         rememberSaveable(existingPlan?.id) {
-            mutableStateOf(existingPlan?.reminderMinutesBefore ?: 30)
+            mutableStateOf(existingPlan?.reminderMinutesBefore ?: defaultReminderMinutes ?: 30)
         }
     var reminderEnabled by
         rememberSaveable(existingPlan?.id) {
-            mutableStateOf(existingPlan == null || existingPlan.reminderMinutesBefore != null)
+            mutableStateOf(
+                if (existingPlan == null) defaultReminderMinutes != null
+                else existingPlan.reminderMinutesBefore != null
+            )
         }
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
     var showTimePicker by rememberSaveable { mutableStateOf(false) }
@@ -114,10 +118,7 @@ internal fun MovieNightPlanForm(
     val hasFixedSummary = maxHeight >= ReelsDimensions.movieNightSheetCompactHeight
 
     Column(modifier = Modifier.fillMaxWidth().heightIn(max = maxHeight)) {
-        PlanSheetHeader(
-            title = "Movie night",
-            onDismiss = onDismiss,
-        )
+        PlanSheetHeader(title = "Movie night", onDismiss = onDismiss)
         PlanSheetDivider()
         if (hasFixedSummary) {
             MoviePlanSummary(
