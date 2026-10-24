@@ -343,6 +343,7 @@ private fun MovieNightRow(
                     fontWeight = FontWeight.Bold,
                 ),
             )
+            Spacer(GlanceModifier.height(PlanWidgetDimensions.CompactTitleSpacing))
             Text(
                 text = if (plan.hasWidgetJourney) {
                     plan.runtimeRemainingLabel(context)
@@ -350,7 +351,11 @@ private fun MovieNightRow(
                     plan.widgetDateLabel(context, isOnline)
                 },
                 maxLines = 1,
-                style = TextStyle(color = PlanWidgetTheme.Accent, fontSize = 12.sp),
+                style = TextStyle(
+                    color = PlanWidgetTheme.Accent,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Medium,
+                ),
             )
             if ((plan.canStartFromWidget() || plan.hasWidgetJourney) &&
                 LocalSize.current.height >= PlanWidgetDimensions.CompactTwoLineMinHeight

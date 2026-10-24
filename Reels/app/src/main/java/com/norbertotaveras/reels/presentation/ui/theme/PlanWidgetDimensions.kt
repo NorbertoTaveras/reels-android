@@ -26,6 +26,7 @@ internal object PlanWidgetDimensions {
     val StartIconSize = 12.dp
     val CompactTopPadding = 2.dp
     val CompactBottomPadding = 8.dp
+    val CompactTitleSpacing = 4.dp
     val CompactTwoLineMinHeight = 88.dp
     val CompactPosterWidth = 44.dp
     val CompactPosterHeight = 60.dp

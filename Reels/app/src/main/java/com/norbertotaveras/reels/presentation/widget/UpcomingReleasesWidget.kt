@@ -371,12 +371,14 @@ private fun ReleaseRow(
                     fontWeight = FontWeight.Bold,
                 ),
             )
+            Spacer(GlanceModifier.height(PlanWidgetDimensions.CompactTitleSpacing))
             Text(
                 text = release.releaseDate.toCompactWidgetReleaseDate(context, isOnline),
                 maxLines = 1,
                 style = TextStyle(
                     color = if (isOnline) PlanWidgetTheme.Accent else PlanWidgetTheme.Secondary,
-                    fontSize = 12.sp,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Medium,
                 ),
             )
         }
