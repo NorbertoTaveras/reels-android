@@ -10,6 +10,7 @@
     android:initialLayout="@layout/glance_default_loading_layout"
     android:minWidth="146dp"
     android:minHeight="72dp"
+    android:minResizeHeight="48dp"
     android:previewImage="@drawable/widget_upcoming_releases_preview"
     android:resizeMode="horizontal|vertical"
     android:targetCellWidth="2"
