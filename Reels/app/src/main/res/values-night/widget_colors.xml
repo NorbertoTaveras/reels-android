@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2026 Norberto Taveras. All rights reserved. -->
+<resources>
+    <color name="widget_empty_mark_fill">#22D4A574</color>
+    <color name="widget_empty_mark_border">#50D4A574</color>
+</resources>

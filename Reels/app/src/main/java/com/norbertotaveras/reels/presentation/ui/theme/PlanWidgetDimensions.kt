@@ -40,8 +40,8 @@ internal object PlanWidgetDimensions {
     val ContentSpacing = 8.dp
     val BrandMarkSize = 13.dp
     val BrandMarkCornerSize = 3.dp
-    val CompactEmptyMarkSize = 24.dp
-    val EmptyMarkSize = 26.dp
+    val CompactEmptyMarkSize = 22.dp
+    val EmptyMarkSize = 28.dp
     val DividerHeight = 1.dp
     val PrimaryNightPosterWidth = 50.dp
     val PrimaryNightPosterHeight = 68.dp

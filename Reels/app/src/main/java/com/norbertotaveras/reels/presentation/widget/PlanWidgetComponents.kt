@@ -157,11 +157,8 @@ internal fun EmptyWidgetMessage(context: Context, message: String, compact: Bool
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        WidgetMark(
-            GlanceModifier.size(
-                if (compact) PlanWidgetDimensions.CompactEmptyMarkSize else PlanWidgetDimensions.EmptyMarkSize,
-            ),
-        )
+        EmptyWidgetMark(compact)
+        Spacer(GlanceModifier.height(if (compact) 4.dp else 8.dp))
         Text(
             text = message,
             maxLines = 1,
