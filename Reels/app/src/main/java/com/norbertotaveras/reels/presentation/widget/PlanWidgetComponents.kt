@@ -151,31 +151,23 @@ internal fun WidgetBackdrop(
 
 @Composable
 internal fun EmptyWidgetMessage(context: Context, message: String, compact: Boolean) {
-    if (compact) {
-        Row(
-            modifier = GlanceModifier.fillMaxSize().padding(horizontal = PlanWidgetDimensions.ContentPadding),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            WidgetMark(GlanceModifier.size(24.dp))
-            Spacer(GlanceModifier.width(8.dp))
-            Text(
-                text = message,
-                maxLines = 1,
-                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
-            )
-        }
-    } else {
-        Column(
-            modifier = GlanceModifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            WidgetMark(GlanceModifier.size(26.dp))
-            Text(
-                text = message,
-                maxLines = 1,
-                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
-            )
+    Column(
+        modifier = GlanceModifier.fillMaxSize()
+            .padding(horizontal = PlanWidgetDimensions.ContentPadding),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        WidgetMark(
+            GlanceModifier.size(
+                if (compact) PlanWidgetDimensions.CompactEmptyMarkSize else PlanWidgetDimensions.EmptyMarkSize,
+            ),
+        )
+        Text(
+            text = message,
+            maxLines = 1,
+            style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
+        )
+        if (!compact) {
             WidgetOpenAction(context.getString(R.string.widget_open_reels))
         }
     }
