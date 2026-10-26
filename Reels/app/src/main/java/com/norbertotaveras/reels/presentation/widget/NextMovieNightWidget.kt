@@ -334,7 +334,7 @@ private fun MovieNightRow(
         Column(modifier = GlanceModifier.defaultWeight()) {
             Text(
                 text = plan.title,
-                maxLines = if (plan.hasWidgetJourney || plan.canStartFromWidget() ||
+                maxLines = if (plan.hasWidgetJourney ||
                     LocalSize.current.height < PlanWidgetDimensions.CompactTwoLineMinHeight
                 ) 1 else 2,
                 style = TextStyle(
@@ -357,7 +357,7 @@ private fun MovieNightRow(
                     fontWeight = FontWeight.Medium,
                 ),
             )
-            if ((plan.canStartFromWidget() || plan.hasWidgetJourney) &&
+            if (plan.hasWidgetJourney &&
                 LocalSize.current.height >= PlanWidgetDimensions.CompactTwoLineMinHeight
             ) {
                 MovieNightJourneyAction(context, plan)
