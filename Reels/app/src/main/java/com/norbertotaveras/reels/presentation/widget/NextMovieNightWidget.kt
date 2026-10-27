@@ -182,21 +182,34 @@ private fun MovieNightHero(context: Context, plan: MovieNightPlan, isOnline: Boo
                 fontWeight = FontWeight.Bold,
             ),
         )
-        Text(
-            text = if (plan.canStartFromWidget()) {
-                plan.toWidgetCountdown(context)
-            } else {
-                plan.widgetDateLabel(context, isOnline)
-            },
-            maxLines = 1,
-            style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
-        )
-        Text(
-            text = if (plan.hasWidgetJourney) plan.runtimeRemainingLabel(context) else plan.runtimeLabel(context),
-            maxLines = 1,
-            style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
-        )
-        MovieNightJourneyAction(context, plan, fillWidth = plan.canStartFromWidget())
+        if (plan.hasWidgetJourney) {
+            Text(
+                text = plan.widgetDateLabel(context, isOnline),
+                maxLines = 1,
+                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
+            )
+            Text(
+                text = plan.runtimeRemainingLabel(context),
+                maxLines = 1,
+                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
+            )
+            MovieNightJourneyAction(context, plan)
+        } else {
+            Spacer(GlanceModifier.height(PlanWidgetDimensions.NightMetadataSpacing))
+            WidgetMovieNightMetadata(
+                date = if (plan.canStartFromWidget()) {
+                    plan.toWidgetCountdown(context)
+                } else {
+                    plan.widgetDateLabel(context, isOnline)
+                },
+                runtime = plan.runtimeLabel(context),
+                reminder = if (plan.canStartFromWidget()) null else plan.reminderLabel(context),
+            )
+            if (plan.canStartFromWidget()) {
+                Spacer(GlanceModifier.height(PlanWidgetDimensions.NightStartSpacing))
+                MovieNightJourneyAction(context, plan, fillWidth = true)
+            }
+        }
     }
 }
 
@@ -289,15 +302,20 @@ private fun ExpandedMovieNightRow(
                 ),
             )
             if (primary) {
-                Text(
-                    text = if (plan.hasWidgetJourney) {
-                        plan.runtimeRemainingLabel(context)
-                    } else {
-                        "${plan.toWidgetCountdown(context)} · ${plan.runtimeLabel(context)}"
-                    },
-                    maxLines = 1,
-                    style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
-                )
+                if (plan.hasWidgetJourney) {
+                    Text(
+                        text = plan.runtimeRemainingLabel(context),
+                        maxLines = 1,
+                        style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
+                    )
+                } else {
+                    Spacer(GlanceModifier.height(PlanWidgetDimensions.NightMetadataSpacing))
+                    WidgetMovieNightMetadata(
+                        date = plan.toWidgetCountdown(context),
+                        runtime = plan.runtimeLabel(context),
+                        itemSpacing = PlanWidgetDimensions.ExpandedNightMetadataItemSpacing,
+                    )
+                }
             }
         }
         Spacer(GlanceModifier.width(PlanWidgetDimensions.ContentSpacing))

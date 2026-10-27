@@ -60,6 +60,10 @@ internal object PlanWidgetDimensions {
     val MetadataIconSize = 12.dp
     val MetadataIconSpacing = 3.dp
     val MetadataItemSpacing = 8.dp
+    val ExpandedNightMetadataItemSpacing = 6.dp
+    val NightMetadataSpacing = 3.dp
+    val NightMetadataIconSize = 9.dp
+    val NightStartSpacing = 4.dp
     const val SecondaryReleasePosterAspectRatio = 32f / 44f
     val ReleaseRowSpacing = 9.dp
     val CachedFooterHeight = 18.dp
