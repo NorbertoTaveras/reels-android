@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2026 Norberto Taveras. All rights reserved. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/widget_empty_mark_fill" />
+    <stroke android:width="1dp" android:color="@color/widget_empty_mark_border" />
+    <corners android:radius="8dp" />
+</shape>

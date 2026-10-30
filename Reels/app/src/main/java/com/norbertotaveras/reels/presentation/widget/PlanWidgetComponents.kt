@@ -58,7 +58,7 @@ internal fun WidgetHeader(title: String) {
             maxLines = 1,
             style = TextStyle(
                 color = PlanWidgetTheme.Secondary,
-                fontSize = 12.sp,
+                fontSize = 9.sp,
                 fontWeight = FontWeight.Bold,
             ),
         )
@@ -152,8 +152,13 @@ internal fun WidgetBackdrop(
 @Composable
 internal fun EmptyWidgetMessage(context: Context, message: String, compact: Boolean) {
     Column(
-        modifier = GlanceModifier.fillMaxSize()
-            .padding(horizontal = PlanWidgetDimensions.ContentPadding),
+        modifier = GlanceModifier.fillMaxWidth()
+            .height((LocalSize.current.height - PlanWidgetDimensions.HeaderSpace).coerceAtLeast(0.dp))
+            .padding(horizontal = PlanWidgetDimensions.EmptyContentPadding)
+            .padding(
+                top = if (compact) PlanWidgetDimensions.CompactTopPadding else PlanWidgetDimensions.EmptyContentPadding,
+                bottom = if (compact) PlanWidgetDimensions.CompactBottomPadding else PlanWidgetDimensions.EmptyContentPadding,
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -162,9 +167,14 @@ internal fun EmptyWidgetMessage(context: Context, message: String, compact: Bool
         Text(
             text = message,
             maxLines = 1,
-            style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
+            style = TextStyle(
+                color = PlanWidgetTheme.Secondary,
+                fontSize = if (compact) 9.sp else 11.sp,
+                fontWeight = FontWeight.Medium,
+            ),
         )
         if (!compact) {
+            Spacer(GlanceModifier.height(PlanWidgetDimensions.ContentSpacing))
             WidgetOpenAction(context.getString(R.string.widget_open_reels))
         }
     }
@@ -220,16 +230,18 @@ internal fun WidgetCountdown(label: String) {
 private fun WidgetOpenAction(label: String) {
     Box(
         modifier = GlanceModifier
-            .background(PlanWidgetTheme.Surface)
-            .cornerRadius(12.dp)
-            .padding(horizontal = 8.dp, vertical = 2.dp),
+            .background(ImageProvider(R.drawable.widget_open_action))
+            .padding(
+                horizontal = PlanWidgetDimensions.EmptyActionHorizontalPadding,
+                vertical = PlanWidgetDimensions.EmptyActionVerticalPadding,
+            ),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text = label,
             style = TextStyle(
-                color = PlanWidgetTheme.Primary,
-                fontSize = 12.sp,
+                color = PlanWidgetTheme.Accent,
+                fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
             ),
         )

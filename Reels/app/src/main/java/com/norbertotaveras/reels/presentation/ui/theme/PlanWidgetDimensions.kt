@@ -18,7 +18,7 @@ internal object PlanWidgetDimensions {
     val ExpandedLayoutMinWidth = 336.dp
     val CornerSize = 16.dp
     val ContentPadding = 10.dp
-    val HeaderSpace = 26.dp
+    val HeaderSpace = 22.dp
     val HeaderTopPadding = 6.dp
     val HeaderBottomPadding = 3.dp
     val HeaderItemSpacing = 5.dp
@@ -43,6 +43,9 @@ internal object PlanWidgetDimensions {
     val BrandMarkCornerSize = 3.dp
     val CompactEmptyMarkSize = 22.dp
     val EmptyMarkSize = 28.dp
+    val EmptyContentPadding = 12.dp
+    val EmptyActionHorizontalPadding = 12.dp
+    val EmptyActionVerticalPadding = 4.dp
     val DividerHeight = 1.dp
     val PrimaryNightPosterWidth = 50.dp
     val PrimaryNightPosterHeight = 68.dp
