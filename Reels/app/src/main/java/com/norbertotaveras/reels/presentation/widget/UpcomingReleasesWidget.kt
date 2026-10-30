@@ -9,6 +9,8 @@ package com.norbertotaveras.reels.presentation.widget
 
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.WifiOff
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -162,7 +164,7 @@ private fun ReleaseCollection(
                         bottom = PlanWidgetDimensions.MediumReleaseDetailsBottomPadding,
                     ),
             ) {
-                ReleaseHero(context, primary)
+                ReleaseHero(context, primary, isOnline)
             }
             releases.getOrNull(1)?.let { release ->
                 WidgetDivider()
@@ -206,12 +208,22 @@ private fun ExpandedReleaseCollection(
             if (index < releases.lastIndex) WidgetDivider()
         }
         if (!isOnline) {
-            Text(
-                text = context.getString(R.string.widget_locally_stored_releases),
-                modifier = GlanceModifier.padding(horizontal = PlanWidgetDimensions.ContentPadding),
-                maxLines = 1,
-                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
-            )
+            Row(
+                modifier = GlanceModifier.padding(
+                    start = PlanWidgetDimensions.ContentPadding,
+                    end = PlanWidgetDimensions.ContentPadding,
+                    bottom = PlanWidgetDimensions.CachedFooterBottomPadding,
+                ),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                WidgetIcon(Icons.Outlined.WifiOff, PlanWidgetDimensions.MetadataIconSize, PlanWidgetTheme.Secondary)
+                Spacer(GlanceModifier.width(PlanWidgetDimensions.MetadataIconSpacing))
+                Text(
+                    text = context.getString(R.string.widget_locally_stored_releases),
+                    maxLines = 1,
+                    style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 9.sp),
+                )
+            }
         }
     }
 }
@@ -278,7 +290,7 @@ private fun ExpandedReleaseRow(
 }
 
 @Composable
-private fun ReleaseHero(context: Context, release: TrackedRelease) {
+private fun ReleaseHero(context: Context, release: TrackedRelease, isOnline: Boolean) {
     Column {
         Text(
             text = release.title,
@@ -291,8 +303,9 @@ private fun ReleaseHero(context: Context, release: TrackedRelease) {
         )
         Spacer(GlanceModifier.height(PlanWidgetDimensions.ReleaseTitleSpacing))
         WidgetReleaseMetadata(
-            date = release.releaseDate.toWidgetReleaseDate(context, isOnline = true, includeRelative = false),
-            reminder = release.reminder.toWidgetLabel(context),
+            date = release.releaseDate.toWidgetReleaseDate(context, isOnline, includeRelative = false),
+            reminder = release.reminder.toWidgetLabel(context).takeIf { isOnline },
+            cached = !isOnline,
         )
     }
 }
@@ -336,7 +349,7 @@ private fun SecondaryReleaseRow(
         }
         release.releaseDate?.let {
             Text(
-                text = it.toWidgetReleaseCountdown(context),
+                text = it.toWidgetReleaseCountdown(context, useMonths = false),
                 style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 10.sp),
             )
         }

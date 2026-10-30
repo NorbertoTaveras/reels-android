@@ -10,6 +10,7 @@ package com.norbertotaveras.reels.presentation.widget
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.NotificationsNone
+import androidx.compose.material.icons.outlined.WifiOff
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
@@ -27,6 +28,7 @@ internal fun WidgetReleaseMetadata(
     date: String,
     reminder: String? = null,
     itemSpacing: Dp = PlanWidgetDimensions.MetadataItemSpacing,
+    cached: Boolean = false,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         WidgetIcon(Icons.Outlined.CalendarToday, PlanWidgetDimensions.MetadataIconSize, PlanWidgetTheme.Secondary)
@@ -46,6 +48,10 @@ internal fun WidgetReleaseMetadata(
                 maxLines = 1,
                 style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 9.sp),
             )
+        }
+        if (cached) {
+            Spacer(GlanceModifier.width(itemSpacing))
+            WidgetIcon(Icons.Outlined.WifiOff, PlanWidgetDimensions.MetadataIconSize, PlanWidgetTheme.Secondary)
         }
     }
 }

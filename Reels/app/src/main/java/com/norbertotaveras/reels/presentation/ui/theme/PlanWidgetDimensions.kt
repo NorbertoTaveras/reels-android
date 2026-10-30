@@ -74,6 +74,7 @@ internal object PlanWidgetDimensions {
     const val SecondaryReleasePosterAspectRatio = 32f / 44f
     val ReleaseRowSpacing = 9.dp
     val CachedFooterHeight = 18.dp
+    val CachedFooterBottomPadding = 5.dp
     val MediumReleasePosterWidth = 26.dp
     val MediumReleasePosterHeight = 36.dp
     val SecondaryReleaseRowHeight = 46.dp

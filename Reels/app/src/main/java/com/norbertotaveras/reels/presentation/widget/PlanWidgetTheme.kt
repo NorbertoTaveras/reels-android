@@ -23,6 +23,6 @@ internal object PlanWidgetTheme {
     )
     val Accent = ColorProvider(day = Color(0xFF9C6820), night = Color(0xFFD4A574))
     val OnAccent = ColorProvider(day = Color(0xFF1C1918), night = Color(0xFF1C1918))
-    val Divider = ColorProvider(day = Color(0xFFE4DEE6), night = Color(0xFF38363F))
+    val Divider = ColorProvider(day = Color(0xFFE3DDD5), night = Color(0xFF38363F))
     val ImageFallback = ColorProvider(day = Color(0xFF29282E), night = Color(0xFF29282E))
 }
