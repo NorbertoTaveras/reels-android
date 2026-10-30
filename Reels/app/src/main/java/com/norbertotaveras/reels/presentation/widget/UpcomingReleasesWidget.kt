@@ -156,8 +156,10 @@ private fun ReleaseCollection(
                 modifier = GlanceModifier.defaultWeight().fillMaxWidth()
                     .clickable(movieAction(context, primary.movieId))
                     .padding(
-                        horizontal = PlanWidgetDimensions.ContentPadding,
-                        vertical = PlanWidgetDimensions.ReleaseDetailsPadding,
+                        start = PlanWidgetDimensions.ContentPadding,
+                        top = PlanWidgetDimensions.ReleaseDetailsPadding,
+                        end = PlanWidgetDimensions.ContentPadding,
+                        bottom = PlanWidgetDimensions.MediumReleaseDetailsBottomPadding,
                     ),
             ) {
                 ReleaseHero(context, primary)
@@ -224,6 +226,7 @@ private fun ExpandedReleaseRow(
     posterHeight: Dp,
     modifier: GlanceModifier,
 ) {
+    val emphasizeCountdown = release.releaseDate.isImminentWidgetRelease()
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -248,14 +251,15 @@ private fun ExpandedReleaseRow(
                 maxLines = 1,
                 style = TextStyle(
                     color = if (primary) PlanWidgetTheme.Primary else PlanWidgetTheme.Secondary,
-                    fontSize = 12.sp,
+                    fontSize = if (primary) 12.sp else 11.sp,
                     fontWeight = FontWeight.Bold,
                 ),
             )
-            Spacer(GlanceModifier.height(PlanWidgetDimensions.ReleaseTitleSpacing))
+            Spacer(GlanceModifier.height(PlanWidgetDimensions.ExpandedReleaseTitleSpacing))
             WidgetReleaseMetadata(
                 date = release.releaseDate.toWidgetReleaseDate(context, isOnline, includeRelative = false),
                 reminder = release.reminder.toWidgetLabel(context).takeIf { primary && isOnline },
+                itemSpacing = PlanWidgetDimensions.ExpandedReleaseMetadataItemSpacing,
             )
         }
         Spacer(GlanceModifier.width(PlanWidgetDimensions.ContentSpacing))
@@ -264,9 +268,9 @@ private fun ExpandedReleaseRow(
                 text = it.toWidgetReleaseCountdown(context),
                 maxLines = 1,
                 style = TextStyle(
-                    color = if (primary) PlanWidgetTheme.Accent else PlanWidgetTheme.Secondary,
-                    fontSize = 12.sp,
-                    fontWeight = if (primary) FontWeight.Bold else FontWeight.Normal,
+                    color = if (emphasizeCountdown) PlanWidgetTheme.Accent else PlanWidgetTheme.Secondary,
+                    fontSize = 11.sp,
+                    fontWeight = if (emphasizeCountdown) FontWeight.Bold else FontWeight.Normal,
                 ),
             )
         }
@@ -313,27 +317,27 @@ private fun SecondaryReleaseRow(
             width = PlanWidgetDimensions.MediumReleasePosterWidth,
             height = PlanWidgetDimensions.MediumReleasePosterHeight,
         )
-        Spacer(GlanceModifier.width(6.dp))
+        Spacer(GlanceModifier.width(PlanWidgetDimensions.SecondaryReleaseRowSpacing))
         Column(modifier = GlanceModifier.defaultWeight()) {
             Text(
                 text = release.title,
                 maxLines = 1,
                 style = TextStyle(
                     color = PlanWidgetTheme.Secondary,
-                    fontSize = 12.sp,
+                    fontSize = 10.sp,
                     fontWeight = FontWeight.Bold,
                 ),
             )
             Text(
                 text = release.dateLabel(context, true),
                 maxLines = 1,
-                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
+                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 9.sp),
             )
         }
         release.releaseDate?.let {
             Text(
                 text = it.toWidgetReleaseCountdown(context),
-                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
+                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 10.sp),
             )
         }
     }
@@ -347,6 +351,7 @@ private fun ReleaseRow(
     isOnline: Boolean,
     modifier: GlanceModifier,
 ) {
+    val emphasizeCountdown = isOnline && release.releaseDate.isImminentWidgetRelease()
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -376,9 +381,9 @@ private fun ReleaseRow(
                 text = release.releaseDate.toCompactWidgetReleaseDate(context, isOnline),
                 maxLines = 1,
                 style = TextStyle(
-                    color = if (isOnline) PlanWidgetTheme.Accent else PlanWidgetTheme.Secondary,
+                    color = if (emphasizeCountdown) PlanWidgetTheme.Accent else PlanWidgetTheme.Secondary,
                     fontSize = 11.sp,
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = if (emphasizeCountdown) FontWeight.Medium else FontWeight.Normal,
                 ),
             )
         }
@@ -393,4 +398,4 @@ private const val MAX_DATE = "9999-12-31"
 private const val MAX_VISIBLE_RELEASES = 3
 
 private fun List<TrackedRelease>.visibleWidgetReleases(): List<TrackedRelease> =
-    sortedBy { it.releaseDate ?: MAX_DATE }.take(MAX_VISIBLE_RELEASES)
+    sortedBy { it.releaseDate?.takeUnless(String::isBlank) ?: MAX_DATE }.take(MAX_VISIBLE_RELEASES)

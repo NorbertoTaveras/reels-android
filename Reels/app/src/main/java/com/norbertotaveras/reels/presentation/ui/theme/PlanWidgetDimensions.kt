@@ -57,9 +57,13 @@ internal object PlanWidgetDimensions {
     const val ReleasePosterAspectRatio = 40f / 56f
     val ReleaseDetailsPadding = 7.dp
     val ReleaseTitleSpacing = 4.dp
-    val MetadataIconSize = 12.dp
+    val MetadataIconSize = 9.dp
     val MetadataIconSpacing = 3.dp
     val MetadataItemSpacing = 8.dp
+    val ExpandedReleaseMetadataItemSpacing = 6.dp
+    val ExpandedReleaseTitleSpacing = 3.dp
+    val MediumReleaseDetailsBottomPadding = 4.dp
+    val SecondaryReleaseRowSpacing = 8.dp
     val ExpandedNightMetadataItemSpacing = 6.dp
     val NightMetadataSpacing = 3.dp
     val NightMetadataIconSize = 9.dp

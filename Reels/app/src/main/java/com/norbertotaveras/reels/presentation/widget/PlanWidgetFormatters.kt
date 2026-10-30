@@ -104,10 +104,16 @@ internal fun String.toWidgetReleaseCountdown(context: Context): String {
     return when {
         days < 0 -> context.getString(R.string.widget_release_released)
         days == 0L -> context.getString(R.string.widget_release_today)
-        days >= 60 -> "${max(1L, days / 30)}mo"
+        days > 30 -> "${(days + 29) / 30}mo"
         else -> "${days}d"
     }
 }
+
+internal fun String?.isImminentWidgetRelease(): Boolean = this?.let { value ->
+    runCatching {
+        ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(value)) in 0..7
+    }.getOrDefault(false)
+} ?: false
 
 internal fun MovieNightPlan.runtimeLabel(context: Context): String =
     runtimeMinutes.takeIf { it in 1..600 }?.let { context.getString(R.string.widget_runtime_minutes, it) }

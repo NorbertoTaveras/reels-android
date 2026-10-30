@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.NotificationsNone
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
 import androidx.glance.layout.Alignment
@@ -22,24 +23,28 @@ import androidx.glance.text.TextStyle
 import com.norbertotaveras.reels.presentation.ui.theme.PlanWidgetDimensions
 
 @Composable
-internal fun WidgetReleaseMetadata(date: String, reminder: String? = null) {
+internal fun WidgetReleaseMetadata(
+    date: String,
+    reminder: String? = null,
+    itemSpacing: Dp = PlanWidgetDimensions.MetadataItemSpacing,
+) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         WidgetIcon(Icons.Outlined.CalendarToday, PlanWidgetDimensions.MetadataIconSize, PlanWidgetTheme.Secondary)
         Spacer(GlanceModifier.width(PlanWidgetDimensions.MetadataIconSpacing))
         Text(
             text = date,
             maxLines = 1,
-            style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
+            style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 9.sp),
         )
         if (reminder != null) {
-            Spacer(GlanceModifier.width(PlanWidgetDimensions.MetadataItemSpacing))
+            Spacer(GlanceModifier.width(itemSpacing))
             WidgetIcon(Icons.Outlined.NotificationsNone, PlanWidgetDimensions.MetadataIconSize, PlanWidgetTheme.Secondary)
             Spacer(GlanceModifier.width(PlanWidgetDimensions.MetadataIconSpacing))
             Text(
                 text = reminder,
                 modifier = GlanceModifier.defaultWeight(),
                 maxLines = 1,
-                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 12.sp),
+                style = TextStyle(color = PlanWidgetTheme.Secondary, fontSize = 9.sp),
             )
         }
     }
