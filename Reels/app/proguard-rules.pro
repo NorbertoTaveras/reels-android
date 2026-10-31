@@ -27,3 +27,8 @@
 }
 -keepattributes Signature
 -keepattributes RuntimeVisibleAnnotations
+
+# Glance instantiates widget actions through their public no-argument constructor.
+-keep class com.norbertotaveras.reels.presentation.widget.** implements androidx.glance.appwidget.action.ActionCallback {
+    public <init>();
+}
