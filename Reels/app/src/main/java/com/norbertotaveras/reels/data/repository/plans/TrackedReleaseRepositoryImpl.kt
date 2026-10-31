@@ -16,6 +16,7 @@ import com.norbertotaveras.reels.domain.model.plans.TrackedRelease
 import com.norbertotaveras.reels.domain.plans.PlanScheduler
 import com.norbertotaveras.reels.domain.plans.ReelsWidgetUpdater
 import com.norbertotaveras.reels.domain.repository.plans.TrackedReleaseRepository
+import com.norbertotaveras.reels.extensions.toConfirmedReleaseDate
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -40,7 +41,11 @@ class TrackedReleaseRepositoryImpl @Inject constructor(
     }
 
     override suspend fun track(release: TrackedRelease): Result<Unit> = repositoryResult(ioDispatcher) {
-        val value = release.copy(updatedAt = System.currentTimeMillis())
+        val value = release.copy(
+            releaseDate = release.releaseDate.toConfirmedReleaseDate(),
+            previousReleaseDate = release.previousReleaseDate.toConfirmedReleaseDate(),
+            updatedAt = System.currentTimeMillis(),
+        )
         dao.upsert(value.toEntity())
         scheduler.scheduleRelease(value)
         widgetUpdater.updateAll()
@@ -51,13 +56,14 @@ class TrackedReleaseRepositoryImpl @Inject constructor(
     override suspend fun refreshReleaseDate(movieId: Int, releaseDate: String?): Result<Unit> =
         repositoryResult(ioDispatcher) {
             val current = dao.get(movieId) ?: return@repositoryResult
-            if (current.releaseDate == releaseDate) {
+            val confirmedDate = releaseDate.toConfirmedReleaseDate()
+            if (current.releaseDate == confirmedDate) {
                 widgetUpdater.updateAll()
                 return@repositoryResult
             }
             val updated = current.copy(
-                previousReleaseDate = current.releaseDate,
-                releaseDate = releaseDate,
+                previousReleaseDate = current.releaseDate.toConfirmedReleaseDate(),
+                releaseDate = confirmedDate,
                 updatedAt = System.currentTimeMillis()
             ).toDataModel()
             dao.upsert(updated.toEntity())

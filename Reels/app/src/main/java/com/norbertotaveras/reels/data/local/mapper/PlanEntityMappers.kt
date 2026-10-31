@@ -13,13 +13,14 @@ import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
 import com.norbertotaveras.reels.domain.model.plans.MovieNightStatus
 import com.norbertotaveras.reels.domain.model.plans.ReleaseReminder
 import com.norbertotaveras.reels.domain.model.plans.TrackedRelease
+import com.norbertotaveras.reels.extensions.toConfirmedReleaseDate
 
 fun TrackedReleaseEntity.toDataModel(): TrackedRelease = TrackedRelease(
     movieId = movieId,
     title = title,
     posterPath = posterPath,
-    releaseDate = releaseDate,
-    previousReleaseDate = previousReleaseDate,
+    releaseDate = releaseDate.toConfirmedReleaseDate(),
+    previousReleaseDate = previousReleaseDate.toConfirmedReleaseDate(),
     reminder = runCatching { ReleaseReminder.valueOf(reminder) }
         .getOrDefault(ReleaseReminder.AppDefault),
     customReminderAt = customReminderAt,
