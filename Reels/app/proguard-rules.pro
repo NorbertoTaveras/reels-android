@@ -32,3 +32,13 @@
 -keep class com.norbertotaveras.reels.presentation.widget.** implements androidx.glance.appwidget.action.ActionCallback {
     public <init>();
 }
+
+# WorkManager creates input mergers reflectively when running Glance updates.
+-keep class androidx.work.OverwritingInputMerger {
+    public <init>();
+}
+
+# Glance persists widget class names and recreates each widget reflectively.
+-keep class com.norbertotaveras.reels.presentation.widget.* extends androidx.glance.appwidget.GlanceAppWidget {
+    public <init>();
+}
