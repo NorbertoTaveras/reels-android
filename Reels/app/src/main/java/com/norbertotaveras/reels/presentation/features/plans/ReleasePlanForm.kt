@@ -458,8 +458,8 @@ private fun ReleaseReminderRow(
 @Composable
 internal fun PlanPermissionNotice(
     canPostNotifications: Boolean,
+    modifier: Modifier = Modifier,
     canScheduleExactAlarms: Boolean = true,
-    modifier: Modifier = Modifier.padding(top = ReelsDimensions.planSheetContentSpacing),
     containerColor: Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.75f),
 ) {
     if (canPostNotifications && canScheduleExactAlarms) return

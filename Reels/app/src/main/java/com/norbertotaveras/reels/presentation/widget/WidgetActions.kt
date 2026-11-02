@@ -9,7 +9,7 @@ package com.norbertotaveras.reels.presentation.widget
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.glance.GlanceId
 import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.ActionCallback
@@ -20,11 +20,11 @@ import com.norbertotaveras.reels.data.widget.PlanWidgetEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 
 internal fun plansAction(context: Context, tab: String) = actionStartActivity(
-    Intent(Intent.ACTION_VIEW, Uri.parse("reels://plans?tab=$tab"), context, MainActivity::class.java),
+    Intent(Intent.ACTION_VIEW, "reels://plans?tab=$tab".toUri(), context, MainActivity::class.java),
 )
 
 internal fun movieAction(context: Context, movieId: Int) = actionStartActivity(
-    Intent(Intent.ACTION_VIEW, Uri.parse("reels://movie/$movieId"), context, MainActivity::class.java),
+    Intent(Intent.ACTION_VIEW, "reels://movie/$movieId".toUri(), context, MainActivity::class.java),
 )
 
 class StartMovieNightAction : ActionCallback {

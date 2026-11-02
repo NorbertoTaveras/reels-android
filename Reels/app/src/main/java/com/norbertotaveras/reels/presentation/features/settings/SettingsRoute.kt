@@ -32,9 +32,9 @@ fun SettingsRoute(
     onNavigateToLibrary: () -> Unit,
     onNavigateToPlans: () -> Unit,
     onOpenExternalUrl: (String) -> Unit,
+    modifier: Modifier = Modifier,
     tmdbAuthCallbackId: Long? = null,
     onTmdbAuthCallbackConsumed: (Long) -> Unit = {},
-    modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()

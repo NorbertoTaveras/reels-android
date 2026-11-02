@@ -42,6 +42,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
+import java.util.Locale
 
 @Composable
 internal fun FilmographyPosterCard(
@@ -131,7 +132,7 @@ private fun FilmographyRatingBadge(
             )
 
             Text(
-                text = String.format("%.1f", rating),
+                text = String.format(Locale.getDefault(), "%.1f", rating),
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontSize = 12.sp,
                     lineHeight = 16.sp

@@ -57,6 +57,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContentCo
 import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPlaceholderColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
+import java.util.Locale
 
 @Composable
 internal fun DiscoverPosterCard(
@@ -158,7 +159,7 @@ private fun DiscoverRatingBadge(
             )
 
             Text(
-                text = String.format("%.1f", rating),
+                text = String.format(Locale.getDefault(), "%.1f", rating),
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontSize = 12.sp,
                     lineHeight = 16.sp

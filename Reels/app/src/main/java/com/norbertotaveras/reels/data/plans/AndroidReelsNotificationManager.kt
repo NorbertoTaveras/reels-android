@@ -9,6 +9,7 @@ package com.norbertotaveras.reels.data.plans
 
 import android.Manifest
 import android.app.AlarmManager
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -46,6 +47,8 @@ constructor(
     private val manager = NotificationManagerCompat.from(context)
 
     override fun createChannels() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+            return
         val systemManager = context.getSystemService(NotificationManager::class.java)
         systemManager.createNotificationChannels(
             listOf(
@@ -70,7 +73,7 @@ constructor(
 
     override fun showReleaseReminder(release: TrackedRelease) {
         if (!canPostNotifications()) return
-        manager.notify(
+        postNotification(
             PlanNotificationContract.ReleaseNotificationOffset + release.movieId,
             baseBuilder(
                     PlanNotificationContract.ReleaseChannelId,
@@ -95,7 +98,7 @@ constructor(
                 plansIntent(PlanNotificationContract.MovieNightsTab),
             )
         if (plan.canStartJourney()) builder.addAction(startAction(plan.id))
-        manager.notify(movieNightReminderNotificationId(plan.id), builder.build())
+        postNotification(movieNightReminderNotificationId(plan.id), builder.build())
     }
 
     override suspend fun showMovieNightCountdown(plan: MovieNightPlan) {
@@ -113,9 +116,15 @@ constructor(
                 )
                 .setWhen(plan.scheduledAt)
                 .setUsesChronometer(true)
-                .setChronometerCountDown(true)
+                .apply {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        setChronometerCountDown(true)
+                    } else {
+                        setUsesChronometer(false)
+                    }
+                }
                 .addAction(startAction(plan.id))
-        manager.notify(movieNightJourneyNotificationId(plan.id), builder.build())
+        postNotification(movieNightJourneyNotificationId(plan.id), builder.build())
     }
 
     override suspend fun showMovieNightProgress(plan: MovieNightPlan) {
@@ -170,14 +179,14 @@ constructor(
                 .addAction(finishAction)
                 .addAction(endAction)
         applyJourneyStyle(builder, progress)
-        manager.notify(movieNightJourneyNotificationId(plan.id), builder.build())
+        postNotification(movieNightJourneyNotificationId(plan.id), builder.build())
     }
 
     override fun showMovieNightCompleted(plan: MovieNightPlan) {
         cancelProgressTick(plan.id)
         manager.cancel(movieNightReminderNotificationId(plan.id))
         if (!canPostNotifications()) return
-        manager.notify(
+        postNotification(
             movieNightJourneyNotificationId(plan.id),
             baseBuilder(
                     PlanNotificationContract.MovieNightChannelId,
@@ -194,6 +203,15 @@ constructor(
         manager.cancel(movieNightReminderNotificationId(planId))
         manager.cancel(movieNightJourneyNotificationId(planId))
         cancelProgressTick(planId)
+    }
+
+    private fun postNotification(id: Int, notification: Notification) {
+        if (!canPostNotifications()) return
+        try {
+            manager.notify(id, notification)
+        } catch (_: SecurityException) {
+            // Permission can be revoked between the check and posting the notification.
+        }
     }
 
     private fun baseBuilder(

@@ -34,6 +34,7 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
+import java.util.Locale
 
 @Composable
 internal fun SearchContent(
@@ -150,7 +151,7 @@ internal fun SearchContent(
                                 genres = movie.genreIds
                                     .mapNotNull { state.genreNamesById[it] }
                                     .take(3),
-                                rating = String.format("%.1f", movie.voteAverage),
+                                rating = String.format(Locale.getDefault(), "%.1f", movie.voteAverage),
                                 onClick = {
                                     onEvent(SearchEvent.MovieClicked(movie.id))
                                 }

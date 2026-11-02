@@ -78,7 +78,9 @@ internal fun String?.toWidgetReleaseDate(
         val relative = when (days) {
             0L -> context.getString(R.string.widget_release_today)
             1L -> context.getString(R.string.widget_release_tomorrow)
-            in 2..Long.MAX_VALUE -> context.getString(R.string.widget_release_days, days)
+            in 2..Long.MAX_VALUE -> context.resources.getQuantityString(
+                R.plurals.widget_release_days, days.coerceAtMost(Int.MAX_VALUE.toLong()).toInt(), days
+            )
             else -> null
         }
         if (relative == null) formattedDate else "$formattedDate · $relative"
@@ -92,7 +94,9 @@ internal fun String?.toCompactWidgetReleaseDate(context: Context, isOnline: Bool
     return when (val days = ChronoUnit.DAYS.between(LocalDate.now(), date)) {
         0L -> context.getString(R.string.widget_release_today)
         1L -> context.getString(R.string.widget_release_tomorrow)
-        in 2..Long.MAX_VALUE -> context.getString(R.string.widget_release_in_days, days)
+        in 2..Long.MAX_VALUE -> context.resources.getQuantityString(
+            R.plurals.widget_release_in_days, days.coerceAtMost(Int.MAX_VALUE.toLong()).toInt(), days
+        )
         else -> context.getString(R.string.widget_release_released)
     }
 }

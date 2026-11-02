@@ -271,8 +271,8 @@ internal fun TmdbBadge(
 
 @Composable
 internal fun OfflineBadge(
-    imageVector: ImageVector = Icons.Filled.Download,
     modifier: Modifier = Modifier,
+    imageVector: ImageVector = Icons.Filled.Download,
 ) {
     Surface(
         modifier = modifier.size(ReelsDimensions.favoritesOfflineBadgeSize),

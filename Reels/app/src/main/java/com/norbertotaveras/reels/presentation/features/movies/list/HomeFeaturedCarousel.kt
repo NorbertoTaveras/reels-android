@@ -54,6 +54,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContentColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
+import java.util.Locale
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
@@ -244,7 +245,7 @@ internal fun RatingBadge(
             )
 
             Text(
-                text = String.format("%.1f", rating),
+                text = String.format(Locale.getDefault(), "%.1f", rating),
                 style = if (compact) {
                     MaterialTheme.typography.labelMedium.copy(
                         fontSize = 12.sp,

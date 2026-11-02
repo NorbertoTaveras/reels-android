@@ -45,6 +45,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContentColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPlaceholderColor
+import java.util.Locale
 
 @Composable
 internal fun MovieCategoryPlaceholderCard(
@@ -174,7 +175,7 @@ private fun CategoryRatingBadge(
             )
 
             Text(
-                text = String.format("%.1f", rating),
+                text = String.format(Locale.getDefault(), "%.1f", rating),
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontSize = 12.sp,
                     lineHeight = 16.sp

@@ -33,7 +33,10 @@
     <string name="widget_no_movie_night">No movie night planned</string>
     <string name="widget_cached_date">%1$s · cached</string>
     <string name="widget_cached">Cached</string>
-    <string name="widget_release_in_days">In %1$d days</string>
+    <plurals name="widget_release_in_days">
+        <item quantity="one">In %1$d day</item>
+        <item quantity="other">In %1$d days</item>
+    </plurals>
     <string name="widget_locally_stored_releases">Showing locally stored releases</string>
     <string name="widget_open_reels">Open Reels</string>
     <string name="widget_runtime_unavailable">Runtime unavailable</string>
@@ -44,7 +47,10 @@
     <string name="widget_release_today">Today</string>
     <string name="widget_release_released">Released</string>
     <string name="widget_release_tomorrow">Tomorrow</string>
-    <string name="widget_release_days">%1$d days</string>
+    <plurals name="widget_release_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
     <string name="widget_tonight_time">Tonight · %1$s</string>
     <string name="widget_tomorrow_time">Tomorrow · %1$s</string>
     <string name="widget_now">Now</string>

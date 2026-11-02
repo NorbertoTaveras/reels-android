@@ -102,12 +102,12 @@ internal fun <T> SettingsOptionDialog(
     selectedOption: T,
     optionLabel: (T) -> String,
     optionDescription: (T) -> String,
+    modifier: Modifier = Modifier,
     optionIcon: ((T) -> ImageVector)? = null,
     confirmLabel: String = "Apply",
     supportingContent: (@Composable () -> Unit)? = null,
     onOptionSelected: (T) -> Unit,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     var pendingOption by remember(selectedOption) { mutableStateOf(selectedOption) }
 
@@ -164,10 +164,10 @@ private fun DialogDescription(text: String, modifier: Modifier = Modifier) {
 private fun SettingsOptionRow(
     label: String,
     description: String,
-    icon: ImageVector? = null,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
 ) {
     Row(
         modifier =

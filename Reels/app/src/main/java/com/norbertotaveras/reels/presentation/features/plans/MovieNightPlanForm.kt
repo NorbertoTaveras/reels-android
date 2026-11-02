@@ -43,6 +43,7 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -96,7 +97,7 @@ internal fun MovieNightPlanForm(
         }
     var reminder by
         rememberSaveable(existingPlan?.id) {
-            mutableStateOf(existingPlan?.reminderMinutesBefore ?: defaultReminderMinutes ?: 30)
+            mutableIntStateOf(existingPlan?.reminderMinutesBefore ?: defaultReminderMinutes ?: 30)
         }
     var reminderEnabled by
         rememberSaveable(existingPlan?.id) {

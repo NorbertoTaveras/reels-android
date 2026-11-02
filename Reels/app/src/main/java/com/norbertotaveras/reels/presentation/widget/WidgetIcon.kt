@@ -7,7 +7,7 @@
 
 package com.norbertotaveras.reels.presentation.widget
 
-import android.graphics.Bitmap
+import androidx.core.graphics.createBitmap
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -45,7 +45,7 @@ private fun WidgetIconContent(icon: ImageVector, size: Dp, tint: ColorProvider) 
     val bitmap = remember(painter, size) {
         // Rasterize the existing icon library for RemoteViews at a crisp launcher density.
         val pixels = (size.value * ICON_DENSITY).toInt().coerceAtLeast(1)
-        Bitmap.createBitmap(pixels, pixels, Bitmap.Config.ARGB_8888).also { bitmap ->
+        createBitmap(pixels, pixels).also { bitmap ->
             val bounds = Size(pixels.toFloat(), pixels.toFloat())
             CanvasDrawScope().draw(
                 density = Density(ICON_DENSITY),

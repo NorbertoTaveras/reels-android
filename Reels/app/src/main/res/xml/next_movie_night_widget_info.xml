@@ -13,7 +13,5 @@
     android:minResizeHeight="48dp"
     android:previewImage="@drawable/widget_next_movie_night_preview"
     android:resizeMode="horizontal|vertical"
-    android:targetCellWidth="2"
-    android:targetCellHeight="1"
     android:updatePeriodMillis="1800000"
     android:widgetCategory="home_screen" />

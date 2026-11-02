@@ -8,12 +8,14 @@
 package com.norbertotaveras.reels.data.network
 
 import android.net.NetworkCapabilities
+import android.os.Build
 
 internal object NetworkCapabilitiesHelper {
     fun hasUsableInternet(capabilities: NetworkCapabilities?): Boolean {
         return capabilities?.run {
             hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
-                hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED)
+                (Build.VERSION.SDK_INT < Build.VERSION_CODES.P ||
+                    hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED))
         } == true
     }
 }

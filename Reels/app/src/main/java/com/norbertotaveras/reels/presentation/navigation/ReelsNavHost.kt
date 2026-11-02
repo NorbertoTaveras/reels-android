@@ -9,7 +9,6 @@ package com.norbertotaveras.reels.presentation.navigation
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
@@ -20,6 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -49,7 +49,7 @@ fun ReelsNavHost(
     val navController = rememberNavController()
     val context = LocalContext.current
     val openExternalUrl: (String) -> Unit = openExternalUrl@{ url ->
-        val uri = Uri.parse(url)
+        val uri = url.toUri()
         val isSupportedScheme =
             uri.scheme.equals("http", ignoreCase = true) ||
                 uri.scheme.equals("https", ignoreCase = true)

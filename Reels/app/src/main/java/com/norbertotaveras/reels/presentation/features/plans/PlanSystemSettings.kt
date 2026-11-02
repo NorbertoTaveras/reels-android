@@ -9,15 +9,15 @@ package com.norbertotaveras.reels.presentation.features.plans
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import androidx.core.net.toUri
 
 internal fun Context.openExactAlarmSettings() {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
     startActivity(
         Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
-            data = Uri.parse("package:$packageName")
+            data = "package:$packageName".toUri()
         }
     )
 }
