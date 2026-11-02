@@ -8,6 +8,7 @@
 package com.norbertotaveras.reels.data.remote.dto.cast
 
 import com.google.gson.annotations.SerializedName
+import com.norbertotaveras.reels.domain.model.cast.CastMemberDataModel
 
 data class CastMemberDto(
     @SerializedName("id")
@@ -22,3 +23,12 @@ data class CastMemberDto(
     @SerializedName("profile_path")
     val profilePath: String?
 )
+
+internal fun CastMemberDto.toCastMemberDataModel(): CastMemberDataModel {
+    return CastMemberDataModel(
+        id = id,
+        name = name,
+        characterName = character.orEmpty(),
+        profilePath = profilePath
+    )
+}

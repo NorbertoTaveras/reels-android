@@ -8,6 +8,7 @@
 package com.norbertotaveras.reels.data.local.entity
 
 import androidx.room.Entity
+import com.norbertotaveras.reels.domain.model.account.TmdbMovieAccountStateDataModel
 
 @Entity(
     tableName = "cached_movie_account_states",
@@ -20,3 +21,24 @@ data class CachedMovieAccountStateEntity(
     val rating: Double?,
     val cachedAt: Long,
 )
+
+internal fun TmdbMovieAccountStateDataModel.toCachedMovieAccountStateEntity(
+    accountId: Int,
+    cachedAt: Long,
+): CachedMovieAccountStateEntity {
+    return CachedMovieAccountStateEntity(
+        accountId = accountId,
+        movieId = movieId,
+        isWatchlisted = isWatchlisted,
+        rating = rating,
+        cachedAt = cachedAt
+    )
+}
+
+internal fun CachedMovieAccountStateEntity.toTmdbMovieAccountStateDataModel(): TmdbMovieAccountStateDataModel {
+    return TmdbMovieAccountStateDataModel(
+        movieId = movieId,
+        isWatchlisted = isWatchlisted,
+        rating = rating
+    )
+}

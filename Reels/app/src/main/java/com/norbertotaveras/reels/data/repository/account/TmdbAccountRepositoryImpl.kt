@@ -16,9 +16,9 @@ import com.norbertotaveras.reels.data.local.dao.CachedMovieDao
 import com.norbertotaveras.reels.data.local.dao.TmdbMovieActivityDao
 import com.norbertotaveras.reels.data.local.db.ReelsDatabase
 import com.norbertotaveras.reels.data.local.entity.TmdbMovieActivityEntity
-import com.norbertotaveras.reels.data.local.mapper.toCachedMovieAccountStateEntity
-import com.norbertotaveras.reels.data.local.mapper.toTmdbMovieActivityDataModel
-import com.norbertotaveras.reels.data.local.mapper.toTmdbMovieAccountStateDataModel
+import com.norbertotaveras.reels.data.local.entity.toCachedMovieAccountStateEntity
+import com.norbertotaveras.reels.data.local.entity.toTmdbMovieActivityDataModel
+import com.norbertotaveras.reels.data.local.entity.toTmdbMovieAccountStateDataModel
 import com.norbertotaveras.reels.data.local.preferences.TmdbAccountDataStore
 import com.norbertotaveras.reels.data.mapper.movie.toCachedMovieDataModel
 import com.norbertotaveras.reels.data.remote.account.TmdbAccountRemoteDataSource

@@ -8,6 +8,7 @@
 package com.norbertotaveras.reels.data.local.entity
 
 import androidx.room.Entity
+import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
 
 @Entity(
     tableName = "cached_genres",
@@ -19,3 +20,22 @@ data class CachedGenreEntity(
     val name: String,
     val cachedAt: Long,
 )
+
+internal fun GenreDataModel.toCachedGenreEntity(
+    language: String,
+    cachedAt: Long,
+): CachedGenreEntity {
+    return CachedGenreEntity(
+        language = language,
+        genreId = id,
+        name = name,
+        cachedAt = cachedAt
+    )
+}
+
+internal fun CachedGenreEntity.toGenreDataModel(): GenreDataModel {
+    return GenreDataModel(
+        id = genreId,
+        name = name
+    )
+}

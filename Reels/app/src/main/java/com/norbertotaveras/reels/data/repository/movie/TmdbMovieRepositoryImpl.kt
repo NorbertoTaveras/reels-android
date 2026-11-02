@@ -20,11 +20,11 @@ import com.norbertotaveras.reels.data.local.db.ReelsDatabase
 import com.norbertotaveras.reels.data.local.entity.CachedMovieListEntryEntity
 import com.norbertotaveras.reels.data.local.entity.CachedContentStatusEntity
 import com.norbertotaveras.reels.data.local.entity.MovieRemoteKeyEntity
-import com.norbertotaveras.reels.data.local.mapper.toCachedGenreEntity
+import com.norbertotaveras.reels.data.local.entity.toCachedGenreEntity
 import com.norbertotaveras.reels.data.local.mapper.toCachedMovieCastEntities
 import com.norbertotaveras.reels.data.local.mapper.toCachedMovieDetailsEntity
 import com.norbertotaveras.reels.data.local.mapper.toCachedMovieVideoEntities
-import com.norbertotaveras.reels.data.local.mapper.toGenreDataModel as toCachedGenreDataModel
+import com.norbertotaveras.reels.data.local.entity.toGenreDataModel as toCachedGenreDataModel
 import com.norbertotaveras.reels.data.local.mapper.toMovieCreditsDataModel as toCachedMovieCreditsDataModel
 import com.norbertotaveras.reels.data.local.mapper.toMovieDetailsDataModel as toCachedMovieDetailsDataModel
 import com.norbertotaveras.reels.data.local.mapper.toMovieVideosDataModel as toCachedMovieVideosDataModel
@@ -33,7 +33,7 @@ import com.norbertotaveras.reels.data.mapper.movie.toCachedMovieEntity
 import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
 import com.norbertotaveras.reels.data.remote.error.NoNetworkConnectionException
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
-import com.norbertotaveras.reels.data.remote.mapper.genre.toGenreDataModel
+import com.norbertotaveras.reels.data.remote.dto.genre.toGenreDataModels
 import com.norbertotaveras.reels.data.remote.mapper.movie.toDiscoverMovieRequestParameters
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieCreditsDataModel
 import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDataModel
@@ -360,9 +360,7 @@ class TmdbMovieRepositoryImpl @Inject constructor(
             networkMonitor = networkMonitor,
             loadRemote = {
                 remoteDataSource.getMovieGenres(language = language)
-                    .genres
-                    .orEmpty()
-                    .map { genreDto -> genreDto.toGenreDataModel() }
+                    .toGenreDataModels()
             },
             saveRemote = { genres ->
                 database.withTransaction {

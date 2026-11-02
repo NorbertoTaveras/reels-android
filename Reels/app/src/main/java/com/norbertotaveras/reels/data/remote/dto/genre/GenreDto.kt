@@ -8,6 +8,7 @@
 package com.norbertotaveras.reels.data.remote.dto.genre
 
 import com.google.gson.annotations.SerializedName
+import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
 
 data class GenreDto(
     @SerializedName("id")
@@ -15,3 +16,10 @@ data class GenreDto(
     @SerializedName("name")
     val name: String
 )
+
+internal fun GenreDto.toGenreDataModel(): GenreDataModel {
+    return GenreDataModel(
+        id = id,
+        name = name
+    )
+}

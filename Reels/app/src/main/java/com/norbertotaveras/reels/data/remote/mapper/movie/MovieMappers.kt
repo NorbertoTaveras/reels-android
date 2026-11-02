@@ -12,8 +12,8 @@ import com.norbertotaveras.reels.data.remote.dto.movie.MovieDetailsDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieVideoDto
 import com.norbertotaveras.reels.data.remote.dto.movie.MovieVideosDto
-import com.norbertotaveras.reels.data.remote.mapper.cast.toCastMemberDataModel
-import com.norbertotaveras.reels.data.remote.mapper.genre.toGenreDataModel
+import com.norbertotaveras.reels.data.remote.dto.cast.toCastMemberDataModel
+import com.norbertotaveras.reels.data.remote.dto.genre.toGenreDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieCreditsDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
 import com.norbertotaveras.reels.domain.model.movie.MovieDetailsDataModel
