@@ -17,16 +17,10 @@ import kotlinx.coroutines.flow.Flow
 
 interface SettingsRepository {
     fun observeSettings(): Flow<AppSettings>
-
     suspend fun updateImageQuality(imageQuality: ImageQuality)
-
     suspend fun updateLanguageRegion(languageRegion: LanguageRegion)
-
     suspend fun updateTheme(theme: AppTheme)
-
     suspend fun updateRecentSearches(recentSearches: List<String>)
-
     suspend fun updateDiscoverFilters(filters: DiscoverFilterDataModel)
-
     suspend fun updatePlanPreferences(preferences: PlanPreferences)
 }

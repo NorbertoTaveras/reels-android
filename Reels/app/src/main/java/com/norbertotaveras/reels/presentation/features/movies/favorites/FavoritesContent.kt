@@ -91,7 +91,8 @@ internal fun FavoritesContent(
         mutableStateOf<LibraryTab?>(null)
     }
     LaunchedEffect(state.isOnline, isUsingCachedTmdbContent) {
-        if (state.isOnline && !isUsingCachedTmdbContent) dismissedCachedNoticeTab = null
+        if (state.isOnline && !isUsingCachedTmdbContent)
+            dismissedCachedNoticeTab = null
     }
 
     LazyVerticalGrid(

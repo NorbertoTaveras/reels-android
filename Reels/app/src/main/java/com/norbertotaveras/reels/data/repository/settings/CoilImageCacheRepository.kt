@@ -32,10 +32,8 @@ class CoilImageCacheRepository @Inject constructor(
         return withContext(ioDispatcher) {
             val imageLoader = SingletonImageLoader.get(context)
             val clearedBytes = imageLoader.diskCache?.size ?: 0L
-
             imageLoader.memoryCache?.clear()
             imageLoader.diskCache?.clear()
-
             clearedBytes
         }
     }

@@ -36,6 +36,7 @@ import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
 import com.norbertotaveras.reels.domain.model.plans.ReleaseReminder
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +60,7 @@ fun MoviePlansSheet(
     LaunchedEffect(mode, state.movieNightPlan?.id) {
         if (mode == MoviePlansSheetMode.MovieNightConfirmation) {
             val plan = state.movieNightPlan ?: return@LaunchedEffect
-            delay(PlanFeedbackTiming.movieNightConfirmationMillis)
+            delay(PlanFeedbackTiming.movieNightConfirmationMillis.milliseconds)
             sheetState.hide()
             onSaved(plan)
         }

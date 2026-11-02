@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface TmdbAccountRepository {
     fun observeAccountState(): Flow<TmdbAccountStateDataModel>
-
     fun observeMovieActivities(): Flow<List<TmdbMovieActivityDataModel>>
 
     fun observeLibraryLastSyncedAt(

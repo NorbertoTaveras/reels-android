@@ -7,7 +7,6 @@
 
 package com.norbertotaveras.reels.domain.model.person
 
-
 data class PersonMovieCreditsDataModel(
     val cast: List<PersonMovieCreditDataModel>
 )

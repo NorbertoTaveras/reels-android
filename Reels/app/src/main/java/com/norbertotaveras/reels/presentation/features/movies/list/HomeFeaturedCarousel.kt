@@ -57,6 +57,7 @@ import com.norbertotaveras.reels.presentation.ui.theme.reelsRatingContainerColor
 import java.util.Locale
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 internal fun FeaturedMovieCarousel(
@@ -71,7 +72,7 @@ internal fun FeaturedMovieCarousel(
         if (movieIds.size <= 1) return@LaunchedEffect
 
         while (isActive) {
-            delay(HERO_AUTO_SCROLL_DELAY_MS)
+            delay(HERO_AUTO_SCROLL_DELAY_MS.milliseconds)
             activeMovieIndex = (activeMovieIndex + 1) % movieIds.size
         }
     }

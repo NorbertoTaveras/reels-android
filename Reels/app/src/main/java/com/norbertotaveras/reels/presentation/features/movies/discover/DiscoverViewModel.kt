@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -273,7 +274,7 @@ class DiscoverViewModel @Inject constructor(
         }
 
         filterResultCountJob = viewModelScope.launch {
-            delay(DISCOVER_FILTER_COUNT_DEBOUNCE_MILLIS)
+            delay(DISCOVER_FILTER_COUNT_DEBOUNCE_MILLIS.milliseconds)
             getDiscoverMovieCountUseCase(
                 filters = filters,
                 language = language

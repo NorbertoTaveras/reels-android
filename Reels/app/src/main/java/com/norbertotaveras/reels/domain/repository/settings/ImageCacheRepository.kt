@@ -9,6 +9,5 @@ package com.norbertotaveras.reels.domain.repository.settings
 
 interface ImageCacheRepository {
     suspend fun getSizeBytes(): Long
-
     suspend fun clear(): Long
 }

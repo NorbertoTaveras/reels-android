@@ -7,7 +7,6 @@
 
 package com.norbertotaveras.reels.domain.model.person
 
-
 data class PersonDetailsDataModel(
     val id: Int,
     val name: String,

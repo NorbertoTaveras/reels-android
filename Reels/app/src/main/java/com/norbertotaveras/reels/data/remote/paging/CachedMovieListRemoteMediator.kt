@@ -46,8 +46,7 @@ internal class CachedMovieListRemoteMediator(
         }
 
         return try {
-            val page = pageFor(loadType = loadType)
-                ?: return MediatorResult.Success(endOfPaginationReached = true)
+            val page = pageFor(loadType = loadType) ?: return MediatorResult.Success(endOfPaginationReached = true)
             val response = loadPage(page)
             val now = System.currentTimeMillis()
             val endOfPaginationReached = page >= response.totalPages
@@ -85,7 +84,6 @@ internal class CachedMovieListRemoteMediator(
                     )
                 )
             }
-
             MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
         } catch (error: CancellationException) {
             throw error

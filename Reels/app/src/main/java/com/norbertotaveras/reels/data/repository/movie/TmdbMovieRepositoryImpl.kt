@@ -230,7 +230,6 @@ class TmdbMovieRepositoryImpl @Inject constructor(
                 } catch (error: CancellationException) {
                     throw error
                 } catch (_: Exception) {
-                    // A cache write must not hide a successful network response.
                 }
 
                 Result.success(

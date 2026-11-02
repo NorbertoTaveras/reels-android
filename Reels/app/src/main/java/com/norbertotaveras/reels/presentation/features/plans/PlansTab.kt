@@ -13,6 +13,8 @@ enum class PlansTab(val routeValue: String, val label: String) {
     ;
 
     companion object {
-        fun fromRoute(value: String?): PlansTab = entries.firstOrNull { it.routeValue == value } ?: Releases
+        fun fromRoute(value: String?): PlansTab = entries.firstOrNull {
+            it.routeValue == value
+        } ?: Releases
     }
 }

@@ -7,7 +7,6 @@
 
 package com.norbertotaveras.reels.domain.model.genre
 
-
 data class GenreDataModel(
     val id: Int,
     val name: String

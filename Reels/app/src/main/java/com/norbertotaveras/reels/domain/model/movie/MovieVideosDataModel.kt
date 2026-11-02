@@ -7,7 +7,6 @@
 
 package com.norbertotaveras.reels.domain.model.movie
 
-
 data class MovieVideosDataModel(
     val videos: List<MovieVideoDataModel>
 )

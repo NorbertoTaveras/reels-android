@@ -42,9 +42,7 @@ internal suspend fun <T> cachedTmdbResult(
         } catch (error: CancellationException) {
             throw error
         } catch (_: Exception) {
-            // A cache write must not hide a successful network response.
         }
-
         Result.success(remote)
     }
 }
@@ -58,7 +56,5 @@ private suspend fun <T> cachedResultOrFailure(
     } catch (_: Exception) {
         null
     }
-
-    return cached?.let(Result.Companion::success)
-        ?: Result.failure(error.toTmdbNetworkException())
+    return cached?.let(Result.Companion::success) ?: Result.failure(error.toTmdbNetworkException())
 }

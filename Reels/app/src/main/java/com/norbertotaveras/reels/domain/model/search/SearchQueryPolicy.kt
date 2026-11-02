@@ -9,8 +9,6 @@ package com.norbertotaveras.reels.domain.model.search
 
 object SearchQueryPolicy {
     const val MIN_LENGTH = 2
-
     fun normalize(query: String): String = query.trim()
-
     fun isValid(query: String): Boolean = normalize(query).length >= MIN_LENGTH
 }

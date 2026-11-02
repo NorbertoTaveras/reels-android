@@ -22,6 +22,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import androidx.core.graphics.createBitmap
 
 internal object WidgetPosterLoader {
     suspend fun load(context: Context, posterPath: String?): Bitmap? = withContext(Dispatchers.IO) {
@@ -43,7 +44,7 @@ internal object WidgetPosterLoader {
 
     fun createBackdrop(source: Bitmap?, width: Int = 720, height: Int = 204): Bitmap? {
         source ?: return null
-        val output = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val output = createBitmap(width, height)
         val canvas = Canvas(output)
         val scale = maxOf(width.toFloat() / source.width, height.toFloat() / source.height)
         val scaledWidth = (source.width * scale).toInt()
@@ -55,7 +56,6 @@ internal object WidgetPosterLoader {
             Rect(left, 0, left + scaledWidth, scaledHeight),
             Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG),
         )
-        // Glance cannot draw gradients, so bake the reference image treatment into the bitmap.
         canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), Paint().apply {
             shader = LinearGradient(
                 0f, height * BACKDROP_GRADIENT_START, 0f, height.toFloat(),

@@ -45,7 +45,10 @@ class MovieNightActionReceiver : BroadcastReceiver() {
                     PlanAlarmContract.ActionMovieNightProgress -> Result.success(Unit)
                     else -> Result.failure(IllegalArgumentException("Unsupported Movie Night action."))
                 }
-                if (mutationResult.isFailure) return@launch
+
+                if (mutationResult.isFailure)
+                    return@launch
+
                 val plan = movieNights.getMovieNights().firstOrNull { it.id == planId } ?: return@launch
                 when (intent.action) {
                     PlanAlarmContract.ActionMovieNightFinish -> notifications.showMovieNightCompleted(plan)

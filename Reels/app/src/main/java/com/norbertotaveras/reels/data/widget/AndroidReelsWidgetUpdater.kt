@@ -30,7 +30,6 @@ class AndroidReelsWidgetUpdater @Inject constructor(
 
     private suspend fun refresh(widget: GlanceAppWidget) {
         GlanceAppWidgetManager(context).getGlanceIds(widget.javaClass).forEach { id ->
-            // Invalidate time-derived labels even when Room has no new values to emit.
             updateAppWidgetState(context, id) { preferences ->
                 preferences[RefreshRevision] = (preferences[RefreshRevision] ?: 0L) + 1L
             }

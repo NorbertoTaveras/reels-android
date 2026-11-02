@@ -7,7 +7,6 @@
 
 package com.norbertotaveras.reels.domain.model.movie
 
-
 data class MovieVideoDataModel(
     val id: String,
     val name: String,
@@ -33,7 +32,6 @@ data class MovieVideoDataModel(
     val isPlayableTrailer: Boolean
         get() {
             val supportedTypes = setOf("Trailer", "Teaser")
-
             return site.equals("YouTube", ignoreCase = true) &&
                     supportedTypes.any { supportedType ->
                         type.equals(supportedType, ignoreCase = true)

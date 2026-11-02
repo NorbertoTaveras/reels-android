@@ -102,8 +102,7 @@ class TmdbPersonRepositoryImpl @Inject constructor(
             },
             loadCached = {
                 if (cachedContentDao.hasContent(cacheKey, CachedContentType.PERSON_CREDITS)) {
-                    cachedContentDao.getPersonMovieCredits(cacheKey = cacheKey)
-                        .toCachedPersonMovieCreditsDataModel()
+                    cachedContentDao.getPersonMovieCredits(cacheKey = cacheKey).toCachedPersonMovieCreditsDataModel()
                 } else {
                     null
                 }

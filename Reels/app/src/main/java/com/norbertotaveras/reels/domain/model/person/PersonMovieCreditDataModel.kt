@@ -7,7 +7,6 @@
 
 package com.norbertotaveras.reels.domain.model.person
 
-
 data class PersonMovieCreditDataModel(
     val id: Int,
     val title: String,
