@@ -45,7 +45,6 @@ fun MovieDetailsContent(
     cachedAt: Long? = null,
     savedPersonIds: Set<Int> = emptySet(),
     savingPersonIds: Set<Int> = emptySet(),
-    isTmdbAccountConnected: Boolean = false,
     isWatchlisted: Boolean = false,
     tmdbRating: Double? = null,
     isAccountActionLoading: Boolean = false,
@@ -222,7 +221,6 @@ private fun MovieDetailsContentPreview() {
                     GenreDataModel(id = 3, name = "Drama")
                 )
             ),
-            isTmdbAccountConnected = true,
             isWatchlisted = true,
             tmdbRating = 8.0,
             savedPersonIds = setOf(1),

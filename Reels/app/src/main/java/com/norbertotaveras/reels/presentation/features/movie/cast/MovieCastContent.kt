@@ -32,7 +32,7 @@ internal fun MovieCastStateContent(
         state.errorMessage != null -> {
             MovieCastErrorState(
                 modifier = modifier,
-                message = state.errorMessage ?: "Unable to load full cast.",
+                message = state.errorMessage,
                 retryLabel = "Retry",
                 onBackClick = {
                     onEvent(MovieCastEvent.BackClicked)

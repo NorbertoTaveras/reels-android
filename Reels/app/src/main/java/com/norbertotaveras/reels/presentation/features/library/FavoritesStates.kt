@@ -45,7 +45,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.R
 import com.norbertotaveras.reels.presentation.ui.components.common.MessageState
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions

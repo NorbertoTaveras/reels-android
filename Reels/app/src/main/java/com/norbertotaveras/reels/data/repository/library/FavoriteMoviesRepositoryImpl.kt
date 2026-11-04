@@ -11,7 +11,6 @@ import com.norbertotaveras.reels.data.local.library.dao.FavoriteMovieDao
 import com.norbertotaveras.reels.data.local.library.mapper.toFavoriteMovieDataModel
 import com.norbertotaveras.reels.data.local.library.mapper.toFavoriteMovieEntity
 import com.norbertotaveras.reels.data.local.library.mapper.toMovieDetailsDataModel
-import com.norbertotaveras.reels.data.local.movie.mapper.toMovieDetailsDataModel
 import com.norbertotaveras.reels.data.repository.repositoryResult
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
 import com.norbertotaveras.reels.domain.library.model.FavoriteMovieDataModel

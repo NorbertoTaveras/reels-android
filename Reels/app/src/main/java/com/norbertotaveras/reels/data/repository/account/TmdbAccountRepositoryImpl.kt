@@ -254,15 +254,15 @@ class TmdbAccountRepositoryImpl @Inject constructor(
     ): Result<TmdbMovieAccountStateDataModel> {
         return accountResult(clearAccountOnExpiredSession = true) {
             val accountState = requireConnectedAccountState()
+            val accountId = accountState.account?.accountId
+                ?: error("TMDB account details are unavailable.")
             remoteDataSource.updateWatchlist(
-                accountId = accountState.account?.accountId
-                    ?: error("TMDB account details are unavailable."),
+                accountId = accountId,
                 sessionId = accountState.sessionId
                     ?: error("TMDB session is unavailable."),
                 movieId = movieId,
                 watchlist = watchlist
             )
-            val accountId = accountState.account?.accountId ?: error("TMDB account details are unavailable.")
             val cached = cachedContentDao.getMovieAccountState(accountId, movieId)
                 ?.toTmdbMovieAccountStateDataModel()
                 ?: TmdbMovieAccountStateDataModel(

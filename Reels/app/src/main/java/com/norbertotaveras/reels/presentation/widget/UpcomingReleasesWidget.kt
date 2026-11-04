@@ -264,9 +264,9 @@ private fun ExpandedReleaseRow(
             title = release.title,
             poster = poster,
             width = posterHeight * if (primary) {
-                PlanWidgetDimensions.ReleasePosterAspectRatio
+                PlanWidgetDimensions.RELEASE_POSTER_ASPECT_RATIO
             } else {
-                PlanWidgetDimensions.SecondaryReleasePosterAspectRatio
+                PlanWidgetDimensions.SECONDARY_RELEASE_POSTER_ASPECT_RATIO
             },
             height = posterHeight,
         )

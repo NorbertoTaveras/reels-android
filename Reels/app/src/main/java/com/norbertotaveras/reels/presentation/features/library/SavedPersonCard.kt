@@ -23,7 +23,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material.icons.filled.Work
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -67,7 +66,7 @@ internal fun SavedPersonCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(ReelsRatios.castPortrait)
+                    .aspectRatio(ReelsRatios.CAST_PORTRAIT)
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 PersonProfileImage(

@@ -7,7 +7,6 @@
 
 package com.norbertotaveras.reels.presentation.features.library
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -51,9 +50,7 @@ internal fun TmdbAccountMovieCard(
                 when (listType) {
                     TmdbLibraryList.Watchlist -> TmdbBadge()
                     TmdbLibraryList.Rated -> UserRatingBadge(
-                        rating = movie.accountRating?.let { rating ->
-                            rating.toRatingText()
-                        }.orEmpty()
+                        rating = movie.accountRating?.toRatingText().orEmpty()
                     )
                 }
             },

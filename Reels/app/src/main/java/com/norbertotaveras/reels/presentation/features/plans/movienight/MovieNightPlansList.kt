@@ -339,13 +339,13 @@ private fun PlanSectionHeading(label: String) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(ReelsDimensions.plansRowSpacing),
     ) {
-        androidx.compose.material3.HorizontalDivider(modifier = Modifier.weight(1f))
+        HorizontalDivider(modifier = Modifier.weight(1f))
         Text(
             label,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        androidx.compose.material3.HorizontalDivider(modifier = Modifier.weight(1f))
+        HorizontalDivider(modifier = Modifier.weight(1f))
     }
 }
 

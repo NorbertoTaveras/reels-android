@@ -31,7 +31,7 @@ internal fun CastDetailsStateContent(
         state.errorMessage != null -> {
             CastDetailsErrorState(
                 modifier = modifier,
-                message = state.errorMessage ?: "Unable to load cast details.",
+                message = state.errorMessage,
                 retryLabel = "Retry",
                 onBackClick = {
                     onEvent(CastDetailsEvent.BackClicked)

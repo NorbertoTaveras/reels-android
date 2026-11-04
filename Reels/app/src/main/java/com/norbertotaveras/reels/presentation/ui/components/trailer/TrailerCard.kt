@@ -62,7 +62,7 @@ fun TrailerCard(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(ReelsRatios.trailer),
+                .aspectRatio(ReelsRatios.TRAILER),
             shape = MaterialTheme.shapes.large,
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -74,7 +74,7 @@ fun TrailerCard(
                     contentDescription = title,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(ReelsRatios.trailer)
+                        .aspectRatio(ReelsRatios.TRAILER)
                         .clip(MaterialTheme.shapes.large),
                     contentScale = ContentScale.Crop
                 )
@@ -82,7 +82,7 @@ fun TrailerCard(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(ReelsRatios.trailer)
+                        .aspectRatio(ReelsRatios.TRAILER)
                         .background(MaterialTheme.colorScheme.background.copy(alpha = 0.30f))
                 )
 

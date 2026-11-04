@@ -125,7 +125,7 @@ internal fun ReleasePlanForm(
     val isTracked = trackedRelease != null
     val maxHeight =
         with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() } *
-            ReelsDimensions.movieNightSheetMaxHeightFraction -
+            ReelsDimensions.MOVIE_NIGHT_SHEET_MAX_HEIGHT_FRACTION -
             ReelsDimensions.movieNightSheetHandleTopPadding -
             ReelsDimensions.movieNightSheetHandleHeight -
             ReelsDimensions.movieNightSheetHandleBottomPadding
@@ -506,9 +506,8 @@ internal fun PlanPermissionNotice(
 
 private fun LocalDate?.releaseSummary(): String {
     if (this == null) return "Release date: TBA"
-    val days = ChronoUnit.DAYS.between(LocalDate.now(), this)
     val relative =
-        when (days) {
+        when (val days = ChronoUnit.DAYS.between(LocalDate.now(), this)) {
             0L -> "today"
             1L -> "1 day away"
             else -> if (days > 1) "$days days away" else "released"

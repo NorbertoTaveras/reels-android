@@ -66,7 +66,7 @@ fun MoviePlansSheet(
     LaunchedEffect(mode, state.movieNightPlan?.id) {
         if (mode == MoviePlansSheetMode.MovieNightConfirmation) {
             val plan = state.movieNightPlan ?: return@LaunchedEffect
-            delay(PlanFeedbackTiming.movieNightConfirmationMillis.milliseconds)
+            delay(PlanFeedbackTiming.MOVIE_NIGHT_CONFIRMATION_MILLIS.milliseconds)
             sheetState.hide()
             onSaved(plan)
         }

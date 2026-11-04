@@ -22,7 +22,6 @@ internal data class WidgetArtwork<Key>(
 @Composable
 internal fun <Key> rememberWidgetArtwork(context: Context, paths: Map<Key, String?>): WidgetArtwork<Key> {
     val artwork by produceState(WidgetArtwork<Key>(), context, paths) {
-        // Publish each image independently so a slow download cannot hold up plan state changes.
         val posters = mutableMapOf<Key, Bitmap?>()
         value = WidgetArtwork()
         paths.forEach { (id, path) ->

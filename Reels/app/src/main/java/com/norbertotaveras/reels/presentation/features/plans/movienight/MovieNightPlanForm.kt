@@ -122,7 +122,7 @@ internal fun MovieNightPlanForm(
     val isValid = runtimeValue in 1..600 && scheduledAt > System.currentTimeMillis()
     val maxHeight =
         with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() } *
-            ReelsDimensions.movieNightSheetMaxHeightFraction -
+            ReelsDimensions.MOVIE_NIGHT_SHEET_MAX_HEIGHT_FRACTION -
             ReelsDimensions.movieNightSheetHandleTopPadding -
             ReelsDimensions.movieNightSheetHandleHeight -
             ReelsDimensions.movieNightSheetHandleBottomPadding

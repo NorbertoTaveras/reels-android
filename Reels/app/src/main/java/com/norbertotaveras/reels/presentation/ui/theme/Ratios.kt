@@ -8,8 +8,8 @@
 package com.norbertotaveras.reels.presentation.ui.theme
 
 object ReelsRatios {
-    const val poster = 2f / 3f
-    const val backdrop = 16f / 9f
-    const val trailer = 16f / 9f
-    const val castPortrait = 1f
+    const val POSTER = 2f / 3f
+    const val BACKDROP = 16f / 9f
+    const val TRAILER = 16f / 9f
+    const val CAST_PORTRAIT = 1f
 }

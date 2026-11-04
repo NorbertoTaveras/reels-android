@@ -23,6 +23,7 @@ import com.norbertotaveras.reels.domain.search.usecase.SaveRecentSearchUseCase
 import com.norbertotaveras.reels.domain.settings.usecase.ObserveSettingsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -50,7 +51,7 @@ class SearchViewModel @Inject constructor(
     private val observeSearchCacheTimestampUseCase: ObserveSearchCacheTimestampUseCase,
     private val loadSearchMetadataUseCase: LoadSearchMetadataUseCase,
     private val observeNetworkConnectivityUseCase: ObserveNetworkConnectivityUseCase,
-    private val observeSettingsUseCase: ObserveSettingsUseCase,
+    observeSettingsUseCase: ObserveSettingsUseCase,
     private val saveRecentSearchUseCase: SaveRecentSearchUseCase,
     private val removeRecentSearchUseCase: RemoveRecentSearchUseCase,
     private val clearRecentSearchesUseCase: ClearRecentSearchesUseCase,
@@ -71,7 +72,7 @@ class SearchViewModel @Inject constructor(
     @OptIn(FlowPreview::class)
     val searchResults: Flow<PagingData<MovieDataModel>> = state
         .map { uiState -> uiState.query.trim() to uiState.language }
-        .debounce(SEARCH_DEBOUNCE_MILLIS)
+        .debounce(SEARCH_DEBOUNCE_MILLIS.milliseconds)
         .distinctUntilChanged()
         .flatMapLatest { (query, language) ->
             if (!SearchQueryPolicy.isValid(query = query)) {

@@ -44,7 +44,7 @@ internal fun LibraryPosterPlaceholder(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(ReelsRatios.poster)
+                .aspectRatio(ReelsRatios.POSTER)
                 .clip(RoundedCornerShape(ReelsDimensions.posterGridPlaceholderCornerSize))
                 .background(reelsPlaceholderColor())
         )
@@ -56,7 +56,7 @@ internal fun LibraryPosterPlaceholder(
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(ReelsDimensions.posterGridPlaceholderTitleWidthFraction)
+                    .fillMaxWidth(ReelsDimensions.POSTER_GRID_PLACEHOLDER_TITLE_WIDTH_FRACTION)
                     .height(ReelsDimensions.posterGridPlaceholderTitleHeight)
                     .clip(
                         RoundedCornerShape(ReelsDimensions.posterGridPlaceholderBarCornerSize)
@@ -66,7 +66,7 @@ internal fun LibraryPosterPlaceholder(
 
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(ReelsDimensions.posterGridPlaceholderYearWidthFraction)
+                    .fillMaxWidth(ReelsDimensions.POSTER_GRID_PLACEHOLDER_YEAR_WIDTH_FRACTION)
                     .height(ReelsDimensions.posterGridPlaceholderYearHeight)
                     .clip(
                         RoundedCornerShape(ReelsDimensions.posterGridPlaceholderBarCornerSize)
@@ -88,7 +88,7 @@ internal fun LibraryPersonPlaceholder(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(ReelsRatios.castPortrait)
+                .aspectRatio(ReelsRatios.CAST_PORTRAIT)
                 .clip(RoundedCornerShape(ReelsDimensions.favoritesPosterCornerSize))
                 .background(reelsPlaceholderColor())
         )

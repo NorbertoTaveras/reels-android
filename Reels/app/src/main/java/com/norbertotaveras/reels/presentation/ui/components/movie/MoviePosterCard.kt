@@ -61,7 +61,7 @@ fun MoviePosterCard(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(ReelsRatios.poster),
+                .aspectRatio(ReelsRatios.POSTER),
             shape = posterShape,
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -73,7 +73,7 @@ fun MoviePosterCard(
                     contentDescription = title,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(ReelsRatios.poster)
+                        .aspectRatio(ReelsRatios.POSTER)
                         .clip(posterShape),
                     contentScale = ContentScale.Crop
                 )

@@ -87,7 +87,7 @@ fun MovieResultRow(
                 contentDescription = title,
                 modifier = Modifier
                     .width(ReelsDimensions.searchResultPosterWidth)
-                    .aspectRatio(ReelsRatios.poster)
+                    .aspectRatio(ReelsRatios.POSTER)
                     .clip(MaterialTheme.shapes.medium)
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentScale = ContentScale.Crop
@@ -164,7 +164,7 @@ private fun MovieResultMetadataRow(
     ) {
         if (hasYear) {
             Text(
-                text = releaseYear.orEmpty(),
+                text = releaseYear,
                 style = MaterialTheme.typography.bodySmall.copy(
                     fontSize = 12.sp,
                     lineHeight = 16.sp
@@ -194,7 +194,7 @@ private fun MovieResultMetadataRow(
             )
 
             Text(
-                text = secondaryMetadata.orEmpty(),
+                text = secondaryMetadata,
                 style = MaterialTheme.typography.bodySmall.copy(
                     fontSize = 12.sp,
                     lineHeight = 16.sp

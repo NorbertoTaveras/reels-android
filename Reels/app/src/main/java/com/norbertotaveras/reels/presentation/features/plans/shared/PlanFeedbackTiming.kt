@@ -8,5 +8,5 @@
 package com.norbertotaveras.reels.presentation.features.plans.shared
 
 internal object PlanFeedbackTiming {
-    const val movieNightConfirmationMillis = 1_600L
+    const val MOVIE_NIGHT_CONFIRMATION_MILLIS = 1_600L
 }

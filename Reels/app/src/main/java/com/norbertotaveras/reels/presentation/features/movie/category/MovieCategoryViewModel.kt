@@ -11,7 +11,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import com.norbertotaveras.reels.domain.movie.model.MovieCategory
 import com.norbertotaveras.reels.domain.movie.usecase.GetMoviesUseCase
 import com.norbertotaveras.reels.domain.settings.usecase.ObserveSettingsUseCase
 import com.norbertotaveras.reels.presentation.navigation.ReelsDestinations

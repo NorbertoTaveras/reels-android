@@ -74,7 +74,7 @@ internal fun SettingsDialog(
                 Modifier.fillMaxSize()
                     .background(
                         MaterialTheme.colorScheme.background.copy(
-                            alpha = ReelsDimensions.settingsDialogBackdropAlpha
+                            alpha = ReelsDimensions.SETTINGS_DIALOG_BACKDROP_ALPHA
                         )
                     )
                     .padding(horizontal = ReelsSpacing.xLarge),
@@ -174,10 +174,12 @@ private fun SettingsDialogWindowEffects() {
     DisposableEffect(view, blurRadius) {
         val window = (view.parent as? DialogWindowProvider)?.window
 
-        window?.setDimAmount(0f)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            window?.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
-            window?.attributes = window?.attributes?.apply { blurBehindRadius = blurRadius }
+        window?.let { dialogWindow ->
+            dialogWindow.setDimAmount(0f)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                dialogWindow.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
+                dialogWindow.attributes = dialogWindow.attributes.apply { blurBehindRadius = blurRadius }
+            }
         }
 
         onDispose {

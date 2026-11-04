@@ -55,17 +55,17 @@ constructor(
         systemManager.createNotificationChannels(
             listOf(
                 NotificationChannel(
-                    PlanNotificationContract.ReleaseChannelId,
+                    PlanNotificationContract.RELEASE_CHANNEL_ID,
                     context.getString(R.string.notification_channel_releases),
                     NotificationManager.IMPORTANCE_DEFAULT,
                 ),
                 NotificationChannel(
-                    PlanNotificationContract.MovieNightChannelId,
+                    PlanNotificationContract.MOVIE_NIGHT_CHANNEL_ID,
                     context.getString(R.string.notification_channel_movie_nights),
                     NotificationManager.IMPORTANCE_DEFAULT,
                 ),
                 NotificationChannel(
-                    PlanNotificationContract.JourneyChannelId,
+                    PlanNotificationContract.JOURNEY_CHANNEL_ID,
                     context.getString(R.string.notification_channel_movie_night_progress),
                     NotificationManager.IMPORTANCE_LOW,
                 ),
@@ -76,9 +76,9 @@ constructor(
     override fun showReleaseReminder(release: TrackedRelease) {
         if (!canPostNotifications()) return
         postNotification(
-            PlanNotificationContract.ReleaseNotificationOffset + release.movieId,
+            PlanNotificationContract.RELEASE_NOTIFICATION_OFFSET + release.movieId,
             baseBuilder(
-                    PlanNotificationContract.ReleaseChannelId,
+                    PlanNotificationContract.RELEASE_CHANNEL_ID,
                     release.title,
                     PlanNotificationFormatter.releaseContent(context, release),
                     movieIntent(release.movieId),
@@ -91,13 +91,13 @@ constructor(
         if (!canPostNotifications()) return
         val builder =
             baseBuilder(
-                PlanNotificationContract.MovieNightChannelId,
+                PlanNotificationContract.MOVIE_NIGHT_CHANNEL_ID,
                 context.getString(R.string.movie_night_reminder_title, plan.title),
                 context.getString(
                     R.string.movie_night_notification_time,
                     PlanNotificationFormatter.movieNightTime(plan),
                 ),
-                plansIntent(PlanNotificationContract.MovieNightsTab),
+                plansIntent(PlanNotificationContract.MOVIE_NIGHTS_TAB),
             )
         if (plan.canStartJourney()) builder.addAction(startAction(plan.id))
         postNotification(movieNightReminderNotificationId(plan.id), builder.build())
@@ -147,8 +147,8 @@ constructor(
                     ),
                     actionIntent(
                         plan.id,
-                        if (isPaused) PlanAlarmContract.ActionMovieNightResume
-                        else PlanAlarmContract.ActionMovieNightPause,
+                        if (isPaused) PlanAlarmContract.ACTION_MOVIE_NIGHT_RESUME
+                        else PlanAlarmContract.ACTION_MOVIE_NIGHT_PAUSE,
                     ),
                 )
                 .build()
@@ -156,26 +156,26 @@ constructor(
             NotificationCompat.Action.Builder(
                     0,
                     context.getString(R.string.movie_night_finish),
-                    actionIntent(plan.id, PlanAlarmContract.ActionMovieNightFinish),
+                    actionIntent(plan.id, PlanAlarmContract.ACTION_MOVIE_NIGHT_FINISH),
                 )
                 .build()
         val endAction =
             NotificationCompat.Action.Builder(
                     0,
                     context.getString(R.string.movie_night_end),
-                    actionIntent(plan.id, PlanAlarmContract.ActionMovieNightEnd),
+                    actionIntent(plan.id, PlanAlarmContract.ACTION_MOVIE_NIGHT_END),
                 )
                 .build()
         val builder =
             baseBuilder(
-                    PlanNotificationContract.JourneyChannelId,
+                    PlanNotificationContract.JOURNEY_CHANNEL_ID,
                     plan.title,
                     context.getString(
                         if (isPaused) R.string.movie_night_progress_paused
                         else R.string.movie_night_progress_playing,
                         progress,
                     ),
-                    plansIntent(PlanNotificationContract.MovieNightsTab),
+                    plansIntent(PlanNotificationContract.MOVIE_NIGHTS_TAB),
                 )
                 .addAction(toggleAction)
                 .addAction(finishAction)
@@ -191,10 +191,10 @@ constructor(
         postNotification(
             movieNightJourneyNotificationId(plan.id),
             baseBuilder(
-                    PlanNotificationContract.MovieNightChannelId,
+                    PlanNotificationContract.MOVIE_NIGHT_CHANNEL_ID,
                     plan.title,
                     context.getString(R.string.movie_night_completed),
-                    plansIntent(PlanNotificationContract.MovieNightsTab),
+                    plansIntent(PlanNotificationContract.MOVIE_NIGHTS_TAB),
                 )
                 .setOngoing(false)
                 .build(),
@@ -240,17 +240,17 @@ constructor(
 
     private fun movieIntent(movieId: Int): PendingIntent =
         activityIntent(
-            requestCode = PlanNotificationContract.MovieRequestOffset + movieId,
+            requestCode = PlanNotificationContract.MOVIE_REQUEST_OFFSET + movieId,
             uri = "reels://movie/$movieId",
         )
 
     private fun plansIntent(tab: String): PendingIntent =
         activityIntent(
             requestCode =
-                if (tab == PlanNotificationContract.ReleasesTab) {
-                    PlanNotificationContract.ReleasesRequestCode
+                if (tab == PlanNotificationContract.RELEASES_TAB) {
+                    PlanNotificationContract.RELEASES_REQUEST_CODE
                 } else {
-                    PlanNotificationContract.MovieNightsRequestCode
+                    PlanNotificationContract.MOVIE_NIGHTS_REQUEST_CODE
                 },
             uri = "reels://plans?tab=$tab",
         )
@@ -269,15 +269,15 @@ constructor(
             action.hashCode() + planId.hashCode(),
             Intent(context, MovieNightActionReceiver::class.java)
                 .setAction(action)
-                .putExtra(PlanAlarmContract.ExtraPlanId, planId),
+                .putExtra(PlanAlarmContract.EXTRA_PLAN_ID, planId),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
     private fun movieNightReminderNotificationId(planId: String): Int =
-        PlanNotificationContract.MovieNightReminderOffset + planId.hashCode()
+        PlanNotificationContract.MOVIE_NIGHT_REMINDER_OFFSET + planId.hashCode()
 
     private fun movieNightJourneyNotificationId(planId: String): Int =
-        PlanNotificationContract.MovieNightJourneyOffset + planId.hashCode()
+        PlanNotificationContract.MOVIE_NIGHT_JOURNEY_OFFSET + planId.hashCode()
 
     private fun scheduleProgressTick(planId: String) {
         val alarmManager = context.getSystemService(AlarmManager::class.java)
@@ -295,10 +295,10 @@ constructor(
     private fun progressPendingIntent(planId: String): PendingIntent =
         PendingIntent.getBroadcast(
             context,
-            PlanNotificationContract.ProgressRequestOffset + planId.hashCode(),
+            PlanNotificationContract.PROGRESS_REQUEST_OFFSET + planId.hashCode(),
             Intent(context, MovieNightActionReceiver::class.java)
-                .setAction(PlanAlarmContract.ActionMovieNightProgress)
-                .putExtra(PlanAlarmContract.ExtraPlanId, planId),
+                .setAction(PlanAlarmContract.ACTION_MOVIE_NIGHT_PROGRESS)
+                .putExtra(PlanAlarmContract.EXTRA_PLAN_ID, planId),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
@@ -314,10 +314,10 @@ constructor(
         progress: Int,
     ): NotificationCompat.Builder =
         baseBuilder(
-                PlanNotificationContract.JourneyChannelId,
+                PlanNotificationContract.JOURNEY_CHANNEL_ID,
                 plan.title,
                 content,
-                plansIntent(PlanNotificationContract.MovieNightsTab),
+                plansIntent(PlanNotificationContract.MOVIE_NIGHTS_TAB),
             )
             .also { applyJourneyStyle(it, progress) }
 
@@ -333,7 +333,7 @@ constructor(
                 NotificationCompat.ProgressStyle()
                     .addProgressSegment(
                         NotificationCompat.ProgressStyle.Segment(
-                                PlanNotificationContract.ProgressMax
+                                PlanNotificationContract.PROGRESS_MAX
                             )
                             .setColor(accent)
                     )
@@ -347,7 +347,7 @@ constructor(
                 builder.setRequestPromotedOngoing(true)
             }
         } else {
-            builder.setProgress(PlanNotificationContract.ProgressMax, progress, false)
+            builder.setProgress(PlanNotificationContract.PROGRESS_MAX, progress, false)
         }
     }
 
@@ -355,7 +355,7 @@ constructor(
         NotificationCompat.Action.Builder(
                 0,
                 context.getString(R.string.movie_night_start_now),
-                actionIntent(planId, PlanAlarmContract.ActionMovieNightStart),
+                actionIntent(planId, PlanAlarmContract.ACTION_MOVIE_NIGHT_START),
             )
             .build()
 }

@@ -37,5 +37,4 @@ val FavoritesUiState.selectedItemCount: Int
 val FavoritesUiState.hasSelectedTabItems: Boolean
     get() = selectedTab == LibraryTab.Tmdb || selectedTab == LibraryTab.Rated || selectedItemCount > 0
 
-val FavoritesUiState.librarySubtitle: String
-    get() = "Your saved movies, people & TMDB activity"
+internal const val LIBRARY_SUBTITLE = "Your saved movies, people & TMDB activity"

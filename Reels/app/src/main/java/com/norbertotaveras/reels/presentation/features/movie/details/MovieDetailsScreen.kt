@@ -31,7 +31,7 @@ fun MovieDetailsScreen(
         state.errorMessage != null -> {
             MovieDetailsErrorState(
                 modifier = modifier,
-                message = state.errorMessage ?: "Unable to load movie details.",
+                message = state.errorMessage,
                 retryLabel = "Retry",
                 onBackClick = {
                     onEvent(MovieDetailsEvent.BackClicked)
@@ -56,7 +56,6 @@ fun MovieDetailsScreen(
                 cachedAt = state.cachedAt,
                 savedPersonIds = state.savedPersonIds,
                 savingPersonIds = state.savingPersonIds,
-                isTmdbAccountConnected = state.isTmdbAccountConnected,
                 isWatchlisted = state.isWatchlisted,
                 tmdbRating = state.tmdbRating,
                 isAccountActionLoading = state.isAccountActionLoading,

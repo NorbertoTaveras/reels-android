@@ -91,7 +91,7 @@ internal fun MovieDetailsLoadingState(
                         .align(Alignment.BottomStart)
                         .padding(start = ReelsSpacing.screenHorizontal, bottom = ReelsSpacing.large)
                         .width(ReelsDimensions.detailsPosterWidth)
-                        .aspectRatio(ReelsRatios.poster)
+                        .aspectRatio(ReelsRatios.POSTER)
                 )
 
                 Column(

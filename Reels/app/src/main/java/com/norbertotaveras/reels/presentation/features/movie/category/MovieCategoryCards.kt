@@ -34,7 +34,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.movie.model.MovieDataModel
@@ -55,19 +54,19 @@ internal fun MovieCategoryPlaceholderCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(ReelsRatios.poster)
+                .aspectRatio(ReelsRatios.POSTER)
                 .clip(RoundedCornerShape(ReelsDimensions.posterGridPlaceholderCornerSize))
                 .background(reelsPlaceholderColor())
         )
 
         Spacer(modifier = Modifier.height(ReelsDimensions.posterGridPlaceholderPosterToTitleSpacing))
         CategoryPlaceholderBar(
-            widthFraction = ReelsDimensions.posterGridPlaceholderTitleWidthFraction,
+            widthFraction = ReelsDimensions.POSTER_GRID_PLACEHOLDER_TITLE_WIDTH_FRACTION,
             height = ReelsDimensions.posterGridPlaceholderTitleHeight
         )
         Spacer(modifier = Modifier.height(ReelsDimensions.posterGridPlaceholderTitleToYearSpacing))
         CategoryPlaceholderBar(
-            widthFraction = ReelsDimensions.posterGridPlaceholderYearWidthFraction,
+            widthFraction = ReelsDimensions.POSTER_GRID_PLACEHOLDER_YEAR_WIDTH_FRACTION,
             height = ReelsDimensions.posterGridPlaceholderYearHeight
         )
     }
@@ -98,7 +97,7 @@ internal fun MovieCategoryPosterCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(ReelsRatios.poster)
+                .aspectRatio(ReelsRatios.POSTER)
                 .clip(RoundedCornerShape(ReelsDimensions.categoryPosterCornerSize))
         ) {
             AsyncImage(

@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -44,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import com.norbertotaveras.reels.domain.discover.model.hasActiveFilters
 import com.norbertotaveras.reels.domain.movie.model.MovieDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.LoadMoreErrorState
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions

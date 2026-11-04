@@ -36,10 +36,10 @@ class PlanAlarmReceiver : BroadcastReceiver() {
         CoroutineScope(SupervisorJob() + ioDispatcher).launch {
             try {
                 when (intent.action) {
-                    PlanAlarmContract.ActionReleaseReminder -> showRelease(intent)
-                    PlanAlarmContract.ActionMovieNightReminder -> showMovieNight(intent)
-                    PlanAlarmContract.ActionMovieNightCountdown -> startMovieNightCountdown(intent)
-                    PlanAlarmContract.ActionMovieNightMissed -> markMovieNightMissed(intent)
+                    PlanAlarmContract.ACTION_RELEASE_REMINDER -> showRelease(intent)
+                    PlanAlarmContract.ACTION_MOVIE_NIGHT_REMINDER -> showMovieNight(intent)
+                    PlanAlarmContract.ACTION_MOVIE_NIGHT_COUNTDOWN -> startMovieNightCountdown(intent)
+                    PlanAlarmContract.ACTION_MOVIE_NIGHT_MISSED -> markMovieNightMissed(intent)
                 }
                 widgetUpdater.updateAll()
             } finally {
@@ -49,21 +49,21 @@ class PlanAlarmReceiver : BroadcastReceiver() {
     }
 
     private suspend fun showRelease(intent: Intent) {
-        val movieId = intent.getIntExtra(PlanAlarmContract.ExtraMovieId, -1)
+        val movieId = intent.getIntExtra(PlanAlarmContract.EXTRA_MOVIE_ID, -1)
         releases.getTrackedReleases().firstOrNull { it.movieId == movieId }?.let {
             notifications.showReleaseReminder(it)
         }
     }
 
     private suspend fun showMovieNight(intent: Intent) {
-        val planId = intent.getStringExtra(PlanAlarmContract.ExtraPlanId) ?: return
+        val planId = intent.getStringExtra(PlanAlarmContract.EXTRA_PLAN_ID) ?: return
         movieNights.getMovieNights().firstOrNull { it.id == planId }?.let {
             notifications.showMovieNightReminder(it)
         }
     }
 
     private suspend fun startMovieNightCountdown(intent: Intent) {
-        val planId = intent.getStringExtra(PlanAlarmContract.ExtraPlanId) ?: return
+        val planId = intent.getStringExtra(PlanAlarmContract.EXTRA_PLAN_ID) ?: return
         if (movieNights.markStartingSoon(planId).isFailure) return
         movieNights.getMovieNights().firstOrNull { it.id == planId }?.let {
             notifications.showMovieNightCountdown(it)
@@ -71,7 +71,7 @@ class PlanAlarmReceiver : BroadcastReceiver() {
     }
 
     private suspend fun markMovieNightMissed(intent: Intent) {
-        val planId = intent.getStringExtra(PlanAlarmContract.ExtraPlanId) ?: return
+        val planId = intent.getStringExtra(PlanAlarmContract.EXTRA_PLAN_ID) ?: return
         if (movieNights.markMissed(planId).isSuccess) {
             notifications.cancelMovieNightProgress(planId)
         }

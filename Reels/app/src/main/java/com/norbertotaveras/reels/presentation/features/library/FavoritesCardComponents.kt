@@ -25,7 +25,6 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -184,7 +183,7 @@ internal fun LibraryPosterCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .aspectRatio(ReelsRatios.poster),
+            .aspectRatio(ReelsRatios.POSTER),
         shape = RoundedCornerShape(ReelsDimensions.favoritesPosterCornerSize),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant

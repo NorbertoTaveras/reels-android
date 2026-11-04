@@ -74,8 +74,7 @@ internal fun String?.toWidgetReleaseDate(
         val formattedDate = date.format(RELEASE_DATE_FORMAT)
         if (!isOnline) return@runCatching context.getString(R.string.widget_cached_date, formattedDate)
         if (!includeRelative) return@runCatching formattedDate
-        val days = ChronoUnit.DAYS.between(LocalDate.now(), date)
-        val relative = when (days) {
+        val relative = when (val days = ChronoUnit.DAYS.between(LocalDate.now(), date)) {
             0L -> context.getString(R.string.widget_release_today)
             1L -> context.getString(R.string.widget_release_tomorrow)
             in 2..Long.MAX_VALUE -> context.resources.getQuantityString(

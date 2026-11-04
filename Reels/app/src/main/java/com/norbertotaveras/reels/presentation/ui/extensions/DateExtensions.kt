@@ -73,8 +73,7 @@ fun String?.toRelativeReleaseAge(
             monthsBetween > 1 -> "in $monthsBetween months"
             monthsBetween == 1 -> "in 1 month"
             daysBetween > 1 -> "in $daysBetween days"
-            daysBetween == 1 -> "tomorrow"
-            else -> null
+            else -> "tomorrow"
         }
     }
 

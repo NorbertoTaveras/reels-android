@@ -37,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.domain.movie.model.MovieCategory
 import com.norbertotaveras.reels.presentation.ui.extensions.displayLabel

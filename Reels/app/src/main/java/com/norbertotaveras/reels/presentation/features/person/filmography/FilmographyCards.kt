@@ -56,7 +56,7 @@ internal fun FilmographyPosterCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(ReelsRatios.poster)
+                .aspectRatio(ReelsRatios.POSTER)
                 .clip(RoundedCornerShape(ReelsDimensions.filmographyPosterCornerRadius))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         ) {

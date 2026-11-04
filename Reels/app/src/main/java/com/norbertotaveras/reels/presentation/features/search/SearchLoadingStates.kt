@@ -37,7 +37,7 @@ internal fun SearchLoadingHeader(
 ) {
     SearchPlaceholder(
         modifier = modifier.padding(bottom = ReelsSpacing.small),
-        widthFraction = ReelsDimensions.searchLoadingHeaderWidthFraction,
+        widthFraction = ReelsDimensions.SEARCH_LOADING_HEADER_WIDTH_FRACTION,
         height = ReelsDimensions.searchLoadingHeaderHeight
     )
 }
@@ -83,11 +83,11 @@ internal fun SearchResultPlaceholder(
                 verticalArrangement = Arrangement.spacedBy(ReelsSpacing.small)
             ) {
                 SearchPlaceholder(
-                    widthFraction = ReelsDimensions.searchLoadingTitleWidthFraction,
+                    widthFraction = ReelsDimensions.SEARCH_LOADING_TITLE_WIDTH_FRACTION,
                     height = ReelsDimensions.searchLoadingTitleHeight
                 )
                 SearchPlaceholder(
-                    widthFraction = ReelsDimensions.searchLoadingMetadataWidthFraction,
+                    widthFraction = ReelsDimensions.SEARCH_LOADING_METADATA_WIDTH_FRACTION,
                     height = ReelsDimensions.searchLoadingMetadataHeight
                 )
                 SearchPlaceholder(

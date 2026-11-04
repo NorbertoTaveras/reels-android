@@ -120,8 +120,8 @@ class AndroidPlanScheduler @Inject constructor(
         context,
         RELEASE_REQUEST_OFFSET + movieId,
         Intent(context, PlanAlarmReceiver::class.java)
-            .setAction(PlanAlarmContract.ActionReleaseReminder)
-            .putExtra(PlanAlarmContract.ExtraMovieId, movieId),
+            .setAction(PlanAlarmContract.ACTION_RELEASE_REMINDER)
+            .putExtra(PlanAlarmContract.EXTRA_MOVIE_ID, movieId),
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
     )
 
@@ -129,8 +129,8 @@ class AndroidPlanScheduler @Inject constructor(
         context,
         MOVIE_NIGHT_REQUEST_OFFSET + planId.hashCode(),
         Intent(context, PlanAlarmReceiver::class.java)
-            .setAction(PlanAlarmContract.ActionMovieNightReminder)
-            .putExtra(PlanAlarmContract.ExtraPlanId, planId),
+            .setAction(PlanAlarmContract.ACTION_MOVIE_NIGHT_REMINDER)
+            .putExtra(PlanAlarmContract.EXTRA_PLAN_ID, planId),
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
     )
 
@@ -138,8 +138,8 @@ class AndroidPlanScheduler @Inject constructor(
         context,
         MOVIE_NIGHT_MISSED_REQUEST_OFFSET + planId.hashCode(),
         Intent(context, PlanAlarmReceiver::class.java)
-            .setAction(PlanAlarmContract.ActionMovieNightMissed)
-            .putExtra(PlanAlarmContract.ExtraPlanId, planId),
+            .setAction(PlanAlarmContract.ACTION_MOVIE_NIGHT_MISSED)
+            .putExtra(PlanAlarmContract.EXTRA_PLAN_ID, planId),
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
     )
 
@@ -147,8 +147,8 @@ class AndroidPlanScheduler @Inject constructor(
         context,
         MOVIE_NIGHT_COUNTDOWN_REQUEST_OFFSET + planId.hashCode(),
         Intent(context, PlanAlarmReceiver::class.java)
-            .setAction(PlanAlarmContract.ActionMovieNightCountdown)
-            .putExtra(PlanAlarmContract.ExtraPlanId, planId),
+            .setAction(PlanAlarmContract.ACTION_MOVIE_NIGHT_COUNTDOWN)
+            .putExtra(PlanAlarmContract.EXTRA_PLAN_ID, planId),
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
     )
 

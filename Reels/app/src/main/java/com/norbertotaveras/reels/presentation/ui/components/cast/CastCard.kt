@@ -68,7 +68,7 @@ fun CastCard(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(ReelsRatios.castPortrait),
+                    .aspectRatio(ReelsRatios.CAST_PORTRAIT),
                 shape = CircleShape,
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -77,7 +77,7 @@ fun CastCard(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(ReelsRatios.castPortrait)
+                        .aspectRatio(ReelsRatios.CAST_PORTRAIT)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center

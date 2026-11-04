@@ -142,7 +142,7 @@ fun MovieHeroHeader(
                 Card(
                     modifier = Modifier
                         .width(ReelsDimensions.detailsPosterWidth)
-                        .aspectRatio(ReelsRatios.poster),
+                        .aspectRatio(ReelsRatios.POSTER),
                     shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -153,7 +153,7 @@ fun MovieHeroHeader(
                         contentDescription = title,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .aspectRatio(ReelsRatios.poster)
+                            .aspectRatio(ReelsRatios.POSTER)
                             .clip(RoundedCornerShape(12.dp)),
                         contentScale = ContentScale.Crop
                     )

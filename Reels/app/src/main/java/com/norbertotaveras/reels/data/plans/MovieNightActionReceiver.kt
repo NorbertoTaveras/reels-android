@@ -33,17 +33,17 @@ class MovieNightActionReceiver : BroadcastReceiver() {
     @Inject @IoDispatcher lateinit var ioDispatcher: CoroutineDispatcher
 
     override fun onReceive(context: Context, intent: Intent) {
-        val planId = intent.getStringExtra(PlanAlarmContract.ExtraPlanId) ?: return
+        val planId = intent.getStringExtra(PlanAlarmContract.EXTRA_PLAN_ID) ?: return
         val pendingResult = goAsync()
         CoroutineScope(SupervisorJob() + ioDispatcher).launch {
             try {
                 val mutationResult = when (intent.action) {
-                    PlanAlarmContract.ActionMovieNightStart -> movieNights.start(planId)
-                    PlanAlarmContract.ActionMovieNightPause -> movieNights.pause(planId)
-                    PlanAlarmContract.ActionMovieNightResume -> movieNights.resume(planId)
-                    PlanAlarmContract.ActionMovieNightFinish -> movieNights.finish(planId)
-                    PlanAlarmContract.ActionMovieNightEnd -> movieNights.cancel(planId)
-                    PlanAlarmContract.ActionMovieNightProgress -> Result.success(Unit)
+                    PlanAlarmContract.ACTION_MOVIE_NIGHT_START -> movieNights.start(planId)
+                    PlanAlarmContract.ACTION_MOVIE_NIGHT_PAUSE -> movieNights.pause(planId)
+                    PlanAlarmContract.ACTION_MOVIE_NIGHT_RESUME -> movieNights.resume(planId)
+                    PlanAlarmContract.ACTION_MOVIE_NIGHT_FINISH -> movieNights.finish(planId)
+                    PlanAlarmContract.ACTION_MOVIE_NIGHT_END -> movieNights.cancel(planId)
+                    PlanAlarmContract.ACTION_MOVIE_NIGHT_PROGRESS -> Result.success(Unit)
                     else -> Result.failure(IllegalArgumentException("Unsupported Movie Night action."))
                 }
 
@@ -52,9 +52,9 @@ class MovieNightActionReceiver : BroadcastReceiver() {
 
                 val plan = movieNights.getMovieNights().firstOrNull { it.id == planId } ?: return@launch
                 when (intent.action) {
-                    PlanAlarmContract.ActionMovieNightFinish -> notifications.showMovieNightCompleted(plan)
-                    PlanAlarmContract.ActionMovieNightEnd -> notifications.cancelMovieNightProgress(planId)
-                    PlanAlarmContract.ActionMovieNightProgress -> {
+                    PlanAlarmContract.ACTION_MOVIE_NIGHT_FINISH -> notifications.showMovieNightCompleted(plan)
+                    PlanAlarmContract.ACTION_MOVIE_NIGHT_END -> notifications.cancelMovieNightProgress(planId)
+                    PlanAlarmContract.ACTION_MOVIE_NIGHT_PROGRESS -> {
                         updateProgress(plan)
                         widgetUpdater.updateAll()
                     }

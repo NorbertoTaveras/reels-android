@@ -12,7 +12,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -22,7 +21,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -53,7 +51,6 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsRatios
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
-import com.norbertotaveras.reels.presentation.ui.theme.reelsBorderColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContentColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPlaceholderColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
@@ -71,7 +68,7 @@ internal fun DiscoverPosterCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(ReelsRatios.poster)
+                .aspectRatio(ReelsRatios.POSTER)
                 .clip(RoundedCornerShape(ReelsDimensions.discoverPosterCornerSize))
         ) {
             AsyncImage(
@@ -180,7 +177,7 @@ internal fun DiscoverPlaceholderCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(ReelsRatios.poster)
+                .aspectRatio(ReelsRatios.POSTER)
                 .clip(RoundedCornerShape(ReelsDimensions.posterGridPlaceholderCornerSize))
                 .background(reelsPlaceholderColor())
         )
@@ -193,7 +190,7 @@ internal fun DiscoverPlaceholderCard(
 
         Box(
             modifier = Modifier
-                .fillMaxWidth(ReelsDimensions.posterGridPlaceholderTitleWidthFraction)
+                .fillMaxWidth(ReelsDimensions.POSTER_GRID_PLACEHOLDER_TITLE_WIDTH_FRACTION)
                 .height(ReelsDimensions.posterGridPlaceholderTitleHeight)
                 .clip(
                     RoundedCornerShape(ReelsDimensions.posterGridPlaceholderBarCornerSize)
@@ -209,7 +206,7 @@ internal fun DiscoverPlaceholderCard(
 
         Box(
             modifier = Modifier
-                .fillMaxWidth(ReelsDimensions.posterGridPlaceholderYearWidthFraction)
+                .fillMaxWidth(ReelsDimensions.POSTER_GRID_PLACEHOLDER_YEAR_WIDTH_FRACTION)
                 .height(ReelsDimensions.posterGridPlaceholderYearHeight)
                 .clip(
                     RoundedCornerShape(ReelsDimensions.posterGridPlaceholderBarCornerSize)

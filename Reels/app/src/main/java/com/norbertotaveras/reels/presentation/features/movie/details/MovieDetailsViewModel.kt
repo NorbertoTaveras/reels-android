@@ -159,11 +159,7 @@ class MovieDetailsViewModel @Inject constructor(
                 _state.update { currentState ->
                     currentState.copy(
                         isTmdbAccountConnected = accountState.isConnected,
-                        isWatchlisted = if (accountState.isConnected && !accountChanged) {
-                            currentState.isWatchlisted
-                        } else {
-                            false
-                        },
+                        isWatchlisted = accountState.isConnected && !accountChanged && currentState.isWatchlisted,
                         tmdbRating = if (accountState.isConnected && !accountChanged) {
                             currentState.tmdbRating
                         } else {

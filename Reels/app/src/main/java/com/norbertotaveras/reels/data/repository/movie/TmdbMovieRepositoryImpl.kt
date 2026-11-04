@@ -17,7 +17,6 @@ import com.norbertotaveras.reels.data.local.cache.dao.CachedContentDao
 import com.norbertotaveras.reels.data.local.cache.entity.CachedContentStatusEntity
 import com.norbertotaveras.reels.data.local.cache.movieDetailsCacheKey
 import com.norbertotaveras.reels.data.local.db.ReelsDatabase
-import com.norbertotaveras.reels.data.local.library.mapper.toMovieDetailsDataModel as toCachedMovieDetailsDataModel
 import com.norbertotaveras.reels.data.local.movie.dao.CachedMovieDao
 import com.norbertotaveras.reels.data.local.movie.entity.CachedMovieListEntryEntity
 import com.norbertotaveras.reels.data.local.movie.entity.MovieRemoteKeyEntity

@@ -40,8 +40,8 @@ object ReelsDimensions {
     val posterGridPlaceholderTitleToYearSpacing = 4.dp
     val posterGridPlaceholderTitleHeight = 10.dp
     val posterGridPlaceholderYearHeight = 8.dp
-    const val posterGridPlaceholderTitleWidthFraction = 0.8f
-    const val posterGridPlaceholderYearWidthFraction = 0.5f
+    const val POSTER_GRID_PLACEHOLDER_TITLE_WIDTH_FRACTION = 0.8f
+    const val POSTER_GRID_PLACEHOLDER_YEAR_WIDTH_FRACTION = 0.5f
 
     val topPadding = 16.dp
     val homeScreenBottomPadding = 72.dp
@@ -149,11 +149,11 @@ object ReelsDimensions {
     val searchResultGenreHorizontalPadding = 8.dp
     val searchResultGenreVerticalPadding = 2.dp
     val searchResultGenreSpacing = 6.dp
-    const val searchLoadingHeaderWidthFraction = 0.4f
+    const val SEARCH_LOADING_HEADER_WIDTH_FRACTION = 0.4f
     val searchLoadingHeaderHeight = 12.dp
-    const val searchLoadingTitleWidthFraction = 0.8f
+    const val SEARCH_LOADING_TITLE_WIDTH_FRACTION = 0.8f
     val searchLoadingTitleHeight = 14.dp
-    const val searchLoadingMetadataWidthFraction = 0.4f
+    const val SEARCH_LOADING_METADATA_WIDTH_FRACTION = 0.4f
     val searchLoadingMetadataHeight = 10.dp
     val searchLoadingRatingWidth = 48.dp
     val searchLoadingRatingHeight = 20.dp
@@ -183,7 +183,7 @@ object ReelsDimensions {
     val discoverClearFiltersIconSize = 10.dp
     val discoverClearFiltersVerticalPadding = 2.dp
     val discoverFilterSheetCornerSize = 24.dp
-    val discoverFilterSheetHeightFraction = 0.78f
+    const val DISCOVER_FILTER_SHEET_HEIGHT_FRACTION = 0.78f
     val discoverFilterSheetSectionSpacing = 24.dp
     val discoverFilterSectionContentSpacing = 12.dp
     val discoverFilterRowSpacing = 8.dp
@@ -474,7 +474,7 @@ object ReelsDimensions {
     val settingsDialogCornerSize = 28.dp
     val settingsDialogBorderWidth = 1.dp
     val settingsDialogBackdropBlurRadius = 2.dp
-    const val settingsDialogBackdropAlpha = 0.60f
+    const val SETTINGS_DIALOG_BACKDROP_ALPHA = 0.60f
     val settingsDialogIconContainerSize = 48.dp
     val settingsDialogIconCornerSize = 16.dp
     val settingsDialogIconSize = 24.dp
@@ -672,7 +672,7 @@ object ReelsDimensions {
     val planSheetNoticePadding = 14.dp
     val planSheetPrimaryActionHeight = 52.dp
     val planSheetPrimaryActionCornerSize = 14.dp
-    const val movieNightSheetMaxHeightFraction = 0.88f
+    const val MOVIE_NIGHT_SHEET_MAX_HEIGHT_FRACTION = 0.88f
     val movieNightSheetCompactHeight = 500.dp
     val movieNightSheetHandleWidth = 40.dp
     val movieNightSheetHandleHeight = 4.dp

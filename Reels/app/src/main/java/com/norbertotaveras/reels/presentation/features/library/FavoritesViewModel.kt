@@ -56,7 +56,7 @@ class FavoritesViewModel @Inject constructor(
     private val observeTmdbLibraryLastSyncedAtUseCase: ObserveTmdbLibraryLastSyncedAtUseCase,
     private val observeTmdbMovieActivitiesUseCase: ObserveTmdbMovieActivitiesUseCase,
     private val getTmdbLibraryMoviesUseCase: GetTmdbLibraryMoviesUseCase,
-    private val observeSettingsUseCase: ObserveSettingsUseCase,
+    observeSettingsUseCase: ObserveSettingsUseCase,
     private val observeNetworkConnectivityUseCase: ObserveNetworkConnectivityUseCase,
     private val updateTmdbWatchlistUseCase: UpdateTmdbWatchlistUseCase,
     private val deleteTmdbMovieRatingUseCase: DeleteTmdbMovieRatingUseCase,

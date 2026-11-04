@@ -14,7 +14,6 @@ import com.norbertotaveras.reels.domain.movie.model.GenreDataModel
 import com.norbertotaveras.reels.domain.movie.model.MovieCategory
 import com.norbertotaveras.reels.domain.movie.model.MovieCreditsDataModel
 import com.norbertotaveras.reels.domain.movie.model.MovieDataModel
-import com.norbertotaveras.reels.domain.movie.model.MovieDetailsDataModel
 import com.norbertotaveras.reels.domain.movie.model.MovieVideosDataModel
 import kotlinx.coroutines.flow.Flow
 
