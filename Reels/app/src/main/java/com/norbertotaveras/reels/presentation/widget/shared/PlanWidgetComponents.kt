@@ -103,29 +103,6 @@ private fun compactPosterHeight(): Dp = minOf(
 )
 
 @Composable
-internal fun WidgetMiniPoster(title: String, poster: Bitmap?) {
-    if (poster != null) {
-        Image(
-            provider = ImageProvider(poster),
-            contentDescription = title,
-            modifier = GlanceModifier
-                .width(PlanWidgetDimensions.MiniPosterWidth)
-                .height(PlanWidgetDimensions.MiniPosterHeight)
-                .cornerRadius(PlanWidgetDimensions.MiniPosterCornerSize),
-            contentScale = ContentScale.Crop,
-        )
-    } else {
-        WidgetMark(
-            modifier = GlanceModifier
-                .width(PlanWidgetDimensions.MiniPosterWidth)
-                .height(PlanWidgetDimensions.MiniPosterHeight)
-                .background(PlanWidgetTheme.Surface)
-                .cornerRadius(PlanWidgetDimensions.MiniPosterCornerSize),
-        )
-    }
-}
-
-@Composable
 internal fun WidgetBackdrop(
     title: String,
     backdrop: Bitmap?,

@@ -178,10 +178,6 @@ constructor(
         }
     }
 
-    fun clearError() {
-        _state.update { it.copy(errorMessage = null) }
-    }
-
     private fun save(onComplete: () -> Unit, operation: suspend () -> Result<Unit>) {
         viewModelScope.launch {
             _state.update { it.copy(isSaving = true, errorMessage = null) }

@@ -31,8 +31,6 @@ class UpdateMovieNightUseCase @Inject constructor(
     }
 
     suspend fun start(id: String) = repository.start(id)
-    suspend fun markStartingSoon(id: String) = repository.markStartingSoon(id)
-    suspend fun markMissed(id: String) = repository.markMissed(id)
     suspend fun pause(id: String) = repository.pause(id)
     suspend fun resume(id: String) = repository.resume(id)
     suspend fun finish(id: String) = repository.finish(id)
