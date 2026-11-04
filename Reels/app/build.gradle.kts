@@ -118,6 +118,7 @@ dependencies {
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
     implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.hilt.navigation.compose)
 
     // core
@@ -126,8 +127,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
 
     // material icons
-    implementation(libs.androidx.compose.material.icons.core.android)
-    implementation(libs.androidx.compose.material.icons.extended.android)
     implementation(libs.androidx.compose.material.icons.extended)
 
     // hilt

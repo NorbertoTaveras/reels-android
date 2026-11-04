@@ -45,8 +45,6 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging" }
 androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging" }
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
-androidx-compose-material-icons-core-android = { group = "androidx.compose.material", name = "material-icons-core-android" }
-androidx-compose-material-icons-extended-android = { group = "androidx.compose.material", name = "material-icons-extended-android" }
 androidx-graphics-path = { group = "androidx.graphics", name = "graphics-path", version.ref = "graphicsPath" }
 androidx-glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glance" }
 androidx-glance-material3 = { group = "androidx.glance", name = "glance-material3", version.ref = "glance" }
