@@ -9,14 +9,14 @@ package com.norbertotaveras.reels.di.modules
 
 import android.content.Context
 import androidx.room.Room
-import com.norbertotaveras.reels.data.local.dao.CachedContentDao
-import com.norbertotaveras.reels.data.local.dao.CachedMovieDao
-import com.norbertotaveras.reels.data.local.dao.FavoriteMovieDao
-import com.norbertotaveras.reels.data.local.dao.SavedPersonDao
-import com.norbertotaveras.reels.data.local.dao.TmdbMovieActivityDao
-import com.norbertotaveras.reels.data.local.dao.MovieNightDao
-import com.norbertotaveras.reels.data.local.dao.TrackedReleaseDao
+import com.norbertotaveras.reels.data.local.account.dao.TmdbMovieActivityDao
+import com.norbertotaveras.reels.data.local.cache.dao.CachedContentDao
 import com.norbertotaveras.reels.data.local.db.ReelsDatabase
+import com.norbertotaveras.reels.data.local.library.dao.FavoriteMovieDao
+import com.norbertotaveras.reels.data.local.library.dao.SavedPersonDao
+import com.norbertotaveras.reels.data.local.movie.dao.CachedMovieDao
+import com.norbertotaveras.reels.data.local.plans.dao.MovieNightDao
+import com.norbertotaveras.reels.data.local.plans.dao.TrackedReleaseDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

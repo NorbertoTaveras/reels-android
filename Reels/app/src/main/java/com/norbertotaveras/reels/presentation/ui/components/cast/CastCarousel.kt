@@ -18,7 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.norbertotaveras.reels.domain.model.cast.CastMemberDataModel
+import com.norbertotaveras.reels.domain.person.model.CastMemberDataModel
 import com.norbertotaveras.reels.presentation.ui.components.common.SectionHeader
 import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl

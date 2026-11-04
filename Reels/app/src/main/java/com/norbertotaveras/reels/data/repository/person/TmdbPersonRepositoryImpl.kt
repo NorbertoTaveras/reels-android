@@ -9,23 +9,23 @@ package com.norbertotaveras.reels.data.repository.person
 
 import androidx.room.withTransaction
 import com.norbertotaveras.reels.data.local.cache.CachedContentType
+import com.norbertotaveras.reels.data.local.cache.dao.CachedContentDao
+import com.norbertotaveras.reels.data.local.cache.entity.CachedContentStatusEntity
 import com.norbertotaveras.reels.data.local.cache.personDetailsCacheKey
-import com.norbertotaveras.reels.data.local.dao.CachedContentDao
 import com.norbertotaveras.reels.data.local.db.ReelsDatabase
-import com.norbertotaveras.reels.data.local.entity.CachedContentStatusEntity
-import com.norbertotaveras.reels.data.local.mapper.toCachedPersonDetailsEntity
-import com.norbertotaveras.reels.data.local.mapper.toCachedPersonMovieCreditEntities
-import com.norbertotaveras.reels.data.local.mapper.toPersonDetailsDataModel as toCachedPersonDetailsDataModel
-import com.norbertotaveras.reels.data.local.mapper.toPersonMovieCreditsDataModel as toCachedPersonMovieCreditsDataModel
-import com.norbertotaveras.reels.data.remote.mapper.person.toPersonDetailsDataModel
-import com.norbertotaveras.reels.data.remote.mapper.person.toPersonMovieCreditsDataModel
+import com.norbertotaveras.reels.data.local.person.mapper.toCachedPersonDetailsEntity
+import com.norbertotaveras.reels.data.local.person.mapper.toCachedPersonMovieCreditEntities
+import com.norbertotaveras.reels.data.local.person.mapper.toPersonDetailsDataModel as toCachedPersonDetailsDataModel
+import com.norbertotaveras.reels.data.local.person.mapper.toPersonMovieCreditsDataModel as toCachedPersonMovieCreditsDataModel
 import com.norbertotaveras.reels.data.remote.person.TmdbPersonRemoteDataSource
+import com.norbertotaveras.reels.data.remote.person.mapper.toPersonDetailsDataModel
+import com.norbertotaveras.reels.data.remote.person.mapper.toPersonMovieCreditsDataModel
 import com.norbertotaveras.reels.data.repository.cachedTmdbResult
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
-import com.norbertotaveras.reels.domain.model.person.PersonDetailsDataModel
-import com.norbertotaveras.reels.domain.model.person.PersonMovieCreditsDataModel
 import com.norbertotaveras.reels.domain.network.NetworkMonitor
-import com.norbertotaveras.reels.domain.repository.person.PersonRepository
+import com.norbertotaveras.reels.domain.person.model.PersonDetailsDataModel
+import com.norbertotaveras.reels.domain.person.model.PersonMovieCreditsDataModel
+import com.norbertotaveras.reels.domain.person.repository.PersonRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher

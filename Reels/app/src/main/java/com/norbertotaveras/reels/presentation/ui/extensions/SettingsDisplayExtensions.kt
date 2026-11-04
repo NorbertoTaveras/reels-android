@@ -7,9 +7,9 @@
 
 package com.norbertotaveras.reels.presentation.ui.extensions
 
-import com.norbertotaveras.reels.domain.model.settings.AppTheme
-import com.norbertotaveras.reels.domain.model.settings.ImageQuality
-import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
+import com.norbertotaveras.reels.domain.settings.model.AppTheme
+import com.norbertotaveras.reels.domain.settings.model.ImageQuality
+import com.norbertotaveras.reels.domain.settings.model.LanguageRegion
 
 val AppTheme.displayLabel: String
     get() = when (this) {

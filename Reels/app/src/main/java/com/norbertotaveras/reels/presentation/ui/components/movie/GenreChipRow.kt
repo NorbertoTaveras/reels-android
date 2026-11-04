@@ -7,8 +7,8 @@
 
 package com.norbertotaveras.reels.presentation.ui.components.movie
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,8 +25,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
-import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightGenreChipContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsGenreChipContainer
+import com.norbertotaveras.reels.presentation.ui.theme.ReelsLightGenreChipContainer
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 import com.norbertotaveras.reels.presentation.ui.theme.isReelsLightTheme

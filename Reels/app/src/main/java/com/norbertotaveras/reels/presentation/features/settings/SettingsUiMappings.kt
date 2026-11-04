@@ -7,9 +7,9 @@
 
 package com.norbertotaveras.reels.presentation.features.settings
 
-import com.norbertotaveras.reels.domain.model.account.TmdbAccountStateDataModel
-import com.norbertotaveras.reels.domain.model.favorite.LibraryContentDataModel
-import com.norbertotaveras.reels.domain.model.settings.AppSettings
+import com.norbertotaveras.reels.domain.account.model.TmdbAccountStateDataModel
+import com.norbertotaveras.reels.domain.library.model.LibraryContentDataModel
+import com.norbertotaveras.reels.domain.settings.model.AppSettings
 import com.norbertotaveras.reels.presentation.ui.extensions.displayLabel
 
 internal fun SettingsUiState.withSettings(settings: AppSettings): SettingsUiState {

@@ -10,7 +10,7 @@ package com.norbertotaveras.reels.data.repository.settings
 import android.content.Context
 import coil3.SingletonImageLoader
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
-import com.norbertotaveras.reels.domain.repository.settings.ImageCacheRepository
+import com.norbertotaveras.reels.domain.settings.repository.ImageCacheRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton

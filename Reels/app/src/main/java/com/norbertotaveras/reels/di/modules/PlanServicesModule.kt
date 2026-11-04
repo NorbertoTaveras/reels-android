@@ -7,8 +7,8 @@
 
 package com.norbertotaveras.reels.di.modules
 
-import com.norbertotaveras.reels.data.plans.AndroidPlanScheduler
-import com.norbertotaveras.reels.data.plans.AndroidReelsNotificationManager
+import com.norbertotaveras.reels.data.plans.notification.AndroidReelsNotificationManager
+import com.norbertotaveras.reels.data.plans.scheduling.AndroidPlanScheduler
 import com.norbertotaveras.reels.data.widget.AndroidReelsWidgetUpdater
 import com.norbertotaveras.reels.domain.plans.PlanScheduler
 import com.norbertotaveras.reels.domain.plans.ReelsNotificationManager

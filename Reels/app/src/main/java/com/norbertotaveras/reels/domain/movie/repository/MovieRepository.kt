@@ -1,0 +1,76 @@
+/*
+ * Copyright (c) 2026 Norberto Taveras. All rights reserved.
+ *
+ * This source code is proprietary and confidential. Unauthorized copying,
+ * modification, distribution, or use is prohibited.
+ */
+
+package com.norbertotaveras.reels.domain.movie.repository
+
+import androidx.paging.PagingData
+import com.norbertotaveras.reels.domain.discover.model.DiscoverFilterDataModel
+import com.norbertotaveras.reels.domain.movie.model.CachedMovieDetailsDataModel
+import com.norbertotaveras.reels.domain.movie.model.GenreDataModel
+import com.norbertotaveras.reels.domain.movie.model.MovieCategory
+import com.norbertotaveras.reels.domain.movie.model.MovieCreditsDataModel
+import com.norbertotaveras.reels.domain.movie.model.MovieDataModel
+import com.norbertotaveras.reels.domain.movie.model.MovieDetailsDataModel
+import com.norbertotaveras.reels.domain.movie.model.MovieVideosDataModel
+import kotlinx.coroutines.flow.Flow
+
+interface MovieRepository {
+    fun getMovies(
+        category: MovieCategory,
+        language: String,
+    ): Flow<PagingData<MovieDataModel>>
+
+    fun searchMovies(
+        query: String,
+        language: String,
+        includeAdult: Boolean = false,
+    ): Flow<PagingData<MovieDataModel>>
+
+    fun observeSearchCacheTimestamp(
+        query: String,
+        language: String,
+        includeAdult: Boolean = false,
+    ): Flow<Long?>
+
+    fun discoverMovies(
+        filters: DiscoverFilterDataModel,
+        language: String,
+    ): Flow<PagingData<MovieDataModel>>
+
+    suspend fun getDiscoverMovieCount(
+        filters: DiscoverFilterDataModel,
+        language: String,
+    ): Result<Int>
+
+    suspend fun getTrendingMovies(
+        language: String,
+    ): Result<List<MovieDataModel>>
+
+    suspend fun getMovieDetails(
+        movieId: Int,
+        language: String,
+    ): Result<CachedMovieDetailsDataModel>
+
+    suspend fun getMovieCredits(
+        movieId: Int,
+        language: String,
+    ): Result<MovieCreditsDataModel>
+
+    suspend fun getMovieVideos(
+        movieId: Int,
+        language: String,
+    ): Result<MovieVideosDataModel>
+
+    suspend fun getSimilarMovies(
+        movieId: Int,
+        language: String,
+    ): Result<List<MovieDataModel>>
+
+    suspend fun getMovieGenres(
+        language: String,
+    ): Result<List<GenreDataModel>>
+}

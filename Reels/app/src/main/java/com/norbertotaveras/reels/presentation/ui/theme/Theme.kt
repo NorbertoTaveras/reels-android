@@ -12,7 +12,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import com.norbertotaveras.reels.domain.model.settings.ImageQuality
+import com.norbertotaveras.reels.domain.settings.model.ImageQuality
 
 private val DarkColorScheme = darkColorScheme(
     primary = ReelsAccent,

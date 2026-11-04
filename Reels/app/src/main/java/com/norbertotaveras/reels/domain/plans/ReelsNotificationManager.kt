@@ -7,8 +7,8 @@
 
 package com.norbertotaveras.reels.domain.plans
 
-import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
-import com.norbertotaveras.reels.domain.model.plans.TrackedRelease
+import com.norbertotaveras.reels.domain.plans.model.MovieNightPlan
+import com.norbertotaveras.reels.domain.plans.model.TrackedRelease
 
 interface ReelsNotificationManager {
     fun createChannels()

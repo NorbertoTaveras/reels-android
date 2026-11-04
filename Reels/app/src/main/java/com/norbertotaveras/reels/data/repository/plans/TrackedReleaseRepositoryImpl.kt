@@ -7,16 +7,16 @@
 
 package com.norbertotaveras.reels.data.repository.plans
 
-import com.norbertotaveras.reels.data.local.dao.TrackedReleaseDao
-import com.norbertotaveras.reels.data.local.mapper.toDataModel
-import com.norbertotaveras.reels.data.local.mapper.toEntity
+import com.norbertotaveras.reels.data.local.plans.dao.TrackedReleaseDao
+import com.norbertotaveras.reels.data.local.plans.mapper.toDataModel
+import com.norbertotaveras.reels.data.local.plans.mapper.toEntity
 import com.norbertotaveras.reels.data.repository.repositoryResult
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
-import com.norbertotaveras.reels.domain.model.plans.TrackedRelease
+import com.norbertotaveras.reels.domain.movie.extensions.toConfirmedReleaseDate
 import com.norbertotaveras.reels.domain.plans.PlanScheduler
 import com.norbertotaveras.reels.domain.plans.ReelsWidgetUpdater
-import com.norbertotaveras.reels.domain.repository.plans.TrackedReleaseRepository
-import com.norbertotaveras.reels.extensions.toConfirmedReleaseDate
+import com.norbertotaveras.reels.domain.plans.model.TrackedRelease
+import com.norbertotaveras.reels.domain.plans.repository.TrackedReleaseRepository
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow

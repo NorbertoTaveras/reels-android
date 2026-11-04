@@ -26,16 +26,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.norbertotaveras.reels.presentation.features.cast.details.CastDetailsRoute
-import com.norbertotaveras.reels.presentation.features.cast.filmography.FilmographyRoute
-import com.norbertotaveras.reels.presentation.features.movies.cast.MovieCastRoute
-import com.norbertotaveras.reels.presentation.features.movies.category.MovieCategoryRoute
-import com.norbertotaveras.reels.presentation.features.movies.details.MovieDetailsRoute
-import com.norbertotaveras.reels.presentation.features.movies.discover.DiscoverRoute
-import com.norbertotaveras.reels.presentation.features.movies.favorites.FavoritesRoute
-import com.norbertotaveras.reels.presentation.features.movies.list.MoviesListRoute
-import com.norbertotaveras.reels.presentation.features.movies.search.SearchRoute
-import com.norbertotaveras.reels.presentation.features.plans.PlansRoute
+import com.norbertotaveras.reels.presentation.features.discover.DiscoverRoute
+import com.norbertotaveras.reels.presentation.features.home.MoviesListRoute
+import com.norbertotaveras.reels.presentation.features.library.FavoritesRoute
+import com.norbertotaveras.reels.presentation.features.movie.cast.MovieCastRoute
+import com.norbertotaveras.reels.presentation.features.movie.category.MovieCategoryRoute
+import com.norbertotaveras.reels.presentation.features.movie.details.MovieDetailsRoute
+import com.norbertotaveras.reels.presentation.features.person.details.CastDetailsRoute
+import com.norbertotaveras.reels.presentation.features.person.filmography.FilmographyRoute
+import com.norbertotaveras.reels.presentation.features.plans.overview.PlansRoute
+import com.norbertotaveras.reels.presentation.features.search.SearchRoute
 import com.norbertotaveras.reels.presentation.features.settings.SettingsRoute
 
 @Composable

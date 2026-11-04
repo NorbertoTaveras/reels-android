@@ -23,7 +23,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.norbertotaveras.reels.presentation.features.plans.openExactAlarmSettings
+import com.norbertotaveras.reels.presentation.features.plans.shared.openExactAlarmSettings
 import com.norbertotaveras.reels.presentation.ui.components.common.ReelsSnackbarHost
 import kotlinx.coroutines.flow.collectLatest
 

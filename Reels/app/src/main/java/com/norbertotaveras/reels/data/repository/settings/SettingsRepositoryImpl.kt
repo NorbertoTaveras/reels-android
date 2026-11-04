@@ -7,15 +7,15 @@
 
 package com.norbertotaveras.reels.data.repository.settings
 
-import com.norbertotaveras.reels.data.local.preferences.SettingsDataStore
+import com.norbertotaveras.reels.data.local.preferences.settings.SettingsDataStore
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
-import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
-import com.norbertotaveras.reels.domain.model.settings.AppSettings
-import com.norbertotaveras.reels.domain.model.settings.AppTheme
-import com.norbertotaveras.reels.domain.model.settings.ImageQuality
-import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
-import com.norbertotaveras.reels.domain.model.settings.PlanPreferences
-import com.norbertotaveras.reels.domain.repository.settings.SettingsRepository
+import com.norbertotaveras.reels.domain.discover.model.DiscoverFilterDataModel
+import com.norbertotaveras.reels.domain.settings.model.AppSettings
+import com.norbertotaveras.reels.domain.settings.model.AppTheme
+import com.norbertotaveras.reels.domain.settings.model.ImageQuality
+import com.norbertotaveras.reels.domain.settings.model.LanguageRegion
+import com.norbertotaveras.reels.domain.settings.model.PlanPreferences
+import com.norbertotaveras.reels.domain.settings.repository.SettingsRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher

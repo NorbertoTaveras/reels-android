@@ -8,7 +8,6 @@
 package com.norbertotaveras.reels.data.remote.error
 
 import com.google.gson.Gson
-import com.norbertotaveras.reels.data.remote.dto.TmdbErrorResponseDto
 import java.io.IOException
 import java.net.SocketTimeoutException
 import retrofit2.HttpException

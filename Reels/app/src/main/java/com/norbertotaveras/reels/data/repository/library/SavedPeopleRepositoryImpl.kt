@@ -1,0 +1,71 @@
+/*
+ * Copyright (c) 2026 Norberto Taveras. All rights reserved.
+ *
+ * This source code is proprietary and confidential. Unauthorized copying,
+ * modification, distribution, or use is prohibited.
+ */
+
+package com.norbertotaveras.reels.data.repository.library
+
+import com.norbertotaveras.reels.data.local.library.dao.SavedPersonDao
+import com.norbertotaveras.reels.data.local.library.mapper.toSavedPersonDataModel
+import com.norbertotaveras.reels.data.local.library.mapper.toSavedPersonEntity
+import com.norbertotaveras.reels.data.local.library.mapper.toSavedPersonKnownForEntity
+import com.norbertotaveras.reels.data.repository.repositoryResult
+import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
+import com.norbertotaveras.reels.domain.library.model.SavedPersonDataModel
+import com.norbertotaveras.reels.domain.library.repository.SavedPeopleRepository
+import com.norbertotaveras.reels.domain.person.model.PersonDetailsDataModel
+import com.norbertotaveras.reels.domain.person.model.PersonMovieCreditDataModel
+import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+
+class SavedPeopleRepositoryImpl @Inject constructor(
+    private val savedPersonDao: SavedPersonDao,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) : SavedPeopleRepository {
+    override fun observeSavedPeople(): Flow<List<SavedPersonDataModel>> {
+        return savedPersonDao.observeSavedPeople()
+            .map { people -> people.map { person -> person.toSavedPersonDataModel() } }
+            .flowOn(ioDispatcher)
+    }
+
+    override fun observeIsPersonSaved(personId: Int): Flow<Boolean> {
+        return savedPersonDao.observeIsPersonSaved(personId = personId)
+            .flowOn(ioDispatcher)
+    }
+
+    override suspend fun getSavedPerson(personId: Int): SavedPersonDataModel? {
+        return withContext(ioDispatcher) {
+            savedPersonDao.getSavedPerson(personId = personId)?.toSavedPersonDataModel()
+        }
+    }
+
+    override suspend fun savePerson(
+        person: PersonDetailsDataModel,
+        knownFor: List<PersonMovieCreditDataModel>
+    ): Result<Unit> {
+        return repositoryResult(ioDispatcher) {
+            val savedAt = System.currentTimeMillis()
+            savedPersonDao.upsertSavedPersonWithKnownFor(
+                person = person.toSavedPersonEntity(savedAt = savedAt),
+                knownFor = knownFor.mapIndexed { index, movie ->
+                    movie.toSavedPersonKnownForEntity(
+                        personId = person.id,
+                        position = index
+                    )
+                }
+            )
+        }
+    }
+
+    override suspend fun removeSavedPerson(personId: Int): Result<Unit> {
+        return repositoryResult(ioDispatcher) {
+            savedPersonDao.deleteSavedPerson(personId = personId)
+        }
+    }
+}

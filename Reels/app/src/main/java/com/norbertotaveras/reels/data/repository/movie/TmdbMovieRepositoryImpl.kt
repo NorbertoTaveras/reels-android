@@ -13,53 +13,54 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import androidx.room.withTransaction
 import com.norbertotaveras.reels.data.local.cache.CachedContentType
+import com.norbertotaveras.reels.data.local.cache.dao.CachedContentDao
+import com.norbertotaveras.reels.data.local.cache.entity.CachedContentStatusEntity
 import com.norbertotaveras.reels.data.local.cache.movieDetailsCacheKey
-import com.norbertotaveras.reels.data.local.dao.CachedContentDao
-import com.norbertotaveras.reels.data.local.dao.CachedMovieDao
 import com.norbertotaveras.reels.data.local.db.ReelsDatabase
-import com.norbertotaveras.reels.data.local.entity.CachedMovieListEntryEntity
-import com.norbertotaveras.reels.data.local.entity.CachedContentStatusEntity
-import com.norbertotaveras.reels.data.local.entity.MovieRemoteKeyEntity
-import com.norbertotaveras.reels.data.local.entity.toCachedGenreEntity
-import com.norbertotaveras.reels.data.local.mapper.toCachedMovieCastEntities
-import com.norbertotaveras.reels.data.local.mapper.toCachedMovieDetailsEntity
-import com.norbertotaveras.reels.data.local.mapper.toCachedMovieVideoEntities
-import com.norbertotaveras.reels.data.local.entity.toGenreDataModel as toCachedGenreDataModel
-import com.norbertotaveras.reels.data.local.mapper.toMovieCreditsDataModel as toCachedMovieCreditsDataModel
-import com.norbertotaveras.reels.data.local.mapper.toMovieDetailsDataModel as toCachedMovieDetailsDataModel
-import com.norbertotaveras.reels.data.local.mapper.toMovieVideosDataModel as toCachedMovieVideosDataModel
-import com.norbertotaveras.reels.data.mapper.movie.toCachedMovieDataModel
-import com.norbertotaveras.reels.data.mapper.movie.toCachedMovieEntity
-import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
+import com.norbertotaveras.reels.data.local.library.mapper.toMovieDetailsDataModel as toCachedMovieDetailsDataModel
+import com.norbertotaveras.reels.data.local.movie.dao.CachedMovieDao
+import com.norbertotaveras.reels.data.local.movie.entity.CachedMovieListEntryEntity
+import com.norbertotaveras.reels.data.local.movie.entity.MovieRemoteKeyEntity
+import com.norbertotaveras.reels.data.local.movie.entity.toCachedGenreEntity
+import com.norbertotaveras.reels.data.local.movie.entity.toGenreDataModel as toCachedGenreDataModel
+import com.norbertotaveras.reels.data.local.movie.mapper.toCachedMovieCastEntities
+import com.norbertotaveras.reels.data.local.movie.mapper.toCachedMovieDataModel
+import com.norbertotaveras.reels.data.local.movie.mapper.toCachedMovieDetailsEntity
+import com.norbertotaveras.reels.data.local.movie.mapper.toCachedMovieEntity
+import com.norbertotaveras.reels.data.local.movie.mapper.toCachedMovieVideoEntities
+import com.norbertotaveras.reels.data.local.movie.mapper.toMovieCreditsDataModel as toCachedMovieCreditsDataModel
+import com.norbertotaveras.reels.data.local.movie.mapper.toMovieDetailsDataModel as toCachedMovieDetailsDataModel
+import com.norbertotaveras.reels.data.local.movie.mapper.toMovieVideosDataModel as toCachedMovieVideosDataModel
 import com.norbertotaveras.reels.data.remote.error.NoNetworkConnectionException
 import com.norbertotaveras.reels.data.remote.error.toTmdbNetworkException
-import com.norbertotaveras.reels.data.remote.dto.genre.toGenreDataModels
-import com.norbertotaveras.reels.data.remote.mapper.movie.toDiscoverMovieRequestParameters
-import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieCreditsDataModel
-import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDataModel
-import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieDetailsDataModel
-import com.norbertotaveras.reels.data.remote.mapper.movie.toMovieVideosDataModel
-import com.norbertotaveras.reels.data.remote.mapper.movie.toTmdbPathSegment
 import com.norbertotaveras.reels.data.remote.movie.TmdbMovieRemoteDataSource
-import com.norbertotaveras.reels.data.remote.paging.CachedMovieListRemoteMediator
-import com.norbertotaveras.reels.data.remote.paging.TMDB_FIRST_PAGE
-import com.norbertotaveras.reels.data.remote.paging.cacheKey
-import com.norbertotaveras.reels.data.remote.paging.discoverCacheKey
-import com.norbertotaveras.reels.data.remote.paging.searchCacheKey
-import com.norbertotaveras.reels.data.remote.paging.similarMoviesCacheKey
-import com.norbertotaveras.reels.data.remote.paging.tmdbPagingConfig
-import com.norbertotaveras.reels.data.remote.paging.trendingCacheKey
+import com.norbertotaveras.reels.data.remote.movie.dto.MoviesResponseDto
+import com.norbertotaveras.reels.data.remote.movie.dto.toGenreDataModels
+import com.norbertotaveras.reels.data.remote.movie.mapper.toDiscoverMovieRequestParameters
+import com.norbertotaveras.reels.data.remote.movie.mapper.toMovieCreditsDataModel
+import com.norbertotaveras.reels.data.remote.movie.mapper.toMovieDataModel
+import com.norbertotaveras.reels.data.remote.movie.mapper.toMovieDetailsDataModel
+import com.norbertotaveras.reels.data.remote.movie.mapper.toMovieVideosDataModel
+import com.norbertotaveras.reels.data.remote.movie.mapper.toTmdbPathSegment
+import com.norbertotaveras.reels.data.remote.movie.paging.CachedMovieListRemoteMediator
+import com.norbertotaveras.reels.data.remote.movie.paging.TMDB_FIRST_PAGE
+import com.norbertotaveras.reels.data.remote.movie.paging.cacheKey
+import com.norbertotaveras.reels.data.remote.movie.paging.discoverCacheKey
+import com.norbertotaveras.reels.data.remote.movie.paging.searchCacheKey
+import com.norbertotaveras.reels.data.remote.movie.paging.similarMoviesCacheKey
+import com.norbertotaveras.reels.data.remote.movie.paging.tmdbPagingConfig
+import com.norbertotaveras.reels.data.remote.movie.paging.trendingCacheKey
 import com.norbertotaveras.reels.data.repository.cachedTmdbResult
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
-import com.norbertotaveras.reels.domain.model.constant.MovieCategory
-import com.norbertotaveras.reels.domain.model.discover.DiscoverFilterDataModel
-import com.norbertotaveras.reels.domain.model.genre.GenreDataModel
-import com.norbertotaveras.reels.domain.model.movie.CachedMovieDetailsDataModel
-import com.norbertotaveras.reels.domain.model.movie.MovieCreditsDataModel
-import com.norbertotaveras.reels.domain.model.movie.MovieDataModel
-import com.norbertotaveras.reels.domain.model.movie.MovieVideosDataModel
+import com.norbertotaveras.reels.domain.discover.model.DiscoverFilterDataModel
+import com.norbertotaveras.reels.domain.movie.model.CachedMovieDetailsDataModel
+import com.norbertotaveras.reels.domain.movie.model.GenreDataModel
+import com.norbertotaveras.reels.domain.movie.model.MovieCategory
+import com.norbertotaveras.reels.domain.movie.model.MovieCreditsDataModel
+import com.norbertotaveras.reels.domain.movie.model.MovieDataModel
+import com.norbertotaveras.reels.domain.movie.model.MovieVideosDataModel
+import com.norbertotaveras.reels.domain.movie.repository.MovieRepository
 import com.norbertotaveras.reels.domain.network.NetworkMonitor
-import com.norbertotaveras.reels.domain.repository.movie.MovieRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CancellationException

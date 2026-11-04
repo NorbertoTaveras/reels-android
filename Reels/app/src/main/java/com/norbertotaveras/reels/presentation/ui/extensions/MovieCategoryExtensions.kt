@@ -7,7 +7,7 @@
 
 package com.norbertotaveras.reels.presentation.ui.extensions
 
-import com.norbertotaveras.reels.domain.model.constant.MovieCategory
+import com.norbertotaveras.reels.domain.movie.model.MovieCategory
 
 val MovieCategory.displayLabel: String
     get() = when (this) {

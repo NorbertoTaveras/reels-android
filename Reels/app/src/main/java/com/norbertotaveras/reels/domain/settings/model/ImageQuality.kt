@@ -1,0 +1,22 @@
+/*
+ * Copyright (c) 2026 Norberto Taveras. All rights reserved.
+ *
+ * This source code is proprietary and confidential. Unauthorized copying,
+ * modification, distribution, or use is prohibited.
+ */
+
+package com.norbertotaveras.reels.domain.settings.model
+
+enum class ImageQuality {
+    High,
+    Standard,
+    Low;
+
+    fun next(): ImageQuality {
+        return when (this) {
+            High -> Standard
+            Standard -> Low
+            Low -> High
+        }
+    }
+}

@@ -1,0 +1,20 @@
+/*
+ * Copyright (c) 2026 Norberto Taveras. All rights reserved.
+ *
+ * This source code is proprietary and confidential. Unauthorized copying,
+ * modification, distribution, or use is prohibited.
+ */
+
+package com.norbertotaveras.reels.domain.library.usecase
+
+import com.norbertotaveras.reels.domain.library.repository.FavoriteMoviesRepository
+import com.norbertotaveras.reels.domain.movie.model.MovieDetailsDataModel
+import javax.inject.Inject
+
+class ToggleFavoriteMovieUseCase @Inject constructor(
+    private val repository: FavoriteMoviesRepository
+) {
+    suspend operator fun invoke(movie: MovieDetailsDataModel): Result<Unit> {
+        return repository.toggleFavoriteMovie(movie = movie)
+    }
+}

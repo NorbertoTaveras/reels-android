@@ -7,7 +7,7 @@
 
 package com.norbertotaveras.reels.domain.plans
 
-import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
+import com.norbertotaveras.reels.domain.plans.model.MovieNightPlan
 import kotlin.math.roundToInt
 
 object MovieNightJourney {

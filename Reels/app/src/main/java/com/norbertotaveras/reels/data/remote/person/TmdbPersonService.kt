@@ -7,8 +7,8 @@
 
 package com.norbertotaveras.reels.data.remote.person
 
-import com.norbertotaveras.reels.data.remote.dto.person.PersonDetailsDto
-import com.norbertotaveras.reels.data.remote.dto.person.PersonMovieCreditsDto
+import com.norbertotaveras.reels.data.remote.person.dto.PersonDetailsDto
+import com.norbertotaveras.reels.data.remote.person.dto.PersonMovieCreditsDto
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

@@ -8,7 +8,7 @@
 package com.norbertotaveras.reels.presentation.features.settings
 
 import com.norbertotaveras.reels.BuildConfig
-import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
+import com.norbertotaveras.reels.domain.settings.model.LanguageRegion
 
 internal fun buildAppVersionLabel(): String {
     return "${BuildConfig.VERSION_NAME} (build ${BuildConfig.VERSION_CODE})"

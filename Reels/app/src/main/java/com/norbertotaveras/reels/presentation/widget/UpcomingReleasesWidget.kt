@@ -45,8 +45,22 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import com.norbertotaveras.reels.R
 import com.norbertotaveras.reels.data.widget.PlanWidgetEntryPoint
-import com.norbertotaveras.reels.domain.model.plans.TrackedRelease
+import com.norbertotaveras.reels.domain.plans.model.TrackedRelease
 import com.norbertotaveras.reels.presentation.ui.theme.PlanWidgetDimensions
+import com.norbertotaveras.reels.presentation.widget.releases.WidgetReleaseMetadata
+import com.norbertotaveras.reels.presentation.widget.shared.EmptyWidgetMessage
+import com.norbertotaveras.reels.presentation.widget.shared.PlanWidgetTheme
+import com.norbertotaveras.reels.presentation.widget.shared.WidgetBackdrop
+import com.norbertotaveras.reels.presentation.widget.shared.WidgetDivider
+import com.norbertotaveras.reels.presentation.widget.shared.WidgetHeader
+import com.norbertotaveras.reels.presentation.widget.shared.WidgetIcon
+import com.norbertotaveras.reels.presentation.widget.shared.WidgetPoster
+import com.norbertotaveras.reels.presentation.widget.shared.isImminentWidgetRelease
+import com.norbertotaveras.reels.presentation.widget.shared.rememberWidgetArtwork
+import com.norbertotaveras.reels.presentation.widget.shared.toCompactWidgetReleaseDate
+import com.norbertotaveras.reels.presentation.widget.shared.toWidgetLabel
+import com.norbertotaveras.reels.presentation.widget.shared.toWidgetReleaseCountdown
+import com.norbertotaveras.reels.presentation.widget.shared.toWidgetReleaseDate
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.map
 

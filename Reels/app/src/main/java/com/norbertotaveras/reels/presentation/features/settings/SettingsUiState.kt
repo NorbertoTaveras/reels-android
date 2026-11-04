@@ -7,10 +7,11 @@
 
 package com.norbertotaveras.reels.presentation.features.settings
 
-import com.norbertotaveras.reels.domain.model.settings.AppTheme
-import com.norbertotaveras.reels.domain.model.settings.ImageQuality
-import com.norbertotaveras.reels.domain.model.settings.LanguageRegion
-import com.norbertotaveras.reels.domain.model.settings.PlanPreferences
+import com.norbertotaveras.reels.domain.settings.model.AppTheme
+import com.norbertotaveras.reels.domain.settings.model.ImageQuality
+import com.norbertotaveras.reels.domain.settings.model.LanguageRegion
+import com.norbertotaveras.reels.domain.settings.model.PlanPreferences
+import com.norbertotaveras.reels.presentation.features.settings.dialog.SettingsPreferenceDialog
 
 data class SettingsUiState(
     val planPreferences: PlanPreferences = PlanPreferences(),

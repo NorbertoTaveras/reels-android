@@ -7,7 +7,7 @@
 
 package com.norbertotaveras.reels.presentation.ui.extensions
 
-import com.norbertotaveras.reels.domain.model.plans.ReleaseReminder
+import com.norbertotaveras.reels.domain.plans.model.ReleaseReminder
 
 internal fun ReleaseReminder.defaultReminderLabel(): String =
     when (this) {

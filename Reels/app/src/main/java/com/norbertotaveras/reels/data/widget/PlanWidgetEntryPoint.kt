@@ -7,10 +7,10 @@
 
 package com.norbertotaveras.reels.data.widget
 
-import com.norbertotaveras.reels.domain.plans.ReelsNotificationManager
 import com.norbertotaveras.reels.domain.network.NetworkMonitor
-import com.norbertotaveras.reels.domain.repository.plans.MovieNightRepository
-import com.norbertotaveras.reels.domain.repository.plans.TrackedReleaseRepository
+import com.norbertotaveras.reels.domain.plans.ReelsNotificationManager
+import com.norbertotaveras.reels.domain.plans.repository.MovieNightRepository
+import com.norbertotaveras.reels.domain.plans.repository.TrackedReleaseRepository
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent

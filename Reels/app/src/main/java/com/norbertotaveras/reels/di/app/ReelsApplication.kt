@@ -9,10 +9,10 @@ package com.norbertotaveras.reels.di.app
 
 import android.app.Application
 import com.norbertotaveras.reels.data.widget.WidgetConnectivityObserver
-import com.norbertotaveras.reels.domain.plans.ReelsNotificationManager
-import com.norbertotaveras.reels.domain.repository.settings.SettingsRepository
-import com.norbertotaveras.reels.domain.usecase.plans.RefreshTrackedReleasesUseCase
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
+import com.norbertotaveras.reels.domain.plans.ReelsNotificationManager
+import com.norbertotaveras.reels.domain.plans.usecase.RefreshTrackedReleasesUseCase
+import com.norbertotaveras.reels.domain.settings.repository.SettingsRepository
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher

@@ -7,15 +7,15 @@
 
 package com.norbertotaveras.reels.data.remote.account
 
-import com.norbertotaveras.reels.data.remote.dto.account.TmdbAccountDto
-import com.norbertotaveras.reels.data.remote.dto.account.TmdbCreateSessionRequestDto
-import com.norbertotaveras.reels.data.remote.dto.account.TmdbDeleteSessionRequestDto
-import com.norbertotaveras.reels.data.remote.dto.account.TmdbMovieAccountStateDto
-import com.norbertotaveras.reels.data.remote.dto.account.TmdbRatingRequestDto
-import com.norbertotaveras.reels.data.remote.dto.account.TmdbRequestTokenDto
-import com.norbertotaveras.reels.data.remote.dto.account.TmdbSessionDto
-import com.norbertotaveras.reels.data.remote.dto.account.TmdbWatchlistRequestDto
-import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
+import com.norbertotaveras.reels.data.remote.account.dto.TmdbAccountDto
+import com.norbertotaveras.reels.data.remote.account.dto.TmdbCreateSessionRequestDto
+import com.norbertotaveras.reels.data.remote.account.dto.TmdbDeleteSessionRequestDto
+import com.norbertotaveras.reels.data.remote.account.dto.TmdbMovieAccountStateDto
+import com.norbertotaveras.reels.data.remote.account.dto.TmdbRatingRequestDto
+import com.norbertotaveras.reels.data.remote.account.dto.TmdbRequestTokenDto
+import com.norbertotaveras.reels.data.remote.account.dto.TmdbSessionDto
+import com.norbertotaveras.reels.data.remote.account.dto.TmdbWatchlistRequestDto
+import com.norbertotaveras.reels.data.remote.movie.dto.MoviesResponseDto
 import javax.inject.Inject
 
 class TmdbAccountRemoteDataSourceImpl @Inject constructor(

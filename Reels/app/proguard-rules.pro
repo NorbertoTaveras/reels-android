@@ -22,7 +22,10 @@
 
 # Gson reads TMDB DTO fields through reflection. DTO fields use explicit
 # @SerializedName values, so field names may still be obfuscated.
--keepclassmembers,allowobfuscation class com.norbertotaveras.reels.data.remote.dto.** {
+-keepclassmembers,allowobfuscation class com.norbertotaveras.reels.data.remote.*.dto.** {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
+-keepclassmembers,allowobfuscation class com.norbertotaveras.reels.data.remote.error.TmdbErrorResponseDto {
     @com.google.gson.annotations.SerializedName <fields>;
 }
 -keepattributes Signature

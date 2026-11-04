@@ -48,9 +48,25 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import com.norbertotaveras.reels.R
 import com.norbertotaveras.reels.data.widget.PlanWidgetEntryPoint
-import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
-import com.norbertotaveras.reels.domain.model.plans.MovieNightStatus
+import com.norbertotaveras.reels.domain.plans.model.MovieNightPlan
+import com.norbertotaveras.reels.domain.plans.model.MovieNightStatus
 import com.norbertotaveras.reels.presentation.ui.theme.PlanWidgetDimensions
+import com.norbertotaveras.reels.presentation.widget.movienight.WidgetMovieNightMetadata
+import com.norbertotaveras.reels.presentation.widget.shared.EmptyWidgetMessage
+import com.norbertotaveras.reels.presentation.widget.shared.PlanWidgetTheme
+import com.norbertotaveras.reels.presentation.widget.shared.WidgetBackdrop
+import com.norbertotaveras.reels.presentation.widget.shared.WidgetCountdown
+import com.norbertotaveras.reels.presentation.widget.shared.WidgetDivider
+import com.norbertotaveras.reels.presentation.widget.shared.WidgetHeader
+import com.norbertotaveras.reels.presentation.widget.shared.WidgetIcon
+import com.norbertotaveras.reels.presentation.widget.shared.WidgetPoster
+import com.norbertotaveras.reels.presentation.widget.shared.canStartFromWidget
+import com.norbertotaveras.reels.presentation.widget.shared.hasWidgetJourney
+import com.norbertotaveras.reels.presentation.widget.shared.rememberWidgetArtwork
+import com.norbertotaveras.reels.presentation.widget.shared.runtimeLabel
+import com.norbertotaveras.reels.presentation.widget.shared.runtimeRemainingLabel
+import com.norbertotaveras.reels.presentation.widget.shared.toRelativeWidgetDateTime
+import com.norbertotaveras.reels.presentation.widget.shared.toWidgetCountdown
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.map
 

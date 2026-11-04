@@ -7,11 +7,11 @@
 
 package com.norbertotaveras.reels.data.remote.movie
 
-import com.norbertotaveras.reels.data.remote.dto.genre.GenresResponseDto
-import com.norbertotaveras.reels.data.remote.dto.movie.MovieCreditsDto
-import com.norbertotaveras.reels.data.remote.dto.movie.MovieDetailsDto
-import com.norbertotaveras.reels.data.remote.dto.movie.MovieVideosDto
-import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
+import com.norbertotaveras.reels.data.remote.movie.dto.GenresResponseDto
+import com.norbertotaveras.reels.data.remote.movie.dto.MovieCreditsDto
+import com.norbertotaveras.reels.data.remote.movie.dto.MovieDetailsDto
+import com.norbertotaveras.reels.data.remote.movie.dto.MovieVideosDto
+import com.norbertotaveras.reels.data.remote.movie.dto.MoviesResponseDto
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

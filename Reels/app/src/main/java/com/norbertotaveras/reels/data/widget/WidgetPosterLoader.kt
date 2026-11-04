@@ -16,13 +16,13 @@ import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.Shader
+import androidx.core.graphics.createBitmap
 import com.norbertotaveras.reels.BuildConfig
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import androidx.core.graphics.createBitmap
 
 internal object WidgetPosterLoader {
     suspend fun load(context: Context, posterPath: String?): Bitmap? = withContext(Dispatchers.IO) {

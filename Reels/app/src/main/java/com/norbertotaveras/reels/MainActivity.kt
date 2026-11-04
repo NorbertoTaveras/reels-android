@@ -21,10 +21,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.norbertotaveras.reels.domain.model.settings.AppSettings
-import com.norbertotaveras.reels.domain.model.settings.AppTheme
-import com.norbertotaveras.reels.domain.model.account.TmdbAuthenticationCallback
-import com.norbertotaveras.reels.domain.usecase.settings.ObserveSettingsUseCase
+import com.norbertotaveras.reels.domain.account.model.TmdbAuthenticationCallback
+import com.norbertotaveras.reels.domain.settings.model.AppSettings
+import com.norbertotaveras.reels.domain.settings.model.AppTheme
+import com.norbertotaveras.reels.domain.settings.usecase.ObserveSettingsUseCase
 import com.norbertotaveras.reels.presentation.navigation.ReelsNavHost
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
 import dagger.hilt.android.AndroidEntryPoint

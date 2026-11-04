@@ -7,16 +7,16 @@
 
 package com.norbertotaveras.reels.data.repository.plans
 
-import com.norbertotaveras.reels.data.local.dao.MovieNightDao
-import com.norbertotaveras.reels.data.local.mapper.toDataModel
-import com.norbertotaveras.reels.data.local.mapper.toEntity
+import com.norbertotaveras.reels.data.local.plans.dao.MovieNightDao
+import com.norbertotaveras.reels.data.local.plans.mapper.toDataModel
+import com.norbertotaveras.reels.data.local.plans.mapper.toEntity
 import com.norbertotaveras.reels.data.repository.repositoryResult
 import com.norbertotaveras.reels.di.qualifiers.IoDispatcher
-import com.norbertotaveras.reels.domain.model.plans.MovieNightPlan
-import com.norbertotaveras.reels.domain.model.plans.MovieNightStatus
 import com.norbertotaveras.reels.domain.plans.PlanScheduler
 import com.norbertotaveras.reels.domain.plans.ReelsWidgetUpdater
-import com.norbertotaveras.reels.domain.repository.plans.MovieNightRepository
+import com.norbertotaveras.reels.domain.plans.model.MovieNightPlan
+import com.norbertotaveras.reels.domain.plans.model.MovieNightStatus
+import com.norbertotaveras.reels.domain.plans.repository.MovieNightRepository
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow

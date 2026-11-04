@@ -7,11 +7,11 @@
 
 package com.norbertotaveras.reels.data.remote.account
 
-import com.norbertotaveras.reels.data.remote.dto.account.TmdbAccountDto
-import com.norbertotaveras.reels.data.remote.dto.account.TmdbMovieAccountStateDto
-import com.norbertotaveras.reels.data.remote.dto.account.TmdbRequestTokenDto
-import com.norbertotaveras.reels.data.remote.dto.account.TmdbSessionDto
-import com.norbertotaveras.reels.data.remote.dto.movie.MoviesResponseDto
+import com.norbertotaveras.reels.data.remote.account.dto.TmdbAccountDto
+import com.norbertotaveras.reels.data.remote.account.dto.TmdbMovieAccountStateDto
+import com.norbertotaveras.reels.data.remote.account.dto.TmdbRequestTokenDto
+import com.norbertotaveras.reels.data.remote.account.dto.TmdbSessionDto
+import com.norbertotaveras.reels.data.remote.movie.dto.MoviesResponseDto
 
 interface TmdbAccountRemoteDataSource {
     suspend fun createRequestToken(): TmdbRequestTokenDto

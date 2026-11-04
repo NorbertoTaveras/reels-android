@@ -9,7 +9,7 @@ package com.norbertotaveras.reels.presentation.ui.extensions
 
 import androidx.compose.runtime.Composable
 import com.norbertotaveras.reels.BuildConfig
-import com.norbertotaveras.reels.domain.model.settings.ImageQuality
+import com.norbertotaveras.reels.domain.settings.model.ImageQuality
 import com.norbertotaveras.reels.presentation.ui.theme.LocalImageQuality
 
 @Composable
