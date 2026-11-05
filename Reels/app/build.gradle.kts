@@ -116,7 +116,7 @@ dependencies {
     implementation(libs.androidx.glance.material3)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.hilt.navigation.compose)
+    implementation(libs.hilt.lifecycle.viewmodel.compose)
 
     // core
     implementation(libs.androidx.core)
