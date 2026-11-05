@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.norbertotaveras.reels.domain.movie.model.GenreDataModel
@@ -33,7 +34,6 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsTheme
-import java.util.Locale
 
 @Composable
 fun MovieDetailsContent(
@@ -82,7 +82,7 @@ fun MovieDetailsContent(
                     movie.releaseDate.toReleaseYear(),
                     movie.runtime?.takeIf { it > 0 }?.let { "$it min" }
                 ),
-                rating = String.format(Locale.getDefault(), "%.1f", movie.voteAverage),
+                rating = String.format(LocalLocale.current.platformLocale, "%.1f", movie.voteAverage),
                 genres = movie.genres.map { it.name },
                 isFavorite = isFavorite,
                 isFavoriteLoading = isFavoriteLoading,
@@ -119,7 +119,7 @@ fun MovieDetailsContent(
             MovieInfoSection(
                 releaseDate = movie.releaseDate,
                 originalLanguage = movie.originalLanguage,
-                popularityLabel = "%,d votes".format(Locale.getDefault(), movie.voteCount),
+                popularityLabel = "%,d votes".format(LocalLocale.current.platformLocale, movie.voteCount),
                 modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing)
             )
         }

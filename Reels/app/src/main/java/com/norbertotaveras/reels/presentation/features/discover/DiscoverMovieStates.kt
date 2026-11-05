@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -54,7 +55,6 @@ import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
 import com.norbertotaveras.reels.presentation.ui.theme.reelsImageRatingContentColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPlaceholderColor
 import com.norbertotaveras.reels.presentation.ui.theme.reelsPosterRatingContainerColor
-import java.util.Locale
 
 @Composable
 internal fun DiscoverPosterCard(
@@ -156,7 +156,7 @@ private fun DiscoverRatingBadge(
             )
 
             Text(
-                text = String.format(Locale.getDefault(), "%.1f", rating),
+                text = String.format(LocalLocale.current.platformLocale, "%.1f", rating),
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontSize = 12.sp,
                     lineHeight = 16.sp

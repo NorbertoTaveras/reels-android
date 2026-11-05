@@ -22,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLocale
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.norbertotaveras.reels.domain.movie.model.MovieDataModel
@@ -34,7 +35,6 @@ import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
 import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsDimensions
 import com.norbertotaveras.reels.presentation.ui.theme.ReelsSpacing
-import java.util.Locale
 
 @Composable
 internal fun SearchContent(
@@ -151,7 +151,7 @@ internal fun SearchContent(
                                 genres = movie.genreIds
                                     .mapNotNull { state.genreNamesById[it] }
                                     .take(3),
-                                rating = String.format(Locale.getDefault(), "%.1f", movie.voteAverage),
+                                rating = String.format(LocalLocale.current.platformLocale, "%.1f", movie.voteAverage),
                                 onClick = {
                                     onEvent(SearchEvent.MovieClicked(movie.id))
                                 }
