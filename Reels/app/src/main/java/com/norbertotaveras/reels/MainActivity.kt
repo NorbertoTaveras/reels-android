@@ -34,7 +34,6 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var observeSettingsUseCase: ObserveSettingsUseCase
-
     private var tmdbAuthCallbackId by mutableStateOf<Long?>(null)
     private var deepLinkRequest by mutableStateOf<String?>(null)
 
