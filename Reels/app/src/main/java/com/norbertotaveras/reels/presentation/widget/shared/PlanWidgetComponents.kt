@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.glance.ColorFilter
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
@@ -50,7 +51,14 @@ internal fun WidgetHeader(title: String) {
         ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        WidgetMark(GlanceModifier.size(PlanWidgetDimensions.BrandMarkSize))
+        WidgetMark(GlanceModifier.size(PlanWidgetDimensions.BrandMarkSize)) {
+            Image(
+                provider = ImageProvider(R.drawable.widget_ribbon_mark),
+                contentDescription = null,
+                modifier = GlanceModifier.size(PlanWidgetDimensions.BrandGlyphSize),
+                colorFilter = ColorFilter.tint(PlanWidgetTheme.OnAccent),
+            )
+        }
         Spacer(GlanceModifier.width(PlanWidgetDimensions.HeaderItemSpacing))
         Text(
             text = title.uppercase(),
@@ -84,7 +92,7 @@ internal fun WidgetPoster(
             contentScale = ContentScale.Crop,
         )
     } else {
-        WidgetMark(
+        WidgetImageFallbackMark(
             modifier = GlanceModifier
                 .width(width)
                 .height(height)
@@ -121,7 +129,7 @@ internal fun WidgetBackdrop(
                 contentScale = ContentScale.Crop,
             )
         } else {
-            WidgetMark(GlanceModifier.fillMaxSize())
+            WidgetImageFallbackMark(GlanceModifier.fillMaxSize())
         }
     }
 }
@@ -158,7 +166,21 @@ internal fun EmptyWidgetMessage(context: Context, message: String, compact: Bool
 }
 
 @Composable
-private fun WidgetMark(modifier: GlanceModifier) {
+private fun WidgetImageFallbackMark(modifier: GlanceModifier) {
+    WidgetMark(modifier) {
+        Text(
+            text = "R",
+            style = TextStyle(
+                color = PlanWidgetTheme.OnAccent,
+                fontSize = 8.sp,
+                fontWeight = FontWeight.Bold,
+            ),
+        )
+    }
+}
+
+@Composable
+private fun WidgetMark(modifier: GlanceModifier, content: @Composable () -> Unit) {
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center,
@@ -169,16 +191,8 @@ private fun WidgetMark(modifier: GlanceModifier) {
                 .background(PlanWidgetTheme.Accent)
                 .cornerRadius(PlanWidgetDimensions.BrandMarkCornerSize),
             contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = "R",
-                style = TextStyle(
-                    color = PlanWidgetTheme.OnAccent,
-                    fontSize = 8.sp,
-                    fontWeight = FontWeight.Bold,
-                ),
-            )
-        }
+            content = content,
+        )
     }
 }
 

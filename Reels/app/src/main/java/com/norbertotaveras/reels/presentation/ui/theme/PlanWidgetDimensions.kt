@@ -40,6 +40,7 @@ internal object PlanWidgetDimensions {
     val MediumReleaseDetailsHeight = 49.dp
     val ContentSpacing = 8.dp
     val BrandMarkSize = 13.dp
+    val BrandGlyphSize = 10.dp
     val BrandMarkCornerSize = 3.dp
     val CompactEmptyMarkSize = 22.dp
     val EmptyMarkSize = 28.dp
