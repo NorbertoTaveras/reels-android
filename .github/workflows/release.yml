@@ -1,0 +1,176 @@
+name: Production release
+
+on:
+  push:
+    branches: ['release/**']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: >-
+      github.repository_id == '1230607410' &&
+      github.repository_owner_id == '25468673' &&
+      github.actor_id == '25468673' &&
+      github.triggering_actor == github.repository_owner &&
+      !github.event.deleted
+    uses: ./.github/workflows/android.yml
+
+  release:
+    name: Sign APK and prepare draft
+    needs: validate
+    if: >-
+      github.repository_id == '1230607410' &&
+      github.repository_owner_id == '25468673' &&
+      github.actor_id == '25468673' &&
+      github.triggering_actor == github.repository_owner
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: production
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out the validated commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up JDK
+        uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Validate wrapper and set up Gradle cache
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+        with:
+          validate-wrappers: true
+          cache-read-only: true
+
+      - name: Check branch and Android SDK
+        run: |
+          version="${GITHUB_REF_NAME#release/}"
+          if [[ ! "$version" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo '::error::Use a release branch named release/MAJOR.MINOR.PATCH.'
+            exit 1
+          fi
+          sdk_root="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+          : "${sdk_root:?Android SDK location is not configured}"
+          packages=()
+          [[ -f "$sdk_root/platforms/android-37.0/android.jar" ]] || packages+=('platforms;android-37.0')
+          [[ -x "$sdk_root/build-tools/36.1.0/apksigner" ]] || packages+=('build-tools;36.1.0')
+          if (( ${#packages[@]} )); then
+            "$sdk_root/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$sdk_root" "${packages[@]}"
+          fi
+          {
+            printf 'RELEASE_VERSION=%s\n' "$version"
+            printf 'BUILD_TOOLS=%s/build-tools/36.1.0\n' "$sdk_root"
+          } >> "$GITHUB_ENV"
+
+      - name: Build Production APK
+        working-directory: Reels
+        env:
+          TMDB_READ_TOKEN: ${{ secrets.TMDB_READ_TOKEN }}
+        run: |
+          : "${TMDB_READ_TOKEN:?Configure the production TMDB_READ_TOKEN secret}"
+          ./gradlew --no-daemon --console=plain :app:assembleProductionRelease
+
+      - name: Verify APK version and prepare release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          apk=Reels/app/build/outputs/apk/production/release/app-production-release-unsigned.apk
+          badging=$("$BUILD_TOOLS/aapt" dump badging "$apk")
+          package=$(sed -n "s/^package: name='\([^']*\)'.*/\1/p" <<< "$badging")
+          version=$(sed -n "s/^package: .*versionName='\([^']*\)'.*/\1/p" <<< "$badging")
+          code=$(sed -n "s/^package: .*versionCode='\([0-9]*\)'.*/\1/p" <<< "$badging")
+          if [[ "$package" != com.norbertotaveras.reels || "$version" != "$RELEASE_VERSION" || ! "$code" =~ ^[1-9][0-9]*$ ]]; then
+            echo '::error::APK package or version does not match the Production release branch.'
+            exit 1
+          fi
+
+          previous=$(gh release list --exclude-drafts --exclude-pre-releases --limit 1 --json tagName --jq '.[0].tagName // empty')
+          range="$GITHUB_SHA"
+          if [[ -n "$previous" ]]; then
+            git merge-base --is-ancestor "refs/tags/$previous" "$GITHUB_SHA"
+            old_apk="$RUNNER_TEMP/previous-release.apk"
+            gh release download "$previous" --pattern "Reels-${previous#v}.apk" --output "$old_apk"
+            old_badging=$("$BUILD_TOOLS/aapt" dump badging "$old_apk")
+            old_code=$(sed -n "s/^package: .*versionCode='\([0-9]*\)'.*/\1/p" <<< "$old_badging")
+            if [[ ! "$old_code" =~ ^[1-9][0-9]*$ ]] || (( code <= old_code )); then
+              echo '::error::Production versionCode must increase from the last published APK.'
+              exit 1
+            fi
+            range="refs/tags/$previous..$GITHUB_SHA"
+          fi
+          {
+            printf '## Changes\n\n'
+            git log --no-merges --grep='^RS-[0-9][0-9]* | ' --format='- %s (%h)' "$range" --
+            if [[ -n "$previous" ]]; then
+              printf '\n[Full comparison](%s/%s/compare/%s...%s)\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$previous" "$GITHUB_SHA"
+            fi
+            printf '\nBuilt from commit %s. Android version code: %s.\n' "$GITHUB_SHA" "$code"
+          } > "$RUNNER_TEMP/release-notes.md"
+
+      - name: Sign and verify Production APK
+        env:
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          RELEASE_CERT_SHA256: ${{ vars.RELEASE_CERT_SHA256 }}
+        run: |
+          : "${RELEASE_KEYSTORE_BASE64:?Missing release keystore}"
+          : "${RELEASE_STORE_PASSWORD:?Missing keystore password}"
+          : "${RELEASE_KEY_ALIAS:?Missing key alias}"
+          : "${RELEASE_KEY_PASSWORD:?Missing key password}"
+          expected="${RELEASE_CERT_SHA256//:/}"
+          [[ "$expected" =~ ^[0-9a-fA-F]{64}$ ]] || { echo '::error::Configure RELEASE_CERT_SHA256.'; exit 1; }
+          umask 077
+          keystore=$(mktemp "$RUNNER_TEMP/reels-keystore.XXXXXX")
+          trap 'rm -f "$keystore"' EXIT
+          printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 --decode > "$keystore"
+          apk=Reels/app/build/outputs/apk/production/release/app-production-release-unsigned.apk
+          cd "$RUNNER_TEMP"
+          signed="Reels-$RELEASE_VERSION.apk"
+          "$BUILD_TOOLS/zipalign" -P 16 -f 4 "$GITHUB_WORKSPACE/$apk" reels-aligned.apk
+          "$BUILD_TOOLS/apksigner" sign --ks "$keystore" --ks-key-alias "$RELEASE_KEY_ALIAS" \
+            --ks-pass env:RELEASE_STORE_PASSWORD --key-pass env:RELEASE_KEY_PASSWORD \
+            --v4-signing-enabled false --out "$signed" reels-aligned.apk
+          verification=$("$BUILD_TOOLS/apksigner" verify --print-certs "$signed")
+          actual=$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' <<< "$verification")
+          if [[ "$(tr '[:upper:]' '[:lower:]' <<< "$actual")" != "$(tr '[:upper:]' '[:lower:]' <<< "$expected")" ]]; then
+            echo '::error::The APK was not signed with the expected Production certificate.'
+            exit 1
+          fi
+          sha256sum "$signed" > "$signed.sha256"
+
+      - name: Attach APK to draft GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tip=$(git ls-remote origin "$GITHUB_REF" | cut -f1)
+          [[ "$tip" == "$GITHUB_SHA" ]] || { echo '::error::Release branch moved during the build.'; exit 1; }
+          tag="v$RELEASE_VERSION"
+          tag_commit=$(git rev-parse --verify --quiet "refs/tags/$tag^{commit}" || true)
+          if [[ -n "$tag_commit" && "$tag_commit" != "$GITHUB_SHA" ]]; then
+            echo '::error::Release tag already points to a different commit.'
+            exit 1
+          fi
+          signed="$RUNNER_TEMP/Reels-$RELEASE_VERSION.apk"
+          notes="$RUNNER_TEMP/release-notes.md"
+          if existing=$(gh release view "$tag" --json isDraft --jq '.isDraft'); then
+            [[ "$existing" == true ]] || { echo '::error::This release is already published.'; exit 1; }
+            gh release edit "$tag" --target "$GITHUB_SHA" --notes-file "$notes"
+            gh release upload "$tag" "$signed" "$signed.sha256" --clobber
+          else
+            gh release create "$tag" "$signed" "$signed.sha256" \
+              --draft --target "$GITHUB_SHA" --title "Reels $RELEASE_VERSION" --notes-file "$notes"
+          fi

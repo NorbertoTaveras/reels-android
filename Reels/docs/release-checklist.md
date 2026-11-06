@@ -34,10 +34,11 @@ Confirm these release expectations:
 
 ## Signing
 
-- Configure real release signing outside source control.
-- Do not commit the keystore or signing passwords.
-- Replace debug signing before Play Store distribution.
-- Verify `versionCode` and `versionName` before uploading a release candidate.
+- In GitHub, configure the `production` environment to allow only `release/*` branches and require approval before releasing secrets.
+- Add environment secrets `RELEASE_KEYSTORE_BASE64` (the base64-encoded Production keystore), `RELEASE_STORE_PASSWORD`, `RELEASE_KEY_ALIAS`, `RELEASE_KEY_PASSWORD`, and `TMDB_READ_TOKEN`. Keep the keystore and passwords out of source control. The TMDB token is embedded in the app; do not use credentials that must remain private after distribution.
+- Add the environment variable `RELEASE_CERT_SHA256` with the SHA-256 fingerprint of the expected Production signing certificate. Use the same signing key for upgrades.
+- Set `versionName` and increment `versionCode` before pushing `release/<versionName>`. GitHub Actions runs Android CI, then builds and signs the Production APK. It checks the version code against the last published stable release APK, when one exists.
+- Review the draft GitHub Release, its commit-based notes, and the signed APK and checksum. Smoke-test the signed APK before publishing the draft yourself.
 
 ## Privacy And Offline Behavior
 
