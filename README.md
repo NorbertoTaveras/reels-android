@@ -14,14 +14,28 @@
 ## Demo
 
 <p align="center">
-  <img src="Reels/docs/assets/reels-demo.gif" width="320" alt="Reels app demo"/>
+  <img src="Reels/docs/assets/reels-pixel-demo.gif" width="320" alt="Reels walkthrough on Pixel 10a: browsing, cast and filmography, planning, and widgets"/>
 </p>
 
 ## Screenshots
 
-<p align="center">
-  <img src="Reels/docs/assets/reels-screenshots.png" alt="Reels screenshots"/>
-</p>
+Captured in Reels on a Pixel 10a emulator.
+
+### Discovery
+
+![Home, Popular, Search results, and Discover filters](Reels/docs/assets/reels-pixel-discovery.png)
+
+### Movies and Cast
+
+![Movie Details, Full Cast, Cast Details, and Filmography](Reels/docs/assets/reels-pixel-movies.png)
+
+### Release Tracking and Movie Nights
+
+![Release reminder and Movie Night forms, followed by both Plans tabs](Reels/docs/assets/reels-pixel-planning.png)
+
+### Library, Settings, and Widgets
+
+![Library, reminder settings, and the Android launcher previews for both Reels widgets](Reels/docs/assets/reels-pixel-library.png)
 
 ## Download
 
