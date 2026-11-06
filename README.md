@@ -1,8 +1,8 @@
-# Reels
+<h1 align="center">Reels</h1>
 
 <p align="center">
   <img alt="API" src="https://img.shields.io/badge/API-23%2B-brightgreen.svg?style=flat"/>
-  <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-Modern-orange.svg?style=flat"/>
+  <img alt="Kotlin 2.4.21" src="https://img.shields.io/badge/Kotlin-2.4.21-orange.svg?style=flat"/>
   <img alt="Jetpack Compose" src="https://img.shields.io/badge/UI-Jetpack%20Compose-blue.svg?style=flat"/>
   <img alt="Material 3" src="https://img.shields.io/badge/Design-Material%203-6750A4.svg?style=flat"/>
 </p>
