@@ -1,0 +1,70 @@
+name: Android CI
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Build and lint
+    if: >-
+      github.repository_id == '1230607410' &&
+      github.repository_owner_id == '25468673' &&
+      github.actor_id == '25468673' &&
+      github.triggering_actor == github.repository_owner &&
+      github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    concurrency:
+      group: android-ci-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up JDK
+        uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Validate wrapper and set up Gradle cache
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+        with:
+          validate-wrappers: true
+
+      - name: Lint workflows
+        env:
+          ACTIONLINT_VERSION: 1.7.12
+          ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+        run: |
+          archive="$RUNNER_TEMP/actionlint.tar.gz"
+          curl -fsSL "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz" -o "$archive"
+          printf '%s  %s\n' "$ACTIONLINT_SHA256" "$archive" | sha256sum --check
+          tar -xzf "$archive" -C "$RUNNER_TEMP" actionlint
+          "$RUNNER_TEMP/actionlint"
+
+      - name: Install Android SDK
+        run: sdkmanager 'platforms;android-37.0'
+
+      - name: Build and lint Stage Debug and Production Release
+        working-directory: Reels
+        run: |
+          ./gradlew --no-daemon --console=plain \
+            :app:assembleStageDebug :app:lintStageDebug \
+            :app:assembleProductionRelease :app:lintProductionRelease
+
+      - name: Write validation summary
+        if: always()
+        run: |
+          {
+            echo '## Android CI'
+            echo '- Result: ${{ job.status }}'
+            echo '- Variants: Stage Debug and Production Release'
+            printf -- '- Commit: `%s`\n' "$GITHUB_SHA"
+          } >> "$GITHUB_STEP_SUMMARY"
