@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  Reels is a movies-first Android app powered by The Movie Database API. It demonstrates production-minded Android development with Kotlin, Jetpack Compose, Material 3, Hilt, Retrofit/OkHttp, Paging, Room, Coroutines, Flow, and MVVM with unidirectional UI state and events.
+  Reels is an Android app for discovering movies, tracking upcoming releases, and planning movie nights. Movie data is powered by The Movie Database (TMDB).
 </p>
 
 ## Demo
@@ -25,9 +25,7 @@
 
 ## Download
 
-Downloadable APKs will be published through [GitHub Releases](https://github.com/NorbertoTaveras/android_reels/releases).
-
-Until a release artifact is attached, you can build the production debug APK locally:
+No prebuilt APK is currently available on [GitHub Releases](https://github.com/NorbertoTaveras/android_reels/releases). To try Reels, follow [Setup](#setup), then build the Production debug APK locally:
 
 ```bash
 cd Reels
@@ -36,17 +34,14 @@ cd Reels
 
 ## About
 
-Reels focuses on a polished movie browsing experience inspired by premium streaming and movie discovery apps. The app includes category and Discover browsing, search, movie and cast details, trailers, filmography, local favorites, TMDB account sync, offline access, settings, and release-ready app configuration.
+- **Browse and discover:** Explore featured movies and paged category grids, filter Discover by genre, year, and rating, or search for movies.
+- **Movie and cast details:** See trailers, similar movies, full casts, and person filmographies.
+- **Library:** Save movies and people locally. Connect a TMDB account to manage your TMDB watchlist and ratings.
+- **Release Tracking:** Follow upcoming movies, set reminders, and see release-date changes as fresh TMDB data becomes available.
+- **Movie Nights:** Schedule a movie, set a reminder, and start, pause, resume, or finish a runtime timer. The timer starts only when you choose to start it.
+- **Home-screen widgets:** Add Upcoming Releases and Next Movie Night for quick access to your plans.
 
-Core screens:
-
-- Home with featured movies and poster carousels.
-- See All category screens with paged movie grids.
-- Search with recent searches, paged results, ratings, and genres.
-- Movie Details with metadata, genres, cast, trailers, similar movies, and favorite actions.
-- Full Cast and Cast Details screens.
-- Favorites with offline availability.
-- Settings with preferences, local storage actions, app info, privacy, and TMDB attribution.
+Release Tracking, Movie Nights, and their widgets work without TMDB sign-in.
 
 ## Project Structure
 
@@ -84,7 +79,8 @@ cd Reels
 
 Build variants:
 
-- `stageDebug`: stage application id and stage app name.
+- `stageDebug`: debuggable Reels Stage build with a separate application ID.
+- `stageRelease`: minified and resource-shrunk Stage build for release QA.
 - `productionDebug`: production application id with debug signing.
 - `productionRelease`: minified and resource-shrunk release build.
 
@@ -96,11 +92,11 @@ Common local commands:
 ./gradlew :app:assembleProductionRelease
 ```
 
-Before preparing a signed build, review the [release checklist](Reels/docs/release-checklist.md).
+Release variants are built unsigned by default. Before signing for distribution, review the [release checklist](Reels/docs/release-checklist.md).
 
 ## Tech Stack & Libraries
 
-- Minimum SDK level 23.
+- Minimum SDK 23 (Android 6.0), target SDK 36, and compile SDK 37.
 - [Kotlin](https://kotlinlang.org/) with [Coroutines](https://kotlinlang.org/docs/coroutines-overview.html) and Flow for asynchronous work and reactive streams.
 - Jetpack libraries:
   - Jetpack Compose for declarative UI.
@@ -108,13 +104,15 @@ Before preparing a signed build, review the [release checklist](Reels/docs/relea
   - Lifecycle and ViewModel for lifecycle-aware UI state.
   - Navigation Compose for screen navigation.
   - Paging 3 for paged movie lists and search results.
-  - Room for local favorites, saved people, and offline response caching.
+  - Room for saved movies and people, tracked releases, Movie Night plans, and offline response caching.
   - DataStore for app preferences.
+  - Glance and Android App Widgets for Upcoming Releases and Next Movie Night.
+- Android alarm and notification APIs for reminders and Movie Night progress. Eligible Android 16+ devices can show promoted Live Updates; older devices use standard notifications.
 - [Hilt](https://dagger.dev/hilt/) for dependency injection.
 - [Retrofit](https://square.github.io/retrofit/) and OkHttp for TMDB networking.
 - [Coil](https://coil-kt.github.io/coil/) for poster, backdrop, profile, and trailer image loading.
 - KSP for annotation processing.
-- Gradle version catalogs for dependency management.
+- The [Gradle version catalog](Reels/gradle/libs.versions.toml) is the source of truth for dependency versions.
 
 ## Architecture
 
@@ -138,14 +136,16 @@ Package structure:
 
 This keeps TMDB DTOs, Room entities, domain models, and UI models from leaking across layers.
 
+Room-backed release and Movie Night plans feed the Plans screen and Glance widgets. Plan changes also update Android alarm schedules and notifications through domain interfaces.
+
 ## Data & Offline Behavior
 
-Reels is online-first and cache-backed. Fresh TMDB responses are preferred, while previously loaded content remains available from Room when the network is unavailable. Local favorites and saved people are also stored in Room independently of the response cache.
+Reels is online-first. It prefers fresh TMDB responses and falls back to previously cached data in Room when connectivity is unavailable or a request fails. Saved movies and people, tracked releases, and Movie Night plans are stored locally, independently of the TMDB response cache.
 
 Current offline scope:
 
 - Home categories, Search, Discover results, trending movies, and category pagination.
-- Movie details, full cast, trailers, and similar movies after they have been loaded once.
+- Movie details, full cast, trailer listings, and similar movies after they have been loaded once. Trailer playback still requires a connection.
 - Person details and complete filmography after they have been loaded once.
 - TMDB watchlist, rated movies, and per-movie account state for the connected account.
 - Movie genres used by Discover filters.
@@ -174,8 +174,6 @@ The app includes:
 - Cleartext traffic disabled.
 - Loading, empty, error, retry, and offline states where applicable.
 - Light and dark Material 3 themes.
-
-See [release-checklist.md](Reels/docs/release-checklist.md) before creating a signed release artifact.
 
 ## License
 
