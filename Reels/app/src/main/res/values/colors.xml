@@ -6,5 +6,7 @@
   modification, distribution, or use is prohibited.
 -->
 <resources>
+    <color name="reels_launcher_background">#0F0F11</color>
+    <color name="reels_launcher_foreground">#D4A574</color>
     <color name="reels_notification_accent">#FFE6A64F</color>
 </resources>
