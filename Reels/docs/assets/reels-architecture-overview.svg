@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 780" width="1200" height="780" role="img" aria-labelledby="title desc">
+  <title id="title">Reels Android architecture</title>
+  <desc id="desc">Presentation and data both depend on domain contracts. Repositories access TMDB, Room, and DataStore. Plan repositories persist plans in Room for Glance widgets and schedule alarms that trigger notifications.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0 0L8 4L0 8Z" fill="#91a0aa"/>
+    </marker>
+    <style>
+      text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; fill: #f2f4f5; }
+      .title { font-size: 42px; font-weight: 700; }
+      .subtitle { font-size: 21px; fill: #bdc7ce; }
+      .section { font-size: 17px; font-weight: 700; fill: #efbf78; }
+      .name { font-size: 23px; font-weight: 650; }
+      .body { font-size: 18px; fill: #bdc7ce; }
+      .edge-label { font-size: 15px; fill: #bdc7ce; text-anchor: middle; }
+      .box { fill: #20272b; stroke: #47545c; }
+      .contract { fill: #302820; stroke: #9b7548; }
+      .edge { fill: none; stroke: #91a0aa; stroke-width: 2; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect width="1200" height="780" rx="16" fill="#151a1d"/>
+  <text x="44" y="72" class="title">Reels Android architecture</text>
+  <text x="44" y="105" class="subtitle">Compose UI, domain contracts, and device integrations</text>
+  <path d="M44 130H1156M44 438H1156" stroke="#47545c"/>
+
+  <text x="44" y="166" class="section">01 / APPLICATION DEPENDENCIES</text>
+  <text x="1156" y="166" text-anchor="end" class="body">Hilt binds contracts to implementations</text>
+
+  <rect x="44" y="192" width="300" height="128" rx="8" class="box"/>
+  <text x="64" y="228" class="name">Presentation</text>
+  <text x="64" y="264" class="body">Compose screens and ViewModels</text>
+  <text x="64" y="291" class="body">UI state, events, and effects</text>
+
+  <rect x="450" y="192" width="300" height="128" rx="8" class="contract"/>
+  <text x="470" y="228" class="name">Domain</text>
+  <text x="470" y="264" class="body">Use cases and domain models</text>
+  <text x="470" y="291" class="body">Repository and platform contracts</text>
+
+  <rect x="856" y="192" width="300" height="128" rx="8" class="box"/>
+  <text x="876" y="228" class="name">Data</text>
+  <text x="876" y="264" class="body">Repository implementations</text>
+  <text x="876" y="291" class="body">Paging 3, mapping, cache fallback</text>
+
+  <path d="M344 254H441" class="edge"/>
+  <text x="397" y="241" class="edge-label">calls</text>
+  <path d="M856 254H759" class="edge"/>
+  <text x="803" y="241" class="edge-label">implements</text>
+  <path d="M1006 320V341" class="edge"/>
+
+  <rect x="450" y="350" width="706" height="60" rx="8" class="box"/>
+  <text x="470" y="388" class="body">Retrofit / OkHttp: TMDB</text>
+  <path d="M697 368V392M938 368V392" stroke="#47545c"/>
+  <text x="722" y="388" class="body">Room: cache and records</text>
+  <text x="962" y="388" class="body">DataStore: settings</text>
+
+  <text x="44" y="478" class="section">02 / PLANS AT RUNTIME</text>
+
+  <rect x="44" y="510" width="300" height="196" rx="8" class="contract"/>
+  <text x="64" y="557" class="name">Plan repositories</text>
+  <text x="64" y="593" class="body">Tracked releases</text>
+  <text x="64" y="620" class="body">Movie Night plans</text>
+  <text x="64" y="672" class="body">Save changes and refresh widgets</text>
+
+  <rect x="450" y="510" width="300" height="86" rx="8" class="box"/>
+  <text x="470" y="546" class="name">Room plan records</text>
+  <text x="470" y="574" class="body">Dates, reminders, and plan state</text>
+  <rect x="856" y="510" width="300" height="86" rx="8" class="box"/>
+  <text x="876" y="546" class="name">Glance widgets</text>
+  <text x="876" y="574" class="body">Releases and Movie Night</text>
+  <path d="M344 554H441" class="edge"/>
+  <path d="M750 554H847" class="edge"/>
+  <text x="397" y="541" class="edge-label">persist</text>
+  <text x="803" y="541" class="edge-label">read by</text>
+
+  <rect x="450" y="620" width="300" height="86" rx="8" class="box"/>
+  <text x="470" y="656" class="name">Android alarms</text>
+  <text x="470" y="684" class="body">Exact or inexact scheduling</text>
+  <rect x="856" y="620" width="300" height="86" rx="8" class="box"/>
+  <text x="876" y="656" class="name">Notifications</text>
+  <text x="876" y="684" class="body">Reminders and runtime progress</text>
+  <path d="M344 664H441" class="edge"/>
+  <path d="M750 664H847" class="edge"/>
+  <text x="397" y="651" class="edge-label">schedule</text>
+  <text x="803" y="651" class="edge-label">trigger</text>
+
+  <text x="44" y="750" class="body">Widgets and notifications link back to Movie Details or the relevant Plans tab.</text>
+</svg>

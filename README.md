@@ -131,7 +131,7 @@ Release variants are built unsigned by default. Before signing for distribution,
 ## Architecture
 
 <p align="center">
-  <img src="Reels/docs/assets/reels-architecture.svg" alt="Reels architecture diagram"/>
+  <img src="Reels/docs/assets/reels-architecture-overview.svg" alt="Reels application dependencies and the flow from saved plans to widgets and notifications"/>
 </p>
 
 Reels uses MVVM with MVI-inspired input/output discipline inside each screen:
