@@ -13,21 +13,20 @@ jobs:
   validate:
     name: Build and lint
     if: >-
-      github.repository_id == '1230607410' &&
-      github.repository_owner_id == '25468673' &&
+      github.repository == 'NorbertoTaveras/reels-android' &&
       (
         (github.event_name == 'workflow_dispatch' &&
-         github.actor_id == '25468673' &&
+         github.actor == github.repository_owner &&
          github.triggering_actor == github.repository_owner &&
          github.ref == 'refs/heads/develop') ||
         (github.event_name == 'push' &&
-         github.actor_id == '25468673' &&
+         github.actor == github.repository_owner &&
          github.triggering_actor == github.repository_owner &&
          startsWith(github.ref, 'refs/heads/release/')) ||
         (github.event_name == 'pull_request' &&
          github.event.pull_request.user.login == 'dependabot[bot]' &&
-         github.event.pull_request.head.repo.id == 1230607410 &&
-         (github.actor == 'dependabot[bot]' || github.actor_id == '25468673') &&
+         github.event.pull_request.head.repo.full_name == github.repository &&
+         (github.actor == 'dependabot[bot]' || github.actor == github.repository_owner) &&
          (github.triggering_actor == 'dependabot[bot]' || github.triggering_actor == github.repository_owner))
       )
     runs-on: ubuntu-24.04

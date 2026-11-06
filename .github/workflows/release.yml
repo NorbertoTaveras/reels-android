@@ -14,9 +14,8 @@ concurrency:
 jobs:
   validate:
     if: >-
-      github.repository_id == '1230607410' &&
-      github.repository_owner_id == '25468673' &&
-      github.actor_id == '25468673' &&
+      github.repository == 'NorbertoTaveras/reels-android' &&
+      github.actor == github.repository_owner &&
       github.triggering_actor == github.repository_owner &&
       !github.event.deleted
     uses: ./.github/workflows/android.yml
@@ -25,9 +24,8 @@ jobs:
     name: Sign APK and prepare draft
     needs: validate
     if: >-
-      github.repository_id == '1230607410' &&
-      github.repository_owner_id == '25468673' &&
-      github.actor_id == '25468673' &&
+      github.repository == 'NorbertoTaveras/reels-android' &&
+      github.actor == github.repository_owner &&
       github.triggering_actor == github.repository_owner
     runs-on: ubuntu-24.04
     timeout-minutes: 30
