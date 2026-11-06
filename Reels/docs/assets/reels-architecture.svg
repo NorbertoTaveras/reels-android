@@ -1,6 +1,6 @@
-<svg width="1280" height="820" viewBox="0 0 1280 820" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+<svg width="1280" height="1010" viewBox="0 0 1280 1010" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">Reels Android architecture diagram</title>
-  <desc id="desc">A professional architecture diagram for Reels showing presentation, domain, data, local storage, TMDB API, and Hilt dependency injection boundaries.</desc>
+  <desc id="desc">Reels presentation, domain, data, and platform layers, including how local plans feed Android reminders and Glance widgets.</desc>
 
   <defs>
     <filter id="cardShadow" x="-16" y="-16" width="420" height="220" color-interpolation-filters="sRGB">
@@ -27,8 +27,8 @@
     </style>
   </defs>
 
-  <rect width="1280" height="820" rx="32" fill="#0B0B0D"/>
-  <rect x="28" y="28" width="1224" height="764" rx="28" fill="#101013" stroke="#25252C"/>
+  <rect width="1280" height="1010" rx="32" fill="#0B0B0D"/>
+  <rect x="28" y="28" width="1224" height="954" rx="28" fill="#101013" stroke="#25252C"/>
 
   <text x="68" y="82" class="title">Reels Architecture</text>
   <text x="68" y="113" class="subtitle">MVVM with MVI-inspired state, events, and effects built on Clean Architecture boundaries.</text>
@@ -112,8 +112,8 @@
     <rect x="1000" y="386" width="162" height="120" rx="20" fill="#211F2A" stroke="#3B3556"/>
     <text x="1024" y="426" class="label purple">Device Storage</text>
     <text x="1024" y="456" class="body">Favorites, settings,</text>
-    <text x="1024" y="477" class="body">recent searches,</text>
-    <text x="1024" y="498" class="body">offline detail fallback</text>
+    <text x="1024" y="477" class="body">plans, recent searches,</text>
+    <text x="1024" y="498" class="body">offline cache</text>
 
     <rect x="1000" y="546" width="162" height="72" rx="20" fill="#1A1713" stroke="#3B2C1A"/>
     <text x="1024" y="587" class="label accent">YouTube Intent</text>
@@ -135,4 +135,20 @@
   <text x="446" y="737" class="small">Domain models stay isolated</text>
   <circle cx="738" cy="732" r="6" fill="#3CBEC9"/>
   <text x="754" y="737" class="small">Remote and local sources are implementation details</text>
+
+  <text x="78" y="798" class="eyebrow">PLANS ON ANDROID</text>
+  <rect x="68" y="816" width="1126" height="130" rx="22" fill="#131317" stroke="#2B2B32"/>
+  <rect x="92" y="838" width="254" height="86" rx="14" fill="#1E2621" stroke="#314436"/>
+  <text x="112" y="868" class="label green">Room-backed plans</text>
+  <text x="112" y="894" class="body">Tracked releases and Movie Nights</text>
+
+  <path d="M346 881H389" stroke="#D8A45D" stroke-width="2" marker-end="url(#arrowPrimary)"/>
+  <rect x="402" y="838" width="338" height="86" rx="14" fill="#1A1713" stroke="#3B2C1A"/>
+  <text x="422" y="868" class="label accent">Alarm scheduling and notifications</text>
+  <text x="422" y="894" class="body">Reminders, countdowns, and runtime progress</text>
+
+  <path d="M346 906H367V934H761V881H783" stroke="#73717A" stroke-width="2" marker-end="url(#arrowMuted)"/>
+  <rect x="796" y="838" width="374" height="86" rx="14" fill="#172529" stroke="#2E4A51"/>
+  <text x="816" y="868" class="label blue">Glance home-screen widgets</text>
+  <text x="816" y="894" class="body">Upcoming Releases and Next Movie Night</text>
 </svg>
