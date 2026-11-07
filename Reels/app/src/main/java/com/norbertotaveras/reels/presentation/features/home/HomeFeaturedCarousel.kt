@@ -32,6 +32,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,7 +70,7 @@ internal fun FeaturedMovieCarousel(
     isAutoAdvanceEnabled: Boolean = true,
 ) {
     val movieIds = remember(movies) { movies.map { movie -> movie.id } }
-    var activeMovieIndex by remember(movieIds) { mutableIntStateOf(0) }
+    var activeMovieIndex by rememberSaveable(movieIds) { mutableIntStateOf(0) }
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
