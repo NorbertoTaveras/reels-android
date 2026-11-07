@@ -42,6 +42,7 @@ fun MovieDetailsContent(
     isFavorite: Boolean = false,
     isFavoriteLoading: Boolean = false,
     isOfflineContent: Boolean = false,
+    isLoadingExtras: Boolean = false,
     cachedAt: Long? = null,
     savedPersonIds: Set<Int> = emptySet(),
     savingPersonIds: Set<Int> = emptySet(),
@@ -124,23 +125,22 @@ fun MovieDetailsContent(
             )
         }
 
-        val hasMissingOnlineExtras = !isOfflineContent &&
-            (cast.isEmpty() || trailers.isEmpty() || similarMovies.isEmpty())
-        val areAllOnlineExtrasMissing = !isOfflineContent &&
+        val showMissingExtras = !isOfflineContent && !isLoadingExtras
+        val areAllOnlineExtrasMissing = showMissingExtras &&
             cast.isEmpty() &&
             trailers.isEmpty() &&
             similarMovies.isEmpty()
 
         if (areAllOnlineExtrasMissing) {
-            item {
+            item(key = "extras-unavailable") {
                 MovieDetailsInlineNotice(
                     modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
                     title = "Extras unavailable",
                     message = "Cast, trailers, and similar movies are not available for this title yet."
                 )
             }
-        } else if (hasMissingOnlineExtras && cast.isEmpty()) {
-            item {
+        } else if (showMissingExtras && cast.isEmpty()) {
+            item(key = "cast") {
                 MovieDetailsInlineNotice(
                     modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
                     title = "Cast unavailable",
@@ -148,7 +148,7 @@ fun MovieDetailsContent(
                 )
             }
         } else if (cast.isNotEmpty()) {
-            item {
+            item(key = "cast") {
                 CastCarousel(
                     modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
                     cast = cast,
@@ -161,8 +161,8 @@ fun MovieDetailsContent(
             }
         }
 
-        if (!areAllOnlineExtrasMissing && !isOfflineContent && trailers.isEmpty()) {
-            item {
+        if (!areAllOnlineExtrasMissing && showMissingExtras && trailers.isEmpty()) {
+            item(key = "trailers") {
                 MovieDetailsInlineNotice(
                     modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
                     title = "No trailers available",
@@ -170,7 +170,7 @@ fun MovieDetailsContent(
                 )
             }
         } else if (trailers.isNotEmpty()) {
-            item {
+            item(key = "trailers") {
                 TrailerCarousel(
                     modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
                     trailers = trailers,
@@ -179,8 +179,8 @@ fun MovieDetailsContent(
             }
         }
 
-        if (!areAllOnlineExtrasMissing && !isOfflineContent && similarMovies.isEmpty()) {
-            item {
+        if (!areAllOnlineExtrasMissing && showMissingExtras && similarMovies.isEmpty()) {
+            item(key = "similar") {
                 MovieDetailsInlineNotice(
                     modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
                     title = "No similar movies yet",
@@ -188,7 +188,7 @@ fun MovieDetailsContent(
                 )
             }
         } else if (similarMovies.isNotEmpty()) {
-            item {
+            item(key = "similar") {
                 SimilarMoviesSection(
                     modifier = Modifier.padding(top = ReelsDimensions.detailsSectionSpacing),
                     movies = similarMovies,

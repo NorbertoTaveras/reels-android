@@ -8,22 +8,23 @@
 package com.norbertotaveras.reels.domain.movie.usecase
 
 import com.norbertotaveras.reels.domain.library.repository.FavoriteMoviesRepository
-import com.norbertotaveras.reels.domain.movie.model.MovieDetailsContentDataModel
+import com.norbertotaveras.reels.domain.movie.model.MovieDetailsContentUpdate
 import com.norbertotaveras.reels.domain.movie.repository.MovieRepository
 import com.norbertotaveras.reels.domain.plans.repository.TrackedReleaseRepository
 import javax.inject.Inject
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.launch
 
 class LoadMovieDetailsContentUseCase @Inject constructor(
     private val movieRepository: MovieRepository,
     private val favoriteMoviesRepository: FavoriteMoviesRepository,
     private val trackedReleaseRepository: TrackedReleaseRepository,
 ) {
-    suspend operator fun invoke(
+    operator fun invoke(
         movieId: Int,
         language: String,
-    ): Result<MovieDetailsContentDataModel> {
+    ): Flow<MovieDetailsContentUpdate> = channelFlow {
         val movieResult = movieRepository.getMovieDetails(
             movieId = movieId,
             language = language
@@ -35,74 +36,50 @@ class LoadMovieDetailsContentUseCase @Inject constructor(
             val offlineFavorite = favoriteMoviesRepository.getFavoriteMovieDetails(
                 movieId = movieId
             )
-            return if (offlineFavorite != null) {
-                Result.success(
-                    MovieDetailsContentDataModel(
+            if (offlineFavorite != null) {
+                send(
+                    MovieDetailsContentUpdate.Main(
                         movie = offlineFavorite.movie,
-                        cast = emptyList(),
-                        trailers = emptyList(),
-                        similarMovies = emptyList(),
-                        isOfflineContent = true,
-                        cachedAt = offlineFavorite.cachedAt
+                        cachedAt = offlineFavorite.cachedAt,
+                        isOfflineContent = true
                     )
                 )
             } else {
-                Result.failure(
-                    movieResult.exceptionOrNull()
-                        ?: IllegalStateException("Movie details request failed")
+                send(
+                    MovieDetailsContentUpdate.Failure(
+                        movieResult.exceptionOrNull()
+                            ?: IllegalStateException("Movie details request failed")
+                    )
                 )
             }
+            return@channelFlow
         }
+
+        send(MovieDetailsContentUpdate.Main(movie, movieSource.cachedAt))
 
         if (movieSource.cachedAt == null) {
-            trackedReleaseRepository.refreshReleaseDate(
-                movieId = movieId,
-                releaseDate = movie.releaseDate,
-            )
+            launch {
+                trackedReleaseRepository.refreshReleaseDate(
+                    movieId = movieId,
+                    releaseDate = movie.releaseDate
+                )
+            }
         }
 
-        return coroutineScope {
-            val creditsDeferred = async {
-                movieRepository.getMovieCredits(
-                    movieId = movieId,
-                    language = language
-                )
-            }
-            val videosDeferred = async {
-                movieRepository.getMovieVideos(
-                    movieId = movieId,
-                    language = language
-                )
-            }
-            val similarDeferred = async {
-                movieRepository.getSimilarMovies(
-                    movieId = movieId,
-                    language = language
-                )
-            }
-
-            Result.success(
-                MovieDetailsContentDataModel(
-                    movie = movie,
-                    cast = creditsDeferred.await()
-                        .getOrNull()
-                        ?.cast
-                        ?.take(DETAILS_SECTION_LIMIT)
-                        .orEmpty(),
-                    trailers = videosDeferred.await()
-                        .getOrNull()
-                        ?.videos
-                        ?.filter { video -> video.isPlayableTrailer }
-                        ?.take(DETAILS_SECTION_LIMIT)
-                        .orEmpty(),
-                    similarMovies = similarDeferred.await()
-                        .getOrNull()
-                        ?.take(DETAILS_SECTION_LIMIT)
-                        .orEmpty(),
-                    isOfflineContent = movieSource.cachedAt != null,
-                    cachedAt = movieSource.cachedAt
-                )
-            )
+        launch {
+            val members = movieRepository.getMovieCredits(movieId, language).getOrNull()
+                ?.cast?.take(DETAILS_SECTION_LIMIT).orEmpty()
+            send(MovieDetailsContentUpdate.Cast(members))
+        }
+        launch {
+            val videos = movieRepository.getMovieVideos(movieId, language).getOrNull()
+                ?.videos?.filter { it.isPlayableTrailer }?.take(DETAILS_SECTION_LIMIT).orEmpty()
+            send(MovieDetailsContentUpdate.Trailers(videos))
+        }
+        launch {
+            val movies = movieRepository.getSimilarMovies(movieId, language).getOrNull()
+                ?.take(DETAILS_SECTION_LIMIT).orEmpty()
+            send(MovieDetailsContentUpdate.Similar(movies))
         }
     }
 

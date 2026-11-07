@@ -9,11 +9,12 @@ package com.norbertotaveras.reels.presentation.features.movie.details
 
 import androidx.compose.runtime.Composable
 import com.norbertotaveras.reels.domain.account.model.TmdbMovieAccountStateDataModel
-import com.norbertotaveras.reels.domain.movie.model.MovieDetailsContentDataModel
+import com.norbertotaveras.reels.domain.movie.model.MovieDetailsContentUpdate
 import com.norbertotaveras.reels.presentation.ui.components.movie.PosterCarouselItem
 import com.norbertotaveras.reels.presentation.ui.components.trailer.TrailerCarouselItem
 import com.norbertotaveras.reels.presentation.ui.extensions.toReleaseYear
 import com.norbertotaveras.reels.presentation.ui.extensions.toTmdbImageUrl
+import com.norbertotaveras.reels.presentation.ui.extensions.toUserMessage
 
 internal fun MovieDetailsUiState.toTrailerCarouselItems(): List<TrailerCarouselItem> {
     return trailers.map { trailer ->
@@ -48,17 +49,25 @@ internal fun MovieDetailsUiState.withTmdbAccountState(
     )
 }
 
-internal fun MovieDetailsUiState.withContent(
-    content: MovieDetailsContentDataModel,
-): MovieDetailsUiState {
-    return copy(
+internal fun MovieDetailsUiState.withContentUpdate(
+    content: MovieDetailsContentUpdate,
+): MovieDetailsUiState = when (content) {
+    is MovieDetailsContentUpdate.Main -> copy(
         movie = content.movie,
-        cast = content.cast,
-        trailers = content.trailers,
-        similarMovies = content.similarMovies,
+        cast = emptyList(),
+        trailers = emptyList(),
+        similarMovies = emptyList(),
         isOfflineContent = content.isOfflineContent,
         cachedAt = content.cachedAt,
         errorMessage = null,
         isLoading = false
+    )
+    is MovieDetailsContentUpdate.Cast -> copy(cast = content.members)
+    is MovieDetailsContentUpdate.Trailers -> copy(trailers = content.videos)
+    is MovieDetailsContentUpdate.Similar -> copy(similarMovies = content.movies)
+    is MovieDetailsContentUpdate.Failure -> copy(
+        errorMessage = content.error.toUserMessage(fallback = "Unable to load movie details."),
+        isLoading = false,
+        isLoadingExtras = false
     )
 }

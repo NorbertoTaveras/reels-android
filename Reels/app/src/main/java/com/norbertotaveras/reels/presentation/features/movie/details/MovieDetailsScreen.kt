@@ -53,6 +53,7 @@ fun MovieDetailsScreen(
                 isFavorite = state.isFavorite,
                 isFavoriteLoading = state.isFavoriteLoading,
                 isOfflineContent = state.isOfflineContent,
+                isLoadingExtras = state.isLoadingExtras,
                 cachedAt = state.cachedAt,
                 savedPersonIds = state.savedPersonIds,
                 savingPersonIds = state.savingPersonIds,

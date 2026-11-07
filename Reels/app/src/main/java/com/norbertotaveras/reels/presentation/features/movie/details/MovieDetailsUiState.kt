@@ -21,6 +21,7 @@ data class MovieDetailsUiState(
     val isFavorite: Boolean = false,
     val isFavoriteLoading: Boolean = false,
     val isOfflineContent: Boolean = false,
+    val isLoadingExtras: Boolean = false,
     val cachedAt: Long? = null,
     val savedPersonIds: Set<Int> = emptySet(),
     val savingPersonIds: Set<Int> = emptySet(),

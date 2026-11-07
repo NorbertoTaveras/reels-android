@@ -103,6 +103,7 @@ class MovieDetailsViewModel @Inject constructor(
             _state.update { currentState ->
                 currentState.copy(
                     isLoading = true,
+                    isLoadingExtras = true,
                     errorMessage = null
                 )
             }
@@ -110,23 +111,14 @@ class MovieDetailsViewModel @Inject constructor(
             loadMovieDetailsContentUseCase(
                 movieId = movieId,
                 language = language
-            ).fold(
-                onSuccess = { content ->
-                    _state.update { currentState ->
-                        currentState.withContent(content = content)
-                    }
-                },
-                onFailure = { error ->
-                    _state.update { currentState ->
-                        currentState.copy(
-                            errorMessage = error.toUserMessage(
-                                fallback = "Unable to load movie details."
-                            ),
-                            isLoading = false
-                        )
-                    }
+            ).collect { content ->
+                _state.update {
+                    currentState -> currentState.withContentUpdate(content)
                 }
-            )
+            }
+            _state.update {
+                currentState -> currentState.copy(isLoadingExtras = false)
+            }
         }
     }
 
