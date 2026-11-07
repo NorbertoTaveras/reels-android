@@ -15,9 +15,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
@@ -64,7 +68,16 @@ internal fun MoviesListContent(
         }
     }
 
+    val listState = rememberLazyListState()
+    val canAdvanceHero by remember(listState) {
+        derivedStateOf {
+            !listState.isScrollInProgress &&
+                listState.layoutInfo.visibleItemsInfo.any { it.key == "featured" }
+        }
+    }
+
     LazyColumn(
+        state = listState,
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
@@ -74,15 +87,16 @@ internal fun MoviesListContent(
         ),
         verticalArrangement = Arrangement.spacedBy(ReelsDimensions.sectionSpacing)
     ) {
-        item {
+        item(key = "header") {
             HomeHeader()
         }
 
-        item {
+        item(key = "featured") {
             val featuredMovies = popularMovies.itemSnapshotList.items.take(HERO_MOVIE_LIMIT)
             if (featuredMovies.isNotEmpty()) {
                 FeaturedMovieCarousel(
                     movies = featuredMovies,
+                    isAutoAdvanceEnabled = canAdvanceHero,
                     onMovieClick = { movieId ->
                         onEvent(MoviesListEvent.MovieClicked(movieId = movieId))
                     }

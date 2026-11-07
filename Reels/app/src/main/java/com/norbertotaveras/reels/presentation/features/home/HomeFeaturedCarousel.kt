@@ -9,7 +9,6 @@ package com.norbertotaveras.reels.presentation.features.home
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLocale
@@ -44,6 +44,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import coil3.compose.AsyncImage
 import com.norbertotaveras.reels.domain.movie.model.MovieDataModel
 import com.norbertotaveras.reels.presentation.ui.extensions.TmdbImageType
@@ -63,16 +66,21 @@ internal fun FeaturedMovieCarousel(
     movies: List<MovieDataModel>,
     onMovieClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    isAutoAdvanceEnabled: Boolean = true,
 ) {
     val movieIds = remember(movies) { movies.map { movie -> movie.id } }
     var activeMovieIndex by remember(movieIds) { mutableIntStateOf(0) }
 
-    LaunchedEffect(movieIds) {
-        if (movieIds.size <= 1) return@LaunchedEffect
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-        while (isActive) {
-            delay(HERO_AUTO_SCROLL_DELAY_MS.milliseconds)
-            activeMovieIndex = (activeMovieIndex + 1) % movieIds.size
+    if (isAutoAdvanceEnabled && movieIds.size > 1) {
+        LaunchedEffect(movieIds, lifecycleOwner) {
+            lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                while (isActive) {
+                    delay(HERO_AUTO_SCROLL_DELAY_MS.milliseconds)
+                    activeMovieIndex = (activeMovieIndex + 1) % movieIds.size
+                }
+            }
         }
     }
 
@@ -111,7 +119,6 @@ private fun FeaturedMovieHero(
 
     Box(
         modifier = modifier
-            .fillMaxWidth()
             .fillMaxSize()
             .clickable(onClick = onClick)
     ) {
@@ -120,22 +127,22 @@ private fun FeaturedMovieHero(
                 imageType = TmdbImageType.Backdrop
             ),
             contentDescription = movie.title,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-
-        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
+                .drawWithCache {
+                    val gradient = Brush.verticalGradient(
                         colors = listOf(
                             backgroundColor.copy(alpha = 0f),
                             backgroundColor.copy(alpha = 0.5f),
                             backgroundColor
                         )
                     )
-                )
+                    onDrawWithContent {
+                        drawContent()
+                        drawRect(gradient)
+                    }
+                },
+            contentScale = ContentScale.Crop
         )
 
         Column(
