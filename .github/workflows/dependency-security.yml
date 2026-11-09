@@ -30,7 +30,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up JDK
-        uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v4
+        uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v4
         with:
           distribution: temurin
           java-version: '17'
@@ -46,7 +46,7 @@ jobs:
           test -f "$android_jar"
 
       - name: Generate and submit dependency graph
-        uses: gradle/actions/dependency-submission@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+        uses: gradle/actions/dependency-submission@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
         with:
           build-root-directory: Reels
           dependency-graph: generate-and-submit
